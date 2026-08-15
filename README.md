@@ -4,8 +4,15 @@
 
 ```sh
 cargo check
-cargo run
 cargo fmt
+# env
+cp .env.example .env
+source .env
+# run
+cargo run
+# cargo build
+cargo build --release
+./target/release/huggies-rex-engine
 ```
 
 =====================
