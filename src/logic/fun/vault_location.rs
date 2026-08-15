@@ -1,8 +1,9 @@
-use std::env;
+//! huggies_rex_vault_location
+//!
+//! The reason this location is hardcoded is because in production you can
+//! mount another location in docker.
 // =========================================
-// huggies_rex_vault_location
-// the reason this location is hardcode
-// is becuase in production you can mount another location in docker
+use std::env;
 // =========================================
 pub fn huggies_rex_vault_location() -> String {
     let home = env::var("HOME")
