@@ -1,3 +1,5 @@
+# huggies-rex-engine
+# =====================
 [package]
 name = "huggies-rex-engine"
 version = "0.1.0"
@@ -5,3 +7,6 @@ edition = "2024"
 # =====================
 [dependencies]
 near-kit = "0.15.0"
+near-kit-tool-box = { git = "https://github.com/sleet-rs/near-kit-tool-box-rs", rev = "91fe220d83c65fd68e18d1da017b9586e08f3077" }
+# =====================
+# copyright 2026 by sleet.near
