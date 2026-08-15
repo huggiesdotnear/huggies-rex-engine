@@ -15,8 +15,7 @@ cargo build --release
 ./target/release/huggies-rex-engine
 
 # docs
-cargo doc --no-deps
-cargo doc --open
+cargo doc --open --no-deps
 ```
 
 =====================
