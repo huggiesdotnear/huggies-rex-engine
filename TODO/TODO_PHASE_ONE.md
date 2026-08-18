@@ -46,6 +46,15 @@ i dont know if i mentioned this but our app should keep track of a lot of pool a
 
 our app should have logic and enpoints for geting this data that we have, so endpinst for token info, and get_return routes like i already mentioned
 
+we should probly also have some kind of routing logic so usere can speify any token in and any token out and get some routes and choose the best route.
+
+
+just so you some furture plans for this is to use this app to set up autmated trading strdgies and bots and orders that exute at certain price points. we could go ahead an implent paper trading and paper strgeies, also all trade history should be saved to json files in our vault, so that we can moniter profits and losses.
+
+i guss for trades have what we call the open and close it. so when a user trades to a ceratain amount, they have that hstru file and can close that trade by swapig that amount back to the token they started with. but also they can trade freely their balcne, so if they trade that to anoher token and then dont have that then they cant't close, but we will deal with this later.
+
+anyway remenebr everythig fully typed.
+
 =====================
 <br/>
 copyright 2026 by sleet.near
