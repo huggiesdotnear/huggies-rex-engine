@@ -2,6 +2,7 @@
 
 spec
 - [DOCS/ENV.md](./ENV.md)
+- [DOCS/CSS.md](./CSS.md)
 
 tools
 - near-kit-rs
