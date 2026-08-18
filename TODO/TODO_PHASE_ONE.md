@@ -42,6 +42,10 @@ we will use my near kit tool box fuctions for the rhea contract view calls, also
 also for some of the repnse, like for the get_pools, do we have tyoes for that in our near-kit-tool-box-rs, i think we do?
 
 
+i dont know if i mentioned this but our app should keep track of a lot of pool and token details, some of this can stay in memory but some of this can be saved in catch .josn files in a catch folder in our vault location, or in an sqlite database so not so much in memory.
+
+our app should have logic and enpoints for geting this data that we have, so endpinst for token info, and get_return routes like i already mentioned
+
 =====================
 <br/>
 copyright 2026 by sleet.near
