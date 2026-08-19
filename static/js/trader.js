@@ -3,7 +3,6 @@
 // =====================
 const NEAR_DECIMALS = 24;
 const tokenMeta = new Map();
-const poolMeta = new Map();
 
 function fmtAmount(raw, decimals) {
     if (raw == null) return '—';
@@ -21,19 +20,15 @@ function fmtAmount(raw, decimals) {
     }
 }
 
-async function loadMeta() {
-    const [tokens, pools] = await Promise.all([
-        fetch('/api/tokens').then(r => r.json()).catch(() => []),
-        fetch('/api/pools').then(r => r.json()).catch(() => []),
-    ]);
-    for (const t of tokens) tokenMeta.set(t.account_id, t);
-    for (const p of pools) poolMeta.set(String(p.pool_id), p);
-}
-
 function shortAccount(acc) {
     if (!acc) return '';
     if (acc.length <= 18) return acc;
     return acc.slice(0, 9) + '…' + acc.slice(-6);
+}
+
+async function loadMeta() {
+    const tokens = await fetch('/api/tokens').then(r => r.json()).catch(() => []);
+    for (const t of tokens) tokenMeta.set(t.account_id, t);
 }
 
 (async function () {
@@ -46,23 +41,38 @@ function shortAccount(acc) {
                 `${fmtAmount(v.near_balance_yocto, NEAR_DECIMALS)} NEAR`;
             const body = document.getElementById('trader-deposits-body');
             document.getElementById('trader-deposits-count').textContent = v.deposits.length;
-            for (const d of v.deposits) {
-                // The values are NEP-141 token balances — use the
-                // decimals the server sent (from the price-indexer).
-                const human = fmtAmount(d.shares.raw, d.shares.decimals);
-                const grouped = d.shares.raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                const sym = d.shares.symbol || shortAccount(d.token_id);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${d.pool_id > 0 ? `<a href="/pool/${d.pool_id}">#${d.pool_id}</a>` : '—'}</td>
-                    <td><a href="/token/${encodeURIComponent(d.token_id)}">${shortAccount(d.token_id)}</a></td>
-                    <td><strong>${human}</strong> <span style="color:var(--huggies-rex-color-00c6d7)">${sym}</span>
-                        <br><small style="color:var(--huggies-rex-color-474747)">raw: ${grouped}${d.shares.decimals == null ? '' : ` &middot; ${d.shares.decimals} decimals`}</small></td>`;
-                body.appendChild(tr);
-            }
             if (v.deposits.length === 0) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="3"><em>no rhea LP deposits found for this account.</em></td>`;
+                tr.innerHTML = `<td colspan="3"><em>no rhea deposits for this account.</em></td>`;
+                body.appendChild(tr);
+                return;
+            }
+            for (const d of v.deposits) {
+                // rhea's get_deposits returns NEP-141 token balances (the
+                // user's escrow balance in each NEP-141 token, summed
+                // across every pool that contains it). use the token's
+                // actual decimals for display + the token's USD price.
+                const meta = tokenMeta.get(d.token_id);
+                const dec = d.shares.decimals;
+                const human = fmtAmount(d.shares.raw, dec);
+                const sym = d.shares.symbol || shortAccount(d.token_id);
+                const grouped = d.shares.raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                let usdLine = '';
+                if (meta && meta.price_usd) {
+                    const usd = Number(human) * meta.price_usd;
+                    usdLine = usd > 0.01
+                        ? `<br><small style="color:var(--huggies-rex-color-00c6d7)">≈ $${usd.toLocaleString('en-US', { maximumFractionDigits: 2 })} USD</small>`
+                        : `<br><small style="color:var(--huggies-rex-color-00c6d7)">≈ $${usd.toExponential(2)} USD</small>`;
+                }
+                const decLabel = dec != null ? ` &middot; ${dec} dec` : '';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="/token/${encodeURIComponent(d.token_id)}">${sym}</a>
+                        <br><small style="color:var(--huggies-rex-color-474747)">${shortAccount(d.token_id)}</small></td>
+                    <td><strong>${human}</strong> <span style="color:var(--huggies-rex-color-00c6d7)">${sym}</span>${usdLine}
+                        <br><small style="color:var(--huggies-rex-color-474747)">raw: ${grouped}${decLabel}</small></td>
+                    <td>${d.pool_id > 0 ? `<a href="/pool/${d.pool_id}">#${d.pool_id}</a>` : '<small style="color:var(--huggies-rex-color-474747)">no direct pool</small>'}</td>
+                `;
                 body.appendChild(tr);
             }
         })
