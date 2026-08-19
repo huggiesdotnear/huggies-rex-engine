@@ -1896,7 +1896,7 @@ dependencies = [
 [[package]]
 name = "near-kit-tool-box"
 version = "0.1.0"
-source = "git+https://github.com/sleet-rs/near-kit-tool-box-rs?rev=3984a9c#3984a9c885f94fcc50b4a663042bd390fde262d1"
+source = "git+https://github.com/sleet-rs/near-kit-tool-box-rs?rev=c5f0550#c5f05501ada9726f590bbd9028f915780d5517a4"
 dependencies = [
  "near-kit",
  "serde",

@@ -13,7 +13,7 @@
     </table>
   </section>
   <script>
-    const TRADER_ID = {{ account_id|json }};
+    const TRADER_ID = {{ account_id|json|safe }};
   </script>
   <script src="/static/js/trader.js"></script>
 {% endblock %}

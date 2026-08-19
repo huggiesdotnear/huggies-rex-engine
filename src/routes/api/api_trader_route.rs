@@ -5,12 +5,12 @@
 // =========================================
 use std::sync::Arc;
 
-use anyhow::Context;
 use axum::Json;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use near_kit::types::{AccountId, BlockReference};
+use near_kit::types::AccountId;
+use near_kit_tool_box::fun::near::view_account_fun_json::view_account;
 use near_kit_tool_box::fun::rhea::rhea_get_deposits_fun_json::get_deposits;
 
 use crate::logic::types::app_state_type::APP_STATE_TYPE;
@@ -27,6 +27,12 @@ pub async fn huggies_rex_api_trader_route(
         }
     };
     let near = state.near_view.next_near();
+    let account = match view_account(&near, &account_id).await {
+        Ok(a) => a,
+        Err(e) => {
+            return (StatusCode::BAD_GATEWAY, format!("view_account failed: {e}")).into_response();
+        }
+    };
     let deposits_map = match get_deposits(&near, &state.rhea_contract_id, &parsed).await {
         Ok(m) => m,
         Err(e) => {
@@ -46,16 +52,9 @@ pub async fn huggies_rex_api_trader_route(
         }
     }
     deposits.sort_by_key(|d| d.pool_id);
-    let near_balance = state
-        .near_view
-        .view_account(&parsed, BlockReference::final_())
-        .await
-        .context("view_account failed")
-        .map(|a| a.amount.as_yoctonear().to_string())
-        .unwrap_or_else(|_| "0".to_string());
     let view = TRADER_VIEW_TYPE {
         account_id: parsed.to_string(),
-        near_balance_yocto: near_balance,
+        near_balance_yocto: account.amount.as_yoctonear().to_string(),
         deposits,
     };
     Json(view).into_response()

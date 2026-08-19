@@ -15,7 +15,7 @@
     </table>
   </section>
   <script>
-    const TOKEN_ID = {{ token_id|json }};
+    const TOKEN_ID = {{ token_id|json|safe }};
   </script>
   <script src="/static/js/token.js"></script>
 {% endblock %}
