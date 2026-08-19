@@ -33,22 +33,6 @@ function fmtAmount(raw, decimals) {
     }
 }
 
-function toRawAmount(human, decimals) {
-    if (human == null || human === '') return null;
-    const s = String(human).trim();
-    if (!s) return null;
-    if (!/^[0-9]+(\.[0-9]+)?$/.test(s)) return null;
-    const [whole, frac = ''] = s.split('.');
-    if (decimals == null || decimals === 0) {
-        return BigInt(whole + frac).toString();
-    }
-    const fracPadded = (frac + '0'.repeat(decimals)).slice(0, decimals);
-    const denom = 10n ** BigInt(decimals);
-    const wholeBig = BigInt(whole) * denom;
-    const fracBig = BigInt(fracPadded || '0');
-    return (wholeBig + fracBig).toString();
-}
-
 const tokenMeta = new Map();
 
 fetch('/api/tokens').then(r => r.json()).then(tokens => {
@@ -174,10 +158,6 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
     if (!/^[0-9]+(\.[0-9]+)?$/.test(human)) {
         amountOutEl.textContent = 'invalid amount';
         routesEl.innerHTML = '<p>amount must be a non-negative decimal number (e.g. 5, 0.5, 0.001).</p>';
-        return;
-    }
-        amountOutEl.textContent = 'invalid amount';
-        routesEl.innerHTML = '<p>amount must be a non-negative decimal number.</p>';
         return;
     }
     routesEl.innerHTML = '<p>quoting…</p>';
