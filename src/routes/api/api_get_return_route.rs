@@ -39,22 +39,27 @@ pub async fn huggies_rex_api_get_return_route(
         &params.token_out,
         amount_in,
     );
-    // Fallback to RPC for direct rhea get_return if no local route.
-    if routes.is_empty() {
-        let pool_id_opt = state.pools.iter().find_map(|entry| {
+    // Fallback to rhea RPC for direct SIMPLE_POOL quotes when the local
+    // BFS found nothing. We only call rhea when we're 100% sure the
+    // pool is a 2-token SIMPLE_POOL that contains BOTH the input and
+    // output token — otherwise the contract panics with E76 invalid
+    // params. Also require a non-trivial amount to avoid 0/yocto spam.
+    if routes.is_empty() && amount_in >= 1_000 {
+        let direct_pool_opt = state.pools.iter().find_map(|entry| {
             let p = entry.value();
             if p.pool_kind == "SIMPLE_POOL"
-                && p.token_account_ids.contains(&params.token_in)
-                && p.token_account_ids.contains(&params.token_out)
+                && p.token_account_ids.len() == 2
+                && p.token_account_ids[0] == params.token_in
+                && p.token_account_ids[1] == params.token_out
             {
                 Some(entry.key().clone())
             } else {
                 None
             }
         });
-        if let Some(pool_id) = pool_id_opt {
+        if let Some(pool_id) = direct_pool_opt {
             let near = state.near_view.next_near();
-            if let Ok(out) = rhea_get_return(
+            match rhea_get_return(
                 &near,
                 &state.rhea_contract_id,
                 pool_id as u32,
@@ -63,22 +68,26 @@ pub async fn huggies_rex_api_get_return_route(
                 &params.token_out,
             )
             .await
-            .context("rhea get_return failed")
             {
-                routes.push(crate::logic::types::route_quote_type::ROUTE_QUOTE_TYPE {
-                    token_in: params.token_in.clone(),
-                    token_out: params.token_out.clone(),
-                    amount_in: params.amount_in.clone(),
-                    amount_out: out.clone(),
-                    hops: vec![crate::logic::types::route_quote_type::ROUTE_HOP_TYPE {
-                        pool_id,
+                Ok(out) => {
+                    routes.push(crate::logic::types::route_quote_type::ROUTE_QUOTE_TYPE {
                         token_in: params.token_in.clone(),
                         token_out: params.token_out.clone(),
                         amount_in: params.amount_in.clone(),
-                        amount_out: out,
-                    }],
-                    source: ROUTE_SOURCE_TYPE::Rpc,
-                });
+                        amount_out: out.clone(),
+                        hops: vec![crate::logic::types::route_quote_type::ROUTE_HOP_TYPE {
+                            pool_id,
+                            token_in: params.token_in.clone(),
+                            token_out: params.token_out.clone(),
+                            amount_in: params.amount_in.clone(),
+                            amount_out: out,
+                        }],
+                        source: ROUTE_SOURCE_TYPE::Rpc,
+                    });
+                }
+                Err(e) => {
+                    tracing::warn!(?e, "rhea get_return fallback failed; skipping");
+                }
             }
         }
     }

@@ -26,6 +26,24 @@ function fmtAmount(raw, decimals) {
     }
 }
 
+// Convert a human-readable amount like "5" or "5.5" into a raw yocto-style
+// integer string using the token's decimals. Returns null if unparseable.
+function toRawAmount(human, decimals) {
+    if (human == null || human === '') return null;
+    const s = String(human).trim();
+    if (!s) return null;
+    if (!/^[0-9]+(\.[0-9]+)?$/.test(s)) return null;
+    const [whole, frac = ''] = s.split('.');
+    if (decimals == null || decimals === 0) {
+        return BigInt(whole + frac).toString();
+    }
+    const fracPadded = (frac + '0'.repeat(decimals)).slice(0, decimals);
+    const denom = 10n ** BigInt(decimals);
+    const wholeBig = BigInt(whole) * denom;
+    const fracBig = BigInt(fracPadded || '0');
+    return (wholeBig + fracBig).toString();
+}
+
 const tokenMeta = new Map();
 
 fetch('/api/tokens').then(r => r.json()).then(tokens => {
@@ -45,16 +63,31 @@ function humanFor(tokenId, rawAmount) {
 }
 
 document.getElementById('swap-quote').addEventListener('click', async () => {
-    const params = new URLSearchParams({
-        token_in: tokenIn.value.trim(),
-        token_out: tokenOut.value.trim(),
-        amount_in: amountIn.value.trim(),
-    });
-    if (!params.get('token_in') || !params.get('token_out') || !params.get('amount_in')) {
+    const inAddr = tokenIn.value.trim();
+    const outAddr = tokenOut.value.trim();
+    const human = amountIn.value.trim();
+    if (!inAddr || !outAddr || !human) {
         amountOutEl.textContent = 'fill all fields';
         routesEl.innerHTML = '';
         return;
     }
+    const inMeta = tokenMeta.get(inAddr);
+    if (!inMeta) {
+        amountOutEl.textContent = 'unknown token in';
+        routesEl.innerHTML = '<p>token_in not in our metadata cache yet. try a known token like <code>wrap.near</code>.</p>';
+        return;
+    }
+    const raw = toRawAmount(human, inMeta.decimals);
+    if (raw == null) {
+        amountOutEl.textContent = 'invalid amount';
+        routesEl.innerHTML = '<p>amount must be a non-negative decimal number.</p>';
+        return;
+    }
+    const params = new URLSearchParams({
+        token_in: inAddr,
+        token_out: outAddr,
+        amount_in: raw,
+    });
     routesEl.innerHTML = '<p>quoting…</p>';
     try {
         const data = await fetch('/api/get_return?' + params).then(r => r.json());
