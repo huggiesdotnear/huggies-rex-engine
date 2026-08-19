@@ -1,12 +1,16 @@
 // =====================
 // swap.js
 // shared by / (home) and /swap
-// fetches all viable routes and lets the user pick
+// supports two modes:
+//   swap       = best routes for token a -> token b
+//   roundtrip  = cycle routes that start and end at the same token
 // =====================
 const tokenIn = document.getElementById('swap-token-in');
 const tokenOut = document.getElementById('swap-token-out');
+const tokenOutLabel = document.getElementById('swap-token-out-label');
 const amountIn = document.getElementById('swap-amount-in');
 const amountOutEl = document.getElementById('swap-amount-out');
+const resultLine = document.getElementById('swap-result-line');
 const routesEl = document.getElementById('swap-routes');
 const list = document.getElementById('swap-token-list');
 
@@ -26,8 +30,6 @@ function fmtAmount(raw, decimals) {
     }
 }
 
-// Convert a human-readable amount like "5" or "5.5" into a raw yocto-style
-// integer string using the token's decimals. Returns null if unparseable.
 function toRawAmount(human, decimals) {
     if (human == null || human === '') return null;
     const s = String(human).trim();
@@ -62,11 +64,77 @@ function humanFor(tokenId, rawAmount) {
     return fmtAmount(rawAmount, dec);
 }
 
+function currentMode() {
+    const r = document.querySelector('input[name="swap-mode"]:checked');
+    return r ? r.value : 'swap';
+}
+
+function applyModeUi() {
+    const mode = currentMode();
+    const swapVisible = mode === 'swap';
+    if (tokenOut) tokenOut.style.display = swapVisible ? '' : 'none';
+    if (tokenOutLabel) tokenOutLabel.style.display = swapVisible ? '' : 'none';
+    if (resultLine) {
+        resultLine.firstChild.textContent = mode === 'swap' ? 'best return: ' : 'best round-trip: ';
+    }
+    amountOutEl.textContent = '—';
+    routesEl.innerHTML = '';
+}
+
+document.querySelectorAll('input[name="swap-mode"]').forEach(r => {
+    r.addEventListener('change', applyModeUi);
+});
+applyModeUi();
+
+function renderRouteCard(i, r) {
+    const card = document.createElement('div');
+    card.className = 'huggies_rex_card';
+    const hopHtml = r.hops.map(h => `
+        <div>
+            pool <a href="/pool/${h.pool_id}">#${h.pool_id}</a>:
+            ${humanFor(h.token_in, h.amount_in)} <a href="/token/${h.token_in}">${h.token_in.split('.')[0]}</a>
+            &rarr; <strong>${humanFor(h.token_out, h.amount_out)}</strong> <a href="/token/${h.token_out}">${h.token_out.split('.')[0]}</a>
+        </div>
+    `).join('');
+    const src = r.source ? `&middot; source: ${r.source}` : '';
+    card.innerHTML = `
+        <strong>route ${i + 1}</strong>
+        &middot; out: <strong>${humanFor(r.token_out, r.amount_out)}</strong> ${r.token_out.split('.')[0]}
+        &middot; hops: ${r.hops.length}
+        ${src}
+        <div style="margin-top:0.5rem">${hopHtml}</div>
+    `;
+    return card;
+}
+
+function renderArbCard(i, c) {
+    const card = document.createElement('div');
+    card.className = 'huggies_rex_card';
+    const profitClass = c.profit_bps >= 0 ? 'color:var(--huggies-rex-color-00c6d7)' : 'color:var(--huggies-rex-color-da291c)';
+    const hopHtml = c.hops.map(h => `
+        <div>
+            pool <a href="/pool/${h.pool_id}">#${h.pool_id}</a>:
+            ${humanFor(h.token_in, h.amount_in)} <a href="/token/${h.token_in}">${h.token_in.split('.')[0]}</a>
+            &rarr; <strong>${humanFor(h.token_out, h.amount_out)}</strong> <a href="/token/${h.token_out}">${h.token_out.split('.')[0]}</a>
+        </div>
+    `).join('');
+    card.innerHTML = `
+        <strong>cycle ${i + 1}</strong>
+        &middot; in: ${humanFor(c.start_token, c.amount_in)} ${c.start_token.split('.')[0]}
+        &middot; out: <strong>${humanFor(c.start_token, c.amount_out)}</strong>
+        &middot; <span style="${profitClass}">profit: ${c.profit} (${c.profit_bps >= 0 ? '+' : ''}${c.profit_bps.toFixed(2)} bps)</span>
+        &middot; hops: ${c.hops.length}
+        <div style="margin-top:0.5rem">${hopHtml}</div>
+    `;
+    return card;
+}
+
 document.getElementById('swap-quote').addEventListener('click', async () => {
+    const mode = currentMode();
     const inAddr = tokenIn.value.trim();
-    const outAddr = tokenOut.value.trim();
+    const outAddr = mode === 'swap' ? tokenOut.value.trim() : '';
     const human = amountIn.value.trim();
-    if (!inAddr || !outAddr || !human) {
+    if (!inAddr || (mode === 'swap' && !outAddr) || !human) {
         amountOutEl.textContent = 'fill all fields';
         routesEl.innerHTML = '';
         return;
@@ -83,41 +151,40 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
         routesEl.innerHTML = '<p>amount must be a non-negative decimal number.</p>';
         return;
     }
-    const params = new URLSearchParams({
-        token_in: inAddr,
-        token_out: outAddr,
-        amount_in: raw,
-    });
     routesEl.innerHTML = '<p>quoting…</p>';
     try {
-        const data = await fetch('/api/get_return?' + params).then(r => r.json());
-        if (!data.routes || data.routes.length === 0) {
-            amountOutEl.textContent = 'no route';
-            routesEl.innerHTML = '<p>no viable route found in local state.</p>';
-            return;
-        }
-        const best = data.routes[0];
-        amountOutEl.textContent = `${humanFor(best.token_out, best.amount_out)} (${best.source})`;
-        routesEl.innerHTML = '';
-        for (let i = 0; i < data.routes.length; i++) {
-            const r = data.routes[i];
-            const card = document.createElement('div');
-            card.className = 'huggies_rex_card';
-            const hopHtml = r.hops.map(h => `
-                <div>
-                    pool #${h.pool_id}:
-                    ${humanFor(h.token_in, h.amount_in)} ${h.token_in}
-                    &rarr; ${humanFor(h.token_out, h.amount_out)} ${h.token_out}
-                </div>
-            `).join('');
-            card.innerHTML = `
-                <strong>route ${i + 1}</strong>
-                &middot; out: ${humanFor(r.token_out, r.amount_out)}
-                &middot; hops: ${r.hops.length}
-                &middot; source: ${r.source}
-                <div style="margin-top:0.5rem">${hopHtml}</div>
-            `;
-            routesEl.appendChild(card);
+        if (mode === 'swap') {
+            const params = new URLSearchParams({
+                token_in: inAddr, token_out: outAddr, amount_in: raw,
+            });
+            const data = await fetch('/api/get_return?' + params).then(r => r.json());
+            if (!data.routes || data.routes.length === 0) {
+                amountOutEl.textContent = 'no route';
+                routesEl.innerHTML = '<p>no viable route found in local state.</p>';
+                return;
+            }
+            const best = data.routes[0];
+            amountOutEl.textContent = `${humanFor(best.token_out, best.amount_out)} (${best.source})`;
+            routesEl.innerHTML = '';
+            for (let i = 0; i < data.routes.length; i++) {
+                routesEl.appendChild(renderRouteCard(i, data.routes[i]));
+            }
+        } else {
+            // round-trip
+            const params = new URLSearchParams({ token: inAddr, amount: raw, max_hops: '3' });
+            const cycles = await fetch('/api/arb?' + params).then(r => r.json());
+            if (!cycles || cycles.length === 0) {
+                amountOutEl.textContent = 'no cycle';
+                routesEl.innerHTML = '<p>no cycle found up to 3 hops in local state.</p>';
+                return;
+            }
+            const best = cycles[0];
+            const sign = best.profit_bps >= 0 ? '+' : '';
+            amountOutEl.textContent = `${humanFor(best.start_token, best.amount_out)} ${inAddr.split('.')[0]} (profit ${sign}${best.profit_bps.toFixed(2)} bps)`;
+            routesEl.innerHTML = '';
+            for (let i = 0; i < cycles.length; i++) {
+                routesEl.appendChild(renderArbCard(i, cycles[i]));
+            }
         }
     } catch (e) {
         amountOutEl.textContent = 'error: ' + e.message;

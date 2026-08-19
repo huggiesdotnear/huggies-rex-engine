@@ -1,5 +1,7 @@
 // =========================================
+pub mod api_arb_route;
 pub mod api_follows_route;
+pub mod api_get_return_compare_route;
 pub mod api_get_return_route;
 pub mod api_pool_route;
 pub mod api_pools_route;

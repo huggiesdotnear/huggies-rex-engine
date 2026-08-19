@@ -27,6 +27,7 @@ use crate::logic::fun::cache_sqlite_open_fun::huggies_rex_cache_sqlite_open_fun;
 use crate::logic::fun::cache_token_upsert_fun::huggies_rex_cache_token_upsert_fun;
 use crate::logic::fun::events_ws_run_fun::huggies_rex_events_ws_run_fun;
 use crate::logic::fun::price_indexer_list_token_price_fun::huggies_rex_price_indexer_list_token_price_fun;
+use crate::logic::fun::price_indexer_refresh_fun::huggies_rex_price_indexer_refresh_fun;
 use crate::logic::fun::vault_dir_fun::huggies_rex_vault_dir_fun;
 use crate::logic::types::app_state_type::{APP_STATE_TYPE, EVENT_BROADCAST_TYPE, SharedAppState};
 use crate::logic::types::pool_record_type::POOL_RECORD_TYPE;
@@ -164,6 +165,14 @@ pub async fn huggies_rex_bootstrap_state_fun(
                 ts_unix_ms: Utc::now().timestamp_millis(),
             });
         }
+    });
+
+    // Price-indexer refresh task (every 5m by default).
+    let state_px = state.clone();
+    let http_px = http.clone();
+    let base_px = NETWORK_CONST_TYPE.price_indexer_base_url.to_string();
+    tokio::spawn(async move {
+        huggies_rex_price_indexer_refresh_fun(state_px, http_px, base_px).await;
     });
 
     Ok(state)

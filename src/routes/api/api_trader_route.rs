@@ -40,18 +40,32 @@ pub async fn huggies_rex_api_trader_route(
         }
     };
     let mut deposits: Vec<TRADER_DEPOSIT_TYPE> = Vec::new();
-    for (key, shares) in deposits_map {
-        if let Some((pool_id_str, token_id)) = key.split_once(':') {
-            if let Ok(pool_id) = pool_id_str.parse::<u64>() {
-                deposits.push(TRADER_DEPOSIT_TYPE {
-                    pool_id,
-                    token_id: token_id.to_string(),
-                    shares,
-                });
-            }
+    for (token_id, shares) in deposits_map {
+        // rhea returns the sum across all pools containing the token;
+        // the value is 0 when the user does not actually hold LP for it.
+        if shares == "0" {
+            continue;
         }
+        // best-effort: attach a concrete pool_id if there's a pool in
+        // our state that contains this token, otherwise 0.
+        let pool_id = state
+            .pools
+            .iter()
+            .find(|p| p.value().token_account_ids.contains(&token_id))
+            .map(|p| p.key().clone())
+            .unwrap_or(0);
+        deposits.push(TRADER_DEPOSIT_TYPE {
+            token_id,
+            shares,
+            pool_id,
+        });
     }
-    deposits.sort_by_key(|d| d.pool_id);
+    deposits.sort_by(|a, b| {
+        b.shares
+            .parse::<u128>()
+            .unwrap_or(0)
+            .cmp(&a.shares.parse::<u128>().unwrap_or(0))
+    });
     let view = TRADER_VIEW_TYPE {
         account_id: parsed.to_string(),
         near_balance_yocto: account.amount.as_yoctonear().to_string(),

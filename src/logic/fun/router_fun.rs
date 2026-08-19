@@ -8,10 +8,12 @@ use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 
 use crate::logic::types::app_state_type::APP_STATE_TYPE;
+use crate::routes::api::api_arb_route::huggies_rex_api_arb_route;
 use crate::routes::api::api_follows_route::{
     huggies_rex_api_follows_add_route, huggies_rex_api_follows_get_route,
     huggies_rex_api_follows_remove_route,
 };
+use crate::routes::api::api_get_return_compare_route::huggies_rex_api_get_return_compare_route;
 use crate::routes::api::api_get_return_route::huggies_rex_api_get_return_route;
 use crate::routes::api::api_pool_route::huggies_rex_api_pool_route;
 use crate::routes::api::api_pools_route::huggies_rex_api_pools_route;
@@ -46,6 +48,11 @@ pub fn huggies_rex_router_fun(state: Arc<APP_STATE_TYPE>) -> Router {
         )
         .route("/api/search", get(huggies_rex_api_search_route))
         .route("/api/get_return", get(huggies_rex_api_get_return_route))
+        .route(
+            "/api/get_return_compare",
+            get(huggies_rex_api_get_return_compare_route),
+        )
+        .route("/api/arb", get(huggies_rex_api_arb_route))
         .route(
             "/api/trader/{account_id}",
             get(huggies_rex_api_trader_route),

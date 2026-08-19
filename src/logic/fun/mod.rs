@@ -1,6 +1,7 @@
 // =========================================
 pub mod apply_trade_pool_change_fun;
 pub mod apply_trade_pool_fun;
+pub mod arb_round_trip_fun;
 pub mod bootstrap_pools_fun;
 pub mod bootstrap_state_fun;
 pub mod cache_pool_get_fun;
@@ -12,8 +13,10 @@ pub mod cache_token_upsert_fun;
 pub mod events_ws_handler_fun;
 pub mod events_ws_run_fun;
 pub mod find_all_routes_fun;
+pub mod get_return_compare_fun;
 pub mod get_return_local_fun;
 pub mod price_indexer_list_token_price_fun;
+pub mod price_indexer_refresh_fun;
 pub mod router_fun;
 pub mod template_into_response_fun;
 pub mod vault_dir_fun;
