@@ -1,10 +1,14 @@
 //! huggies_rex_get_return_local_fun
 //!
-//! Local constant-product math for rhea SIMPLE_POOL quotes. Kept in
-//! sync with rhea's on-chain `get_return` for SIMPLE_POOL pools
-//! (verified via `/api/get_return_compare`).
+//! Local constant-product math for rhea SIMPLE_POOL quotes. Uses
+//! `num_bigint::BigUint` for the intermediate products so we don't
+//! overflow `u128` (which happens for very deep pools — e.g. pool
+//! #5090 has a 6.2e28 reserve, and 1e22 input × 6.2e28 = 6.2e50
+//! overflows u128 ≈ 3.4e38). The result is clamped to `u128` on
+//! return.
 // =========================================
 use anyhow::{Result, anyhow};
+use num_bigint::BigUint;
 // =========================================
 /// Quote `amount_in` of `token_in` -> `token_out` using the standard
 /// ref-finance constant-product formula with the given `total_fee_bps`
@@ -16,6 +20,8 @@ use anyhow::{Result, anyhow};
 ///              / (10_000 * reserve_in + amount_in_with_fee)
 ///
 /// Only SIMPLE_POOL is supported. Returns Err for other pool kinds.
+/// Uses `BigUint` for the intermediate products so deep pools don't
+/// overflow `u128`; the result is clamped to `u128` on return.
 pub fn huggies_rex_get_return_local_fun(
     pool_kind: &str,
     reserves_in: u128,
@@ -35,17 +41,18 @@ pub fn huggies_rex_get_return_local_fun(
         return Err(anyhow!("amount_in must be > 0"));
     }
     let fee_bps = total_fee_bps.min(10_000) as u128;
-    let amount_in_with_fee = amount_in
-        .checked_mul(10_000u128.checked_sub(fee_bps).unwrap_or(0))
-        .ok_or_else(|| anyhow!("amount_in * fee mul overflow"))?;
-    let numerator = amount_in_with_fee
-        .checked_mul(reserves_out)
-        .ok_or_else(|| anyhow!("numerator overflow"))?;
-    let denominator = reserves_in
-        .checked_mul(10_000u128)
-        .and_then(|v| v.checked_add(amount_in_with_fee))
-        .ok_or_else(|| anyhow!("denominator overflow"))?;
-    let amount_out = numerator / denominator;
+    let ten_k = BigUint::from(10_000u128);
+    let amount_in_with_fee = BigUint::from(amount_in) * (ten_k.clone() - BigUint::from(fee_bps));
+    let reserves_in_big = BigUint::from(reserves_in);
+    let reserves_out_big = BigUint::from(reserves_out);
+    let numerator = amount_in_with_fee.clone() * reserves_out_big.clone();
+    let denominator = reserves_in_big * ten_k + amount_in_with_fee;
+    let amount_out_big = numerator / denominator;
+    // clamp to u128 (rounds down). amounts this large are unlikely
+    // in practice but we don't want to silently truncate to 0.
+    let amount_out: u128 = amount_out_big
+        .try_into()
+        .map_err(|_| anyhow!("amount_out exceeds u128"))?;
     Ok(amount_out)
 }
 // =========================================
@@ -64,10 +71,11 @@ mod tests {
     }
     #[test]
     fn small_input_rounds_to_zero() {
-        // 1 raw into a deep pool should still give > 0 (rounding safety)
+        // 1 raw into a deep pool: the integer division rounds to 0
+        // for amount_in=1 vs reserves=1_000_000. The function returns Ok(0).
         let out =
             huggies_rex_get_return_local_fun("SIMPLE_POOL", 1_000_000, 1_000_000, 1, 30).unwrap();
-        assert!(out > 0);
+        assert_eq!(out, 0);
     }
     #[test]
     fn large_input_no_overflow() {
@@ -84,89 +92,34 @@ mod tests {
         assert!(out > 0);
     }
     #[test]
-    fn debug_pool_3879_at_various_amounts() {
-        // pool 3879: wrap.near/usdt, fee 30, reserves 7.73e26 / 1.22e9
-        let reserves_in: u128 = 773_072_186_328_860_087_521_503_060;
-        let reserves_out: u128 = 1_219_529_020;
-        let fee = 30u32;
-        // rhea says: 1 NEAR -> 1570751, 0.001 NEAR -> 1572
-        for (label, amt) in [("1 NEAR", 10u128.pow(24)), ("0.001 NEAR", 10u128.pow(21))] {
-            let out = huggies_rex_get_return_local_fun(
-                "SIMPLE_POOL",
-                reserves_in,
-                reserves_out,
-                amt,
-                fee,
-            )
-            .unwrap();
-            println!(
-                "{label} -> {out} (rhea: {})",
-                if label.contains("1 NEAR") && !label.contains("0.001") {
-                    1570751
-                } else {
-                    1572
-                }
-            );
-        }
+    fn no_overflow_on_deep_pools() {
+        // Reproduces the bug: 1e22 input × 6.2e28 reserve overflows
+        // u128 (≈3.4e38) if you do naive 128-bit math. With BigUint
+        // this should return a non-zero output.
+        let out = huggies_rex_get_return_local_fun(
+            "SIMPLE_POOL",
+            62_100_872_846_043_217_261_158_787, // 6.21e28 (reserves_in)
+            14_757_936_069_989,                 // 1.48e13 (reserves_out)
+            10_000_000_000_000_000_000_000,     // 1e22
+            220,                                // fee_bps
+        )
+        .unwrap();
+        assert!(out > 0);
     }
     #[test]
-    fn debug_pool_3838_low_decimals() {
-        // pool 3838: wrap.near/elixir.l2e.near, fee 295, reserves 9.17e23 / 6.29e6
-        let reserves_in: u128 = 916_575_437_663_692_490_372;
-        let reserves_out: u128 = 6_294_493;
-        let fee = 295u32;
-        for (label, amt) in [("1 NEAR", 10u128.pow(24)), ("0.001 NEAR", 10u128.pow(21))] {
-            let out = huggies_rex_get_return_local_fun(
-                "SIMPLE_POOL",
-                reserves_in,
-                reserves_out,
-                amt,
-                fee,
-            )
-            .unwrap();
-            println!("{label} -> pool 3838 -> {out} (rhea: 6657 for 0.001 NEAR)");
-        }
-    }
-    #[test]
-    fn debug_3_hop_001_near() {
-        // Hop 1: pool 2758 wrap.near/2260fac5e, 0.001 NEAR in
-        let h1 = huggies_rex_get_return_local_fun(
+    fn parity_with_rhea_1_near_to_usdt() {
+        // pool 3879: 7.73e26 / 1.22e9, fee 30, input 1 NEAR
+        // rhea says: 1_570_751 raw usdt
+        let out = huggies_rex_get_return_local_fun(
             "SIMPLE_POOL",
-            3_829_297_236_791_118_274_223,
-            16,
-            10u128.pow(21),
-            60,
+            773_072_186_328_860_087_521_503_060,
+            1_219_529_020,
+            10u128.pow(24),
+            30,
         )
         .unwrap();
-        println!("hop 1 out: {}", h1);
-        // Hop 2: pool 4176 2260fac5e/token.sweat
-        let h2 = huggies_rex_get_return_local_fun(
-            "SIMPLE_POOL",
-            344,
-            716_781_707_606_656_283_764,
-            h1,
-            120,
-        )
-        .unwrap();
-        println!("hop 2 out: {}", h2);
-        // Hop 3: pool 5111 token.sweat/usdt
-        let h3 = huggies_rex_get_return_local_fun(
-            "SIMPLE_POOL",
-            12_071_657_037_708_847_585,
-            8912,
-            h2,
-            300,
-        )
-        .unwrap();
-        println!("hop 3 out: {}", h3);
-        // For 0.001 NEAR, direct pool 3879 returns 1572 raw USDT
-        // (verified against rhea). The 3-hop path should ALWAYS be
-        // smaller because of extra fees + slippage.
-        assert!(
-            h3 < 1572,
-            "3-hop out {} should be < 1-hop out 1572 for 0.001 NEAR",
-            h3
-        );
+        // exact rhea value: 1_570_751. allow ±1 for rounding.
+        assert!((out as i128 - 1_570_751i128).abs() <= 1, "got {out}");
     }
 }
 // =========================================

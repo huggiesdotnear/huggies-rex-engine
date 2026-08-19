@@ -38,6 +38,14 @@ pub fn huggies_rex_arb_round_trip_fun(
     if amount_in == 0 || start_token.is_empty() || max_hops == 0 {
         return Vec::new();
     }
+    tracing::info!(
+        start = start_token,
+        amount = amount_in,
+        max_hops,
+        max_cycles,
+        pool_count = pools.len(),
+        "BFS start"
+    );
     if let Some(mid) = middle {
         // Fixed 2-hop round trip through `mid`: start -> mid -> start.
         // Pick the best pool for each leg independently so the user
@@ -86,6 +94,7 @@ pub fn huggies_rex_arb_round_trip_fun(
                 new_path.push((pool.pool_id, next_token.clone(), step_out));
                 if next_token == start_token {
                     // completed cycle
+                    tracing::debug!(pool_id = pool.pool_id, step_out, "BFS cycle completed");
                     let profit_i = (step_out as i128) - (amount_in as i128);
                     let profit_bps = (profit_i as f64) * 10_000.0 / (amount_in.max(1) as f64);
                     let profit_str = if profit_i >= 0 {
