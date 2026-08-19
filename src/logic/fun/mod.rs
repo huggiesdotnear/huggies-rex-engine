@@ -1,6 +1,7 @@
 // =========================================
 pub mod apply_trade_pool_change_fun;
 pub mod apply_trade_pool_fun;
+pub mod apply_trade_swap_fun;
 pub mod arb_round_trip_fun;
 pub mod bootstrap_pools_fun;
 pub mod bootstrap_state_fun;

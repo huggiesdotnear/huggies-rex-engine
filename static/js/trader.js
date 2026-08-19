@@ -47,11 +47,14 @@ function shortAccount(acc) {
             const body = document.getElementById('trader-deposits-body');
             document.getElementById('trader-deposits-count').textContent = v.deposits.length;
             for (const d of v.deposits) {
+                // rhea LP shares are MFT tokens with 24 decimals; render
+                // human-readable alongside the raw figure.
+                const sharesHuman = fmtAmount(d.shares, 24);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><a href="/pool/${d.pool_id}">#${d.pool_id}</a></td>
+                    <td>${d.pool_id > 0 ? `<a href="/pool/${d.pool_id}">#${d.pool_id}</a>` : '—'}</td>
                     <td><a href="/token/${encodeURIComponent(d.token_id)}">${shortAccount(d.token_id)}</a></td>
-                    <td>${d.shares}</td>`;
+                    <td><strong>${sharesHuman}</strong> <small style="color:var(--huggies-rex-color-474747)">(raw: ${d.shares})</small></td>`;
                 body.appendChild(tr);
             }
             if (v.deposits.length === 0) {

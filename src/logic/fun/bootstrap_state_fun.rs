@@ -21,6 +21,7 @@ use crate::logic::constants::rhea_contract_id_const::RHEA_CONTRACT_ID;
 use crate::logic::constants::vault_const::VAULT_CONST_TYPE;
 use crate::logic::fun::apply_trade_pool_change_fun::huggies_rex_apply_trade_pool_change_fun;
 use crate::logic::fun::apply_trade_pool_fun::huggies_rex_apply_trade_pool_fun;
+use crate::logic::fun::apply_trade_swap_fun::huggies_rex_apply_trade_swap_fun;
 use crate::logic::fun::bootstrap_pools_fun::huggies_rex_bootstrap_pools_fun;
 use crate::logic::fun::cache_pool_upsert_fun::huggies_rex_cache_pool_upsert_fun;
 use crate::logic::fun::cache_sqlite_open_fun::huggies_rex_cache_sqlite_open_fun;
@@ -116,10 +117,9 @@ pub async fn huggies_rex_bootstrap_state_fun(
         huggies_rex_events_ws_run_fun(base, path, label, move |raw| {
             let s = state_trade_pool.clone();
             tokio::spawn(async move {
-                huggies_rex_apply_trade_pool_fun(&s, raw).await;
-                let _ = s.event_tx.send(EVENT_BROADCAST_TYPE::Heartbeat {
-                    ts_unix_ms: Utc::now().timestamp_millis(),
-                });
+                if let Some(broadcast) = huggies_rex_apply_trade_pool_fun(&s, raw).await {
+                    let _ = s.event_tx.send(broadcast);
+                }
             });
         })
         .await;
@@ -133,10 +133,9 @@ pub async fn huggies_rex_bootstrap_state_fun(
         huggies_rex_events_ws_run_fun(base, path, label, move |raw| {
             let s = state_pool_change.clone();
             tokio::spawn(async move {
-                huggies_rex_apply_trade_pool_change_fun(&s, raw).await;
-                let _ = s.event_tx.send(EVENT_BROADCAST_TYPE::Heartbeat {
-                    ts_unix_ms: Utc::now().timestamp_millis(),
-                });
+                if let Some(broadcast) = huggies_rex_apply_trade_pool_change_fun(&s, raw).await {
+                    let _ = s.event_tx.send(broadcast);
+                }
             });
         })
         .await;
@@ -147,9 +146,12 @@ pub async fn huggies_rex_bootstrap_state_fun(
         let base = NETWORK_CONST_TYPE.events_ws_base_url;
         let path = crate::logic::constants::events_const::TRADE_SWAP_EVENT_PATH;
         let label = "trade_swap";
-        huggies_rex_events_ws_run_fun(base, path, label, move |_raw| {
-            let _ = state_swap.event_tx.send(EVENT_BROADCAST_TYPE::Heartbeat {
-                ts_unix_ms: Utc::now().timestamp_millis(),
+        huggies_rex_events_ws_run_fun(base, path, label, move |raw| {
+            let s = state_swap.clone();
+            tokio::spawn(async move {
+                if let Some(broadcast) = huggies_rex_apply_trade_swap_fun(raw).await {
+                    let _ = s.event_tx.send(broadcast);
+                }
             });
         })
         .await;

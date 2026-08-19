@@ -14,6 +14,8 @@ use crate::logic::types::route_quote_type::ROUTE_HOP_TYPE;
 pub struct ARB_QUERY_TYPE {
     pub token: String,
     pub amount: String,
+    #[serde(default)]
+    pub middle: Option<String>,
     #[serde(default = "default_max_hops")]
     pub max_hops: usize,
     #[serde(default = "default_max_cycles")]
@@ -45,6 +47,7 @@ pub async fn huggies_rex_api_arb_route(
         amount_in,
         params.max_hops.clamp(2, 4),
         params.max_cycles.clamp(1, 50),
+        params.middle.as_deref(),
     );
     // patch first hop's amount_in on every cycle to the cycle's amount_in
     let cycles: Vec<ARB_CYCLE_TYPE> = raw_cycles

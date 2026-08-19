@@ -25,17 +25,18 @@ fn parse_pool_id_string(raw: &str) -> Option<u64> {
 pub async fn huggies_rex_apply_trade_pool_change_fun(
     state: &APP_STATE_TYPE,
     raw: serde_json::Value,
-) {
+) -> Option<crate::logic::types::app_state_type::EVENT_BROADCAST_TYPE> {
+    use crate::logic::types::app_state_type::EVENT_BROADCAST_TYPE;
     let event: TRADE_POOL_CHANGE_EVENT_TYPE = match serde_json::from_value(raw) {
         Ok(e) => e,
         Err(e) => {
             warn!(?e, "trade_pool_change: failed to deserialize event");
-            return;
+            return None;
         }
     };
     let Some(pool_id) = parse_pool_id_string(&event.pool_id) else {
         warn!(pool_id = %event.pool_id, "trade_pool_change: could not parse pool_id");
-        return;
+        return None;
     };
     let pool_kind: String;
     let token_account_ids: Vec<String>;
@@ -45,7 +46,7 @@ pub async fn huggies_rex_apply_trade_pool_change_fun(
     let amp: u64;
     let ref_pool = match event.pool {
         POOL_TYPE_WRAPPER_TYPE::Ref(r) => r,
-        _ => return,
+        _ => return None,
     };
     match ref_pool {
         REF_POOL_CHANGE_TYPE::SimplePool(p) => {
@@ -99,7 +100,7 @@ pub async fn huggies_rex_apply_trade_pool_change_fun(
     let updated_at = Utc::now().timestamp_millis();
     let record = POOL_RECORD_TYPE {
         pool_id,
-        pool_kind,
+        pool_kind: pool_kind.clone(),
         token_account_ids: token_account_ids.clone(),
         amounts: amounts.clone(),
         total_fee,
@@ -131,6 +132,15 @@ pub async fn huggies_rex_apply_trade_pool_change_fun(
         };
         state.tokens.entry(token_id.clone()).or_insert(new_token);
     }
+    let ts_unix_ms = (event.block_timestamp_nanosec / 1_000_000) as i64;
+    Some(EVENT_BROADCAST_TYPE::TradePoolChange {
+        pool_id: event.pool_id,
+        pool_kind,
+        token_account_ids,
+        amounts,
+        total_fee,
+        ts_unix_ms,
+    })
 }
 // =========================================
 // =========================================

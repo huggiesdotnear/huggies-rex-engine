@@ -8,6 +8,8 @@
 const tokenIn = document.getElementById('swap-token-in');
 const tokenOut = document.getElementById('swap-token-out');
 const tokenOutLabel = document.getElementById('swap-token-out-label');
+const middleInput = document.getElementById('swap-middle');
+const middleLabel = document.getElementById('swap-middle-label');
 const amountIn = document.getElementById('swap-amount-in');
 const amountOutEl = document.getElementById('swap-amount-out');
 const resultLine = document.getElementById('swap-result-line');
@@ -72,10 +74,16 @@ function currentMode() {
 function applyModeUi() {
     const mode = currentMode();
     const swapVisible = mode === 'swap';
+    const viaVisible = mode === 'via';
     if (tokenOut) tokenOut.style.display = swapVisible ? '' : 'none';
     if (tokenOutLabel) tokenOutLabel.style.display = swapVisible ? '' : 'none';
+    if (middleInput) middleInput.style.display = viaVisible ? '' : 'none';
+    if (middleLabel) middleLabel.style.display = viaVisible ? '' : 'none';
     if (resultLine) {
-        resultLine.firstChild.textContent = mode === 'swap' ? 'best return: ' : 'best round-trip: ';
+        const label = mode === 'swap' ? 'best return: '
+            : mode === 'via' ? 'best round-trip: '
+            : 'best cycle: ';
+        resultLine.firstChild.textContent = label;
     }
     amountOutEl.textContent = '—';
     routesEl.innerHTML = '';
@@ -133,8 +141,9 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
     const mode = currentMode();
     const inAddr = tokenIn.value.trim();
     const outAddr = mode === 'swap' ? tokenOut.value.trim() : '';
+    const middleAddr = mode === 'via' ? middleInput.value.trim() : '';
     const human = amountIn.value.trim();
-    if (!inAddr || (mode === 'swap' && !outAddr) || !human) {
+    if (!inAddr || (mode === 'swap' && !outAddr) || (mode === 'via' && !middleAddr) || !human) {
         amountOutEl.textContent = 'fill all fields';
         routesEl.innerHTML = '';
         return;
@@ -170,12 +179,15 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
                 routesEl.appendChild(renderRouteCard(i, data.routes[i]));
             }
         } else {
-            // round-trip
-            const params = new URLSearchParams({ token: inAddr, amount: raw, max_hops: '3' });
+            // round-trip (with or without a fixed middle)
+            const params = new URLSearchParams({
+                token: inAddr, amount: raw, max_hops: '3',
+            });
+            if (middleAddr) params.set('middle', middleAddr);
             const cycles = await fetch('/api/arb?' + params).then(r => r.json());
             if (!cycles || cycles.length === 0) {
                 amountOutEl.textContent = 'no cycle';
-                routesEl.innerHTML = '<p>no cycle found up to 3 hops in local state.</p>';
+                routesEl.innerHTML = '<p>no cycle found in local state.</p>';
                 return;
             }
             const best = cycles[0];

@@ -7,6 +7,8 @@
       <label style="display:inline"><input type="radio" name="swap-mode" value="swap" checked> swap token a &rarr; token b</label>
       &nbsp;&nbsp;
       <label style="display:inline"><input type="radio" name="swap-mode" value="roundtrip"> round-trip: start + end same token</label>
+      &nbsp;&nbsp;
+      <label style="display:inline"><input type="radio" name="swap-mode" value="via"> round-trip via middle token</label>
     </p>
     <label>token in</label>
     <input class="huggies_rex_input" id="swap-token-in" list="swap-token-list" placeholder="search token or paste account id">
@@ -14,7 +16,9 @@
     <input class="huggies_rex_input" id="swap-amount-in" placeholder="0.0">
     <label id="swap-token-out-label" style="display:none">token out (round-trip ignores this)</label>
     <input class="huggies_rex_input" id="swap-token-out" list="swap-token-list" placeholder="search token or paste account id" style="display:none">
-    <p>best return: <span id="swap-amount-out">—</span></p>
+    <label id="swap-middle-label" style="display:none">middle token (e.g. <code>usdt.tether-token.near</code>)</label>
+    <input class="huggies_rex_input" id="swap-middle" list="swap-token-list" placeholder="search token or paste account id" style="display:none">
+    <p id="swap-result-line">best return: <span id="swap-amount-out">—</span></p>
     <button class="huggies_rex_button" id="swap-quote">GET QUOTES</button>
     <p><small>phase one is read-only — no transactions are submitted.</small></p>
     <div id="swap-routes"></div>
