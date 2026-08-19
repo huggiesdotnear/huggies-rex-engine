@@ -33,11 +33,17 @@ pub async fn huggies_rex_api_get_return_route(
         .iter()
         .map(|e| (e.key().clone(), e.value().clone()))
         .collect();
+    let tokens_snapshot: std::collections::HashMap<String, _> = state
+        .tokens
+        .iter()
+        .map(|e| (e.key().clone(), e.value().clone()))
+        .collect();
     let mut routes = huggies_rex_find_all_routes_fun(
         &pools_snapshot,
         &params.token_in,
         &params.token_out,
         amount_in,
+        &tokens_snapshot,
     );
     // Fallback to rhea RPC for direct SIMPLE_POOL quotes when the local
     // BFS found nothing. We only call rhea when we're 100% sure the
@@ -79,8 +85,16 @@ pub async fn huggies_rex_api_get_return_route(
                             pool_id,
                             token_in: params.token_in.clone(),
                             token_out: params.token_out.clone(),
-                            amount_in: params.amount_in.clone(),
-                            amount_out: out,
+                            amount_in:
+                                crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                                    params.amount_in.clone(),
+                                    None,
+                                    None,
+                                ),
+                            amount_out:
+                                crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                                    out, None, None,
+                                ),
                         }],
                         source: ROUTE_SOURCE_TYPE::Rpc,
                     });

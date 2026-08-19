@@ -54,7 +54,7 @@ pub async fn huggies_rex_api_arb_route(
         .into_iter()
         .map(|mut c| {
             if let Some(first) = c.hops.first_mut() {
-                first.amount_in = c.amount_in.clone();
+                first.amount_in.raw = c.amount_in.clone();
             }
             c
         })

@@ -100,8 +100,8 @@ function renderRouteCard(i, r) {
     const hopHtml = r.hops.map(h => `
         <div>
             pool <a href="/pool/${h.pool_id}">#${h.pool_id}</a>:
-            ${humanFor(h.token_in, h.amount_in)} <a href="/token/${h.token_in}">${h.token_in.split('.')[0]}</a>
-            &rarr; <strong>${humanFor(h.token_out, h.amount_out)}</strong> <a href="/token/${h.token_out}">${h.token_out.split('.')[0]}</a>
+            ${humanFor(h.token_in, h.amount_in.raw)} <a href="/token/${h.token_in}">${h.token_in.split('.')[0]}</a>
+            &rarr; <strong>${humanFor(h.token_out, h.amount_out.raw)}</strong> <a href="/token/${h.token_out}">${h.token_out.split('.')[0]}</a>
         </div>
     `).join('');
     const src = r.source ? `&middot; source: ${r.source}` : '';
@@ -122,8 +122,8 @@ function renderArbCard(i, c) {
     const hopHtml = c.hops.map(h => `
         <div>
             pool <a href="/pool/${h.pool_id}">#${h.pool_id}</a>:
-            ${humanFor(h.token_in, h.amount_in)} <a href="/token/${h.token_in}">${h.token_in.split('.')[0]}</a>
-            &rarr; <strong>${humanFor(h.token_out, h.amount_out)}</strong> <a href="/token/${h.token_out}">${h.token_out.split('.')[0]}</a>
+            ${humanFor(h.token_in, h.amount_in.raw)} <a href="/token/${h.token_in}">${h.token_in.split('.')[0]}</a>
+            &rarr; <strong>${humanFor(h.token_out, h.amount_out.raw)}</strong> <a href="/token/${h.token_out}">${h.token_out.split('.')[0]}</a>
         </div>
     `).join('');
     card.innerHTML = `

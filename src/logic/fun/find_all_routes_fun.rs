@@ -12,6 +12,8 @@ use crate::logic::constants::trading_const::MAX_ROUTE_HOPS;
 use crate::logic::fun::get_return_local_fun::huggies_rex_get_return_local_fun;
 use crate::logic::types::pool_record_type::POOL_RECORD_TYPE;
 use crate::logic::types::route_quote_type::{ROUTE_HOP_TYPE, ROUTE_QUOTE_TYPE, ROUTE_SOURCE_TYPE};
+use crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE;
+use crate::logic::types::token_record_type::TOKEN_RECORD_TYPE;
 // =========================================
 const MAX_ROUTES_RETURNED: usize = 12;
 // =========================================
@@ -27,10 +29,12 @@ pub fn huggies_rex_find_all_routes_fun(
     token_in: &str,
     token_out: &str,
     amount_in: u128,
+    tokens: &HashMap<String, TOKEN_RECORD_TYPE>,
 ) -> Vec<ROUTE_QUOTE_TYPE> {
     if token_in == token_out || amount_in == 0 {
         return Vec::new();
     }
+    let decimals_for = |addr: &str| -> Option<u8> { tokens.get(addr).map(|t| t.decimals) };
     // frontier: (current_token, path of ROUTE_NODE)
     let mut frontier: Vec<(String, Vec<ROUTE_NODE>)> = vec![(token_in.to_string(), Vec::new())];
     let mut completed: Vec<Vec<ROUTE_NODE>> = Vec::new();
@@ -102,33 +106,39 @@ pub fn huggies_rex_find_all_routes_fun(
 
     completed
         .into_iter()
-        .map(|path| path_to_quote(token_in, token_out, amount_in, &path))
+        .map(|path| path_to_quote(token_in, token_out, amount_in, &path, &decimals_for))
         .collect()
 }
 // =========================================
-fn path_to_quote(
+fn path_to_quote<F>(
     token_in: &str,
     token_out: &str,
     amount_in: u128,
     path: &[ROUTE_NODE],
-) -> ROUTE_QUOTE_TYPE {
+    decimals_for: &F,
+) -> ROUTE_QUOTE_TYPE
+where
+    F: Fn(&str) -> Option<u8>,
+{
     let mut hops = Vec::with_capacity(path.len());
     let mut prev_token = token_in.to_string();
     let mut running_in = amount_in;
     for node in path {
+        let amount_in_dec = decimals_for(&prev_token);
+        let amount_out_dec = decimals_for(&node.next_token);
         hops.push(ROUTE_HOP_TYPE {
             pool_id: node.pool_id,
             token_in: prev_token.clone(),
             token_out: node.next_token.clone(),
-            amount_in: running_in.to_string(),
-            amount_out: node.amount_out.to_string(),
+            amount_in: TOKEN_AMOUNT_TYPE::new(running_in.to_string(), amount_in_dec, None),
+            amount_out: TOKEN_AMOUNT_TYPE::new(node.amount_out.to_string(), amount_out_dec, None),
         });
         prev_token = node.next_token.clone();
         running_in = node.amount_out;
     }
     let amount_out = hops
         .last()
-        .map(|h| h.amount_out.clone())
+        .map(|h| h.amount_out.raw.clone())
         .unwrap_or_else(|| "0".to_string());
     ROUTE_QUOTE_TYPE {
         token_in: token_in.to_string(),

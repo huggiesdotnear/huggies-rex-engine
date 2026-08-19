@@ -14,6 +14,7 @@ use near_kit_tool_box::fun::near::view_account_fun_json::view_account;
 use near_kit_tool_box::fun::rhea::rhea_get_deposits_fun_json::get_deposits;
 
 use crate::logic::types::app_state_type::APP_STATE_TYPE;
+use crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE;
 use crate::logic::types::trader_view_type::{TRADER_DEPOSIT_TYPE, TRADER_VIEW_TYPE};
 // =========================================
 pub async fn huggies_rex_api_trader_route(
@@ -54,17 +55,32 @@ pub async fn huggies_rex_api_trader_route(
             .find(|p| p.value().token_account_ids.contains(&token_id))
             .map(|p| p.key().clone())
             .unwrap_or(0);
+        // The values are NEP-141 token balances (not LP share MFTs);
+        // use the underlying token's decimals from our in-memory
+        // token map (populated from the price-indexer at boot).
+        let (decimals, symbol) = state
+            .tokens
+            .get(&token_id)
+            .map(|t| {
+                let dec = if t.decimals == 0 {
+                    None
+                } else {
+                    Some(t.decimals)
+                };
+                (dec, Some(t.symbol.clone()))
+            })
+            .unwrap_or((None, None));
+        let shares_amount = TOKEN_AMOUNT_TYPE::new(shares, decimals, symbol);
         deposits.push(TRADER_DEPOSIT_TYPE {
             token_id,
-            shares,
+            shares: shares_amount,
             pool_id,
         });
     }
     deposits.sort_by(|a, b| {
-        b.shares
-            .parse::<u128>()
-            .unwrap_or(0)
-            .cmp(&a.shares.parse::<u128>().unwrap_or(0))
+        let av: u128 = a.shares.raw.parse().unwrap_or(0);
+        let bv: u128 = b.shares.raw.parse().unwrap_or(0);
+        bv.cmp(&av)
     });
     let view = TRADER_VIEW_TYPE {
         account_id: parsed.to_string(),

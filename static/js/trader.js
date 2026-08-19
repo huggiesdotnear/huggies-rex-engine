@@ -47,14 +47,17 @@ function shortAccount(acc) {
             const body = document.getElementById('trader-deposits-body');
             document.getElementById('trader-deposits-count').textContent = v.deposits.length;
             for (const d of v.deposits) {
-                // rhea LP shares are MFT tokens with 24 decimals; render
-                // human-readable alongside the raw figure.
-                const sharesHuman = fmtAmount(d.shares, 24);
+                // The values are NEP-141 token balances — use the
+                // decimals the server sent (from the price-indexer).
+                const human = fmtAmount(d.shares.raw, d.shares.decimals);
+                const grouped = d.shares.raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                const sym = d.shares.symbol || shortAccount(d.token_id);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${d.pool_id > 0 ? `<a href="/pool/${d.pool_id}">#${d.pool_id}</a>` : '—'}</td>
                     <td><a href="/token/${encodeURIComponent(d.token_id)}">${shortAccount(d.token_id)}</a></td>
-                    <td><strong>${sharesHuman}</strong> <small style="color:var(--huggies-rex-color-474747)">(raw: ${d.shares})</small></td>`;
+                    <td><strong>${human}</strong> <span style="color:var(--huggies-rex-color-00c6d7)">${sym}</span>
+                        <br><small style="color:var(--huggies-rex-color-474747)">raw: ${grouped}${d.shares.decimals == null ? '' : ` &middot; ${d.shares.decimals} decimals`}</small></td>`;
                 body.appendChild(tr);
             }
             if (v.deposits.length === 0) {

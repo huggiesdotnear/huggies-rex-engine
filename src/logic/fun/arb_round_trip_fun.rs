@@ -216,17 +216,38 @@ fn arb_via_middle(
                     pool_id: p1.pool_id,
                     token_in: start_token.to_string(),
                     token_out: middle.to_string(),
-                    amount_in: amount_in.to_string(),
-                    amount_out: mid_amount.to_string(),
+                    amount_in: crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                        amount_in.to_string(),
+                        None,
+                        None,
+                    ),
+                    amount_out: crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                        mid_amount.to_string(),
+                        None,
+                        None,
+                    ),
                 },
                 ROUTE_HOP_TYPE {
                     pool_id: p2.pool_id,
                     token_in: middle.to_string(),
                     token_out: start_token.to_string(),
-                    amount_in: mid_amount.to_string(),
-                    amount_out: final_amount.to_string(),
+                    amount_in: crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                        mid_amount.to_string(),
+                        None,
+                        None,
+                    ),
+                    amount_out: crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                        final_amount.to_string(),
+                        None,
+                        None,
+                    ),
                 },
             ];
+            // The decimals for amount_in / amount_out are filled in by
+            // the route builder (find_all_routes_fun) using the
+            // in-memory token map. For round-trip via middle, the
+            // caller's known decimals can be plugged in by the route
+            // handler.
             results.push(ARB_CYCLE_TYPE {
                 start_token: start_token.to_string(),
                 amount_in: amount_in.to_string(),
@@ -259,8 +280,16 @@ fn cycle_to_hops(start_token: &str, path: &[(u64, String, u128)]) -> Vec<ROUTE_H
             pool_id: *pool_id,
             token_in: prev_token.clone(),
             token_out: next_token.clone(),
-            amount_in: running_in.to_string(),
-            amount_out: amount_out.to_string(),
+            amount_in: crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                running_in.to_string(),
+                None,
+                None,
+            ),
+            amount_out: crate::logic::types::token_amount_type::TOKEN_AMOUNT_TYPE::new(
+                amount_out.to_string(),
+                None,
+                None,
+            ),
         });
         prev_token = next_token.clone();
         running_in = *amount_out;
@@ -270,7 +299,7 @@ fn cycle_to_hops(start_token: &str, path: &[(u64, String, u128)]) -> Vec<ROUTE_H
     }
     // patch first hop's amount_in to "" (caller fills via cycle.amount_in)
     if let Some(first) = hops.first_mut() {
-        first.amount_in.clear();
+        first.amount_in.raw.clear();
     }
     hops
 }
