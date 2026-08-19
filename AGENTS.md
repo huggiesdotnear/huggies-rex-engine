@@ -4,6 +4,7 @@
 
 - see [STANDARDS.md](./STANDARDS.md) for general standards
 - see [RULES.md](./RULES.md) for general rules
+- see [DOCS/README.md](./DOCS/README.md), for some docs
 
 FOLDERS/FILES
 - `src/` - main program logic, lib.rs and main.rs
