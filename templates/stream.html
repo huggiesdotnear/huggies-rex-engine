@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}LIVE STREAM — HUGGIES REX{% endblock %}
+{% block content %}
+  <section class="huggies_rex_card">
+    <h1>LIVE</h1>
+    <p>status: <span id="ws-status">connecting…</span></p>
+    <pre id="ws-log" style="max-height: 70vh; overflow: auto; background: var(--huggies-rex-color-ffe8e6); padding: 0.75rem; border-radius: 8px;"></pre>
+  </section>
+  <script src="/static/js/stream.js"></script>
+{% endblock %}
+<!-- ==================================== -->
+<!-- end stream.html -->
+<!-- ==================================== -->

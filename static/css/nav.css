@@ -1,0 +1,29 @@
+/* ===================== */
+/* HUGGIES_REX NAV */
+/* fixed top nav bar with our accent red. */
+/* ===================== */
+.huggies_rex_nav {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	padding: 0.75rem 1.25rem;
+	background-color: var(--huggies-rex-color-da291c);
+	color: var(--huggies-rex-color-ffffff);
+	font-family: "Lilita One", sans-serif;
+	letter-spacing: 0.04em;
+}
+.huggies_rex_nav a {
+	color: var(--huggies-rex-color-ffffff);
+	text-decoration: none;
+	padding: 0.25rem 0.75rem;
+	border-radius: 999px;
+}
+.huggies_rex_nav a:hover {
+	background-color: var(--huggies-rex-color-ffe8e6);
+	color: var(--huggies-rex-color-da291c);
+}
+.huggies_rex_nav_brand {
+	font-size: 1.4rem;
+	margin-right: auto;
+}
+/* ===================== */

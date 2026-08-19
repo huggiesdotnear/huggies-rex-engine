@@ -1,0 +1,12 @@
+/* ===================== */
+/* HUGGIES_REX MAIN */
+/* single entry point. */
+/* ===================== */
+@import url(./palette.css);
+@import url(./base.css);
+@import url(./nav.css);
+@import url(./page.css);
+@import url(./card.css);
+@import url(./input.css);
+@import url(./table.css);
+/* ===================== */

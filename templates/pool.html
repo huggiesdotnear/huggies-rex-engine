@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}POOL {{ pool_id }} — HUGGIES REX{% endblock %}
+{% block content %}
+  <section class="huggies_rex_card">
+    <h1>POOL #{{ pool_id }}</h1>
+    <p>kind: <span id="pool-kind">…</span></p>
+    <p>tokens: <span id="pool-tokens">…</span></p>
+    <p>reserves: <span id="pool-amounts">…</span></p>
+    <p>fee: <span id="pool-fee">…</span></p>
+    <p>shares total supply: <span id="pool-shares">…</span></p>
+  </section>
+  <script>
+    const POOL_ID = {{ pool_id }};
+  </script>
+  <script src="/static/js/pool.js"></script>
+{% endblock %}
+<!-- ==================================== -->
+<!-- end pool.html -->
+<!-- ==================================== -->

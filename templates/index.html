@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}HUGGIES REX{% endblock %}
+{% block content %}
+  <section class="huggies_rex_card">
+    <h1>HUGGIES REX</h1>
+    <p>rhea finance personal trading engine — read-only dex ui for {{ default_trader }}.</p>
+    <p>
+      <a class="huggies_rex_button" href="/swap">OPEN SWAP</a>
+      <a class="huggies_rex_button huggies_rex_button_secondary" href="/pools">BROWSE POOLS</a>
+    </p>
+  </section>
+  <section class="huggies_rex_card">
+    <h2>live stream</h2>
+    <p>subscribe to <a href="/stream">/stream</a> for live trade, pool change, and swap events.</p>
+  </section>
+{% endblock %}
+<!-- ==================================== -->
+<!-- end index.html -->
+<!-- ==================================== -->

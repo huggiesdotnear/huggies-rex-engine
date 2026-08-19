@@ -1,0 +1,23 @@
+<!-- ==================================== -->
+<!-- base.html -->
+<!-- shared html shell. every page extends this. -->
+<!-- ==================================== -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}HUGGIES REX{% endblock %}</title>
+  {% include "components/favicon.html" %}
+  {% include "components/css_link.html" %}
+</head>
+<body>
+  {% include "components/nav.html" %}
+  <main class="huggies_rex_page">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
+<!-- ==================================== -->
+<!-- end base.html -->
+<!-- ==================================== -->

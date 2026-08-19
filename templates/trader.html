@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}TRADER — HUGGIES REX{% endblock %}
+{% block content %}
+  <section class="huggies_rex_card">
+    <h1 id="trader-account">…</h1>
+    <p>near balance: <span id="trader-near">…</span></p>
+  </section>
+  <section class="huggies_rex_card">
+    <h2>rhea deposits</h2>
+    <table class="huggies_rex_table">
+      <thead><tr><th>pool</th><th>token</th><th>shares</th></tr></thead>
+      <tbody id="trader-deposits-body"></tbody>
+    </table>
+  </section>
+  <script>
+    const TRADER_ID = {{ account_id|json }};
+  </script>
+  <script src="/static/js/trader.js"></script>
+{% endblock %}
+<!-- ==================================== -->
+<!-- end trader.html -->
+<!-- ==================================== -->

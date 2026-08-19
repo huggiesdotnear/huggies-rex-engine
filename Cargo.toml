@@ -6,7 +6,25 @@ version = "0.1.0"
 edition = "2024"
 # =====================
 [dependencies]
+anyhow = "1.0.104"
+askama = { version = "0.16.0", features = ["serde_json"] }
+axum = { version = "0.8.9", features = ["ws"] }
+axum-extra = { version = "0.12.6", features = ["form"] }
+chrono = { version = "0.4.45", features = ["serde"] }
+dashmap = "6.2.1"
+dotenvy = "0.15.7"
+futures-util = "0.3.34"
 near-kit = "0.15.0"
 near-kit-tool-box = { git = "https://github.com/sleet-rs/near-kit-tool-box-rs", rev = "91fe220d83c65fd68e18d1da017b9586e08f3077" }
+parking_lot = "0.12.5"
+reqwest = { version = "0.13.4", features = ["rustls", "json"] }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", features = ["full"] }
+tokio-tungstenite = { version = "0.30.0", features = ["rustls-tls-webpki-roots"] }
+tower-http = { version = "0.7.0", features = ["fs", "cors"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 # =====================
 # copyright 2026 by sleet.near

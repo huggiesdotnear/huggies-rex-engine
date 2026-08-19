@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}PROFILE — HUGGIES REX{% endblock %}
+{% block content %}
+  <section class="huggies_rex_card">
+    <h1>PROFILE</h1>
+    <p>signed-in trader: <code>{{ default_trader }}</code></p>
+    <p>vault: <code>{{ vault_dir }}</code></p>
+  </section>
+  <section class="huggies_rex_card">
+    <h2>watchlist</h2>
+    <input class="huggies_rex_input" id="watchlist-input" placeholder="token account id">
+    <button class="huggies_rex_button" id="watchlist-add">ADD</button>
+    <table class="huggies_rex_table">
+      <thead><tr><th>token</th><th>note</th><th></th></tr></thead>
+      <tbody id="watchlist-body"></tbody>
+    </table>
+  </section>
+  <section class="huggies_rex_card">
+    <h2>following</h2>
+    <input class="huggies_rex_input" id="follows-input" placeholder="account id">
+    <button class="huggies_rex_button huggies_rex_button_secondary" id="follows-add">FOLLOW</button>
+    <table class="huggies_rex_table">
+      <thead><tr><th>account</th><th>note</th><th></th></tr></thead>
+      <tbody id="follows-body"></tbody>
+    </table>
+  </section>
+  <script src="/static/js/profile.js"></script>
+{% endblock %}
+<!-- ==================================== -->
+<!-- end profile.html -->
+<!-- ==================================== -->
