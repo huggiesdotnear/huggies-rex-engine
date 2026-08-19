@@ -15,6 +15,7 @@ const amountOutEl = document.getElementById('swap-amount-out');
 const resultLine = document.getElementById('swap-result-line');
 const routesEl = document.getElementById('swap-routes');
 const list = document.getElementById('swap-token-list');
+const MAX_HOPS_DISPLAY = 3;
 
 function fmtAmount(raw, decimals) {
     if (raw == null) return '—';
@@ -94,6 +95,21 @@ document.querySelectorAll('input[name="swap-mode"]').forEach(r => {
 });
 applyModeUi();
 
+// When the user picks a token, show its decimals next to the amount
+// input so they know the scale of what they're typing.
+function refreshAmountHint() {
+    const hint = document.getElementById('swap-amount-hint');
+    if (!hint) return;
+    const meta = tokenMeta.get(tokenIn.value.trim());
+    if (meta) {
+        hint.innerHTML = `token has <strong>${meta.decimals}</strong> decimals. typing "1" = 1 ${(meta.symbol || meta.account_id.split('.')[0])} (${'1' + '0'.repeat(meta.decimals)} raw). typing "0.001" = ${meta.decimals >= 3 ? '1' + '0'.repeat(meta.decimals - 3) : '0.001'} raw.`;
+    } else {
+        hint.textContent = '';
+    }
+}
+tokenIn.addEventListener('input', refreshAmountHint);
+refreshAmountHint();
+
 function renderRouteCard(i, r) {
     const card = document.createElement('div');
     card.className = 'huggies_rex_card';
@@ -169,7 +185,14 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
             const data = await fetch('/api/get_return?' + params).then(r => r.json());
             if (!data.routes || data.routes.length === 0) {
                 amountOutEl.textContent = 'no route';
-                routesEl.innerHTML = '<p>no viable route found in local state.</p>';
+                const dec = inMeta.decimals;
+                routesEl.innerHTML = `
+                    <p>no viable route found in local state. likely reasons:</p>
+                    <ul style="text-align:left">
+                        <li>no SIMPLE_POOL connects ${inAddr} and ${outAddr}.</li>
+                        <li>the amount is too small to produce a non-zero output (constant-product math rounds to 0). try at least 1 ${inAddr.split('.')[0]} (= 10<sup>${dec}</sup> raw).</li>
+                    </ul>
+                `;
                 return;
             }
             const best = data.routes[0];
@@ -187,7 +210,14 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
             const cycles = await fetch('/api/arb?' + params).then(r => r.json());
             if (!cycles || cycles.length === 0) {
                 amountOutEl.textContent = 'no cycle';
-                routesEl.innerHTML = '<p>no cycle found in local state.</p>';
+                const dec = inMeta.decimals;
+                routesEl.innerHTML = `
+                    <p>no cycle found in local state. likely reasons:</p>
+                    <ul style="text-align:left">
+                        <li>the amount is too small to produce a non-zero output in any pool (constant-product math rounds to 0). try at least 1 ${inAddr.split('.')[0]} (= 10<sup>${dec}</sup> raw).</li>
+                        <li>no ${MAX_HOPS_DISPLAY}-hop path connects ${inAddr} back to itself through SIMPLE_POOLs with valid reserves.</li>
+                    </ul>
+                `;
                 return;
             }
             const best = cycles[0];
