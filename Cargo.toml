@@ -15,7 +15,7 @@ dashmap = "6.2.1"
 dotenvy = "0.15.7"
 futures-util = "0.3.34"
 near-kit = "0.15.0"
-near-kit-tool-box = { git = "https://github.com/sleet-rs/near-kit-tool-box-rs", rev = "91fe220d83c65fd68e18d1da017b9586e08f3077" }
+near-kit-tool-box = { git = "https://github.com/sleet-rs/near-kit-tool-box-rs", rev = "3984a9c" }
 parking_lot = "0.12.5"
 reqwest = { version = "0.13.4", features = ["rustls", "json"] }
 rusqlite = { version = "0.40.2", features = ["bundled"] }

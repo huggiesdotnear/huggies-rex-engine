@@ -2,18 +2,22 @@
 {% block title %}HUGGIES REX{% endblock %}
 {% block content %}
   <section class="huggies_rex_card">
-    <h1>HUGGIES REX</h1>
-    <p>rhea finance personal trading engine — read-only dex ui for {{ default_trader }}.</p>
-    <p>
-      <a class="huggies_rex_button" href="/swap">OPEN SWAP</a>
-      <a class="huggies_rex_button huggies_rex_button_secondary" href="/pools">BROWSE POOLS</a>
-    </p>
+    <h1 class="huggies_rex_brand">HUGGIES REX<span class="huggies_rex_brand_dot">.</span></h1>
+    <p>rhea finance personal trading engine — read-only dex ui for <code>{{ default_trader }}</code>.</p>
   </section>
   <section class="huggies_rex_card">
-    <h2>live stream</h2>
-    <p>subscribe to <a href="/stream">/stream</a> for live trade, pool change, and swap events.</p>
+    <h2>swap</h2>
+    <label>token in</label>
+    <input class="huggies_rex_input" id="swap-token-in" list="swap-token-list" placeholder="search token or paste account id">
+    <label>amount in</label>
+    <input class="huggies_rex_input" id="swap-amount-in" placeholder="0.0">
+    <label>token out</label>
+    <input class="huggies_rex_input" id="swap-token-out" list="swap-token-list" placeholder="search token or paste account id">
+    <p>best return: <span id="swap-amount-out">—</span></p>
+    <button class="huggies_rex_button" id="swap-quote">GET QUOTES</button>
+    <p><small>phase one is read-only — no transactions are submitted.</small></p>
+    <div id="swap-routes"></div>
   </section>
+  <datalist id="swap-token-list"></datalist>
+  <script src="/static/js/swap.js"></script>
 {% endblock %}
-<!-- ==================================== -->
-<!-- end index.html -->
-<!-- ==================================== -->

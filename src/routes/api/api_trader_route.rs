@@ -51,7 +51,7 @@ pub async fn huggies_rex_api_trader_route(
         .view_account(&parsed, BlockReference::final_())
         .await
         .context("view_account failed")
-        .map(|a| a.amount.to_string())
+        .map(|a| a.amount.as_yoctonear().to_string())
         .unwrap_or_else(|_| "0".to_string());
     let view = TRADER_VIEW_TYPE {
         account_id: parsed.to_string(),

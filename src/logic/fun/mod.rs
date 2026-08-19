@@ -11,7 +11,7 @@ pub mod cache_token_get_fun;
 pub mod cache_token_upsert_fun;
 pub mod events_ws_handler_fun;
 pub mod events_ws_run_fun;
-pub mod find_best_route_fun;
+pub mod find_all_routes_fun;
 pub mod get_return_local_fun;
 pub mod price_indexer_list_token_price_fun;
 pub mod router_fun;

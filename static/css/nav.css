@@ -1,29 +1,59 @@
 /* ===================== */
 /* HUGGIES_REX NAV */
-/* fixed top nav bar with our accent red. */
+/* fixed bottom-pill nav island (graphytos-style). */
 /* ===================== */
-.huggies_rex_nav {
+.huggies_rex_island {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 1rem;
+	z-index: 50;
 	display: flex;
-	gap: 1rem;
-	align-items: center;
-	padding: 0.75rem 1.25rem;
+	justify-content: center;
+	pointer-events: none;
+}
+.huggies_rex_island_inner {
+	pointer-events: auto;
 	background-color: var(--huggies-rex-color-da291c);
 	color: var(--huggies-rex-color-ffffff);
-	font-family: "Lilita One", sans-serif;
-	letter-spacing: 0.04em;
+	border-radius: 999px;
+	padding: 0.5rem 0.75rem;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+	max-width: 92vw;
 }
-.huggies_rex_nav a {
+.huggies_rex_island_nav {
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+.huggies_rex_island_nav a {
 	color: var(--huggies-rex-color-ffffff);
 	text-decoration: none;
-	padding: 0.25rem 0.75rem;
+	padding: 0.4rem 0.9rem;
 	border-radius: 999px;
+	font-family: "Lilita One", sans-serif;
+	letter-spacing: 0.04em;
+	font-size: 0.95rem;
+	transition: background-color 120ms ease, color  120ms ease;
 }
-.huggies_rex_nav a:hover {
+.huggies_rex_island_nav a:hover {
 	background-color: var(--huggies-rex-color-ffe8e6);
 	color: var(--huggies-rex-color-da291c);
 }
-.huggies_rex_nav_brand {
-	font-size: 1.4rem;
-	margin-right: auto;
+.huggies_rex_island_nav a.huggies_rex_island_nav_active {
+	background-color: var(--huggies-rex-color-ffffff);
+	color: var(--huggies-rex-color-da291c);
+}
+.huggies_rex_brand {
+	font-family: "Lilita One", sans-serif;
+	font-size: 1.6rem;
+	color: var(--huggies-rex-color-da291c);
+	margin: 0.5rem 0 0.25rem;
+	letter-spacing: 0.04em;
+}
+.huggies_rex_brand_dot {
+	color: var(--huggies-rex-color-00c6d7);
 }
 /* ===================== */

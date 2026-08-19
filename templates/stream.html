@@ -3,11 +3,14 @@
 {% block content %}
   <section class="huggies_rex_card">
     <h1>LIVE</h1>
-    <p>status: <span id="ws-status">connecting…</span></p>
-    <pre id="ws-log" style="max-height: 70vh; overflow: auto; background: var(--huggies-rex-color-ffe8e6); padding: 0.75rem; border-radius: 8px;"></pre>
+    <p>status: <strong id="ws-status">connecting…</strong></p>
+    <p>
+      swaps <strong id="ws-count-trade-pool">0</strong>
+      &middot; pool changes <strong id="ws-count-trade-pool-change">0</strong>
+      &middot; swaps (root) <strong id="ws-count-trade-swap">0</strong>
+      &middot; heartbeats <strong id="ws-count-heartbeat">0</strong>
+    </p>
+    <div id="ws-log"></div>
   </section>
   <script src="/static/js/stream.js"></script>
 {% endblock %}
-<!-- ==================================== -->
-<!-- end stream.html -->
-<!-- ==================================== -->

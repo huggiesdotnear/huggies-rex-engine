@@ -8,9 +8,10 @@ use axum::extract::{Query, State};
 use near_kit_tool_box::fun::rhea::rhea_get_return_fun_json::get_return as rhea_get_return;
 use serde::Deserialize;
 
-use crate::logic::fun::find_best_route_fun::huggies_rex_find_best_route_fun;
+use crate::logic::fun::find_all_routes_fun::huggies_rex_find_all_routes_fun;
 use crate::logic::types::app_state_type::APP_STATE_TYPE;
-use crate::logic::types::route_quote_type::{ROUTE_QUOTE_TYPE, ROUTE_SOURCE_TYPE};
+use crate::logic::types::route_quote_type::ROUTE_SOURCE_TYPE;
+use crate::logic::types::route_quotes_type::ROUTE_QUOTES_TYPE;
 // =========================================
 #[derive(Debug, Deserialize)]
 pub struct GET_RETURN_QUERY_TYPE {
@@ -22,59 +23,70 @@ pub struct GET_RETURN_QUERY_TYPE {
 pub async fn huggies_rex_api_get_return_route(
     State(state): State<Arc<APP_STATE_TYPE>>,
     Query(params): Query<GET_RETURN_QUERY_TYPE>,
-) -> Result<Json<ROUTE_QUOTE_TYPE>, axum::http::StatusCode> {
+) -> Result<Json<ROUTE_QUOTES_TYPE>, axum::http::StatusCode> {
     let amount_in: u128 = params
         .amount_in
         .parse()
         .map_err(|_| axum::http::StatusCode::BAD_REQUEST)?;
-    let pools_snapshot = state
+    let pools_snapshot: std::collections::HashMap<u64, _> = state
         .pools
         .iter()
         .map(|e| (e.key().clone(), e.value().clone()))
         .collect();
-    if let Some(local) = huggies_rex_find_best_route_fun(
+    let mut routes = huggies_rex_find_all_routes_fun(
         &pools_snapshot,
         &params.token_in,
         &params.token_out,
         amount_in,
-    ) {
-        return Ok(Json(local));
-    }
-    // Fallback: ask rhea directly. We need a single pool_id, so we try
-    // the first SIMPLE_POOL containing both tokens.
-    let pool_id_opt = state.pools.iter().find_map(|entry| {
-        let p = entry.value();
-        if p.pool_kind == "SIMPLE_POOL"
-            && p.token_account_ids.contains(&params.token_in)
-            && p.token_account_ids.contains(&params.token_out)
-        {
-            Some(entry.key().clone())
-        } else {
-            None
+    );
+    // Fallback to RPC for direct rhea get_return if no local route.
+    if routes.is_empty() {
+        let pool_id_opt = state.pools.iter().find_map(|entry| {
+            let p = entry.value();
+            if p.pool_kind == "SIMPLE_POOL"
+                && p.token_account_ids.contains(&params.token_in)
+                && p.token_account_ids.contains(&params.token_out)
+            {
+                Some(entry.key().clone())
+            } else {
+                None
+            }
+        });
+        if let Some(pool_id) = pool_id_opt {
+            let near = state.near_view.next_near();
+            if let Ok(out) = rhea_get_return(
+                &near,
+                &state.rhea_contract_id,
+                pool_id as u32,
+                &params.token_in,
+                &params.amount_in,
+                &params.token_out,
+            )
+            .await
+            .context("rhea get_return failed")
+            {
+                routes.push(crate::logic::types::route_quote_type::ROUTE_QUOTE_TYPE {
+                    token_in: params.token_in.clone(),
+                    token_out: params.token_out.clone(),
+                    amount_in: params.amount_in.clone(),
+                    amount_out: out.clone(),
+                    hops: vec![crate::logic::types::route_quote_type::ROUTE_HOP_TYPE {
+                        pool_id,
+                        token_in: params.token_in.clone(),
+                        token_out: params.token_out.clone(),
+                        amount_in: params.amount_in.clone(),
+                        amount_out: out,
+                    }],
+                    source: ROUTE_SOURCE_TYPE::Rpc,
+                });
+            }
         }
-    });
-    let Some(pool_id) = pool_id_opt else {
-        return Err(axum::http::StatusCode::NOT_FOUND);
-    };
-    let near = state.near_view.next_near();
-    let out = rhea_get_return(
-        &near,
-        &state.rhea_contract_id,
-        pool_id as u32,
-        &params.token_in,
-        &params.amount_in,
-        &params.token_out,
-    )
-    .await
-    .context("rhea get_return failed")
-    .map_err(|_| axum::http::StatusCode::BAD_GATEWAY)?;
-    Ok(Json(ROUTE_QUOTE_TYPE {
+    }
+    Ok(Json(ROUTE_QUOTES_TYPE {
         token_in: params.token_in,
         token_out: params.token_out,
         amount_in: params.amount_in,
-        amount_out: out,
-        hops: Vec::new(),
-        source: ROUTE_SOURCE_TYPE::Rpc,
+        routes,
     }))
 }
 // =========================================

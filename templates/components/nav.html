@@ -1,15 +1,32 @@
 <!-- ==================================== -->
 <!-- nav.html -->
-<!-- shared top nav bar across every page. -->
+<!-- bottom-pill island nav, mirror of the graphytos island pattern. -->
+<!-- active link is set client-side by nav.js using the current path. -->
 <!-- ==================================== -->
-<nav class="huggies_rex_nav">
-    <span class="huggies_rex_nav_brand">HUGGIES REX</span>
-    <a href="/">HOME</a>
-    <a href="/swap">SWAP</a>
-    <a href="/pools">POOLS</a>
-    <a href="/stream">LIVE</a>
-    <a href="/profile">PROFILE</a>
-</nav>
+<div class="huggies_rex_island" data-graphytos-island-preview="">
+    <div class="huggies_rex_island_inner">
+        <nav class="huggies_rex_island_nav" id="huggies_rex_island_nav">
+            <a href="/swap" data-nav="swap">SWAP</a>
+            <a href="/pools" data-nav="pools">POOLS</a>
+            <a href="/stream" data-nav="stream">LIVE</a>
+            <a href="/profile" data-nav="profile">PROFILE</a>
+        </nav>
+    </div>
+</div>
+<script>
+(function () {
+    var p = window.location.pathname;
+    var key = null;
+    if (p === '/' || p.startsWith('/swap')) key = 'swap';
+    else if (p.startsWith('/pools') || p.startsWith('/pool/') || p.startsWith('/token/')) key = 'pools';
+    else if (p.startsWith('/stream') || p.startsWith('/trader/')) key = 'stream';
+    else if (p.startsWith('/profile')) key = 'profile';
+    if (key) {
+        var el = document.querySelector('[data-nav="' + key + '"]');
+        if (el) el.classList.add('huggies_rex_island_nav_active');
+    }
+})();
+</script>
 <!-- ==================================== -->
 <!-- end nav.html -->
 <!-- ==================================== -->

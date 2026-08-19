@@ -2,7 +2,7 @@
 {% block title %}POOLS — HUGGIES REX{% endblock %}
 {% block content %}
   <section class="huggies_rex_card">
-    <h1>POOLS</h1>
+    <h1>POOLS <small id="pools-shown"></small></h1>
     <input class="huggies_rex_input" id="pools-search" placeholder="search pool id or token">
     <table class="huggies_rex_table">
       <thead>
@@ -10,9 +10,7 @@
       </thead>
       <tbody id="pools-body"></tbody>
     </table>
+    <small>showing up to 500 matching pools.</small>
   </section>
   <script src="/static/js/pools.js"></script>
 {% endblock %}
-<!-- ==================================== -->
-<!-- end pools.html -->
-<!-- ==================================== -->

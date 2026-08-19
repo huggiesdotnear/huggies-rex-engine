@@ -1,7 +1,3 @@
-<!-- ==================================== -->
-<!-- base.html -->
-<!-- shared html shell. every page extends this. -->
-<!-- ==================================== -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,12 +8,9 @@
   {% include "components/css_link.html" %}
 </head>
 <body>
-  {% include "components/nav.html" %}
   <main class="huggies_rex_page">
     {% block content %}{% endblock %}
   </main>
+  {% include "components/nav.html" %}
 </body>
 </html>
-<!-- ==================================== -->
-<!-- end base.html -->
-<!-- ==================================== -->
