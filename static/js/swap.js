@@ -103,6 +103,10 @@ applyModeUi();
 // input so they know the scale of what they're typing. Also show a
 // live preview of the actual human amount being quoted, and warn if
 // the raw amount rounds to 0 in pool math.
+function withSeparators(whole) {
+    // group digits in threes from the right
+    return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
 function refreshAmountHint() {
     const hint = document.getElementById('swap-amount-hint');
     if (!hint) return;
@@ -111,9 +115,10 @@ function refreshAmountHint() {
         hint.textContent = '';
         return;
     }
+    const sym = meta.symbol || meta.account_id.split('.')[0];
     const human = amountIn.value.trim();
     if (!human) {
-        hint.innerHTML = `token has <strong>${meta.decimals}</strong> decimals. typing <code>1</code> = 1 ${meta.symbol || meta.account_id.split('.')[0]}. typing <code>0.5</code> = 0.5.`;
+        hint.innerHTML = `token has <strong>${meta.decimals}</strong> decimals. typing <code>1</code> = 1 ${sym}, typing <code>0.5</code> = 0.5.`;
         return;
     }
     if (!/^[0-9]+(\.[0-9]+)?$/.test(human)) {
@@ -125,16 +130,28 @@ function refreshAmountHint() {
         hint.textContent = '';
         return;
     }
-    // Compare the user's typed number to the token's natural scale (1
-    // unit). For 24-decimal tokens, typing an 11-digit number is
-    // usually a decimal-place mistake.
+    // format human with separators (e.g. 10567964656 -> 10,567,964,656)
+    const [hWhole = '0', hFrac = ''] = human.split('.');
+    const humanFmt = withSeparators(hWhole) + (hFrac ? '.' + hFrac : '');
     const usd = meta.price_usd;
-    const usdValue = (Number(human) * usd).toExponential(2);
-    const warnSmall = raw < 1000n ? ' <span style="color:var(--huggies-rex-color-da291c)">too small to quote (will round to 0)</span>' : '';
-    const warnBig = human.length > 6 && meta.decimals >= 18
-        ? ` <span style="color:var(--huggies-rex-color-da291c)">note: 1 ${meta.symbol || meta.account_id.split('.')[0]} = ${meta.decimals} digits, this is ${human.length > 9 ? `1e${human.length - 1}` : 'less than 1'} ${meta.symbol || meta.account_id.split('.')[0]}</span>`
-        : '';
-    hint.innerHTML = `quoting <strong>${human}</strong> ${meta.symbol || meta.account_id.split('.')[0]} = ${raw} raw ≈ <strong>$${usdValue}</strong> USD. ${warnSmall}${warnBig}`;
+    const usdNum = Number(human) * usd;
+    const usdFmt = (usdNum > 0 && usdNum < 0.01)
+        ? usdNum.toExponential(2)  // scientific for tiny values
+        : usdNum.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    // raw formatted with separators (split every 3 from the right)
+    const rawFmt = withSeparators(raw);
+    // Compare the typed human value (as a JS number) to 1 unit of the
+    // token. typed > 1   => at least 1 unit (no warning)
+    // 1 >= typed > 0.01  => at least 1% of 1 unit (no warning)
+    // typed <= 0.01      => tiny fraction; pool math will likely round to 0
+    const typedNum = Number(human);
+    let warning = '';
+    if (raw < 1000n) {
+        warning = `<br><span style="color:var(--huggies-rex-color-da291c)">⚠ raw amount &lt; 1000 — pool math will round to 0. try at least <code>1</code> ${sym} (= 1 followed by ${meta.decimals} zeros).</span>`;
+    } else if (typedNum > 0 && typedNum < 0.01) {
+        warning = `<br><span style="color:var(--huggies-rex-color-da291c)">⚠ that's a tiny fraction of 1 ${sym} (~10<sup>${Math.floor(Math.log10(1 / typedNum))}</sup>× smaller than 1 unit). pool math may round to 0.</span>`;
+    }
+    hint.innerHTML = `quoting <strong>${humanFmt}</strong> ${sym} = <code>${rawFmt}</code> raw ≈ <strong>$${usdFmt}</strong> USD.${warning}`;
 }
 amountIn.addEventListener('input', refreshAmountHint);
 tokenIn.addEventListener('input', refreshAmountHint);
