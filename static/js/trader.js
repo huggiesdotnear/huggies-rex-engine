@@ -43,7 +43,7 @@ async function loadMeta() {
             document.getElementById('trader-deposits-count').textContent = v.deposits.length;
             if (v.deposits.length === 0) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="3"><em>no rhea deposits for this account.</em></td>`;
+                tr.innerHTML = `<td colspan="2"><em>no rhea deposits for this account.</em></td>`;
                 body.appendChild(tr);
                 return;
             }
@@ -71,7 +71,6 @@ async function loadMeta() {
                         <br><small style="color:var(--huggies-rex-color-474747)">${shortAccount(d.token_id)}</small></td>
                     <td><strong>${human}</strong> <span style="color:var(--huggies-rex-color-00c6d7)">${sym}</span>${usdLine}
                         <br><small style="color:var(--huggies-rex-color-474747)">raw: ${grouped}${decLabel}</small></td>
-                    <td>${d.pool_id > 0 ? `<a href="/pool/${d.pool_id}">#${d.pool_id}</a>` : '<small style="color:var(--huggies-rex-color-474747)">no direct pool</small>'}</td>
                 `;
                 body.appendChild(tr);
             }
