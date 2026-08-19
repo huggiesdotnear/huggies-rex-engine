@@ -35,6 +35,26 @@ function fmtAmount(raw, decimals) {
 
 const tokenMeta = new Map();
 
+// Convert a human-readable amount like "5" or "0.5" into a raw yocto-style
+// integer string using the token's decimals. Returns null if unparseable.
+// Only used for the UI preview hint — actual quoting goes through the
+// server (which is the single source of truth for decimals).
+function toRawAmount(human, decimals) {
+    if (human == null || human === '') return null;
+    const s = String(human).trim();
+    if (!s) return null;
+    if (!/^[0-9]+(\.[0-9]+)?$/.test(s)) return null;
+    const [whole, frac = ''] = s.split('.');
+    if (decimals == null || decimals === 0) {
+        return BigInt(whole + frac).toString();
+    }
+    const fracPadded = (frac + '0'.repeat(decimals)).slice(0, decimals);
+    const denom = 10n ** BigInt(decimals);
+    const wholeBig = BigInt(whole) * denom;
+    const fracBig = BigInt(fracPadded || '0');
+    return (wholeBig + fracBig).toString();
+}
+
 fetch('/api/tokens').then(r => r.json()).then(tokens => {
     for (const t of tokens) {
         tokenMeta.set(t.account_id, t);
@@ -80,17 +100,43 @@ document.querySelectorAll('input[name="swap-mode"]').forEach(r => {
 applyModeUi();
 
 // When the user picks a token, show its decimals next to the amount
-// input so they know the scale of what they're typing.
+// input so they know the scale of what they're typing. Also show a
+// live preview of the actual human amount being quoted, and warn if
+// the raw amount rounds to 0 in pool math.
 function refreshAmountHint() {
     const hint = document.getElementById('swap-amount-hint');
     if (!hint) return;
     const meta = tokenMeta.get(tokenIn.value.trim());
-    if (meta) {
-        hint.innerHTML = `token has <strong>${meta.decimals}</strong> decimals. typing "1" = 1 ${(meta.symbol || meta.account_id.split('.')[0])} (${'1' + '0'.repeat(meta.decimals)} raw). typing "0.001" = ${meta.decimals >= 3 ? '1' + '0'.repeat(meta.decimals - 3) : '0.001'} raw.`;
-    } else {
+    if (!meta) {
         hint.textContent = '';
+        return;
     }
+    const human = amountIn.value.trim();
+    if (!human) {
+        hint.innerHTML = `token has <strong>${meta.decimals}</strong> decimals. typing <code>1</code> = 1 ${meta.symbol || meta.account_id.split('.')[0]}. typing <code>0.5</code> = 0.5.`;
+        return;
+    }
+    if (!/^[0-9]+(\.[0-9]+)?$/.test(human)) {
+        hint.innerHTML = `<span style="color:var(--huggies-rex-color-da291c)">invalid: must be a non-negative decimal like 5 or 0.5</span>`;
+        return;
+    }
+    const raw = toRawAmount(human, meta.decimals);
+    if (raw == null) {
+        hint.textContent = '';
+        return;
+    }
+    // Compare the user's typed number to the token's natural scale (1
+    // unit). For 24-decimal tokens, typing an 11-digit number is
+    // usually a decimal-place mistake.
+    const usd = meta.price_usd;
+    const usdValue = (Number(human) * usd).toExponential(2);
+    const warnSmall = raw < 1000n ? ' <span style="color:var(--huggies-rex-color-da291c)">too small to quote (will round to 0)</span>' : '';
+    const warnBig = human.length > 6 && meta.decimals >= 18
+        ? ` <span style="color:var(--huggies-rex-color-da291c)">note: 1 ${meta.symbol || meta.account_id.split('.')[0]} = ${meta.decimals} digits, this is ${human.length > 9 ? `1e${human.length - 1}` : 'less than 1'} ${meta.symbol || meta.account_id.split('.')[0]}</span>`
+        : '';
+    hint.innerHTML = `quoting <strong>${human}</strong> ${meta.symbol || meta.account_id.split('.')[0]} = ${raw} raw ≈ <strong>$${usdValue}</strong> USD. ${warnSmall}${warnBig}`;
 }
+amountIn.addEventListener('input', refreshAmountHint);
 tokenIn.addEventListener('input', refreshAmountHint);
 refreshAmountHint();
 
