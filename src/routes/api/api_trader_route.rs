@@ -1,7 +1,8 @@
 //! huggies_rex_api_trader_route
 //!
-//! GET `/api/trader/{account_id}` — returns the rhea LP deposits and
-//! the NEAR native balance for the given account id.
+//! GET `/api/trader/{account_id}` — returns the trader's internal
+//! rhea balances (per NEP-141 token) and the NEAR native balance
+//! for the given account id.
 // =========================================
 use std::sync::Arc;
 
@@ -41,23 +42,15 @@ pub async fn huggies_rex_api_trader_route(
         }
     };
     let mut deposits: Vec<TRADER_DEPOSIT_TYPE> = Vec::new();
-    for (token_id, shares) in deposits_map {
-        // rhea returns the sum across all pools containing the token;
-        // the value is 0 when the user does not actually hold LP for it.
-        if shares == "0" {
+    for (token_id, raw_balance) in deposits_map {
+        // value is "0" when the user has no internal balance for
+        // this token — skip so the UI doesn't render empties.
+        if raw_balance == "0" {
             continue;
         }
-        // best-effort: attach a concrete pool_id if there's a pool in
-        // our state that contains this token, otherwise 0.
-        let pool_id = state
-            .pools
-            .iter()
-            .find(|p| p.value().token_account_ids.contains(&token_id))
-            .map(|p| p.key().clone())
-            .unwrap_or(0);
-        // The values are NEP-141 token balances (not LP share MFTs);
-        // use the underlying token's decimals from our in-memory
-        // token map (populated from the price-indexer at boot).
+        // NEP-141 token balance; look up decimals + symbol from the
+        // in-memory token map (populated from the price-indexer at
+        // boot). Unknown tokens fall through with `None`.
         let (decimals, symbol) = state
             .tokens
             .get(&token_id)
@@ -70,16 +63,12 @@ pub async fn huggies_rex_api_trader_route(
                 (dec, Some(t.symbol.clone()))
             })
             .unwrap_or((None, None));
-        let shares_amount = TOKEN_AMOUNT_TYPE::new(shares, decimals, symbol);
-        deposits.push(TRADER_DEPOSIT_TYPE {
-            token_id,
-            shares: shares_amount,
-            pool_id,
-        });
+        let balance = TOKEN_AMOUNT_TYPE::new(raw_balance, decimals, symbol);
+        deposits.push(TRADER_DEPOSIT_TYPE { token_id, balance });
     }
     deposits.sort_by(|a, b| {
-        let av: u128 = a.shares.raw.parse().unwrap_or(0);
-        let bv: u128 = b.shares.raw.parse().unwrap_or(0);
+        let av: u128 = a.balance.raw.parse().unwrap_or(0);
+        let bv: u128 = b.balance.raw.parse().unwrap_or(0);
         bv.cmp(&av)
     });
     let view = TRADER_VIEW_TYPE {

@@ -18,7 +18,7 @@ pub struct TOKEN_AMOUNT_TYPE {
     /// from rhea / NEP-141 view calls).
     pub raw: String,
     /// Number of decimal places for the token. None means the value
-    /// is opaque (e.g. LP share MFTs without a public metadata view).
+    /// is opaque (no public metadata view, e.g. MFT share counts).
     pub decimals: Option<u8>,
     /// Optional symbol for display. None falls back to the token
     /// account id's first segment.

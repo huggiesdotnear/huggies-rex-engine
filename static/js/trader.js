@@ -48,15 +48,16 @@ async function loadMeta() {
                 return;
             }
             for (const d of v.deposits) {
-                // rhea's get_deposits returns NEP-141 token balances (the
-                // user's escrow balance in each NEP-141 token, summed
-                // across every pool that contains it). use the token's
-                // actual decimals for display + the token's USD price.
+                // rhea's get_deposits returns the trader's internal
+                // NEP-141 token balances inside the rhea DEX (pre-funded
+                // for trading, withdrawable; nothing to do with pools or
+                // LP). use the token's actual decimals for display +
+                // the token's USD price.
                 const meta = tokenMeta.get(d.token_id);
-                const dec = d.shares.decimals;
-                const human = fmtAmount(d.shares.raw, dec);
-                const sym = d.shares.symbol || shortAccount(d.token_id);
-                const grouped = d.shares.raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                const dec = d.balance.decimals;
+                const human = fmtAmount(d.balance.raw, dec);
+                const sym = d.balance.symbol || shortAccount(d.token_id);
+                const grouped = d.balance.raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                 let usdLine = '';
                 if (meta && meta.price_usd) {
                     const usd = Number(human) * meta.price_usd;
