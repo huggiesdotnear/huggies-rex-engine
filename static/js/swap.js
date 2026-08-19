@@ -170,8 +170,12 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
         routesEl.innerHTML = '<p>token_in not in our metadata cache yet. try a known token like <code>wrap.near</code>.</p>';
         return;
     }
-    const raw = toRawAmount(human, inMeta.decimals);
-    if (raw == null) {
+    // basic sanity: must look like a non-negative decimal
+    if (!/^[0-9]+(\.[0-9]+)?$/.test(human)) {
+        amountOutEl.textContent = 'invalid amount';
+        routesEl.innerHTML = '<p>amount must be a non-negative decimal number (e.g. 5, 0.5, 0.001).</p>';
+        return;
+    }
         amountOutEl.textContent = 'invalid amount';
         routesEl.innerHTML = '<p>amount must be a non-negative decimal number.</p>';
         return;
@@ -179,8 +183,10 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
     routesEl.innerHTML = '<p>quoting…</p>';
     try {
         if (mode === 'swap') {
+            // send the human value to the backend; the server is the
+            // single source of truth for token decimals (price-indexer).
             const params = new URLSearchParams({
-                token_in: inAddr, token_out: outAddr, amount_in: raw,
+                token_in: inAddr, token_out: outAddr, amount: human,
             });
             const data = await fetch('/api/get_return?' + params).then(r => r.json());
             if (!data.routes || data.routes.length === 0) {
@@ -204,7 +210,7 @@ document.getElementById('swap-quote').addEventListener('click', async () => {
         } else {
             // round-trip (with or without a fixed middle)
             const params = new URLSearchParams({
-                token: inAddr, amount: raw, max_hops: '3',
+                token: inAddr, amount: human, max_hops: '3',
             });
             if (middleAddr) params.set('middle', middleAddr);
             const cycles = await fetch('/api/arb?' + params).then(r => r.json());
