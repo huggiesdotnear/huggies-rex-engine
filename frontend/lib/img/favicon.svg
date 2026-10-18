@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="54px" height="42px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-4,-10.44)">
+        <g id="SVGRepo_iconCarrier">
+            <g id="shit-sunglasses">
+                <path d="M50.5,35L49.79,35C49.926,33.838 49.996,32.67 50,31.5C50,28.483 47.517,26 44.5,26L42,26C42.483,25.297 42.741,24.463 42.74,23.61C42.702,21.19 40.701,19.219 38.281,19.219C38.257,19.219 38.234,19.22 38.21,19.22L34.93,19.22C30.522,18.429 27.097,14.875 26.47,10.44C22.828,12.043 20.185,15.321 19.39,19.22L19.22,22.31C19.221,23.669 19.719,24.982 20.62,26L17.5,26C14.483,26 12,28.483 12,31.5C12.004,32.67 12.074,33.838 12.21,35L11.5,35C7.36,35 4,39.36 4,43.5C4,47.64 7.36,52 11.5,52L50.5,52C54.64,52 58,47.64 58,43.5C58,39.36 54.64,35 50.5,35Z" style="fill:rgb(255,254,254);fill-rule:nonzero;"/>
+                <circle cx="23" cy="32" r="6" style="fill:rgb(255,254,254);"/>
+                <circle cx="38" cy="32" r="6" style="fill:rgb(255,254,254);"/>
+                <path d="M26,41C26,43.743 28.257,46 31,46C33.743,46 36,43.743 36,41L26,41Z" style="fill:rgb(255,254,254);fill-rule:nonzero;"/>
+                <ellipse cx="31" cy="44" rx="2" ry="1" style="fill:rgb(255,254,254);"/>
+            </g>
+        </g>
+    </g>
+</svg>
