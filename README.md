@@ -2,13 +2,23 @@
 
 💩 near defi trading engine
 
+
+bun/frontend
+
 ```sh
-cargo check
+bun i
+bunx prettier . --write
+bun tsc --noEmit
+bun run frontend/index.html
+# bun build recursive
+cd frontend && bun build ./**/*.html --outdir=../static --minify
+```
+
+rust/backend
+
+```sh
 cargo fmt
-# env
-cp .env.example .env
-source .env
-# run
+cargo check
 cargo run
 # cargo build
 cargo build --release
