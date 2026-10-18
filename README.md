@@ -1,6 +1,6 @@
 # huggies-rex-engine
 
-💩 rhea finance personal trading engine
+💩 near defi trading engine
 
 ```sh
 cargo check
@@ -13,9 +13,6 @@ cargo run
 # cargo build
 cargo build --release
 ./target/release/huggies-rex-engine
-
-# docs
-cargo doc --open --no-deps
 ```
 
 =====================
