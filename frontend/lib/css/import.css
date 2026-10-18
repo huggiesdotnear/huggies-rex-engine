@@ -1,6 +1,10 @@
 /*==================================*/
+/* GOOGLE FONTS */
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+/*==================================*/
 /* css  */
 @import url(./colors.css);
+@import url(./font.css);
 @import url(./body.css);
 /*@import url(./button.css);*/
 /*@import url(./footer.css);*/
