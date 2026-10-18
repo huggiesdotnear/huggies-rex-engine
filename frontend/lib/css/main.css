@@ -1,0 +1,16 @@
+/*==================================*/
+main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1000px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  /*----------------------*/
+  margin-top: 20px;
+  margin-bottom: 20px;
+  /*----------------------*/
+  /*border: 1px solid purple;*/
+}
+/*==================================*/
