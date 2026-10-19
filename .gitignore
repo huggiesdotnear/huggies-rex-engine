@@ -1,3 +1,5 @@
 /target
 .DS_Store
 node_modules
+# static - bun build outputs there, populated at run/deploy time
+/static
