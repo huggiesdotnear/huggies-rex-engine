@@ -5,6 +5,7 @@ routes and pages
 - `/` - serve the static folder
 
 ### `/api/huggies/` - huggies specifics
+
 user info and session managmnets
 
 - `/api/huggies/?????` - replace this with acctual bullet points of routes
@@ -14,13 +15,14 @@ user info and session managmnets
 - 👀 `/api/near/contract/{contract_id}/{method}`
 - 👀 `/api/near/token/`
 
-
 ### intear
 
 **/api/intear/token/**
+
 - `/api/intear/token/`
 
 **/api/intear/router/**
+
 - `/api/intear/router/`
 
 =====================

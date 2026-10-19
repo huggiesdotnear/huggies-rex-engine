@@ -2,7 +2,6 @@
 
 see `DOCS/` for docs.
 
-
 RULES
 
 - one function per a file, clean clear sanke_case nameing for functions. and file name should match function name.
@@ -16,7 +15,6 @@ WORKFLOW
 - always pull first.
 - undo local chages/commits if commits on the remote that are not local, rather than some rebase/force bullshit, then manually reapply changes if applicable.
 - commit and push after making changes.
-
 
 ========================================
 <br/>
