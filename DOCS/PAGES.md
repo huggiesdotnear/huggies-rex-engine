@@ -6,26 +6,30 @@ nav
 
 - index.html - FEED
 - swap.html - SWAP
-- account.html - PROFILE/ACCOUNT PAGE
-- skill.html - SKILL INFO PAGE
+- account.html - PROFILE
+- skill.html - SKILL
 
 ---
 
-#### FEED
+#### FEED - frontend/app/index.html
 
 transaction feed
 
-#### SWAP
+#### SWAP - frontend/app/swap.html
 
 swap componenet
 
-#### ACCOUNT
+#### ACCOUNT - frontend/app/account.html
 
 profile/account page
 
-#### SKILL
+#### SKILL - frontend/app/skill.html
 
 skill info page
+
+### AUTH - frontend/app/auth.html
+
+auth login page, auto redirects to account page if logged in
 
 =====================
 <br/>
