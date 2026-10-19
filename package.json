@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "lucide-preact": "^1.59.0",
     "preact": "^11.0.1"
   },
   "devDependencies": {

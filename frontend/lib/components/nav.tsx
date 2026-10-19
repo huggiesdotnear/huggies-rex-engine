@@ -26,20 +26,24 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { Home, RefreshCcw, User, GraduationCap } from "lucide-preact";
+// ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // the four nav entries. `href` is the bare filename (no directory
 // prefix); the runtime resolver below applies the right number of
 // "../" prefixes for the current page depth.
+import type { ComponentType } from "preact";
 interface HUGGIES_NAV_LINK {
   href: string;
   label: string;
+  Icon: ComponentType<{ size?: number }>;
 }
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
-  { href: "index.html", label: "FEED" },
-  { href: "swap.html", label: "SWAP" },
-  { href: "account.html", label: "ACCOUNT" },
-  { href: "skill.html", label: "SKILL" },
+  { href: "index.html", label: "FEED", Icon: Home },
+  { href: "swap.html", label: "SWAP", Icon: RefreshCcw },
+  { href: "account.html", label: "ACCOUNT", Icon: User },
+  { href: "skill.html", label: "SKILL", Icon: GraduationCap },
 ];
 // ========================================
 // --- HELPERS ----------------------------
@@ -116,21 +120,18 @@ function HUGGIES_COMPONENT_NAV_FUN() {
   const current_base = current_basename_fun();
 
   return (
-    <>
-      {/*no need to use the div, <> is enough*/}
-      {/*keep the comment <div> for aesthetic purposes*/}
-      {/*<div class="HUGGIES_NAV_DIV">*/}
+    <nav>
       {HUGGIES_NAV_LINKS.map((link) => {
         const resolved = resolve_href_fun(link.href, depth);
         const is_active = is_active_link_fun(link.href, current_base);
         return (
           <a href={resolved} aria-current={is_active ? "page" : undefined}>
-            {link.label}
+            <link.Icon size={20} />
+            <span>{link.label}</span>
           </a>
         );
       })}
-      {/*</div>*/}
-    </>
+    </nav>
   );
 }
 // ========================================
