@@ -1,0 +1,12 @@
+/*==================================*/
+nav {
+  background-color: white;
+  color: black;
+  mix-blend-mode: difference;
+}
+nav a:hover,
+nav a[aria-current="page"] {
+  background-color: black;
+  color: white;
+}
+/*==================================*/
