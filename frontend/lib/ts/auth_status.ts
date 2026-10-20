@@ -312,71 +312,6 @@ async function log_wallet_diagnostics_fun(connector: NearConnector): Promise<voi
   }
 }
 // ----------------------------------------
-// ensure_random_uuid_fun — guarantee crypto.randomUUID exists.
-//
-// WHY THIS IS NEEDED: crypto.randomUUID is only exposed in a SECURE
-// CONTEXT — HTTPS, or http://localhost / 127.0.0.1. Loading the app
-// from a LAN address (http://192.168.x.x:54733) leaves it undefined,
-// and any code that calls it unguarded throws
-// "crypto.randomUUID is not a function".
-//
-// near-connect's own helper guards for this and falls back to a
-// Math.random-based uuid, so near-connect alone will not throw. the
-// error comes from code that calls it directly — most likely a wallet
-// executor running inside the sandboxed iframe that near-connect
-// creates when you pick a wallet, which is third-party code this
-// module cannot patch.
-//
-// installing a real getRandomValues-backed polyfill here means the API
-// exists on insecure origins too. getRandomValues IS available on
-// insecure origins (it is not secure-context gated), so the polyfill
-// is cryptographically sound, not a downgrade. it only fills in what
-// the platform withheld.
-//
-// this is intentionally NOT a security boundary — near-connect uses
-// these uuids for iframe message correlation, not for signing. the
-// actual NEP-413 signature comes from the wallet over ed25519, and
-// the nonce comes from near-kit's generateNonce(), which uses
-// getRandomValues and is unaffected.
-// ----------------------------------------
-function ensure_random_uuid_fun(): void {
-  if (typeof crypto === "undefined") return;
-  const target = crypto as Crypto & { randomUUID?: () => string };
-  if (typeof target.randomUUID === "function") {
-    // secure context — nothing to do
-    if (typeof window !== "undefined" && window.isSecureContext === false) {
-      console.info(
-        "[auth] origin is not a secure context but randomUUID exists — " +
-          `origin=${window.location.origin}`,
-      );
-    }
-    return;
-  }
-  console.warn(
-    "[auth] crypto.randomUUID is unavailable on this origin — installing a " +
-      `getRandomValues polyfill. origin=${typeof window !== "undefined" ? window.location.origin : "(no window)"} ` +
-      "secureContext=" +
-      `${typeof window !== "undefined" ? window.isSecureContext : "?"}. ` +
-      "This is expected on a LAN IP over http:// and usually harmless; " +
-      "loading from http://localhost avoids it entirely.",
-  );
-  // assigned through a loose cast: the DOM lib types randomUUID as
-  // returning a template-literal uuid, which a runtime-built string
-  // cannot satisfy without an `as` on every return.
-  target.randomUUID = (() => {
-    const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
-    // RFC 4122 version 4 layout: version nibble 4, variant 10xx.
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0"));
-    return (
-      `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-` +
-      `${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-` +
-      `${hex.slice(10, 16).join("")}`
-    );
-  }) as Crypto["randomUUID"];
-}
 // ========================================
 // ========================================
 // ========================================
@@ -434,6 +369,10 @@ async function sign_in_fun(): Promise<void> {
 
   const network = getStoredNetworkId();
   const nonce = make_nonce_fun();
+  // names the call in flight, reported in the catch. near-connect
+  // reuses the same error strings across steps, so this is the only
+  // way to tell which call actually failed.
+  let stage = "start";
   in_flight_nonce = nonce;
   const phrase = pick_session_phrase_fun();
   // logged for support/debugging only — the phrase is NOT part of the
@@ -448,7 +387,6 @@ async function sign_in_fun(): Promise<void> {
   // failure mode into a bare "Failed to sign in".
   //
   // logged before the attempt so a silent failure still leaves a trail.
-  ensure_random_uuid_fun();
   log_wallet_diagnostics_fun(connector);
 
   try {
@@ -466,13 +404,24 @@ async function sign_in_fun(): Promise<void> {
     // sleet-js/intear-dex-aggregator-tool-box uses (html/src/auth.ts)
     // and is the most widely supported across wallets. the cost is one
     // extra wallet prompt, paid in exchange for sign-in working at all.
+    stage = "connect";
     await connector.connect();
 
+    stage = "get wallet";
     const wallet = await connector.wallet();
 
     // account id from getAccounts() rather than the sign-in event: same
-    // call the reference implementation uses, and it reflects the
+    // call both reference implementations use, and it reflects the
     // wallet's real state.
+    //
+    // this call THROWS rather than returning empty — getAccounts()
+    // goes through the wallet executor and surfaces "Wallet closed"
+    // or an executor error when the wallet misbehaves. both reference
+    // demos wrap it in try/catch for that reason. it is inside the
+    // outer try already, so a throw lands in the catch below with the
+    // rollback; the explicit empty check stays for the wallet that
+    // genuinely resolves with zero accounts.
+    stage = "get accounts";
     const accounts = await wallet.getAccounts();
     const signed_account = accounts[0];
     if (signed_account === undefined) {
@@ -481,6 +430,7 @@ async function sign_in_fun(): Promise<void> {
         network,
         accounts,
       });
+      await rollback_connection_fun(connector);
       return;
     }
 
@@ -488,11 +438,21 @@ async function sign_in_fun(): Promise<void> {
     // standalone signMessage feature (12/14 manifest wallets, versus
     // 11/14 for the combined path), and it is the call server-side
     // NEP-413 verification is built around.
+    //
+    // NOTE: only the three required fields are passed. near-kit's own
+    // near-connect adapter (dist/wallets/adapters.js) calls
+    // wallet.signMessage({ message, recipient, nonce }) and nothing
+    // else, deliberately dropping signerId/callbackUrl. the wallet
+    // layer already defaults network from the connector
+    // (SandboxedWallet.signMessage does
+    // `params.network ?? this.connector.network`), so passing it adds
+    // a field the wallets have to tolerate for no benefit. match the
+    // known-good shape exactly.
+    stage = "sign message";
     const signed = await wallet.signMessage({
       message: HUGGIES_SIGN_IN_MESSAGE,
       recipient: HUGGIES_SIGN_IN_RECIPIENT,
       nonce,
-      network,
     });
 
     save_session_fun({
@@ -511,6 +471,24 @@ async function sign_in_fun(): Promise<void> {
     account_id = signed_account.accountId;
     console.info(`[auth] signed in as ${signed_account.accountId}`);
   } catch (err) {
+    // The connector can log its own internals — NearConnector takes a
+    // `logger` option and its executor logs each iframe call ("Calling
+    // method", "Iframe ready", "postMessage"). Those lines are the only
+    // place the wallet executor's real failure appears, because
+    // SandboxedWallet.call() rejects with the executor's raw result and
+    // the connector otherwise swallows it.
+    //
+    // only the currently-selected connector can be given a logger
+    // after construction, and the toolbox builds it internally, so this
+    // attaches directly. safe if already set: near-connect reads
+    // logger?.log everywhere, so overriding is additive rather than a
+    // replacement of behaviour.
+    const active = near_connect_client();
+    if (active.logger === undefined) {
+      active.logger = {
+        log: (...args: unknown[]) => console.debug("[near-connect]", ...args),
+      };
+    }
     const message = err instanceof Error ? err.message : String(err);
     // a rejected or closed popup is a normal outcome, not a crash —
     // report it and leave the app signed out.
@@ -528,23 +506,32 @@ async function sign_in_fun(): Promise<void> {
     // session, so retrying starts from a clean slate instead of
     // silently re-using a half-finished connection.
     await rollback_connection_fun(connector);
-    // "Failed to sign in" is near-connect's catch-all: it means the
-    // wallet returned an empty account list, which covers a closed
-    // popup, a blocked manifest, a wallet that cannot sign messages,
-    // and a genuine wallet-side failure. spell that out so the console
-    // is not the same single useless line the user just saw.
+    // Which call failed matters more than the message. near-connect
+    // uses the SAME "Failed to sign in" / "Wallet closed" strings for
+    // several very different failures, and the previous logs could not
+    // distinguish "the user declined connect" from "the wallet
+    // rejected the sign message" — both just printed the message.
+    //
+    // `stage` names the last call that was entered, so one console
+    // line is enough to locate the failure. the raw error is logged
+    // as an Error object (not just its .message) because the wallet
+    // executors put the useful detail on the stack/properties.
     console.warn("[auth] sign in failed", {
+      stage,
       error: message,
+      raw: err,
       network,
       walletsLoaded: connector.wallets.length,
       walletIds: connector.wallets.map((wallet) => wallet.manifest.id),
       hint:
         message === "Failed to sign in"
-          ? "The wallet returned no accounts. This is thrown by connector.connect() " +
-            "when the wallet's sign-in returns an empty list — usually the user " +
-            "dismissed or closed the popup. The manifest loaded fine, so this is " +
-            "wallet-side. Retry, or pick a different wallet."
-          : undefined,
+          ? 'Thrown by connect() when the wallet\'s sign-in returns an empty ' +
+            "account list. The manifest loaded fine, so this is wallet-side: " +
+            "the user declined, closed the popup, or the wallet executor " +
+            "failed. Retry, or pick a different wallet."
+          : message === "Wallet closed"
+            ? "The wallet popup was dismissed or closed before it answered."
+            : undefined,
     });
   } finally {
     in_flight_nonce = null;
