@@ -18,12 +18,17 @@
 //   /app/swap.html        HUGGIES_COMPONENT_NAV
 //   /app/account.html     HUGGIES_COMPONENT_NAV
 //   /app/skill.html       HUGGIES_COMPONENT_NAV
+//   /index.html           HUGGIES_COMPONENT_RANDOM_SLOGAN_P
 //
 // auth.html is intentionally not wired — it is the login/redirect
 // page, so the nav would be confusing.
 //
 // the nav lives on every other page, so its import is universal.
+// the random slogan only lives on the root landing page, but its
+// import is harmless everywhere — the self-mount block inside
+// the component only fires when a matching id is on the page.
 // ========================================
 
 import "../components/nav";
+import "../components/random_slogan_p";
 // ========================================

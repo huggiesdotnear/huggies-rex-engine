@@ -1,3 +1,18 @@
+// ========================================
+// HUGGIES_SLOGANS
+// the raw copy pool the random slogan component draws from
+// (see frontend/lib/components/random_slogan_p.tsx). kept in its
+// own file so editing the copy never means touching component
+// logic.
+//
+// entries are plain strings with no interpolation — the $SHIT /
+// $NEAR / #HUGGIES tokens are literal text, not template
+// variables, so a slogan can be dropped in verbatim.
+//
+// the list is `readonly` so no consumer can sort/shuffle it in
+// place; a component that wants a different order should copy it
+// first.
+// ========================================
 export const HUGGIES_SLOGANS: readonly string[] = [
   "DIAPER HANDS ONLY", // index 0
   "$SHIT - The world is full of it.",
@@ -19,3 +34,4 @@ export const HUGGIES_SLOGANS: readonly string[] = [
   "$SHIT $SHIT $SHIT $SHIT $SHIT $SHIT $SHIT",
   "the ultimate hedge against inflation. $SHIT",
 ];
+// ========================================
