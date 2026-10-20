@@ -341,24 +341,26 @@ async function rollback_connection_fun(connector: NearConnector): Promise<void> 
 // ========================================
 // ========================================
 // --- SIGN IN ----------------------------
-// sign_in_fun — sign in, then sign a login message.
+// sign_in_fun — sign in AND sign the login message in ONE wallet prompt.
 //
-// two wallet prompts, deliberately:
-//   1. connect()                          — pick a wallet, sign in
-//   2. wallet.signMessage({ ... })        — approve the login message
+// uses connect({ signMessageParams }), matching the official example at
+// azbang/near-connect example/src/App.tsx ("Connect (With Signed
+// Message)"). the message params travel with the sign-in and the wallet
+// emits wallet:signInAndSignMessage, so the user approves ONCE.
 //
-// this replaced connect({ signMessageParams }), which does both in a
-// single popup and is the tidier API, but it throws "Failed to sign in"
-// against real wallets: the combined wallet:signInAndSignMessage call
-// comes back with no accounts. paying for one extra prompt is worth it
-// when the alternative does not work at all.
+// an earlier revision used the two-step path (connect(), then a
+// separate wallet.signMessage()). it worked in Firefox but produced two
+// popups — worse than the official flow, and not what was originally
+// asked for. the "Failed to sign in" reports that prompted that change
+// came from the Edge wallet extension failing inside its own signIn
+// (`Cannot read properties of undefined (reading 'generateKey')` in
+// about:srcdoc), not from the combined call.
 //
 // the sequence:
 //   1. snapshot the nonce — the wallet will NOT echo it back
-//   2. connect()
-//   3. read the account id via wallet().getAccounts()
-//   4. sign the message with the same nonce
-//   5. store message + nonce + recipient + network + signature
+//   2. arm a one-shot listener for the combined event
+//   3. connect({ signMessageParams }) — one popup
+//   4. store message + nonce + recipient + network + signature
 //
 // any failure clears the in-flight nonce, because a nonce that is
 // never persisted is useless and a leaked one is a replay liability.
@@ -389,76 +391,77 @@ async function sign_in_fun(): Promise<void> {
   // logged before the attempt so a silent failure still leaves a trail.
   log_wallet_diagnostics_fun(connector);
 
+  // arm the one-shot listener BEFORE connect(). connect() emits
+    // wallet:signInAndSignMessage synchronously as part of resolving,
+    // so a listener attached afterwards would never fire.
+    const signed = new Promise<{
+      accountId: string;
+      publicKey: string;
+      signature: string;
+    }>((resolve) => {
+      const handler = (payload: {
+        accounts: Array<{
+          accountId: string;
+          signedMessage: { publicKey?: string; signature: string };
+        }>;
+      }) => {
+        // detach immediately so a later sign-in cannot resolve this
+        // stale promise.
+        connector.off("wallet:signInAndSignMessage", handler);
+        const first = payload.accounts[0];
+        if (first === undefined) return;
+        resolve({
+          accountId: first.accountId,
+          publicKey: first.signedMessage.publicKey ?? "",
+          signature: first.signedMessage.signature,
+        });
+      };
+      connector.on("wallet:signInAndSignMessage", handler);
+    });
+
   try {
-    // STEP 1 — sign in, with NO signMessageParams.
+    // ONE popup: connect + sign the message together. this is the
+    // official "Connect (With Signed Message)" pattern from
+    // azbang/near-connect example/src/App.tsx.
     //
-    // this deliberately does NOT use connect({ signMessageParams }),
-    // which folds both steps into one popup. that path calls
-    // wallet.signInAndSignMessage() and throws "Failed to sign in" in
-    // practice — the wallet returns no accounts for the combined call,
-    // and near-connect reports the same generic error whether the user
-    // declined, the popup closed, or the wallet does not implement the
-    // combined call well.
-    //
-    // plain connect() is what the reference implementation in
-    // sleet-js/intear-dex-aggregator-tool-box uses (html/src/auth.ts)
-    // and is the most widely supported across wallets. the cost is one
-    // extra wallet prompt, paid in exchange for sign-in working at all.
-    stage = "connect";
-    await connector.connect();
+    // signMessageParams omits signerId and network by type
+    // (SignMessageDuringSignInParams = Omit<SignMessageParams,
+    // "signerId" | "network">) — the connector and wallet fill those in
+    // from their own configuration.
+    stage = "connect + sign";
+    await connector.connect({
+      signMessageParams: {
+        message: HUGGIES_SIGN_IN_MESSAGE,
+        recipient: HUGGIES_SIGN_IN_RECIPIENT,
+        nonce,
+      },
+    });
 
-    stage = "get wallet";
-    const wallet = await connector.wallet();
-
-    // account id from getAccounts() rather than the sign-in event: same
-    // call both reference implementations use, and it reflects the
-    // wallet's real state.
-    //
-    // this call THROWS rather than returning empty — getAccounts()
-    // goes through the wallet executor and surfaces "Wallet closed"
-    // or an executor error when the wallet misbehaves. both reference
-    // demos wrap it in try/catch for that reason. it is inside the
-    // outer try already, so a throw lands in the catch below with the
-    // rollback; the explicit empty check stays for the wallet that
-    // genuinely resolves with zero accounts.
-    stage = "get accounts";
-    const accounts = await wallet.getAccounts();
-    const signed_account = accounts[0];
-    if (signed_account === undefined) {
-      set_error_fun("Wallet returned no accounts.");
-      console.warn("[auth] wallet connected but reported zero accounts", {
+    // the connector resolves before we necessarily have the payload,
+    // so await the event. if the wallet signed in but returned no
+    // accounts this promise never settles — the guard below keeps that
+    // from hanging the UI forever.
+    stage = "await signed message";
+    const result = await Promise.race([
+      signed,
+      // generous ceiling: a wallet that never answers must not leave
+      // the button stuck on "..." for ever.
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 60_000)),
+    ]);
+    if (result === null) {
+      set_error_fun("Wallet signed in but returned no signed message.");
+      console.warn("[auth] wallet:signInAndSignMessage never arrived", {
         network,
-        accounts,
+        walletsLoaded: connector.wallets.length,
       });
       await rollback_connection_fun(connector);
       return;
     }
 
-    // STEP 2 — sign the message. this is the widely supported
-    // standalone signMessage feature (12/14 manifest wallets, versus
-    // 11/14 for the combined path), and it is the call server-side
-    // NEP-413 verification is built around.
-    //
-    // NOTE: only the three required fields are passed. near-kit's own
-    // near-connect adapter (dist/wallets/adapters.js) calls
-    // wallet.signMessage({ message, recipient, nonce }) and nothing
-    // else, deliberately dropping signerId/callbackUrl. the wallet
-    // layer already defaults network from the connector
-    // (SandboxedWallet.signMessage does
-    // `params.network ?? this.connector.network`), so passing it adds
-    // a field the wallets have to tolerate for no benefit. match the
-    // known-good shape exactly.
-    stage = "sign message";
-    const signed = await wallet.signMessage({
-      message: HUGGIES_SIGN_IN_MESSAGE,
-      recipient: HUGGIES_SIGN_IN_RECIPIENT,
-      nonce,
-    });
-
     save_session_fun({
-      accountId: signed_account.accountId,
-      publicKey: signed.publicKey ?? "",
-      signature: signed.signature,
+      accountId: result.accountId,
+      publicKey: result.publicKey,
+      signature: result.signature,
       message: HUGGIES_SIGN_IN_MESSAGE,
       nonce: bytes_to_base64_fun(nonce),
       recipient: HUGGIES_SIGN_IN_RECIPIENT,
@@ -468,8 +471,8 @@ async function sign_in_fun(): Promise<void> {
     });
 
     session_network = network;
-    account_id = signed_account.accountId;
-    console.info(`[auth] signed in as ${signed_account.accountId}`);
+    account_id = result.accountId;
+    console.info(`[auth] signed in as ${result.accountId}`);
   } catch (err) {
     // The connector can log its own internals — NearConnector takes a
     // `logger` option and its executor logs each iframe call ("Calling
@@ -495,12 +498,12 @@ async function sign_in_fun(): Promise<void> {
     set_error_fun(message);
     // ROLL BACK THE WALLET CONNECTION.
     //
-    // the two-step flow means connect() can succeed and signMessage()
-    // then fail — the user connects, then declines the login message.
-    // connect() emits wallet:signIn, which the listener in init()
-    // adopts into account_id, so without this the button would keep
-    // showing a signed-in account for a session that has NO signature
-    // and can therefore never be verified server-side.
+    // connect() can emit wallet:signIn (and autoConnect does so on its
+    // own for injected wallets) even when the combined sign-in+sign
+    // call then fails. init()'s listener adopts that event into
+    // account_id, so without this the button would keep showing a
+    // signed-in account for a session that has NO signature and can
+    // therefore never be verified server-side.
     //
     // this clears our local view AND tells the wallet to drop the
     // session, so retrying starts from a clean slate instead of
