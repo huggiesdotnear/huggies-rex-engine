@@ -136,11 +136,16 @@ function toggle_fun(): "mainnet" | "testnet" {
 // refreshed from it after every toggle, so the label can never
 // drift from what near_kit_client() would return.
 //
-// note the rendered <button> deliberately does NOT carry the mount
-// id. the id belongs to the page's own empty <button> element, and
-// preact renders into that element — putting the id on the child
-// too would nest a second button inside the first, which is invalid
-// HTML and would make the click land on the inner node.
+// returns a fragment, exactly like HUGGIES_COMPONENT_NAV_FUN, so
+// this component contributes only the <button> and never adds a
+// wrapper of its own.
+//
+// the rendered <button> deliberately does NOT carry the mount id.
+// the id belongs to the page's own <div>, and preact renders into
+// that element — putting the id on the button too would mean two
+// elements claiming the same id. with a <div> mount this whole
+// class of nesting bug is gone: there is never a button inside a
+// button.
 function HUGGIES_COMPONENT_NETWORK_BUTTON_FUN() {
   // ========================================
   const [current, set_current] = use_state(getStoredNetworkId());
@@ -150,9 +155,11 @@ function HUGGIES_COMPONENT_NETWORK_BUTTON_FUN() {
   };
 
   return (
-    <button type="button" onClick={on_click_fun} data-huggies-network={current}>
-      {current.toUpperCase()}
-    </button>
+    <>
+      <button type="button" onClick={on_click_fun} data-huggies-network={current}>
+        {current.toUpperCase()}
+      </button>
+    </>
   );
 }
 // ========================================
@@ -161,7 +168,7 @@ function HUGGIES_COMPONENT_NETWORK_BUTTON_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount so the component file works as its own entry. looks
-// for a <button id="HUGGIES_COMPONENT_NETWORK_BUTTON"> on the page
+// for a <div id="HUGGIES_COMPONENT_NETWORK_BUTTON"> on the page
 // (added by the frontend/app/*.html pages) and renders into it.
 //
 // the side effect is guarded by an id check so importing this

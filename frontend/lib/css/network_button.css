@@ -1,22 +1,19 @@
 /*==================================*/
 /* NETWORK BUTTON */
 /* the page declares an empty                                        */
-/*   <button id="HUGGIES_COMPONENT_NETWORK_BUTTON"></button>        */
-/* and preact renders the real control INSIDE it, so the id sits   */
-/* on a wrapper with the styled button one level down. that indirection is */
-/* deliberate: putting the id on the rendered button too would nest  */
-/* a button inside a button.                                         */
-/*                                                                  */
-/* sits just above the fixed bottom nav, centered so it reads as a */
-/* page-level control rather than part of the nav row.              */
+/*   <div id="HUGGIES_COMPONENT_NETWORK_BUTTON"></div>              */
+/* and preact renders the real control inside it. a <div> is used   */
+/* rather than a <button> so the rendered <button> can never end up */
+/* nested inside another button — the id lives on the wrapper only, */
+/* exactly once.                                                     */
+/*                                                                    */
+/* the wrapper carries the positioning and the pill styling; it is  */
+/* never itself a click target.                                      */
 #HUGGIES_COMPONENT_NETWORK_BUTTON {
   position: fixed;
   bottom: 76px;
   left: 50%;
   transform: translateX(-50%);
-  display: block;
-  /* the wrapper is only a positioning anchor, never a target */
-  pointer-events: none;
 }
 /*----------------------*/
 #HUGGIES_COMPONENT_NETWORK_BUTTON > button {
@@ -31,7 +28,6 @@
   border: 1px solid #474747;
   border-radius: 999px;
   cursor: pointer;
-  pointer-events: auto;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 /*----------------------*/
