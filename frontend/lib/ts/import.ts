@@ -24,13 +24,20 @@
 // page, so the nav would be confusing.
 //
 // the nav lives on every other page, so its import is universal.
-// the network button is wired alongside the nav for the same
-// reason; the random slogan only lives on the root landing page.
-// neither cares about which pages carry the id — the self-mount
-// blocks only fire when a matching id is actually on the page.
+// the network button and auth button are wired alongside the nav for
+// the same reason; the random slogan only lives on the root landing
+// page. none of them care about which pages carry the id — the
+// self-mount blocks only fire when a matching id is actually on the
+// page.
+//
+// the auth button pulls in auth_status.ts, which builds a
+// NearConnector and wires wallet events. that only happens inside its
+// guarded mount block, so importing it on a page with no auth mount
+// element stays inert.
 // ========================================
 
 import "../components/nav";
 import "../components/random_slogan_p";
 import "../components/network_button";
+import "../components/auth_button";
 // ========================================
