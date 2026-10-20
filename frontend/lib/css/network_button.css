@@ -1,0 +1,47 @@
+/*==================================*/
+/* NETWORK BUTTON */
+/* the page declares an empty                                        */
+/*   <button id="HUGGIES_COMPONENT_NETWORK_BUTTON"></button>        */
+/* and preact renders the real control INSIDE it, so the id sits   */
+/* on a wrapper with the styled button one level down. that indirection is */
+/* deliberate: putting the id on the rendered button too would nest  */
+/* a button inside a button.                                         */
+/*                                                                  */
+/* sits just above the fixed bottom nav, centered so it reads as a */
+/* page-level control rather than part of the nav row.              */
+#HUGGIES_COMPONENT_NETWORK_BUTTON {
+  position: fixed;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  /* the wrapper is only a positioning anchor, never a target */
+  pointer-events: none;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_NETWORK_BUTTON > button {
+  display: block;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--color-backend);
+  background-color: var(--color-fontend);
+  border: 1px solid #474747;
+  border-radius: 999px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_NETWORK_BUTTON > button:hover {
+  background-color: var(--color-backend);
+  color: var(--color-fontend);
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_NETWORK_BUTTON > button:focus-visible {
+  outline: 2px solid var(--color-backend);
+  outline-offset: 2px;
+}
+/*==================================*/

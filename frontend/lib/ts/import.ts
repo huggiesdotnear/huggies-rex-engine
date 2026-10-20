@@ -24,11 +24,13 @@
 // page, so the nav would be confusing.
 //
 // the nav lives on every other page, so its import is universal.
-// the random slogan only lives on the root landing page, but its
-// import is harmless everywhere — the self-mount block inside
-// the component only fires when a matching id is on the page.
+// the network button is wired alongside the nav for the same
+// reason; the random slogan only lives on the root landing page.
+// neither cares about which pages carry the id — the self-mount
+// blocks only fire when a matching id is actually on the page.
 // ========================================
 
 import "../components/nav";
 import "../components/random_slogan_p";
+import "../components/network_button";
 // ========================================
