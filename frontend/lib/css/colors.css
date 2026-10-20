@@ -4,6 +4,9 @@
   --color-fontend: #ffffff;
   --color-middle: #00c6d7;
   --color-backend: #da291c;
+  /* derived tones */
+  --color-middle-dark: #009aab;
+  --color-backend-light: #ffe8e6;
 }
 /*==================================*/
 /*

@@ -1,0 +1,68 @@
+/*==================================*/
+/* BUTTON */
+/* general styling for every <button> in the app. components should */
+/* not need their own button css — if a control needs to look        */
+/* different, add a modifier class here rather than a new file.      */
+/*                                                                    */
+/* no positioning: buttons flow in normal document order. any         */
+/* control that must sit somewhere specific (fixed nav, toolbar,     */
+/* etc.) positions itself with its own layout rules, not from here.  */
+/*                                                                    */
+/* the resting fill is a light tint of the page background rather    */
+/* than the saturated red, because the body itself is red — a red     */
+/* fill on a red page reads as no fill at all. hover swaps to the    */
+/* teal accent, which is far enough away in hue to register clearly. */
+/*==================================*/
+button {
+  display: block;
+  /*----------------------*/
+  width: 100%;
+  box-sizing: border-box;
+  /*----------------------*/
+  padding: 10px 16px;
+  /*----------------------*/
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  /*----------------------*/
+  color: var(--color-backend);
+  background-color: var(--color-backend-light);
+  /*----------------------*/
+  border: 2px solid var(--color-middle);
+  border-radius: 12px;
+  /*----------------------*/
+  cursor: pointer;
+  /*----------------------*/
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+/*----------------------*/
+button:hover {
+  background-color: var(--color-middle);
+  color: var(--color-fontend);
+  border-color: var(--color-middle-dark);
+}
+/*----------------------*/
+button:focus-visible {
+  outline: 3px solid var(--color-middle);
+  outline-offset: 2px;
+}
+/*----------------------*/
+/* keyboard users get the same clear ring as hover, since hover */
+/* cannot apply to them.                                               */
+button:focus {
+  outline: 3px solid var(--color-middle);
+  outline-offset: 2px;
+}
+/*----------------------*/
+button:active {
+  background-color: var(--color-middle-dark);
+  color: var(--color-fontend);
+}
+/*----------------------*/
+button[disabled],
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+/*==================================*/
