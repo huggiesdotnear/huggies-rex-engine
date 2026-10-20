@@ -311,6 +311,72 @@ async function log_wallet_diagnostics_fun(connector: NearConnector): Promise<voi
     console.warn("[auth] diagnostics failed", err);
   }
 }
+// ----------------------------------------
+// ensure_random_uuid_fun — guarantee crypto.randomUUID exists.
+//
+// WHY THIS IS NEEDED: crypto.randomUUID is only exposed in a SECURE
+// CONTEXT — HTTPS, or http://localhost / 127.0.0.1. Loading the app
+// from a LAN address (http://192.168.x.x:54733) leaves it undefined,
+// and any code that calls it unguarded throws
+// "crypto.randomUUID is not a function".
+//
+// near-connect's own helper guards for this and falls back to a
+// Math.random-based uuid, so near-connect alone will not throw. the
+// error comes from code that calls it directly — most likely a wallet
+// executor running inside the sandboxed iframe that near-connect
+// creates when you pick a wallet, which is third-party code this
+// module cannot patch.
+//
+// installing a real getRandomValues-backed polyfill here means the API
+// exists on insecure origins too. getRandomValues IS available on
+// insecure origins (it is not secure-context gated), so the polyfill
+// is cryptographically sound, not a downgrade. it only fills in what
+// the platform withheld.
+//
+// this is intentionally NOT a security boundary — near-connect uses
+// these uuids for iframe message correlation, not for signing. the
+// actual NEP-413 signature comes from the wallet over ed25519, and
+// the nonce comes from near-kit's generateNonce(), which uses
+// getRandomValues and is unaffected.
+// ----------------------------------------
+function ensure_random_uuid_fun(): void {
+  if (typeof crypto === "undefined") return;
+  const target = crypto as Crypto & { randomUUID?: () => string };
+  if (typeof target.randomUUID === "function") {
+    // secure context — nothing to do
+    if (typeof window !== "undefined" && window.isSecureContext === false) {
+      console.info(
+        "[auth] origin is not a secure context but randomUUID exists — " +
+          `origin=${window.location.origin}`,
+      );
+    }
+    return;
+  }
+  console.warn(
+    "[auth] crypto.randomUUID is unavailable on this origin — installing a " +
+      `getRandomValues polyfill. origin=${typeof window !== "undefined" ? window.location.origin : "(no window)"} ` +
+      "secureContext=" +
+      `${typeof window !== "undefined" ? window.isSecureContext : "?"}. ` +
+      "This is expected on a LAN IP over http:// and usually harmless; " +
+      "loading from http://localhost avoids it entirely.",
+  );
+  // assigned through a loose cast: the DOM lib types randomUUID as
+  // returning a template-literal uuid, which a runtime-built string
+  // cannot satisfy without an `as` on every return.
+  target.randomUUID = (() => {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    // RFC 4122 version 4 layout: version nibble 4, variant 10xx.
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0"));
+    return (
+      `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-` +
+      `${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-` +
+      `${hex.slice(10, 16).join("")}`
+    );
+  }) as Crypto["randomUUID"];
+}
 // ========================================
 // ========================================
 // ========================================
@@ -355,6 +421,7 @@ async function sign_in_fun(): Promise<void> {
   // the popup.
   //
   // logged before the attempt so a silent failure still leaves a trail.
+  ensure_random_uuid_fun();
   log_wallet_diagnostics_fun(connector);
 
   // one-shot listener: resolve once the combined sign-in+sign event
