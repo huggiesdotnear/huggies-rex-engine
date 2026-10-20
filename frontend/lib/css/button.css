@@ -12,11 +12,20 @@
 /* than the saturated red, because the body itself is red — a red     */
 /* fill on a red page reads as no fill at all. hover swaps to the    */
 /* teal accent, which is far enough away in hue to register clearly. */
+/*                                                                    */
+/* width: buttons match the page column (500px / 90vw) rather than  */
+/* stretching to the viewport, so they line up with main and nav.    */
+/* the width sits on the button itself and not on whatever mount     */
+/* element wraps it: body is a flex column with align-items:center,  */
+/* so a wrapper div shrinks to fit its content and a nested           */
+/* `width:100%` would only fill that shrunken box. sizing the button */
+/* directly makes it independent of whatever it is mounted into.     */
 /*==================================*/
 button {
   display: block;
   /*----------------------*/
-  width: 100%;
+  width: 500px;
+  max-width: 90vw;
   box-sizing: border-box;
   /*----------------------*/
   padding: 10px 16px;
