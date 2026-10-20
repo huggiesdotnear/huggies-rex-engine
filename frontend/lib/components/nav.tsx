@@ -120,7 +120,7 @@ function HUGGIES_COMPONENT_NAV_FUN() {
   const current_base = current_basename_fun();
 
   return (
-    <nav>
+    <>
       {HUGGIES_NAV_LINKS.map((link) => {
         const resolved = resolve_href_fun(link.href, depth);
         const is_active = is_active_link_fun(link.href, current_base);
@@ -131,7 +131,7 @@ function HUGGIES_COMPONENT_NAV_FUN() {
           </a>
         );
       })}
-    </nav>
+    </>
   );
 }
 // ========================================
