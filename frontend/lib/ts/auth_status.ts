@@ -34,6 +34,7 @@ import {
   near_connect_client,
   getStoredNetworkId,
 } from "@near-kit-tool-box/web";
+import type { NearConnector } from "@hot-labs/near-connect";
 import { generateNonce } from "near-kit";
 import {
   HUGGIES_SIGN_IN_MESSAGE,
@@ -254,6 +255,62 @@ function get_error_fun(): string | null {
 function get_session_fun(): HUGGIES_AUTH_SESSION | null {
   return load_session_fun();
 }
+// ----------------------------------------
+// log_wallet_diagnostics_fun — explain WHY a sign in failed.
+//
+// near-connect hides the real cause at two points:
+//   1. _loadManifest() does `.catch(() => ({ wallets: [] }))`, so a
+//      blocked or offline manifest fetch looks identical to an empty
+//      wallet list. the picker then shows nothing to click, and the
+//      connect that follows reports a bare "Failed to sign in".
+//   2. connect() collapses every failure into that same message.
+//
+// this logs the things that actually distinguish the cases: how many
+// wallets loaded, whether that list is empty, whether any of them
+// support the signInAndSignMessage feature this flow needs, and which
+// network the connector is pointed at.
+//
+// it logs INSTEAD of throwing. diagnostics must never be the reason
+// sign-in breaks.
+// ----------------------------------------
+async function log_wallet_diagnostics_fun(connector: NearConnector): Promise<void> {
+  try {
+    // whenManifestLoaded always resolves — it already caught the
+    // fetch failure — so this only waits for wallet registration.
+    await connector.whenManifestLoaded;
+    const wallets = connector.wallets;
+    console.info(
+      `[auth] connector network=${connector.network} wallets=${wallets.length}`,
+      wallets.map((wallet) => wallet.manifest.id),
+    );
+    if (wallets.length === 0) {
+      console.warn(
+        "[auth] no wallets loaded — the wallet manifest fetch probably failed " +
+          "(offline, blocked, or CORS). the wallet picker will be empty.",
+      );
+      return;
+    }
+    // the one-shot flow calls signInAndSignMessage, so a wallet that
+    // only supports the standalone signMessage feature will be
+    // filtered out of the picker even though it can sign messages.
+    const can_sign_in_and_sign = wallets.filter(
+      (wallet) => wallet.manifest.features?.signInAndSignMessage === true,
+    );
+    console.info(
+      `[auth] wallets supporting signInAndSignMessage: ${can_sign_in_and_sign.length}/${wallets.length}`,
+      can_sign_in_and_sign.map((wallet) => wallet.manifest.id),
+    );
+    if (can_sign_in_and_sign.length === 0) {
+      console.warn(
+        "[auth] no loaded wallet advertises signInAndSignMessage — every wallet " +
+          "in the picker will be filtered out and connect() will throw " +
+          "'Failed to sign in'.",
+      );
+    }
+  } catch (err) {
+    console.warn("[auth] diagnostics failed", err);
+  }
+}
 // ========================================
 // ========================================
 // ========================================
@@ -288,6 +345,17 @@ async function sign_in_fun(): Promise<void> {
   console.info(`[auth] signing in on ${network} — phrase: ${phrase}`);
 
   const connector = near_connect_client();
+
+  // diagnose why a connect fails. near-connect swallows most of the
+  // useful detail: _loadManifest() catches its own fetch failure and
+  // falls back to an empty wallet list, and connect() collapses every
+  // failure mode into a bare "Failed to sign in". without this, a
+  // blocked wallet manifest or a wallet that does not support
+  // signInAndSignMessage is indistinguishable from a user who closed
+  // the popup.
+  //
+  // logged before the attempt so a silent failure still leaves a trail.
+  log_wallet_diagnostics_fun(connector);
 
   // one-shot listener: resolve once the combined sign-in+sign event
   // arrives, then detach so a later sign-in cannot resolve this again.
@@ -345,7 +413,24 @@ async function sign_in_fun(): Promise<void> {
     // a rejected or closed popup is a normal outcome, not a crash —
     // report it and leave the app signed out.
     set_error_fun(message);
-    console.warn("[auth] sign in failed", err);
+    // "Failed to sign in" is near-connect's catch-all: it means the
+    // wallet returned an empty account list, which covers a closed
+    // popup, a blocked manifest, a wallet that cannot sign messages,
+    // and a genuine wallet-side failure. spell that out so the console
+    // is not the same single useless line the user just saw.
+    console.warn("[auth] sign in failed", {
+      error: message,
+      network,
+      walletsLoaded: connector.wallets.length,
+      walletIds: connector.wallets.map((wallet) => wallet.manifest.id),
+      hint:
+        message === "Failed to sign in"
+          ? "The wallet returned no accounts. Check whether the wallet manifest " +
+            "loaded (log_wallet_diagnostics above) and whether the chosen wallet " +
+            "supports signInAndSignMessage. An empty wallet list usually means the " +
+            "manifest fetch was blocked."
+          : undefined,
+    });
   } finally {
     in_flight_nonce = null;
     set_busy_fun(false);
@@ -398,6 +483,24 @@ function init_fun(): void {
   }
 
   const connector = near_connect_client();
+
+  // log the raw wallet lifecycle. near-connect emits nothing on
+  // failure, so these are the only positive signals that a connect
+  // actually reached the wallet. they are the fastest way to tell
+  // "the popup never opened" from "the user declined".
+  connector.on("wallet:signInAndSignMessage", (payload) => {
+    console.info(
+      `[auth] wallet signed in and signed — account=${payload.accounts[0]?.accountId ?? "(none)"}`,
+    );
+  });
+  connector.on("wallet:signIn", (payload) => {
+    console.info(
+      `[auth] wallet sign in — source=${payload.source} accounts=${payload.accounts.length}`,
+    );
+  });
+  connector.on("selector:walletsChanged", () => {
+    console.info(`[auth] wallet list changed — ${connector.wallets.length} available`);
+  });
 
   // the wallet can sign out from outside the app (the wallet UI
   // itself), so mirror that into our state instead of drifting.
