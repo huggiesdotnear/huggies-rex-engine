@@ -1,8 +1,8 @@
 // ========================================
 // AUTH BUTTON
 // the sign-in / sign-out control. shows "LOGIN" while signed out and
-// the connected account id (shortened) once signed in, and starts a
-// NEP-413 signed-message handshake on click.
+// the connected account id once signed in, and starts a NEP-413
+// signed-message handshake on click.
 //
 // ALL auth state lives in frontend/lib/ts/auth_status.ts. this file
 // is only a view: it reads from HUGGIES_AUTH and re-renders when that
@@ -15,10 +15,11 @@
 // signature, and the message/nonce/recipient it depends on, are stored
 // by auth_status.ts for later server-side verification.
 //
-// the account id is truncated for display only — the full id is what
-// gets stored and verified. ellipsis placement keeps the start and
-// end visible because NEAR ids are often name.near and the suffix is
-// the part people recognise.
+// the account id is shown verbatim — NEAR ids are bounded length
+// (well under the worst-case useful name), and the button column is
+// wide enough to hold them. truncating to "sle...ear"-style ellipsis
+// hides the disambiguating suffix that is usually the part of the id
+// people recognise, and the saved pixels were not buying anything.
 // ========================================
 import { render } from "preact";
 // preact exports these hooks as `useState`/`useEffect`; aliased on
@@ -29,16 +30,6 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_AUTH } from "../ts/auth_status";
 // ========================================
 // ========================================
-// --- HELPERS ----------------------------
-// shorten_account_fun — "sleet.near" becomes "sle…ear" so the button
-// stays inside the 500px page column. naive character slicing, which
-// is fine for an id that is always ASCII.
-function shorten_account_fun(account_id: string): string {
-  const KEEP_HEAD = 3;
-  const KEEP_TAIL = 3;
-  if (account_id.length <= KEEP_HEAD + KEEP_TAIL + 1) return account_id;
-  return `${account_id.slice(0, KEEP_HEAD)}...${account_id.slice(-KEEP_TAIL)}`;
-}
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -80,11 +71,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
     void HUGGIES_AUTH.sign_in().finally(() => set_busy(false));
   };
 
-  const label = busy
-    ? "..."
-    : is_signed_in
-      ? shorten_account_fun(account_id ?? "")
-      : "LOGIN";
+  const label = busy ? "..." : is_signed_in ? (account_id ?? "") : "LOGIN";
 
   return (
     <>

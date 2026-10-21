@@ -6,7 +6,7 @@ nav
 
 - index.html - FEED
 - swap.html - SWAP
-- account.html - PROFILE
+- account-router.html - PROFILE
 - skill.html - SKILL
 
 ---

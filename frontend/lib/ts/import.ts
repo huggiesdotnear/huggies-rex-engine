@@ -20,10 +20,12 @@
 //   /app/skill.html            HUGGIES_COMPONENT_NAV
 //   /index.html                HUGGIES_COMPONENT_RANDOM_SLOGAN_P
 //
-// auth.html and account-router.html are intentionally not wired —
-// auth.html is the login/redirect page (the nav would be
-// confusing), and account-router.html is a pure redirect shim
-// that never stays on screen long enough to host a nav.
+// auth.html and account-router.html are intentionally not wired from
+// here — both are pure redirect pages that pull in their own scripts:
+//   - auth.html            loads auth_redirect.ts (which side-effect
+//                          imports auth_button + network_button)
+//   - account-router.html  loads account_router.ts (a one-shot
+//                          redirect, no UI to mount)
 //
 // the nav lives on every other page, so its import is universal.
 // the network button and auth button are wired alongside the nav for
