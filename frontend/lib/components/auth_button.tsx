@@ -21,8 +21,8 @@
 // the part people recognise.
 // ========================================
 import { render } from "preact";
-// preact exports this hook as `useState`/`useEffect`; they are aliased
-// on import so the call sites below follow this repo's snake_case rule
+// preact exports these hooks as `useState`/`useEffect`; aliased on
+// import so the call sites below follow this repo's snake_case rule
 // without renaming the upstream exports.
 import {
   useState as use_state,
@@ -47,10 +47,17 @@ function shorten_account_fun(account_id: string): string {
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
   // ========================================
-  // a single counter forces a re-render whenever auth_status notifies.
-  // reading the real values through the getters on every render keeps
-  // this component a pure view of the module's state.
+  // a single counter forces a re-render whenever auth_status notifies,
+  // because preact does not re-render purely from an external setState
+  // call. reading the real values through the getters on every render
+  // keeps this component a pure view of the module's state.
   const [, set_revision] = use_state(0);
+
+  // while the wallet popup is open the button is disabled, so a
+  // second click cannot open a second popup. local to the component
+  // because the click flow is the component's concern, not the
+  // auth_status module's.
+  const [busy, set_busy] = use_state(false);
 
   // subscribe to auth changes and clean up on unmount, so a
   // remounted component does not stack listeners.
@@ -62,21 +69,25 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
   }, []);
 
   const account_id = HUGGIES_AUTH.get_account_id();
-  const busy = HUGGIES_AUTH.get_busy();
   const error = HUGGIES_AUTH.get_error();
   const is_signed_in = HUGGIES_AUTH.is_signed_in();
 
   const on_click_fun = () => {
+    if (busy) return;
     if (is_signed_in) {
-      void HUGGIES_AUTH.sign_out();
+      set_busy(true);
+      void HUGGIES_AUTH.sign_out().finally(() => set_busy(false));
       return;
     }
-    void HUGGIES_AUTH.sign_in();
+    set_busy(true);
+    void HUGGIES_AUTH.sign_in().finally(() => set_busy(false));
   };
 
-  // while the wallet popup is open the button is disabled, so a second
-  // click cannot open a second popup.
-  const label = busy ? "..." : is_signed_in ? shorten_account_fun(account_id ?? "") : "LOGIN";
+  const label = busy
+    ? "..."
+    : is_signed_in
+      ? shorten_account_fun(account_id ?? "")
+      : "LOGIN";
 
   return (
     <>

@@ -39,7 +39,6 @@ import { generateNonce } from "near-kit";
 import {
   HUGGIES_SIGN_IN_MESSAGE,
   HUGGIES_SIGN_IN_RECIPIENT,
-  pick_session_phrase_fun,
 } from "./sign_in_messages";
 // ========================================
 // ========================================
@@ -59,19 +58,11 @@ const HUGGIES_AUTH_STORAGE_KEY = "huggies_auth_session";
 let account_id: string | null = null;
 // the network the CURRENT session was signed in on.
 let session_network: "mainnet" | "testnet" | null = null;
-// true while a wallet popup is open, so the button can show a pending
-// state instead of letting the user double-submit.
-let busy = false;
 // the last error from a failed attempt; cleared on the next attempt.
 let last_error: string | null = null;
 // re-render callbacks. a plain array rather than a Set so
 // subscribe/unsubscribe ordering is stable and predictable.
 const listeners: Array<() => void> = [];
-// the nonce for an in-flight sign-in. the wallet echoes back the
-// signature but NOT the nonce we passed in, so we must hold on to our
-// own copy — the server needs those exact bytes to re-derive the
-// payload. cleared once stored or failed.
-let in_flight_nonce: Uint8Array | null = null;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -99,13 +90,8 @@ function subscribe_fun(listener: () => void): () => void {
   };
 }
 // ========================================
-// set_busy_fun / set_error_fun — the remaining state writes, each
-// notifying so the button can react without polling.
-function set_busy_fun(next: boolean): void {
-  busy = next;
-  notify_fun();
-}
-// ========================================
+// set_error_fun — clear the last error or set a new one. notifies
+// so the component re-renders to show/hide the error <p>.
 function set_error_fun(next: string | null): void {
   last_error = next;
   notify_fun();
@@ -113,7 +99,8 @@ function set_error_fun(next: string | null): void {
 // ========================================
 // bytes_to_base64_fun — Uint8Array -> base64, for storing the nonce.
 // btoa/atob rather than Buffer so this works in a browser without a
-// polyfill. chunked because String.fromCharCode(...bytes) blows the
+// polyfill. btoa takes a string, so the bytes are assembled in chunks
+// instead of spread — String.fromCharCode(...bytes) blows the
 // argument limit on large arrays; a nonce is 32 bytes so this is
 // belt-and-braces, but the helper stays correct for any length.
 function bytes_to_base64_fun(bytes: Uint8Array): string {
@@ -167,7 +154,6 @@ export interface HUGGIES_AUTH_SESSION {
   nonce: string;
   recipient: string;
   network: "mainnet" | "testnet";
-  phrase: string;
   createdAt: number;
 }
 // ========================================
@@ -207,7 +193,6 @@ function load_session_fun(): HUGGIES_AUTH_SESSION | null {
       nonce: parsed.nonce,
       recipient: parsed.recipient,
       network: parsed.network === "testnet" ? "testnet" : "mainnet",
-      phrase: typeof parsed.phrase === "string" ? parsed.phrase : "",
       createdAt: typeof parsed.createdAt === "number" ? parsed.createdAt : 0,
     };
   } catch {
@@ -241,11 +226,6 @@ function is_signed_in_fun(): boolean {
   return account_id !== null;
 }
 // ========================================
-// get_busy_fun — true while a wallet popup is open.
-function get_busy_fun(): boolean {
-  return busy;
-}
-// ========================================
 // get_error_fun — the last failure message, or null.
 function get_error_fun(): string | null {
   return last_error;
@@ -255,67 +235,8 @@ function get_error_fun(): string | null {
 function get_session_fun(): HUGGIES_AUTH_SESSION | null {
   return load_session_fun();
 }
-// ----------------------------------------
-// log_wallet_diagnostics_fun — explain WHY a sign in failed.
-//
-// near-connect hides the real cause at two points:
-//   1. _loadManifest() does `.catch(() => ({ wallets: [] }))`, so a
-//      blocked or offline manifest fetch looks identical to an empty
-//      wallet list. the picker then shows nothing to click, and the
-//      connect that follows reports a bare "Failed to sign in".
-//   2. connect() collapses every failure into that same message.
-//
-// this logs the things that actually distinguish the cases: how many
-// wallets loaded, whether that list is empty, whether any of them
-// support the signInAndSignMessage feature this flow needs, and which
-// network the connector is pointed at.
-//
-// it logs INSTEAD of throwing. diagnostics must never be the reason
-// sign-in breaks.
-// ----------------------------------------
-async function log_wallet_diagnostics_fun(connector: NearConnector): Promise<void> {
-  try {
-    // whenManifestLoaded always resolves — it already caught the
-    // fetch failure — so this only waits for wallet registration.
-    await connector.whenManifestLoaded;
-    const wallets = connector.wallets;
-    console.info(
-      `[auth] connector network=${connector.network} wallets=${wallets.length}`,
-      wallets.map((wallet) => wallet.manifest.id),
-    );
-    if (wallets.length === 0) {
-      console.warn(
-        "[auth] no wallets loaded — the wallet manifest fetch probably failed " +
-          "(offline, blocked, or CORS). the wallet picker will be empty.",
-      );
-      return;
-    }
-    // the one-shot flow calls signInAndSignMessage, so a wallet that
-    // only supports the standalone signMessage feature will be
-    // filtered out of the picker even though it can sign messages.
-    const can_sign_in_and_sign = wallets.filter(
-      (wallet) => wallet.manifest.features?.signInAndSignMessage === true,
-    );
-    console.info(
-      `[auth] wallets supporting signInAndSignMessage: ${can_sign_in_and_sign.length}/${wallets.length}`,
-      can_sign_in_and_sign.map((wallet) => wallet.manifest.id),
-    );
-    if (can_sign_in_and_sign.length === 0) {
-      console.warn(
-        "[auth] no loaded wallet advertises signInAndSignMessage — every wallet " +
-          "in the picker will be filtered out and connect() will throw " +
-          "'Failed to sign in'.",
-      );
-    }
-  } catch (err) {
-    console.warn("[auth] diagnostics failed", err);
-  }
-}
-// ----------------------------------------
 // ========================================
-// ========================================
-// ========================================
-// --- HELPERS ----------------------------
+// ----------------------------------------
 // rollback_connection_fun — undo a connect that did not complete.
 //
 // clears our state unconditionally, then asks the wallet to sign out.
@@ -324,8 +245,14 @@ async function log_wallet_diagnostics_fun(connector: NearConnector): Promise<voi
 // failed sign-in must never leave a stale account id on screen even
 // when the wallet side errors.
 //
-// used when connect() succeeds but signMessage() fails, so a declined
-// login message does not leave a connected-but-unverifiable session.
+// used when connect() succeeds but signInAndSignMessage then fails —
+// so a declined login message does not leave a connected-but-
+// unverifiable session. it also catches the case where autoConnect
+// emitted wallet:signIn for an injected wallet before the combined
+// call failed; that event adopts into account_id, and without this
+// the button would keep showing a signed-in account for a session
+// that has NO signature.
+// ----------------------------------------
 async function rollback_connection_fun(connector: NearConnector): Promise<void> {
   clear_session_fun();
   session_network = null;
@@ -348,76 +275,47 @@ async function rollback_connection_fun(connector: NearConnector): Promise<void> 
 // Message)"). the message params travel with the sign-in and the wallet
 // emits wallet:signInAndSignMessage, so the user approves ONCE.
 //
-// an earlier revision used the two-step path (connect(), then a
-// separate wallet.signMessage()). it worked in Firefox but produced two
-// popups — worse than the official flow, and not what was originally
-// asked for. the "Failed to sign in" reports that prompted that change
-// came from the Edge wallet extension failing inside its own signIn
-// (`Cannot read properties of undefined (reading 'generateKey')` in
-// about:srcdoc), not from the combined call.
-//
 // the sequence:
 //   1. snapshot the nonce — the wallet will NOT echo it back
 //   2. arm a one-shot listener for the combined event
 //   3. connect({ signMessageParams }) — one popup
 //   4. store message + nonce + recipient + network + signature
 //
-// any failure clears the in-flight nonce, because a nonce that is
-// never persisted is useless and a leaked one is a replay liability.
+// any failure rolls back the wallet session and reports the error.
 async function sign_in_fun(): Promise<void> {
-  if (busy) return;
-  set_error_fun(null);
-  set_busy_fun(true);
+  if (last_error !== null) set_error_fun(null);
 
   const network = getStoredNetworkId();
   const nonce = make_nonce_fun();
-  // names the call in flight, reported in the catch. near-connect
-  // reuses the same error strings across steps, so this is the only
-  // way to tell which call actually failed.
-  let stage = "start";
-  in_flight_nonce = nonce;
-  const phrase = pick_session_phrase_fun();
-  // logged for support/debugging only — the phrase is NOT part of the
-  // signed payload, so it never affects verification.
-  console.info(`[auth] signing in on ${network} — phrase: ${phrase}`);
-
   const connector = near_connect_client();
 
-  // diagnose why a connect fails. near-connect swallows most of the
-  // useful detail: _loadManifest() catches its own fetch failure and
-  // falls back to an empty wallet list, and connect() collapses every
-  // failure mode into a bare "Failed to sign in".
-  //
-  // logged before the attempt so a silent failure still leaves a trail.
-  log_wallet_diagnostics_fun(connector);
-
   // arm the one-shot listener BEFORE connect(). connect() emits
-    // wallet:signInAndSignMessage synchronously as part of resolving,
-    // so a listener attached afterwards would never fire.
-    const signed = new Promise<{
-      accountId: string;
-      publicKey: string;
-      signature: string;
-    }>((resolve) => {
-      const handler = (payload: {
-        accounts: Array<{
-          accountId: string;
-          signedMessage: { publicKey?: string; signature: string };
-        }>;
-      }) => {
-        // detach immediately so a later sign-in cannot resolve this
-        // stale promise.
-        connector.off("wallet:signInAndSignMessage", handler);
-        const first = payload.accounts[0];
-        if (first === undefined) return;
-        resolve({
-          accountId: first.accountId,
-          publicKey: first.signedMessage.publicKey ?? "",
-          signature: first.signedMessage.signature,
-        });
-      };
-      connector.on("wallet:signInAndSignMessage", handler);
-    });
+  // wallet:signInAndSignMessage synchronously as part of resolving,
+  // so a listener attached afterwards would never fire.
+  const signed = new Promise<{
+    accountId: string;
+    publicKey: string;
+    signature: string;
+  }>((resolve) => {
+    const handler = (payload: {
+      accounts: Array<{
+        accountId: string;
+        signedMessage: { publicKey?: string; signature: string };
+      }>;
+    }) => {
+      // detach immediately so a later sign-in cannot resolve this
+      // stale promise.
+      connector.off("wallet:signInAndSignMessage", handler);
+      const first = payload.accounts[0];
+      if (first === undefined) return;
+      resolve({
+        accountId: first.accountId,
+        publicKey: first.signedMessage.publicKey ?? "",
+        signature: first.signedMessage.signature,
+      });
+    };
+    connector.on("wallet:signInAndSignMessage", handler);
+  });
 
   try {
     // ONE popup: connect + sign the message together. this is the
@@ -428,7 +326,6 @@ async function sign_in_fun(): Promise<void> {
     // (SignMessageDuringSignInParams = Omit<SignMessageParams,
     // "signerId" | "network">) — the connector and wallet fill those in
     // from their own configuration.
-    stage = "connect + sign";
     await connector.connect({
       signMessageParams: {
         message: HUGGIES_SIGN_IN_MESSAGE,
@@ -438,22 +335,16 @@ async function sign_in_fun(): Promise<void> {
     });
 
     // the connector resolves before we necessarily have the payload,
-    // so await the event. if the wallet signed in but returned no
-    // accounts this promise never settles — the guard below keeps that
-    // from hanging the UI forever.
-    stage = "await signed message";
+    // so await the event. if the wallet signed in but never produced
+    // a signed message, this promise never settles — the guard below
+    // keeps that from hanging the UI forever.
     const result = await Promise.race([
       signed,
-      // generous ceiling: a wallet that never answers must not leave
-      // the button stuck on "..." for ever.
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 60_000)),
     ]);
     if (result === null) {
       set_error_fun("Wallet signed in but returned no signed message.");
-      console.warn("[auth] wallet:signInAndSignMessage never arrived", {
-        network,
-        walletsLoaded: connector.wallets.length,
-      });
+      console.warn("[auth] wallet:signInAndSignMessage never arrived");
       await rollback_connection_fun(connector);
       return;
     }
@@ -466,79 +357,24 @@ async function sign_in_fun(): Promise<void> {
       nonce: bytes_to_base64_fun(nonce),
       recipient: HUGGIES_SIGN_IN_RECIPIENT,
       network,
-      phrase,
       createdAt: Date.now(),
     });
 
     session_network = network;
     account_id = result.accountId;
+    notify_fun();
     console.info(`[auth] signed in as ${result.accountId}`);
   } catch (err) {
-    // The connector can log its own internals — NearConnector takes a
-    // `logger` option and its executor logs each iframe call ("Calling
-    // method", "Iframe ready", "postMessage"). Those lines are the only
-    // place the wallet executor's real failure appears, because
-    // SandboxedWallet.call() rejects with the executor's raw result and
-    // the connector otherwise swallows it.
-    //
-    // only the currently-selected connector can be given a logger
-    // after construction, and the toolbox builds it internally, so this
-    // attaches directly. safe if already set: near-connect reads
-    // logger?.log everywhere, so overriding is additive rather than a
-    // replacement of behaviour.
-    const active = near_connect_client();
-    if (active.logger === undefined) {
-      active.logger = {
-        log: (...args: unknown[]) => console.debug("[near-connect]", ...args),
-      };
-    }
     const message = err instanceof Error ? err.message : String(err);
-    // a rejected or closed popup is a normal outcome, not a crash —
-    // report it and leave the app signed out.
     set_error_fun(message);
-    // ROLL BACK THE WALLET CONNECTION.
-    //
-    // connect() can emit wallet:signIn (and autoConnect does so on its
-    // own for injected wallets) even when the combined sign-in+sign
-    // call then fails. init()'s listener adopts that event into
-    // account_id, so without this the button would keep showing a
-    // signed-in account for a session that has NO signature and can
-    // therefore never be verified server-side.
-    //
-    // this clears our local view AND tells the wallet to drop the
-    // session, so retrying starts from a clean slate instead of
-    // silently re-using a half-finished connection.
+    // see rollback_connection_fun for why this is needed: connect()
+    // may have emitted wallet:signIn before throwing.
     await rollback_connection_fun(connector);
-    // Which call failed matters more than the message. near-connect
-    // uses the SAME "Failed to sign in" / "Wallet closed" strings for
-    // several very different failures, and the previous logs could not
-    // distinguish "the user declined connect" from "the wallet
-    // rejected the sign message" — both just printed the message.
-    //
-    // `stage` names the last call that was entered, so one console
-    // line is enough to locate the failure. the raw error is logged
-    // as an Error object (not just its .message) because the wallet
-    // executors put the useful detail on the stack/properties.
     console.warn("[auth] sign in failed", {
-      stage,
       error: message,
       raw: err,
       network,
-      walletsLoaded: connector.wallets.length,
-      walletIds: connector.wallets.map((wallet) => wallet.manifest.id),
-      hint:
-        message === "Failed to sign in"
-          ? 'Thrown by connect() when the wallet\'s sign-in returns an empty ' +
-            "account list. The manifest loaded fine, so this is wallet-side: " +
-            "the user declined, closed the popup, or the wallet executor " +
-            "failed. Retry, or pick a different wallet."
-          : message === "Wallet closed"
-            ? "The wallet popup was dismissed or closed before it answered."
-            : undefined,
     });
-  } finally {
-    in_flight_nonce = null;
-    set_busy_fun(false);
   }
 }
 // ========================================
@@ -552,8 +388,6 @@ async function sign_in_fun(): Promise<void> {
 // the wallet does, so the UI can never get stuck showing a stale
 // account id.
 async function sign_out_fun(): Promise<void> {
-  if (busy) return;
-  set_busy_fun(true);
   try {
     await near_connect_client().disconnect();
   } catch (err) {
@@ -563,7 +397,6 @@ async function sign_out_fun(): Promise<void> {
     session_network = null;
     account_id = null;
     set_error_fun(null);
-    set_busy_fun(false);
     notify_fun();
   }
 }
@@ -589,29 +422,18 @@ function init_fun(): void {
 
   const connector = near_connect_client();
 
-  // log the raw wallet lifecycle. near-connect emits nothing on
-  // failure, so these are the only positive signals that a connect
-  // actually reached the wallet. they are the fastest way to tell
-  // "the popup never opened" from "the user declined".
-  //
   // autoConnect can sign in on its own for an injected wallet, so
   // when it fires outside our own sign_in_fun there is no signed
-  // message — that session is connected but not authenticated, and the
-  // button should reflect the wallet rather than a stored session.
+  // message — that session is connected but not authenticated, and
+  // the button should reflect the wallet rather than a stored
+  // session. only adopt the account when we have no session of our
+  // own, because a stored session carries a signature this event
+  // knows nothing about.
   connector.on("wallet:signIn", (payload) => {
-    console.info(
-      `[auth] wallet sign in — source=${payload.source} accounts=${payload.accounts.length}`,
-    );
-    // only adopt the wallet's account when we have no session of our
-    // own; an existing session carries a signature this event knows
-    // nothing about.
     if (account_id === null && payload.source === "signIn") {
       account_id = payload.accounts[0]?.accountId ?? null;
       notify_fun();
     }
-  });
-  connector.on("selector:walletsChanged", () => {
-    console.info(`[auth] wallet list changed — ${connector.wallets.length} available`);
   });
 
   // the wallet can sign out from outside the app (the wallet UI
@@ -623,6 +445,9 @@ function init_fun(): void {
     notify_fun();
   });
 
+  // reconcile may have cleared state and notified; one final
+  // notify is harmless if not, and keeps the API "init() leaves the
+  // UI in sync" simple.
   reconcile_fun();
   notify_fun();
 }
@@ -634,9 +459,7 @@ function init_fun(): void {
 //
 // MUST notify when it changes something. reconcile is called from
 // outside the sign-in flow (after the network toggle moves), so
-// subscribers get no other chance to repaint — without the notify the
-// state clears correctly but the button keeps rendering the old
-// account id.
+// subscribers get no other chance to repaint.
 function reconcile_fun(): void {
   const current = getStoredNetworkId();
   if (session_network !== null && session_network !== current) {
@@ -657,7 +480,6 @@ export const HUGGIES_AUTH = {
   init: init_fun,
   get_account_id: get_account_id_fun,
   is_signed_in: is_signed_in_fun,
-  get_busy: get_busy_fun,
   get_error: get_error_fun,
   get_session: get_session_fun,
 };
