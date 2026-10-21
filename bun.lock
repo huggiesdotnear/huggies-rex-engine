@@ -5,6 +5,7 @@
     "": {
       "name": "huggies-rex-frontend",
       "dependencies": {
+        "@near-kit-tool-box/fun": "^0.2.0",
         "@near-kit-tool-box/web": "^0.2.0",
         "@sleet-js/intear-api-tool-box": "^0.1.0",
         "lucide-preact": "^1.59.0",
@@ -47,6 +48,8 @@
     "@napi-rs/keyring-win32-ia32-msvc": ["@napi-rs/keyring-win32-ia32-msvc@1.3.0", "", { "os": "win32", "cpu": "ia32" }, "sha512-sPSqeAFZMGqP1R++M2JTza7GQJJ/TpCo6JU6Vcd4jnebvOaEDs9b7eipakU1PJdSvhpC2yXMCNRk9gXfrhuwHQ=="],
 
     "@napi-rs/keyring-win32-x64-msvc": ["@napi-rs/keyring-win32-x64-msvc@1.3.0", "", { "os": "win32", "cpu": "x64" }, "sha512-4DnCWXwDc0HRKwyRlG5y0VhKZW2tNRQfKKfyj6IX/KWfDNyq9hn4n+GL1auyDcOO/v8PwnhmYo2+rOOqCkvvOg=="],
+
+    "@near-kit-tool-box/fun": ["@near-kit-tool-box/fun@0.2.0", "", { "dependencies": { "near-kit": "^0.20.2", "prettier": "^3.8.3", "zod": "^4.4.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-nApdxVqVw6VoYaOLKvZsyEnIeTYTJO1HzEwVM8Np3gMjB2oKtKm90JjYbrmwPpYt3nt2YSwL/cwFV5rX+YkrlQ=="],
 
     "@near-kit-tool-box/web": ["@near-kit-tool-box/web@0.2.0", "", { "dependencies": { "@hot-labs/near-connect": "^0.11.4", "near-kit": "^0.20.2", "prettier": "^3.8.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-Z5KNJe2QhPkJ7MiLIxUE5ApYKC25+dGMstmnNkbdyFY4EnZFOXQDPD9fFbODmbsTL2iVWFn86Ej+QifmOkrAKA=="],
 

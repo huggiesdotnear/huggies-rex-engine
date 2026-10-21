@@ -151,6 +151,20 @@
   font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
+/* --- section heading (rhea deposits) --- */
+#HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE .huggies-section-title {
+  text-align: left;
+  font-size: 18px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
 #HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE p {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
