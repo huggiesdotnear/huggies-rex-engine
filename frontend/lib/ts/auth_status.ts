@@ -35,7 +35,7 @@ import {
 // localStorage key for the persisted session. prefixed so it
 // cannot collide with anything near-connect writes (it owns
 // "selected-wallet").
-const HUGGIES_AUTH_STORAGE_KEY = "huggies_auth_session";
+const HUGGIES_AUTH_STORAGE_KEY = "HUGGIES_AUTH_SESSION";
 // ========================================
 // ========================================
 // ========================================
