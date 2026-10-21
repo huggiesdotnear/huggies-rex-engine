@@ -14,8 +14,10 @@
 // these strings are also what the user sees in their wallet prompt,
 // so they read as plain english rather than as protocol noise.
 // ========================================
-// Sign in to HUGGIES — the only diaper company in crypto.
-export const HUGGIES_SIGN_IN_MESSAGE = "Sign in to HUGGIES — the only diaper company in crypto.";
+// Short, slogan-flavored, and carries the ownership claim the server
+// will verify. "diaper hands" is the brand on-brand phrasing and a
+// wink to a returning user.
+export const HUGGIES_SIGN_IN_MESSAGE = "I verify I have diaper hands and own this NEAR account.";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
