@@ -18,6 +18,7 @@ import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { HUGGIES_BALANCE_FILTER } from "../ts/balance_filter";
 import { HUGGIES_BALANCE_SORT } from "../ts/balance_sort";
+import { huggies_balance_row_fun } from "../ts/balance_row";
 import type { HUGGIES_BALANCE_ENTRY } from "../ts/balance_filter";
 import type { HUGGIES_SORT_BY } from "../ts/balance_sort";
 // ========================================
@@ -79,75 +80,6 @@ async function fetch_balance_entries_fun(
 }
 // ========================================
 // ========================================
-// --- ICON ------------------------------
-// the token's icon when it has one, else a neutral dot so every row
-// keeps the same alignment.
-// --- WHY --- <img> with the api's data: url directly: the icon field is
-// already a self-contained data uri, so there is no extra request and
-// no origin problem to configure.
-function token_icon_fun(
-  icon: string | null,
-  symbol: string,
-): preact.JSX.Element {
-  if (icon === null) {
-    return <span class="huggies-token-icon huggies-token-icon--empty" aria-hidden="true" />;
-  }
-  return (
-    <img
-      class="huggies-token-icon"
-      src={icon}
-      alt=""
-      width={20}
-      height={20}
-      loading="lazy"
-      title={symbol}
-    />
-  );
-}
-// ========================================
-// ========================================
-// ========================================
-// --- ROW -------------------------------
-// one token with every field stacked in a single cell: icon, ticker,
-// balance and usd on the first line, the contract id clipped on the
-// line below.
-// --- WHY --- one cell rather than three columns: a full contract id
-// next to a long balance made the table overflow horizontally on
-// narrow screens. stacking keeps every row inside the viewport and lets
-// the contract id ellipsise on its own line instead of stretching the
-// whole table.
-function balance_row_fun(
-  entry: HUGGIES_BALANCE_ENTRY,
-  pinned: boolean,
-): preact.JSX.Element {
-  const { info, raw, usd_value } = entry;
-  return (
-    // keyed by token id, not symbol: symbols are not unique (two
-    // different tokens can share one).
-    <tr key={entry.id} class={pinned ? "is-pinned" : undefined}>
-      <td>
-        <div class="huggies-row-head">
-          {token_icon_fun(info.icon, info.symbol)}
-          <span class="huggies-ticker">{info.symbol}</span>
-          {pinned && <span class="huggies-pinned-tag">NEAR</span>}
-          <span class="huggies-amounts">
-            <span class="huggies-amount">
-              {HUGGIES_AMOUNT_FORMAT.balance(raw, info)}
-            </span>
-            <span class="huggies-usd">
-              {HUGGIES_AMOUNT_FORMAT.usd(usd_value)}
-            </span>
-          </span>
-        </div>
-        {/* the full contract id stays selectable and copyable, and is
-            in the title so a clipped id can still be read. */}
-        <div class="huggies-contract" title={entry.id}>
-          {entry.id}
-        </div>
-      </td>
-    </tr>
-  );
-}
 // ========================================
 // ========================================
 // --- SORT CONTROL ----------------------
@@ -274,8 +206,23 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
                 <td>LOADING...</td>
               </tr>
             )}
-            {near_entry !== undefined && balance_row_fun(near_entry, true)}
-            {sorted.map((entry) => balance_row_fun(entry, false))}
+            {near_entry !== undefined &&
+              huggies_balance_row_fun({
+                id: near_entry.id,
+                raw: near_entry.raw,
+                info: near_entry.info,
+                usd_value: near_entry.usd_value,
+                pinned: true,
+                tag: "NEAR",
+              })}
+            {sorted.map((entry) =>
+              huggies_balance_row_fun({
+                id: entry.id,
+                raw: entry.raw,
+                info: entry.info,
+                usd_value: entry.usd_value,
+              }),
+            )}
             {entries !== null && sorted.length === 0 && near_entry === undefined && (
               <tr>
                 <td>

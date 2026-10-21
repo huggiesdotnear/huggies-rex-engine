@@ -1,5 +1,11 @@
 /*==================================*/
-/* account page: account id h1 + balance list */
+/* account page: account id h1 + balance tables
+   the balance table look lives on .huggies-balance-table, NOT on a
+   component mount id, so every account table (direct balances, rhea
+   deposits, anything added later) shares one appearance by adding that
+   class. scoping these to a mount id instead would mean restating all
+   of it per component, which is how the two tables drifted apart. */
+/*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
   /* body centers text; the heading reads better flush left. */
   text-align: left;
@@ -12,23 +18,27 @@
   padding-bottom: 8px;
   margin-bottom: 16px;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE {
+/* --- shared table block --- */
+.huggies-balance-table {
   text-align: left;
   width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
 }
 /* the scroll box: caps the height and scrolls the rest. */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-scroll {
+.huggies-balance-table .huggies-scroll {
   max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 /* --- sort control --- */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-sort {
+.huggies-balance-table .huggies-sort {
   display: flex;
   gap: 6px;
   margin-bottom: 8px;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-sort button {
+.huggies-balance-table .huggies-sort button {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   text-transform: uppercase;
@@ -43,12 +53,12 @@
   align-items: center;
   gap: 4px;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-sort button.is-active {
+.huggies-balance-table .huggies-sort button.is-active {
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.15);
 }
 /* --- table --- */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE table {
+.huggies-balance-table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 16px;
@@ -56,36 +66,36 @@
      never needs horizontal scrolling. */
   table-layout: fixed;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE td {
+.huggies-balance-table td {
   padding: 8px 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   vertical-align: top;
   width: 100%;
 }
 /* --- one row, stacked --- */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-row-head {
+.huggies-balance-table .huggies-row-head {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-token-icon {
+.huggies-balance-table .huggies-token-icon {
   width: 20px;
   height: 20px;
   border-radius: 50%;
   flex: none;
   object-fit: cover;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-token-icon--empty {
+.huggies-balance-table .huggies-token-icon--empty {
   display: inline-block;
   background-color: rgba(255, 255, 255, 0.25);
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-ticker {
+.huggies-balance-table .huggies-ticker {
   font-weight: bold;
   flex: none;
   white-space: nowrap;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-pinned-tag {
+.huggies-balance-table .huggies-pinned-tag {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   text-transform: uppercase;
@@ -96,27 +106,27 @@
   flex: none;
 }
 /* balance + usd sit right, and keep their digits aligned. */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-amounts {
+.huggies-balance-table .huggies-amounts {
   margin-left: auto;
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-amount {
+.huggies-balance-table .huggies-amount {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-usd {
+.huggies-balance-table .huggies-usd {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   opacity: 0.85;
 }
 /* the full contract id on its own line, clipped so one long id cannot
    stretch the row. the complete value stays in the title tooltip. */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-contract {
+.huggies-balance-table .huggies-contract {
   font-family: monospace;
   font-size: 11px;
   opacity: 0.55;
@@ -127,14 +137,14 @@
   padding-left: 26px;
 }
 /* --- pinned NEAR row --- */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE tr.is-pinned td {
+.huggies-balance-table tr.is-pinned td {
   border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE tr.is-pinned .huggies-ticker {
+.huggies-balance-table tr.is-pinned .huggies-ticker {
   color: var(--color-middle);
 }
 /* --- total --- */
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE tfoot th {
+.huggies-balance-table tfoot th {
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
@@ -146,26 +156,20 @@
   align-items: baseline;
   gap: 8px;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-total-usd {
+.huggies-balance-table .huggies-total-usd {
   margin-left: auto;
   font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
-/* --- section heading (rhea deposits) --- */
-#HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE {
-  width: 100%;
-  max-width: 90vw;
-  box-sizing: border-box;
-  margin-top: 20px;
-}
-#HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE .huggies-section-title {
+/* --- section heading (above a titled table block) --- */
+.huggies-balance-table .huggies-section-title {
   text-align: left;
   font-size: 18px;
   border-bottom: 1px solid #474747;
   padding-bottom: 6px;
   margin-bottom: 8px;
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE p {
+.huggies-balance-table p {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   opacity: 0.8;

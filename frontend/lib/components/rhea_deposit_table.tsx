@@ -17,6 +17,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
+import { huggies_balance_row_fun } from "../ts/balance_row";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../ts/token_info";
 // ========================================
 // ========================================
@@ -113,43 +114,9 @@ function HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE_FUN() {
         <div class="huggies-scroll">
           <table data-huggies-rhea-account={account_id}>
             <tbody>
-              {rows?.map((row) => (
-                <tr key={row.id}>
-                  <td>
-                    <div class="huggies-row-head">
-                      {row.info.icon === null ? (
-                        <span
-                          class="huggies-token-icon huggies-token-icon--empty"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <img
-                          class="huggies-token-icon"
-                          src={row.info.icon}
-                          alt=""
-                          width={20}
-                          height={20}
-                          loading="lazy"
-                        />
-                      )}
-                      <span class="huggies-ticker">{row.info.symbol}</span>
-                      <span class="huggies-amounts">
-                        <span class="huggies-amount">
-                          {HUGGIES_AMOUNT_FORMAT.balance(row.raw, row.info)}
-                        </span>
-                        <span class="huggies-usd">
-                          {HUGGIES_AMOUNT_FORMAT.usd(
-                            HUGGIES_AMOUNT_FORMAT.balance_usd(row.raw, row.info),
-                          )}
-                        </span>
-                      </span>
-                    </div>
-                    <div class="huggies-contract" title={row.id}>
-                      {row.id}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {rows?.map((row) =>
+                huggies_balance_row_fun({ id: row.id, raw: row.raw, info: row.info }),
+              )}
             </tbody>
           </table>
         </div>
