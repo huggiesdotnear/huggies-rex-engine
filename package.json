@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@near-kit-tool-box/web": "^0.2.0",
+    "@sleet-js/intear-api-tool-box": "^0.1.0",
     "lucide-preact": "^1.59.0",
     "preact": "^11.0.1"
   },
