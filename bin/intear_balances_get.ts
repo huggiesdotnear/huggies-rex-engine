@@ -15,7 +15,6 @@
 // ========================================
 
 import { api_intear_balances_get } from "../middleman/intear";
-import { print_summary } from "./fun/print_summary";
 import { split_argv } from "./fun/split_argv";
 
 // --- argv ----------------------------------------------------------
@@ -46,7 +45,7 @@ const response = await api_intear_balances_get({
 });
 
 // --- summary -------------------------------------------------------
-print_summary(
+console.log(
   "BALANCES",
   `${response.balances.rows.length} balance(s) for ${account_id} at height ${response.height}`,
 );

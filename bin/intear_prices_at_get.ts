@@ -19,7 +19,6 @@
 // ========================================
 
 import { api_intear_prices_at_get } from "../middleman/intear";
-import { print_summary } from "./fun/print_summary";
 import { split_argv } from "./fun/split_argv";
 
 // --- CONFIG --------------------------------------------------------
@@ -68,7 +67,7 @@ const response = await api_intear_prices_at_get({ queries });
 // --- summary -------------------------------------------------------
 // --- WHY --- prices come back positionally in query order, so the
 // token list has to be walked alongside the prices array.
-print_summary(
+console.log(
   "PRICES",
   `${response.prices.length} price(s) at height ${response.height}`,
 );

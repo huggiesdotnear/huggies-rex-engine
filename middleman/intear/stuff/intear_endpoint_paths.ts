@@ -10,12 +10,16 @@
 
 export const INTEAR_ENDPOINT_PATHS = {
   api_intear_tokens: "/tokens",
+  api_intear_tokens_search: "/tokens/search",
+  api_intear_trades: "/trades",
+  api_intear_transfers: "/transfers",
+  api_intear_activity: "/activity",
   api_intear_candles: "/candles",
   api_intear_balances: "/balances",
   api_intear_holders: "/holders",
   api_intear_positions: "/positions",
   api_intear_prices_at: "/prices/at",
-  api_intear_accounts: "/accounts",
+  api_intear_accounts_search: "/accounts/search",
   api_intear_schema: "/schema",
 } as const;
 

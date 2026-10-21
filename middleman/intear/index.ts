@@ -16,12 +16,17 @@
 
 export * from "./fun/api_intear_get";
 export * from "./fun/api_intear_tokens_get";
+export * from "./fun/api_intear_tokens_search";
 export * from "./fun/api_intear_token_fields";
+export * from "./fun/api_intear_trades_query";
+export * from "./fun/api_intear_transfers_query";
+export * from "./fun/api_intear_activity_query";
 export * from "./fun/api_intear_candles_get";
 export * from "./fun/api_intear_balances_get";
 export * from "./fun/api_intear_holders_get";
 export * from "./fun/api_intear_positions_get";
 export * from "./fun/api_intear_prices_at_get";
+export * from "./fun/api_intear_accounts_search";
 
 export { INTEAR_BASE_URL } from "./stuff/intear_base_url";
 export { INTEAR_ENDPOINT_PATHS } from "./stuff/intear_endpoint_paths";

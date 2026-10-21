@@ -13,7 +13,6 @@
 // ========================================
 
 import { api_intear_positions_get } from "../middleman/intear";
-import { print_summary } from "./fun/print_summary";
 import { split_argv } from "./fun/split_argv";
 
 // --- argv ----------------------------------------------------------
@@ -35,7 +34,7 @@ const response = await api_intear_positions_get({
 });
 
 // --- summary -------------------------------------------------------
-print_summary(
+console.log(
   "POSITIONS",
   `${response.rows.length} position(s) for ${account_id} at height ${response.height}`,
 );

@@ -21,7 +21,6 @@ import type {
   candle_series,
 } from "@sleet-js/intear-api-tool-box";
 import { api_intear_candles_get } from "../middleman/intear";
-import { print_summary } from "./fun/print_summary";
 import { split_argv } from "./fun/split_argv";
 
 // --- argv ----------------------------------------------------------
@@ -78,7 +77,7 @@ const response = await api_intear_candles_get({
 });
 
 // --- summary -------------------------------------------------------
-print_summary(
+console.log(
   "CANDLES",
   `${resolution} at height ${response.height}, ` +
     `${Object.keys(response.tokens).length}/${token_ids.length} token(s) returned`,

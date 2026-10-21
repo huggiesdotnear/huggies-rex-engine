@@ -14,7 +14,6 @@
 // ========================================
 
 import { api_intear_holders_get } from "../middleman/intear";
-import { print_summary } from "./fun/print_summary";
 import { split_argv } from "./fun/split_argv";
 
 // --- argv ----------------------------------------------------------
@@ -37,7 +36,7 @@ const response = await api_intear_holders_get({
 });
 
 // --- summary -------------------------------------------------------
-print_summary(
+console.log(
   "HOLDERS",
   `${response.rows.length} of ${response.total} holder(s) at height ${response.height}`,
 );

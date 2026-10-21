@@ -23,7 +23,6 @@ import {
   api_intear_token_fields,
   api_intear_tokens_get,
 } from "../middleman/intear";
-import { print_summary } from "./fun/print_summary";
 import { split_argv } from "./fun/split_argv";
 
 // --- argv ----------------------------------------------------------
@@ -100,7 +99,7 @@ const response = await api_intear_tokens_get({
 });
 
 // --- summary -------------------------------------------------------
-print_summary(
+console.log(
   "TOKENS",
   `${response.rows.length} row(s) at height ${response.height}` +
     (sort_field !== undefined ? ` sorted by ${sort_field}` : ""),
