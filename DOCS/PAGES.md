@@ -21,7 +21,7 @@ swap componenet
 
 #### ACCOUNT - frontend/app/account.html
 
-profile/account page
+profile/account page - ?id=
 
 #### SKILL - frontend/app/skill.html
 
