@@ -1,10 +1,10 @@
 // ========================================
-// root landing-page script: after a 3s splash delay, sends the
+// root landing-page script: after a 1.5s splash delay, sends the
 // browser into app/index.html. SSR guard skips the timer outside
 // the browser so this module stays importable from tests/scripts.
 // ========================================
 
-const REDIRECT_DELAY_MS = 3000;
+const REDIRECT_DELAY_MS = 1500;
 const REDIRECT_TARGET = "./app/index.html";
 
 if (typeof window !== "undefined") {
