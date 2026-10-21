@@ -61,13 +61,19 @@ function to_number_fun(value: unknown): number {
 // fetching it costs nothing extra: the native balance only ever appears
 // on an account that may well already hold wNEAR, and when it does not
 // the price simply reads as unknown rather than being invented.
-function near_info_fun(wnear_price_usd: number): HUGGIES_TOKEN_INFO {
+function near_info_fun(wnear: {
+  price_usd: number;
+  icon: string | null;
+}): HUGGIES_TOKEN_INFO {
   return {
     id: HUGGIES_NEAR_ID,
     symbol: HUGGIES_NEAR_SYMBOL,
     decimals: HUGGIES_NEAR_DECIMALS,
-    icon: null,
-    price_usd: wnear_price_usd,
+    // the chain token has no registry entry of its own, so it borrows
+    // wNEAR's icon — which IS the NEAR logo (the green #00EC97 "N"),
+    // not a lookalike.
+    icon: wnear.icon,
+    price_usd: wnear.price_usd,
     reputation: "Reputable",
     holders: 0,
   };
@@ -104,6 +110,7 @@ async function fetch_and_merge_fun(
 
   const durable_to_cache = [];
   let wnear_price_usd = 0;
+  let wnear_icon: string | null = null;
   for (const row of response.rows) {
     const [id, symbol, decimals, icon, price_usd, reputation, holders] = row;
     const record: HUGGIES_TOKEN_INFO = {
@@ -115,7 +122,10 @@ async function fetch_and_merge_fun(
       reputation: typeof reputation === "string" ? reputation : "Unknown",
       holders: to_number_fun(holders),
     };
-    if (id === HUGGIES_WRAP_ID) wnear_price_usd = record.price_usd;
+    if (id === HUGGIES_WRAP_ID) {
+      wnear_price_usd = record.price_usd;
+      wnear_icon = record.icon;
+    }
     out.set(id, record);
     durable_to_cache.push({
       id,
@@ -130,7 +140,7 @@ async function fetch_and_merge_fun(
 
   // the registry has no `near`, so supply it ourselves.
   if (wants_near && !out.has(HUGGIES_NEAR_ID)) {
-    out.set(HUGGIES_NEAR_ID, near_info_fun(wnear_price_usd));
+    out.set(HUGGIES_NEAR_ID, near_info_fun({ price_usd: wnear_price_usd, icon: wnear_icon }));
   }
 
   // anything we hold durably but the api did not return: still show it,

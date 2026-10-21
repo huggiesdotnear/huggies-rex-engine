@@ -61,10 +61,12 @@ metadata endpoint is intear `GET /tokens?ids=...&fields=...`. it takes up
 to 2000 ids per request. `limit` requires a `sort`.
 
 intear has NO `near` entry in /tokens (it comes back in `missing`), so
-`token_info.ts` supplies NEAR itself: symbol NEAR, 24 decimals, and a
-usd price borrowed from wNEAR, which is 1:1 redeemable with NEAR. it
-also asks for `wrap.near` alongside whatever ids were requested, so the
-price costs no extra request.
+`token_info.ts` supplies NEAR itself: symbol NEAR, 24 decimals, a usd
+price borrowed from wNEAR, which is 1:1 redeemable with NEAR, and
+wNEAR's icon — which is the actual NEAR logo (the green `#00EC97` "N"),
+not a lookalike. it also asks for `wrap.near` alongside whatever ids were
+requested, so the price and icon cost no extra request. note NEAR has no
+contract id of its own; the `near` balance is native, not an NEP-20 token.
 
 #### SKILL - frontend/app/skill.html
 
