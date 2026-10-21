@@ -72,11 +72,7 @@ export async function api_intear_get<t = unknown>({
     "RESPONSE STATUS:",
     `${response.status} - ${response.statusText}`,
   );
-  // --- WHY --- stringify before logging. console.log inspects objects
-  // with util.inspect, which collapses long nested arrays to
-  // `[Array ...]` — a 145-row balances response printed as 145
-  // placeholders. JSON.stringify always shows the real values.
-  console.log("RESPONSE:", JSON.stringify(json, null, 2));
+  console.log("RESPONSE:", json);
   console.log("=============================");
   return json;
 }
