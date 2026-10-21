@@ -16,6 +16,7 @@
 
 export * from "./fun/api_intear_get";
 export * from "./fun/api_intear_tokens_get";
+export * from "./fun/api_intear_token_fields";
 export * from "./fun/api_intear_candles_get";
 export * from "./fun/api_intear_balances_get";
 export * from "./fun/api_intear_holders_get";

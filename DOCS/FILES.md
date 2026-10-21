@@ -10,7 +10,8 @@ some files/folders
     the backend is never rate limited by intear.
   - `middleman/huggies/` - typed client for our own backend routes
     under `/api/huggies/`. empty until those routes are added.
-- `bin/` - ts files that i can run with bun
+- `bin/` - ts files that i can run with bun. see [`bin/README.md`](../bin/README.md)
+  for the cli usage.
 
 =========================
 <br/>

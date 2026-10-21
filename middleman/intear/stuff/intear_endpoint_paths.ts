@@ -16,6 +16,7 @@ export const INTEAR_ENDPOINT_PATHS = {
   api_intear_positions: "/positions",
   api_intear_prices_at: "/prices/at",
   api_intear_accounts: "/accounts",
+  api_intear_schema: "/schema",
 } as const;
 
 export type INTEAR_ENDPOINT_KEY = keyof typeof INTEAR_ENDPOINT_PATHS;
