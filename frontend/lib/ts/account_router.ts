@@ -23,15 +23,6 @@
 // code, and an SSR `typeof window` guard keeps it importable from
 // non-browser contexts (tests, future node scripts) without
 // throwing on window.location.
-//
-// LOADED THROUGH IMPORT.TS
-// ------------------------
-// like auth_redirect.ts, this module is pulled in as a side
-// effect of every app/* page's import.ts (see
-// frontend/lib/ts/import.ts). account-router.html mounts no
-// components, so the few extra module loads it picks up are
-// no-ops — uniformity of the "every page loads import.ts"
-// convention is worth more than the skipped work.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
 // ========================================
@@ -149,10 +140,11 @@ function route_fun(): void {
 // ========================================
 // --- RUN --------------------------------
 // kick the redirect as a side effect of import. self-runs because
-// this file is wired in through import.ts (the same bundle every
-// app/* page loads), and the page has nothing else to do while
-// the redirect happens, so wrapping this in a function someone
-// has to call would only invite a page author to forget the call.
+// this file is its own entry, loaded directly from
+// account-router.html's <script src="../lib/ts/account_router.ts">
+// tag — and the page has nothing else to do while the redirect
+// happens, so wrapping this in a function someone has to call
+// would only invite a page author to forget the call.
 //
 // location.replace (vs assign) keeps the router page out of the
 // browser's history, so the back button does not bounce back to a

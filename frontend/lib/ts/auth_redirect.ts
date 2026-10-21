@@ -28,8 +28,8 @@
 // sign_in_fun(), and again on wallet:signIn from autoConnect on
 // load. zero polling, zero latency, zero missed events.
 //
-// WHY THIS LIVES IN ITS OWN MODULE
-// -------------------------------
+// WHY THIS LIVES IN ITS OWN MODULE, NOT INLINE IN auth.html
+// ---------------------------------------------------------
 // the subscriber needs to run before any user click, which means
 // it has to import HUGGIES_AUTH. putting it inline in the html
 // would mean a <script type="module"> tag and re-deriving the
@@ -37,13 +37,16 @@
 // the depth-aware URL builder) next to the code, mirroring the
 // shape of account_router.ts so the two redirect pages read
 // the same way.
-//
-// this module is loaded through import.ts (the same bundle every
-// app/* page loads) rather than directly by auth.html. that
-// keeps the page-loading convention uniform: any future
-// redirect page gets the same wiring by default.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
+// side-effect imports — pulling in the two components auth.html
+// renders (network toggle + LOGIN button) so a single
+// <script src=".../auth_redirect.ts"> tag in auth.html is
+// enough to get the working UI. account_router.ts does not
+// reuse this trick because account-router.html intentionally
+// has no UI of its own (it redirects immediately on load).
+import "../components/auth_button";
+import "../components/network_button";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -137,10 +140,8 @@ function redirect_if_signed_in_fun(): void {
 // ========================================
 // --- RUN --------------------------------
 // kick the redirect as a side effect of import. self-runs because
-// this file is wired in through import.ts (the same bundle every
-// app/* page loads), and the redirect has to be armed before any
-// user click — wrapping it in a function someone has to call would
-// only invite a page author to forget the call.
+// this file is its own entry, loaded directly from auth.html's
+// <script src="../lib/ts/auth_redirect.ts"> tag.
 //
 // init() must run first so the stored-session rehydration is in
 // place before either redirect branch reads account_id. it is
