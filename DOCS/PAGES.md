@@ -68,6 +68,17 @@ half. a cold load pays 341KB once; every revisit after is ~10KB.
 - `frontend/lib/ts/balance_filter.ts` - spam + usd-floor policy.
 - `frontend/lib/ts/balance_sort.ts` - ticker / usd ordering.
 
+### RHEA DEPOSITS
+
+`HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE` - the account's rhea (ref finance
+v2) deposits, via `rhea_ammv2_get_deposits_fun_json` from
+`@near-kit-tool-box/fun`, using `near_kit_client()`. these are DEPOSITS
+(tokens held by rhea for the account), not LP positions. renders nothing
+when there is no `?id=`, still loading, or no non-zero deposit — the view
+returns keys for tokens the account touched once, mostly `"0"`, so key
+count alone would show an empty section. rhea contract is
+`v2.ref-finance.near` mainnet / `ref-finance-101.testnet` testnet.
+
 metadata endpoint is intear `GET /tokens?ids=...&fields=...`. it takes up
 to 2000 ids per request. `limit` requires a `sort`.
 

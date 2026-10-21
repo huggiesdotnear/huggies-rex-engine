@@ -5,8 +5,8 @@
     "": {
       "name": "huggies-rex-frontend",
       "dependencies": {
-        "@near-kit-tool-box/fun": "^0.2.0",
-        "@near-kit-tool-box/web": "^0.2.0",
+        "@near-kit-tool-box/fun": "0.2.1",
+        "@near-kit-tool-box/web": "0.2.1",
         "@sleet-js/intear-api-tool-box": "^0.1.0",
         "lucide-preact": "^1.59.0",
         "preact": "^11.0.1",
@@ -49,9 +49,9 @@
 
     "@napi-rs/keyring-win32-x64-msvc": ["@napi-rs/keyring-win32-x64-msvc@1.3.0", "", { "os": "win32", "cpu": "x64" }, "sha512-4DnCWXwDc0HRKwyRlG5y0VhKZW2tNRQfKKfyj6IX/KWfDNyq9hn4n+GL1auyDcOO/v8PwnhmYo2+rOOqCkvvOg=="],
 
-    "@near-kit-tool-box/fun": ["@near-kit-tool-box/fun@0.2.0", "", { "dependencies": { "near-kit": "^0.20.2", "prettier": "^3.8.3", "zod": "^4.4.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-nApdxVqVw6VoYaOLKvZsyEnIeTYTJO1HzEwVM8Np3gMjB2oKtKm90JjYbrmwPpYt3nt2YSwL/cwFV5rX+YkrlQ=="],
+    "@near-kit-tool-box/fun": ["@near-kit-tool-box/fun@0.2.1", "", { "dependencies": { "near-kit": "^0.20.2", "prettier": "^3.8.3", "zod": "^4.4.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-sXWX6qhAlEbsCdOQxocvvQCGPRKh2NeofIAzZDLqy/evu/AM2kHyVDNQC50jDoTGAhhC8FI0FkhJxsh9D8MMww=="],
 
-    "@near-kit-tool-box/web": ["@near-kit-tool-box/web@0.2.0", "", { "dependencies": { "@hot-labs/near-connect": "^0.11.4", "near-kit": "^0.20.2", "prettier": "^3.8.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-Z5KNJe2QhPkJ7MiLIxUE5ApYKC25+dGMstmnNkbdyFY4EnZFOXQDPD9fFbODmbsTL2iVWFn86Ej+QifmOkrAKA=="],
+    "@near-kit-tool-box/web": ["@near-kit-tool-box/web@0.2.1", "", { "dependencies": { "@hot-labs/near-connect": "^0.11.4", "near-kit": "^0.20.2", "prettier": "^3.8.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-yrjUY9qM/smDeeLaq0QIJBGtXsTnvXXeaweK44UFNZkuhmk9uw3zlXJf2GQDsI10s5euz57Sk8Dcu3fV5YwrfQ=="],
 
     "@noble/ciphers": ["@noble/ciphers@2.2.0", "", {}, "sha512-Z6pjIZ/8IJcCGzb2S/0Px5J81yij85xASuk1teLNeg75bfT07MV3a/O2Mtn1I2se43k3lkVEcFaR10N4cgQcZA=="],
 

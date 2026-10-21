@@ -9,8 +9,10 @@ import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { near_kit_client, getStoredNetworkId } from "@near-kit-tool-box/web";
-import * as HUGGIES_NEAR_FUN from "@near-kit-tool-box/fun";
-import { rhea_ammv2_get_deposits_fun_json } from "@near-kit-tool-box/fun";
+import {
+  rhea_ammv2_get_deposits_fun_json,
+  rhea_ammv2_contractid,
+} from "@near-kit-tool-box/fun";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
@@ -20,17 +22,8 @@ import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../ts/token_info";
 // ========================================
 // --- HELPERS ----------------------------
 // the rhea (ref finance v2) contract for the selected network.
-// --- WHY --- this calls the tool box's own rhea_ammv2_contractid, but
-// through a cast: @near-kit-tool-box/fun@0.2.0 ships a
-// contract_id_const_type.d.ts containing no type definitions at all
-// (an empty export plus a source map), so NETWORK_ID resolves to
-// unknown and the call will not typecheck. the cast is confined to this
-// one line. delete it once the published types are fixed.
 function rhea_contract_id_fun(): string {
-  const contractid = HUGGIES_NEAR_FUN.rhea_ammv2_contractid as (
-    network: "mainnet" | "testnet",
-  ) => string;
-  return contractid(getStoredNetworkId());
+  return rhea_ammv2_contractid(getStoredNetworkId());
 }
 // ========================================
 // ========================================
@@ -44,20 +37,7 @@ async function fetch_deposit_entries_fun(
   account_id: string,
 ): Promise<ReadonlyArray<{ id: string; raw: string; info: TOKEN_INFO }>> {
   const near = near_kit_client();
-  // --- WHY --- the cast is a workaround for a bug in the published
-  // @near-kit-tool-box/fun@0.2.0 build: rhea_ammv2_get_deposits is
-  // declared as returning Promise<unknown> because its annotation pulls
-  // in NETWORK_ID/RHEA_AMMV2_GET_DEPOSITS_TYPE from a d.ts that ships
-  // with no type definitions. the real return is
-  // `{ [token_id: string]: balance_string }` (confirmed against
-  // mainnet), which is what is restored here. drop the cast once the
-  // package's types are fixed.
-  const get_deposits = rhea_ammv2_get_deposits_fun_json as (
-    near: unknown,
-    contractId: string,
-    account: string,
-  ) => Promise<{ [token_id: string]: string }>;
-  const deposits = await get_deposits(
+  const deposits = await rhea_ammv2_get_deposits_fun_json(
     near,
     rhea_contract_id_fun(),
     account_id,
