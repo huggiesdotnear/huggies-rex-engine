@@ -3,12 +3,24 @@
 #HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
   /* body centers text; the heading reads better flush left. */
   text-align: left;
+  /* full width of main()'s box, so the border spans the content
+     rather than only the text. */
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
   border-bottom: 1px solid #474747;
   padding-bottom: 8px;
   margin-bottom: 16px;
 }
 #HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE {
   text-align: left;
+  width: 100%;
+}
+/* the scroll box: caps the table height and scrolls the rest. */
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 #HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE table {
   width: 100%;
@@ -22,14 +34,79 @@
   text-transform: uppercase;
   opacity: 0.75;
   padding: 6px 4px;
+  /* keeps the header readable while the body scrolls under it. */
+  position: sticky;
+  top: 0;
+  background-color: var(--color-backend);
+  z-index: 1;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE th button {
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  opacity: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE th.is-active {
+  opacity: 1;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE th svg.is-idle {
+  opacity: 0.25;
 }
 #HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE td {
   padding: 7px 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE th:last-child,
-#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE td:last-child {
+/* numeric columns line up on the decimal. */
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-numeric {
   text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-token-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-token-icon--empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-ticker {
+  font-weight: bold;
+  flex: none;
+}
+/* the full contract id, clipped so one long id cannot stretch the row.
+   the complete id stays available via the title tooltip. */
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE .huggies-contract {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE tfoot th {
+  text-align: left;
+  position: static;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  opacity: 1;
 }
 #HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE p {
   font-family: Arial, Helvetica, sans-serif;

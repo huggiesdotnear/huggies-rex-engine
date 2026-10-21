@@ -32,7 +32,30 @@ any account renders for anyone. components read it through
   aligned with a bottom border.
 - `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE` - table of the
   account's direct token balances from the intear api. `direct` source
-  only; `native` and `rhea` (LP positions) are not shown here.
+  only; `native` and `rhea` (LP positions) are not shown here. shows
+  icon, ticker, full contract id, human-readable balance and USD, and
+  sorts by ticker or USD (default USD, descending). balances under the
+  usd floor in `lib/ts/balance_filter.ts` are hidden and counted in a
+  note below the table.
+
+### TOKEN INFO
+
+token metadata has one read-through path, used anywhere token info is
+needed — never call the api for token fields directly.
+
+- `frontend/lib/ts/token_info.ts` - `HUGGIES_TOKEN_INFO.get(ids)` returns
+  a map of id -> info (symbol, decimals, icon, price_usd, reputation,
+  holders).
+- `frontend/lib/ts/token_cache.ts` - the durable half (symbol, decimals,
+  icon) in an indexeddb `tokens` store, one entry per token id, never
+  expires. price/reputation are deliberately NOT cached.
+- `frontend/lib/ts/token_amount_format.ts` - raw smallest-unit amounts ->
+  human strings, and usd formatting.
+- `frontend/lib/ts/balance_filter.ts` - spam + usd-floor policy.
+- `frontend/lib/ts/balance_sort.ts` - ticker / usd ordering.
+
+metadata endpoint is intear `GET /tokens?ids=...&fields=...`. it takes up
+to 2000 ids per request. `limit` requires a `sort`.
 
 #### SKILL - frontend/app/skill.html
 
