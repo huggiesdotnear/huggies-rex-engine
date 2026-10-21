@@ -23,6 +23,18 @@
 // code, and an SSR `typeof window` guard keeps it importable from
 // non-browser contexts (tests, future node scripts) without
 // throwing on window.location.
+//
+// SCOPE: REDIRECT ONLY
+// --------------------
+// this module does NOT mount components — it owns the one-shot
+// redirect on load and nothing else. the component wiring lives
+// in frontend/lib/ts/import.ts and is the host page's job to
+// load via its own <script src=".../import.ts"> tag. that keeps
+// import.ts as the single place every component is imported from,
+// per AGENTS.md. account-router.html mounts nothing, so the four
+// import.ts side effects (nav, random_slogan_p, network_button,
+// auth_button) all run their mount guards and skip — they're
+// loaded for symmetry with auth.html rather than out of necessity.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
 // ========================================
@@ -140,9 +152,10 @@ function route_fun(): void {
 // ========================================
 // --- RUN --------------------------------
 // kick the redirect as a side effect of import. self-runs because
-// this file is its own entry, loaded directly from
+// this file is its own entry, loaded from
 // account-router.html's <script src="../lib/ts/account_router.ts">
-// tag — and the page has nothing else to do while the redirect
+// tag (alongside import.ts for component-loading symmetry with
+// auth.html — see the SCOPE block in the file header). — and the page has nothing else to do while the redirect
 // happens, so wrapping this in a function someone has to call
 // would only invite a page author to forget the call.
 //

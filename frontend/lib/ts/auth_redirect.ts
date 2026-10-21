@@ -37,16 +37,18 @@
 // the depth-aware URL builder) next to the code, mirroring the
 // shape of account_router.ts so the two redirect pages read
 // the same way.
+//
+// SCOPE: REDIRECT ONLY
+// --------------------
+// this module does NOT mount components — it owns the redirect
+// subscription + the on-load bounce and nothing else. the
+// component wiring (network button, login button, etc.) lives
+// in frontend/lib/ts/import.ts and is the host page's job to
+// load via its own <script src=".../import.ts"> tag. that
+// keeps import.ts as the single place every component is
+// imported from, per AGENTS.md.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
-// side-effect imports — pulling in the two components auth.html
-// renders (network toggle + LOGIN button) so a single
-// <script src=".../auth_redirect.ts"> tag in auth.html is
-// enough to get the working UI. account_router.ts does not
-// reuse this trick because account-router.html intentionally
-// has no UI of its own (it redirects immediately on load).
-import "../components/auth_button";
-import "../components/network_button";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -140,8 +142,10 @@ function redirect_if_signed_in_fun(): void {
 // ========================================
 // --- RUN --------------------------------
 // kick the redirect as a side effect of import. self-runs because
-// this file is its own entry, loaded directly from auth.html's
-// <script src="../lib/ts/auth_redirect.ts"> tag.
+// this file is its own entry, loaded from auth.html's
+// <script src="../lib/ts/auth_redirect.ts"> tag (alongside
+// import.ts for the component mounts — see the SCOPE block in
+// the file header).
 //
 // init() must run first so the stored-session rehydration is in
 // place before either redirect branch reads account_id. it is
