@@ -24,10 +24,7 @@ import { render } from "preact";
 // preact exports these hooks as `useState`/`useEffect`; aliased on
 // import so the call sites below follow this repo's snake_case rule
 // without renaming the upstream exports.
-import {
-  useState as use_state,
-  useEffect as use_effect,
-} from "preact/hooks";
+import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_AUTH } from "../ts/auth_status";
 // ========================================
@@ -96,7 +93,11 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
         type="button"
         onClick={on_click_fun}
         disabled={busy}
-        title={is_signed_in ? `signed in as ${account_id} — click to sign out` : "sign in with NEAR"}
+        title={
+          is_signed_in
+            ? `signed in as ${account_id} — click to sign out`
+            : "sign in with NEAR"
+        }
       >
         {label}
       </button>

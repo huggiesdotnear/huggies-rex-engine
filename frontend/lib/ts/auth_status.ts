@@ -253,7 +253,9 @@ function get_session_fun(): HUGGIES_AUTH_SESSION | null {
 // the button would keep showing a signed-in account for a session
 // that has NO signature.
 // ----------------------------------------
-async function rollback_connection_fun(connector: NearConnector): Promise<void> {
+async function rollback_connection_fun(
+  connector: NearConnector,
+): Promise<void> {
   clear_session_fun();
   session_network = null;
   account_id = null;

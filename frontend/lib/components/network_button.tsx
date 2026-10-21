@@ -156,7 +156,11 @@ function HUGGIES_COMPONENT_NETWORK_BUTTON_FUN() {
 
   return (
     <>
-      <button type="button" onClick={on_click_fun} data-huggies-network={current}>
+      <button
+        type="button"
+        onClick={on_click_fun}
+        data-huggies-network={current}
+      >
         {current.toUpperCase()}
       </button>
     </>
