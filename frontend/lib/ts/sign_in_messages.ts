@@ -14,7 +14,8 @@
 // these strings are also what the user sees in their wallet prompt,
 // so they read as plain english rather than as protocol noise.
 // ========================================
-export const HUGGIES_SIGN_IN_MESSAGE = "Sign in to HUGGIES";
+// Sign in to HUGGIES — the only diaper company in crypto.
+export const HUGGIES_SIGN_IN_MESSAGE = "Sign in to HUGGIES — the only diaper company in crypto.";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -22,8 +23,20 @@ export const HUGGIES_SIGN_IN_MESSAGE = "Sign in to HUGGIES";
 // hashed into the signed payload, so it MUST be identical on the
 // server at verification time. keep it in sync with the backend.
 //
-// it is not an on-chain account — it is the app's identifier.
-export const HUGGIES_SIGN_IN_RECIPIENT = "huggies-rex.near";
+// NEP-413 does not require the recipient to be an on-chain account,
+// but using a real one lets a curious user look it up on a NEAR
+// explorer and confirm they are signing for HUGGIES rather than
+// something impersonating it. huggies.near is the public HUGGIES
+// account on mainnet.
+//
+// SERVER VERIFICATION NOTE: when an existing session is replayed to
+// the server, the server must verify the signature against the
+// `message` and `recipient` that are STORED in the session, not
+// against the current value of HUGGIES_SIGN_IN_MESSAGE or
+// HUGGIES_SIGN_IN_RECIPIENT. the bytes the wallet signed are pinned
+// at the time of sign-in, and any drift here would silently
+// invalidate every prior session.
+export const HUGGIES_SIGN_IN_RECIPIENT = "huggies.near";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================
