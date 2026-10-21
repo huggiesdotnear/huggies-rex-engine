@@ -9,4 +9,6 @@ import "../components/nav";
 import "../components/random_slogan_p";
 import "../components/network_button";
 import "../components/auth_button";
+import "../components/account_id_h1";
+import "../components/account_direct_balance_table";
 // ========================================

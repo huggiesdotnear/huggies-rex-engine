@@ -1,0 +1,39 @@
+/*==================================*/
+/* account page: account id h1 + direct balance table */
+#HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
+  /* body centers text; the heading reads better flush left. */
+  text-align: left;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE {
+  text-align: left;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  text-transform: uppercase;
+  opacity: 0.75;
+  padding: 6px 4px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE td {
+  padding: 7px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE th:last-child,
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE td:last-child {
+  text-align: right;
+}
+#HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
+}
+/*==================================*/
