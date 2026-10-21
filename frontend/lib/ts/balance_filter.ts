@@ -16,6 +16,10 @@ const HUGGIES_MIN_USD_BALANCE = 0.1;
 // outright; "Unknown" tokens still pass if they clear the usd floor,
 // because a low-reputation token can still be worth holding.
 const HUGGIES_SPAM_REPUTATION = "Spam";
+// the chain's own token. never hidden: it is the balance an account is
+// most likely to care about, and its usd price is derived rather than
+// reported, so the floor below could hide a real holding.
+const HUGGIES_NEAR_ID = "near";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -37,6 +41,7 @@ export interface HUGGIES_BALANCE_ENTRY {
 // leave pure dust in the table.
 function keep_entry_fun(entry: HUGGIES_BALANCE_ENTRY): boolean {
   if (entry.info.reputation === HUGGIES_SPAM_REPUTATION) return false;
+  if (entry.id === HUGGIES_NEAR_ID) return true;
   return entry.usd_value >= HUGGIES_MIN_USD_BALANCE;
 }
 // ========================================

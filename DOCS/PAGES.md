@@ -30,13 +30,16 @@ any account renders for anyone. components read it through
 
 - `HUGGIES_COMPONENT_ACCOUNT_ID_H1` - <h1> of the account id, left
   aligned with a bottom border.
-- `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE` - table of the
-  account's direct token balances from the intear api. `direct` source
-  only; `native` and `rhea` (LP positions) are not shown here. shows
-  icon, ticker, full contract id, human-readable balance and USD, and
-  sorts by ticker or USD (default USD, descending). balances under the
+- `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE` - the account's
+  balances from intear, sources `direct` + `native`. `rhea` (LP
+  positions) is not shown. one row per token, every field stacked in a
+  single column (icon, ticker, balance, usd, then the full contract id
+  clipped underneath) so the table never scrolls sideways. the native
+  NEAR balance is pinned above the sorted list. sortable by ticker or
+  usd, either direction, default usd descending. balances under the
   usd floor in `lib/ts/balance_filter.ts` are hidden and counted in a
-  note below the table.
+  note below the table. `rhea` + `native` come from the SAME /balances
+  request; there is no separate near-balance endpoint.
 
 ### TOKEN INFO
 
@@ -56,6 +59,12 @@ needed — never call the api for token fields directly.
 
 metadata endpoint is intear `GET /tokens?ids=...&fields=...`. it takes up
 to 2000 ids per request. `limit` requires a `sort`.
+
+intear has NO `near` entry in /tokens (it comes back in `missing`), so
+`token_info.ts` supplies NEAR itself: symbol NEAR, 24 decimals, and a
+usd price borrowed from wNEAR, which is 1:1 redeemable with NEAR. it
+also asks for `wrap.near` alongside whatever ids were requested, so the
+price costs no extra request.
 
 #### SKILL - frontend/app/skill.html
 

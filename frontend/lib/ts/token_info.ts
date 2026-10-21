@@ -20,6 +20,15 @@ const HUGGIES_TOKEN_FIELDS = [
   ...HUGGIES_DURABLE_FIELDS,
   ...HUGGIES_VOLATILE_FIELDS,
 ] as const;
+// --- WHY --- intear has NO `near` entry in /tokens (it comes back in
+// the response's `missing` list), so the chain's own token has to be
+// described here or the native balance cannot be rendered at all. 24
+// decimals is the NEAR protocol constant, not a fetched value.
+const HUGGIES_NEAR_ID = "near";
+const HUGGIES_NEAR_SYMBOL = "NEAR";
+const HUGGIES_NEAR_DECIMALS = 24;
+// the 1:1 wrapper whose price stands in for NEAR's.
+const HUGGIES_WRAP_ID = "wrap.near";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -44,6 +53,26 @@ function to_number_fun(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 // ========================================
+// --- NEAR ------------------------------
+// describe the chain's own token, which the token registry does not
+// carry. its usd price is borrowed from wNEAR, which tracks NEAR 1:1.
+// --- WHY --- wNEAR is a 1:1 redeemable wrapper of NEAR, so its
+// price_usd is the same number to the precision this table shows.
+// fetching it costs nothing extra: the native balance only ever appears
+// on an account that may well already hold wNEAR, and when it does not
+// the price simply reads as unknown rather than being invented.
+function near_info_fun(wnear_price_usd: number): HUGGIES_TOKEN_INFO {
+  return {
+    id: HUGGIES_NEAR_ID,
+    symbol: HUGGIES_NEAR_SYMBOL,
+    decimals: HUGGIES_NEAR_DECIMALS,
+    icon: null,
+    price_usd: wnear_price_usd,
+    reputation: "Reputable",
+    holders: 0,
+  };
+}
+// ========================================
 // ========================================
 // --- FETCH -----------------------------
 // fetch metadata for the ids we do not already have cached, cache the
@@ -57,16 +86,24 @@ async function fetch_and_merge_fun(
   const out = new Map<string, HUGGIES_TOKEN_INFO>();
   if (ids.length === 0) return out;
 
+  // ask for wNEAR alongside the requested ids so the native NEAR row
+  // can be priced without a second round trip.
+  const wants_near = ids.includes(HUGGIES_NEAR_ID);
+  const asked = wants_near
+    ? [...new Set([...ids, HUGGIES_WRAP_ID])]
+    : ids;
+
   // durable metadata we already hold, used to fill any id the fresh
   // response omits (a token can drop out of /tokens between calls).
-  const cached = await HUGGIES_TOKEN_CACHE.get_many(ids);
+  const cached = await HUGGIES_TOKEN_CACHE.get_many(asked);
 
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_FIELDS,
-    ids,
+    ids: asked,
   });
 
   const durable_to_cache = [];
+  let wnear_price_usd = 0;
   for (const row of response.rows) {
     const [id, symbol, decimals, icon, price_usd, reputation, holders] = row;
     const record: HUGGIES_TOKEN_INFO = {
@@ -78,6 +115,7 @@ async function fetch_and_merge_fun(
       reputation: typeof reputation === "string" ? reputation : "Unknown",
       holders: to_number_fun(holders),
     };
+    if (id === HUGGIES_WRAP_ID) wnear_price_usd = record.price_usd;
     out.set(id, record);
     durable_to_cache.push({
       id,
@@ -89,6 +127,11 @@ async function fetch_and_merge_fun(
 
   // write the durable half back so the next read is served from cache.
   await HUGGIES_TOKEN_CACHE.put_many(durable_to_cache);
+
+  // the registry has no `near`, so supply it ourselves.
+  if (wants_near && !out.has(HUGGIES_NEAR_ID)) {
+    out.set(HUGGIES_NEAR_ID, near_info_fun(wnear_price_usd));
+  }
 
   // anything we hold durably but the api did not return: still show it,
   // with no fresh price/reputation to go on.

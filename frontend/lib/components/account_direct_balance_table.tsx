@@ -1,10 +1,12 @@
 // ========================================
-// <table> of an account's direct token balances from the intear api.
+// <table> of an account's token balances from the intear api.
 // reads the `?id=` url parameter through lib/ts/account_id.ts, joins
 // token metadata through lib/ts/token_info.ts (indexeddb-cached),
 // filters through balance_filter.ts and sorts through balance_sort.ts.
 // amounts are rendered human-readable via token_amount_format.ts.
-// mounts into <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE">.
+// one row per token, each field stacked in a single column so the
+// table never needs horizontal scrolling. mounts into
+// <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE">.
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
@@ -21,12 +23,16 @@ import type { HUGGIES_SORT_BY } from "../ts/balance_sort";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// why only "direct": intear splits an account's holdings across three
-// sources — "direct" tokens the account holds itself, "native" ones
-// tracked another way, and "rhea" LP positions. this table is the
-// direct balance only; a later component covering the rest is the
-// place to add the other two sources.
-const HUGGIES_DIRECT_BALANCE_SOURCES = ["direct"] as const;
+// "direct" is what the account holds itself; "native" is the chain's
+// own NEAR balance, which intear reports as its own source. both come
+// from the SAME /balances request — there is no separate endpoint for
+// the NEAR balance. "rhea" (LP positions) is deliberately left out; a
+// later component covering LP holdings is the place to add it.
+const HUGGIES_BALANCE_SOURCES = ["direct", "native"] as const;
+// the native NEAR row is pinned above the sorted list: it is the gas
+// balance an account cannot function without, so it is not competing
+// for rank with the rest.
+const HUGGIES_NEAR_ID = "near";
 // the default order: biggest position first, which is what a reader
 // opening their own account wants to see.
 const HUGGIES_DEFAULT_SORT_BY: HUGGIES_SORT_BY = "usd";
@@ -34,8 +40,8 @@ const HUGGIES_DEFAULT_SORT_DESC = true;
 // ========================================
 // ========================================
 // --- FETCH -----------------------------
-// pull direct balances, attach metadata, apply the filter, and hand
-// back the entries the table renders plus how many were hidden.
+// pull balances, attach metadata, apply the filter, and hand back the
+// entries the table renders plus how many were hidden.
 // --- WHY --- the hidden count is returned rather than recomputed in the
 // component: only here do we know both the pre-filter and post-filter
 // sizes, and the note under the table needs the difference.
@@ -47,7 +53,7 @@ async function fetch_balance_entries_fun(
 }> {
   const response = await api_intear_balances_get({
     account: account_id,
-    sources: HUGGIES_DIRECT_BALANCE_SOURCES,
+    sources: HUGGIES_BALANCE_SOURCES,
   });
 
   const rows = response.balances.rows;
@@ -100,30 +106,90 @@ function token_icon_fun(
 }
 // ========================================
 // ========================================
-// --- SORT HEADER ------------------------
-// a clickable column header that shows the current direction.
-function sort_header_fun(
-  label: string,
-  by: HUGGIES_SORT_BY,
-  current: HUGGIES_SORT_BY,
-  desc: boolean,
+// ========================================
+// --- ROW -------------------------------
+// one token with every field stacked in a single cell: icon, ticker,
+// balance and usd on the first line, the contract id clipped on the
+// line below.
+// --- WHY --- one cell rather than three columns: a full contract id
+// next to a long balance made the table overflow horizontally on
+// narrow screens. stacking keeps every row inside the viewport and lets
+// the contract id ellipsise on its own line instead of stretching the
+// whole table.
+function balance_row_fun(
+  entry: HUGGIES_BALANCE_ENTRY,
+  pinned: boolean,
+): preact.JSX.Element {
+  const { info, raw, usd_value } = entry;
+  return (
+    // keyed by token id, not symbol: symbols are not unique (two
+    // different tokens can share one).
+    <tr key={entry.id} class={pinned ? "is-pinned" : undefined}>
+      <td>
+        <div class="huggies-row-head">
+          {token_icon_fun(info.icon, info.symbol)}
+          <span class="huggies-ticker">{info.symbol}</span>
+          {pinned && <span class="huggies-pinned-tag">NEAR</span>}
+          <span class="huggies-amounts">
+            <span class="huggies-amount">
+              {HUGGIES_AMOUNT_FORMAT.balance(raw, info)}
+            </span>
+            <span class="huggies-usd">
+              {HUGGIES_AMOUNT_FORMAT.usd(usd_value)}
+            </span>
+          </span>
+        </div>
+        {/* the full contract id stays selectable and copyable, and is
+            in the title so a clipped id can still be read. */}
+        <div class="huggies-contract" title={entry.id}>
+          {entry.id}
+        </div>
+      </td>
+    </tr>
+  );
+}
+// ========================================
+// ========================================
+// --- SORT CONTROL ----------------------
+// the two sort keys as a toggle above the table, plus a direction
+// button. one control for both rather than clickable column headers,
+// because with a single stacked column there is no header row to hang
+// them on.
+function sort_toggle_fun(
+  sort_by: HUGGIES_SORT_BY,
+  sort_desc: boolean,
   on_sort: (by: HUGGIES_SORT_BY) => void,
 ): preact.JSX.Element {
-  const active = current === by;
-  const Icon = desc ? ArrowDown : ArrowUp;
+  const Icon = sort_desc ? ArrowDown : ArrowUp;
   return (
-    <th scope="col" data-huggies-sort={by} class={active ? "is-active" : ""}>
+    <div class="huggies-sort" role="group" aria-label="sort balances">
       <button
         type="button"
-        onClick={() => on_sort(by)}
-        aria-label={`sort by ${label}`}
-        title={`sort by ${label}`}
+        class={sort_by === "usd" ? "is-active" : ""}
+        aria-pressed={sort_by === "usd"}
+        onClick={() => on_sort("usd")}
       >
-        {label}
-        {/* an inactive column shows a faint arrow so the control is discoverable */}
-        {active ? <Icon size={12} /> : <Icon size={12} class="is-idle" />}
+        USD
       </button>
-    </th>
+      <button
+        type="button"
+        class={sort_by === "symbol" ? "is-active" : ""}
+        aria-pressed={sort_by === "symbol"}
+        onClick={() => on_sort("symbol")}
+      >
+        TICKER
+      </button>
+      <button
+        type="button"
+        class="huggies-sort-dir"
+        onClick={() => on_sort(sort_by)}
+        aria-label={sort_desc ? "sort ascending" : "sort descending"}
+        title={sort_desc ? "descending" : "ascending"}
+      >
+        <Icon size={14} />
+        {sort_desc ? "DESC" : "ASC"}
+      </button>
+    </div>
   );
 }
 // ========================================
@@ -172,9 +238,8 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
     };
   }, [account_id]);
 
-  // clicking the active column flips direction; clicking a new column
-  // switches to it and starts descending, which is the useful default
-  // for both keys.
+  // clicking the active key flips direction; clicking a new key
+  // switches to it and starts descending, the useful default for both.
   const on_sort_fun = (by: HUGGIES_SORT_BY) => {
     if (by === sort_by) {
       set_sort_desc(!sort_desc);
@@ -187,76 +252,49 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
   // no `?id=` on this url — render nothing.
   if (account_id === null) return <></>;
 
-  const sorted =
-    entries === null
-      ? []
-      : HUGGIES_BALANCE_SORT.sort(entries, sort_by, sort_desc);
-  const total_usd = sorted.reduce((sum, entry) => sum + entry.usd_value, 0);
+  // the native NEAR holding is pulled out of the sortable list and
+  // pinned above it; everything else competes on usd or ticker.
+  const all_entries = entries ?? [];
+  const near_entry = all_entries.find((entry) => entry.id === HUGGIES_NEAR_ID);
+  const rest = all_entries.filter((entry) => entry.id !== HUGGIES_NEAR_ID);
+  const sorted = HUGGIES_BALANCE_SORT.sort(rest, sort_by, sort_desc);
+  // the total covers the pinned row too, so it is not counted twice.
+  const total_usd = all_entries.reduce((sum, entry) => sum + entry.usd_value, 0);
 
   return (
     <>
+      {sort_toggle_fun(sort_by, sort_desc, on_sort_fun)}
       {/* the scroll box caps the height so a long token list never
           pushes the rest of the page off screen. */}
       <div class="huggies-scroll">
         <table data-huggies-account={account_id}>
-        <thead>
-          <tr>
-            {sort_header_fun(
-              "TOKEN",
-              "symbol",
-              sort_by,
-              sort_desc,
-              on_sort_fun,
+          <tbody>
+            {entries === null && error === null && (
+              <tr>
+                <td>LOADING...</td>
+              </tr>
             )}
-            <th scope="col" class="huggies-numeric">BALANCE</th>
-            {sort_header_fun("USD", "usd", sort_by, sort_desc, on_sort_fun)}
-          </tr>
-        </thead>
-        <tbody>
-          {entries === null && error === null && (
+            {near_entry !== undefined && balance_row_fun(near_entry, true)}
+            {sorted.map((entry) => balance_row_fun(entry, false))}
+            {entries !== null && sorted.length === 0 && near_entry === undefined && (
+              <tr>
+                <td>
+                  NO BALANCES OVER {HUGGIES_BALANCE_FILTER.min_usd} USD
+                </td>
+              </tr>
+            )}
+          </tbody>
+          <tfoot>
             <tr>
-              <td colSpan={3}>LOADING...</td>
-            </tr>
-          )}
-          {sorted.map((entry) => (
-            // --- WHY --- keyed by token id, not symbol: symbols are not
-            // unique (two different tokens can share one).
-            <tr key={entry.id}>
-              <td>
-                <span class="huggies-token-cell">
-                  {token_icon_fun(entry.info.icon, entry.info.symbol)}
-                  <span class="huggies-ticker">{entry.info.symbol}</span>
-                  {/* the full contract id, so a row is always copyable
-                      back to a block explorer */}
-                  <span class="huggies-contract" title={entry.id}>
-                    {entry.id}
-                  </span>
+              <th scope="row">
+                TOTAL
+                <span class="huggies-total-usd">
+                  {HUGGIES_AMOUNT_FORMAT.usd(total_usd)}
                 </span>
-              </td>
-              <td class="huggies-numeric">
-                {HUGGIES_AMOUNT_FORMAT.balance(entry.raw, entry.info)}
-              </td>
-              <td class="huggies-numeric">
-                {HUGGIES_AMOUNT_FORMAT.usd(entry.usd_value)}
-              </td>
+              </th>
             </tr>
-          ))}
-          {entries !== null && sorted.length === 0 && (
-            <tr>
-              <td colSpan={3}>NO DIRECT BALANCES OVER {HUGGIES_BALANCE_FILTER.min_usd} USD</td>
-            </tr>
-          )}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th scope="row">TOTAL</th>
-            <td />
-            <td class="huggies-numeric">
-              {HUGGIES_AMOUNT_FORMAT.usd(total_usd)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+          </tfoot>
+        </table>
       </div>
       {hidden_count > 0 && (
         <p class="huggies-hidden-note">
