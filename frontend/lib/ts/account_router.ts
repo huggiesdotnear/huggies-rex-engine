@@ -5,9 +5,6 @@
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
 // ========================================
-// splash delay before the route fires, matching index.ts.
-const REDIRECT_DELAY_MS = 1500;
-// ========================================
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -49,8 +46,7 @@ function build_account_href_fun(account_id: string): string {
 // ========================================
 // ========================================
 // --- ROUTE ------------------------------
-// inspect auth state and replace-location to the right page, after
-// a short splash delay so the page paints first.
+// inspect auth state and replace-location to the right page.
 // --- WHY --- init() must run BEFORE get_account_id(): init is what
 // rehydrates account_id from localStorage, so without it a fresh
 // page load always looks signed out even when a session sits in
@@ -63,9 +59,7 @@ function route_fun(): void {
     account_id === null
       ? build_login_href_fun()
       : build_account_href_fun(account_id);
-  window.setTimeout(() => {
-    window.location.replace(target);
-  }, REDIRECT_DELAY_MS);
+  window.location.replace(target);
 }
 // ========================================
 // ========================================
@@ -74,8 +68,7 @@ function route_fun(): void {
 // --- RUN --------------------------------
 // self-run on import. replace (vs assign) keeps the router out
 // of history, so back doesn't bounce into a page that immediately
-// bounces forward — same trick as index.ts. the timer delays the
-// hop rather than blocking it, so mount still happens first.
+// bounces forward — same trick as index.ts.
 route_fun();
 // ========================================
 // copyright 2026 by sleet.near
