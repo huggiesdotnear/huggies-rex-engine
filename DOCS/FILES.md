@@ -53,27 +53,6 @@ const ok = await verifyNep413Signature(
 );
 ```
 
-### running it
-
-`cargo run` binds `0.0.0.0` (a wildcard, not a URL you can open) and
-prints the addresses you can actually use:
-
-```
-open in a browser:
-  http://localhost:54733   <- use this for wallet login
-  http://192.168.1.20:54733 <- LAN, wallet login will NOT work here
-```
-
-**always open `localhost` for wallet work.** a LAN address over plain
-HTTP is not a secure context, so the browser withholds WebCrypto
-Ed25519 from the wallet's sandbox iframe and sign-in fails with
-`Cannot read properties of undefined (reading 'generateKey')`.
-`https`, `http://localhost` and `http://127.0.0.1` are all treated as
-secure.
-
-bind somewhere else with `HUGGIES_HOST` / `HUGGIES_PORT`
-(defaults `0.0.0.0` and `54733`).
-
 =========================
 <br/>
 copyright 2026 by sleet.near

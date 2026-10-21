@@ -5,6 +5,7 @@
 // ====================================
 pub mod backend {
     pub mod logic {
+        pub mod huggies_banner_fun;
         pub mod huggies_host_fun;
         pub mod huggies_local_ips_fun;
         pub mod huggies_port_fun;
