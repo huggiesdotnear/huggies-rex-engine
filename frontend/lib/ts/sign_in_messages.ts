@@ -1,7 +1,6 @@
 // ========================================
-// HUGGIES_SIGN_IN_MESSAGES
+// the message + recipient the wallet signs during sign-in.
 // ========================================
-// the message the user signs in their wallet prompt.
 export const HUGGIES_SIGN_IN_MESSAGE =
   "I verify I have diaper hands and own this NEAR account.";
 // ========================================

@@ -1,15 +1,7 @@
 // ========================================
-// INDEX
-// tiny landing-page script wired into the root frontend/index.html.
-// waits three seconds then redirects the browser into the actual
-// app at app/index.html. lives in lib/ts (instead of inline in the
-// html) so the timer / target live in one place and any future
-// landing-page logic can land in the same file.
-//
-// the 3000ms delay gives the HUGGIES splash on the root page a
-// chance to register visually before the swap. SSR guard skips the
-// setTimeout when this module is imported from non-browser
-// contexts (tests, future node scripts) so window is safe.
+// root landing-page script: after a 3s splash delay, sends the
+// browser into app/index.html. SSR guard skips the timer outside
+// the browser so this module stays importable from tests/scripts.
 // ========================================
 
 const REDIRECT_DELAY_MS = 3000;

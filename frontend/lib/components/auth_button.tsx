@@ -1,30 +1,10 @@
 // ========================================
-// AUTH BUTTON
-// the sign-in / sign-out control. shows "LOGIN" while signed out and
-// the connected account id once signed in, and starts a NEP-413
-// signed-message handshake on click.
-//
-// ALL auth state lives in frontend/lib/ts/auth_status.ts. this file
-// is only a view: it reads from HUGGIES_AUTH and re-renders when that
-// module says something changed. keeping the wallet handshake out of
-// here means the account page (or any gated feature) can subscribe to
-// the same state without duplicating it.
-//
-// signing in is a one-shot connect+sign: a single wallet popup that
-// both connects the wallet and produces the signed message. the
-// signature, and the message/nonce/recipient it depends on, are stored
-// by auth_status.ts for later server-side verification.
-//
-// the account id is shown verbatim — NEAR ids are bounded length
-// (well under the worst-case useful name), and the button column is
-// wide enough to hold them. truncating to "sle...ear"-style ellipsis
-// hides the disambiguating suffix that is usually the part of the id
-// people recognise, and the saved pixels were not buying anything.
+// sign-in / sign-out control. shows "LOGIN" when signed out and
+// the full account id when signed in. all auth state lives in
+// frontend/lib/ts/auth_status.ts — this file is a view.
 // ========================================
 import { render } from "preact";
-// preact exports these hooks as `useState`/`useEffect`; aliased on
-// import so the call sites below follow this repo's snake_case rule
-// without renaming the upstream exports.
+// aliased on import so call sites follow this repo's snake_case rule.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_AUTH } from "../ts/auth_status";
@@ -35,20 +15,16 @@ import { HUGGIES_AUTH } from "../ts/auth_status";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
   // ========================================
-  // a single counter forces a re-render whenever auth_status notifies,
-  // because preact does not re-render purely from an external setState
-  // call. reading the real values through the getters on every render
-  // keeps this component a pure view of the module's state.
+  // --- WHY --- a revision counter forces a re-render on every
+  // auth_status notify; preact doesn't re-render from external
+  // state changes alone.
   const [, set_revision] = use_state(0);
-
-  // while the wallet popup is open the button is disabled, so a
-  // second click cannot open a second popup. local to the component
-  // because the click flow is the component's concern, not the
-  // auth_status module's.
+  // disabled while the wallet popup is open so a second click
+  // can't open a second popup.
   const [busy, set_busy] = use_state(false);
 
-  // subscribe to auth changes and clean up on unmount, so a
-  // remounted component does not stack listeners.
+  // subscribe to auth changes; return the unsubscribe so the
+  // effect cleans up on unmount.
   use_effect(() => {
     const unsubscribe = HUGGIES_AUTH.subscribe(() => {
       set_revision((revision) => revision + 1);
@@ -75,7 +51,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
 
   return (
     <>
-      {/* disabled while busy so the popup cannot be opened twice */}
+      {/* surface rather than swallow — a rejected wallet popup is a normal outcome */}
       <button
         type="button"
         onClick={on_click_fun}
@@ -88,8 +64,6 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
       >
         {label}
       </button>
-      {/* surfaced rather than swallowed — a rejected wallet popup is */}
-      {/* a normal outcome and the user should see why nothing happened */}
       {error !== null && <p data-huggies-auth-error={error}>{error}</p>}
     </>
   );
@@ -99,15 +73,9 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
 // ========================================
 // ========================================
 // --- MOUNT ------------------------------
-// self-mount so the component file works as its own entry. looks for
-// a <div id="HUGGIES_COMPONENT_AUTH_BUTTON"> on the page and renders
-// into it.
-//
-// the side effect is guarded by an id check so importing this module
-// from another file won't accidentally mount a second instance.
-//
-// init() runs BEFORE the first render and before any connect(), so the
-// wallet's autoConnect cannot emit a sign-in we have no listener for.
+// --- WHY --- init() runs BEFORE the first render / connect so
+// the wallet's autoConnect can't emit a sign-in we have no
+// listener for.
 const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_AUTH_BUTTON;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
