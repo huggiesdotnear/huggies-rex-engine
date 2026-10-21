@@ -11,15 +11,14 @@ import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 // --- CONFIG -----------------------------
 // the fields this system fetches. keep the volatile and durable lists
 // in sync with which fields land in the cache below.
-// volatile: changes constantly, never cached.
+// volatile: changes constantly, never cached. fetched for every id on
+// every load, so it stays a small field set.
 const HUGGIES_VOLATILE_FIELDS = ["price_usd", "reputation", "holders"] as const;
 // durable: fixed for a token's life, cached in indexeddb forever.
+// `icon` is a full inline svg data uri and makes up almost the entire
+// payload — 336KB for ~100 tokens with the icons, ~10KB without — so
+// these fields are only ever requested for ids we have not cached.
 const HUGGIES_DURABLE_FIELDS = ["symbol", "decimals", "icon"] as const;
-// all fields, in the order the response returns them.
-const HUGGIES_TOKEN_FIELDS = [
-  ...HUGGIES_DURABLE_FIELDS,
-  ...HUGGIES_VOLATILE_FIELDS,
-] as const;
 // --- WHY --- intear has NO `near` entry in /tokens (it comes back in
 // the response's `missing` list), so the chain's own token has to be
 // described here or the native balance cannot be rendered at all. 24
@@ -27,7 +26,7 @@ const HUGGIES_TOKEN_FIELDS = [
 const HUGGIES_NEAR_ID = "near";
 const HUGGIES_NEAR_SYMBOL = "NEAR";
 const HUGGIES_NEAR_DECIMALS = 24;
-// the 1:1 wrapper whose price stands in for NEAR's.
+// the 1:1 wrapper whose price and icon stand in for NEAR's.
 const HUGGIES_WRAP_ID = "wrap.near";
 // ========================================
 // ========================================
@@ -81,11 +80,13 @@ function near_info_fun(wnear: {
 // ========================================
 // ========================================
 // --- FETCH -----------------------------
-// fetch metadata for the ids we do not already have cached, cache the
-// durable fields, and merge everything into flat records.
-// --- WHY --- a fresh price/reputation is fetched for every id on every
-// call even when its metadata is cached, because those values go stale
-// within minutes; only the never-changing fields come from the cache.
+// fetch the volatile half for every id on every load, and the durable
+// half only for ids not already cached, then merge into flat records.
+// --- WHY --- two requests with different field sets, not one with all
+// of them. `icon` is a full inline svg data uri, so asking for it on
+// ids already cached costs ~326KB of the ~336KB response and buys
+// nothing — those bytes are already in indexeddb. splitting it means a
+// revisit fetches ~10KB of price/reputation instead.
 async function fetch_and_merge_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, HUGGIES_TOKEN_INFO>> {
@@ -95,60 +96,75 @@ async function fetch_and_merge_fun(
   // ask for wNEAR alongside the requested ids so the native NEAR row
   // can be priced without a second round trip.
   const wants_near = ids.includes(HUGGIES_NEAR_ID);
-  const asked = wants_near
-    ? [...new Set([...ids, HUGGIES_WRAP_ID])]
-    : ids;
+  const asked = wants_near ? [...new Set([...ids, HUGGIES_WRAP_ID])] : ids;
 
-  // durable metadata we already hold, used to fill any id the fresh
-  // response omits (a token can drop out of /tokens between calls).
   const cached = await HUGGIES_TOKEN_CACHE.get_many(asked);
+  // the ids whose symbol/decimals/icon we have never stored. on a warm
+  // cache this is empty, so no durable request is made at all.
+  const uncached = asked.filter((id) => !cached.has(id));
 
-  const response = await api_intear_tokens_get({
-    fields: HUGGIES_TOKEN_FIELDS,
+  // 1. durable fields, only for ids we have never stored. empty list
+  // means a warm cache, and the request is skipped entirely.
+  if (uncached.length > 0) {
+    const fresh = await api_intear_tokens_get({
+      fields: HUGGIES_DURABLE_FIELDS,
+      ids: uncached,
+    });
+    await HUGGIES_TOKEN_CACHE.put_many(
+      fresh.rows.map((row) => {
+        const [id, symbol, decimals, icon] = row;
+        return {
+          id,
+          symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
+          decimals: to_number_fun(decimals),
+          icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+        };
+      }),
+    );
+  }
+
+  // 2. volatile fields for every id, so usd values are never stale.
+  const live = await api_intear_tokens_get({
+    fields: HUGGIES_VOLATILE_FIELDS,
     ids: asked,
   });
+  // re-read: step 1 may have just written durable rows we now need.
+  const durable = await HUGGIES_TOKEN_CACHE.get_many(asked);
 
-  const durable_to_cache = [];
-  let wnear_price_usd = 0;
-  let wnear_icon: string | null = null;
-  for (const row of response.rows) {
-    const [id, symbol, decimals, icon, price_usd, reputation, holders] = row;
+  for (const row of live.rows) {
+    const [id, price_usd, reputation, holders] = row;
+    const base = durable.get(id);
     const record: HUGGIES_TOKEN_INFO = {
       id,
-      symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
-      decimals: to_number_fun(decimals),
-      icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+      symbol: base?.symbol ?? id,
+      decimals: base?.decimals ?? 0,
+      icon: base?.icon ?? null,
       price_usd: to_number_fun(price_usd),
       reputation: typeof reputation === "string" ? reputation : "Unknown",
       holders: to_number_fun(holders),
     };
-    if (id === HUGGIES_WRAP_ID) {
-      wnear_price_usd = record.price_usd;
-      wnear_icon = record.icon;
-    }
     out.set(id, record);
-    durable_to_cache.push({
-      id,
-      symbol: record.symbol,
-      decimals: record.decimals,
-      icon: record.icon,
-    });
   }
 
-  // write the durable half back so the next read is served from cache.
-  await HUGGIES_TOKEN_CACHE.put_many(durable_to_cache);
-
-  // the registry has no `near`, so supply it ourselves.
+  // the registry has no `near`, so supply it ourselves from wNEAR.
+  const wnear = out.get(HUGGIES_WRAP_ID);
   if (wants_near && !out.has(HUGGIES_NEAR_ID)) {
-    out.set(HUGGIES_NEAR_ID, near_info_fun({ price_usd: wnear_price_usd, icon: wnear_icon }));
+    const wrap_durable = durable.get(HUGGIES_WRAP_ID);
+    out.set(
+      HUGGIES_NEAR_ID,
+      near_info_fun({
+        price_usd: wnear?.price_usd ?? 0,
+        icon: wrap_durable?.icon ?? null,
+      }),
+    );
   }
 
-  // anything we hold durably but the api did not return: still show it,
-  // with no fresh price/reputation to go on.
-  for (const [id, durable] of cached) {
+  // anything we hold durably but the live call did not return: still show
+  // it, with no fresh price to go on.
+  for (const [id, base] of durable) {
     if (out.has(id)) continue;
     out.set(id, {
-      ...durable,
+      ...base,
       price_usd: 0,
       reputation: "Unknown",
       holders: 0,

@@ -52,6 +52,17 @@ needed — never call the api for token fields directly.
 - `frontend/lib/ts/token_cache.ts` - the durable half (symbol, decimals,
   icon) in an indexeddb `tokens` store, one entry per token id, never
   expires. price/reputation are deliberately NOT cached.
+
+`token_info.ts` issues TWO `/tokens` requests, not one:
+
+- durable fields (`symbol,decimals,icon`) only for ids not already in
+  the cache — skipped entirely on a warm cache.
+- volatile fields (`price_usd,reputation,holders`) for every id on
+  every load, so usd values are never stale.
+
+this split matters because `icon` is a full inline svg data uri: for
+~100 tokens the two are ~341KB together but only ~10KB for the volatile
+half. a cold load pays 341KB once; every revisit after is ~10KB.
 - `frontend/lib/ts/token_amount_format.ts` - raw smallest-unit amounts ->
   human strings, and usd formatting.
 - `frontend/lib/ts/balance_filter.ts` - spam + usd-floor policy.
