@@ -11,11 +11,15 @@ import type { HUGGIES_TOKEN_INFO } from "./token_info";
 // with fewer, so they get their own smaller cap.
 const HUGGIES_MAX_DISPLAY_DECIMALS = 2;
 // dust gets up to 12 decimals: the floor that decides whether a price
-// is real at all is 1e-12, so a value just above it needs enough
-// decimals to be distinguishable from 0.
-const HUGGIES_DUST_MAX_DECIMALS = 12;
-// below 1e-12 a usd figure is not worth showing digits for; the
-// formatter collapses it to "0" rather than printing a wall of zeros.
+// the most decimals a tiny amount may expand to. must cover the full
+// exponent range of a 24-decimal token: a real holding can be as small
+// as 1e-24, and a cap below that renders a non-zero balance as "0".
+// 24 is the protocol maximum for NEAR-family tokens.
+const HUGGIES_DUST_MAX_DECIMALS = 24;
+// a usd value at or below this is noise rather than a price, and shows
+// as an em dash. deliberately separate from the decimal cap above: an
+// amount is real even when it is microscopic, but a "price" that small
+// is not worth digits.
 const HUGGIES_USD_FLOOR = 1e-12;
 // ========================================
 // ========================================
