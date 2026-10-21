@@ -14,14 +14,16 @@
 //   - hello.ts stays a tiny entry that just runs the banner
 //
 // pages wired:
-//   /app/index.html       HUGGIES_COMPONENT_NAV
-//   /app/swap.html        HUGGIES_COMPONENT_NAV
-//   /app/account.html     HUGGIES_COMPONENT_NAV
-//   /app/skill.html       HUGGIES_COMPONENT_NAV
-//   /index.html           HUGGIES_COMPONENT_RANDOM_SLOGAN_P
+//   /app/index.html            HUGGIES_COMPONENT_NAV
+//   /app/swap.html             HUGGIES_COMPONENT_NAV
+//   /app/account.html          HUGGIES_COMPONENT_NAV
+//   /app/skill.html            HUGGIES_COMPONENT_NAV
+//   /index.html                HUGGIES_COMPONENT_RANDOM_SLOGAN_P
 //
-// auth.html is intentionally not wired — it is the login/redirect
-// page, so the nav would be confusing.
+// auth.html and account-router.html are intentionally not wired —
+// auth.html is the login/redirect page (the nav would be
+// confusing), and account-router.html is a pure redirect shim
+// that never stays on screen long enough to host a nav.
 //
 // the nav lives on every other page, so its import is universal.
 // the network button and auth button are wired alongside the nav for

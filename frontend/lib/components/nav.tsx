@@ -3,7 +3,7 @@
 // shared top-level nav that lives on every app/* page. mounts into
 // the <nav id="HUGGIES_COMPONENT_NAV"> element each page already
 // declares (see frontend/app/*.html) and renders four links:
-// FEED, SWAP, ACCOUNT, SKILL.
+// FEED, SWAP, PROFILE, SKILL.
 //
 // hrefs are computed at render time from window.location.pathname
 // so the nav works no matter how deep the current page sits inside
@@ -20,9 +20,13 @@
 // else in this app — pages can mount as many cards as they want,
 // the nav is just one of them.
 //
-// auth.html is intentionally excluded — it is the login page that
-// auto-redirects when the user is signed in, so adding a nav there
-// would be confusing (a logged-in user lands on ACCOUNT directly).
+// auth.html and account-router.html are intentionally excluded —
+// auth.html is the login page that auto-redirects when the user is
+// signed in, and account-router.html is a pure redirect shim that
+// picks auth.html vs account.html based on login state. landing on
+// the nav from either is wrong: auth.html redirects elsewhere, and
+// account-router.html never stays put long enough to be a useful
+// active-link target.
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -42,7 +46,14 @@ interface HUGGIES_NAV_LINK {
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
   { href: "swap.html", label: "SWAP", Icon: RefreshCcw },
-  { href: "account.html", label: "ACCOUNT", Icon: User },
+  // PROFILE points at account-router.html, not account.html —
+  // account-router.html is a tiny redirect shim that funnels the
+  // user into auth.html when nobody is signed in and into
+  // account.html?id=<account_id> when they are. keeping the link
+  // on the router means the same nav entry works regardless of
+  // login state, instead of landing signed-out users on a blank
+  // account.html with no session to fill it.
+  { href: "account-router.html", label: "PROFILE", Icon: User },
   { href: "skill.html", label: "SKILL", Icon: GraduationCap },
 ];
 // ========================================
