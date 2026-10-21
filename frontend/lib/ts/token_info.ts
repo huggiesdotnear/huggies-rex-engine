@@ -6,6 +6,7 @@
 // record per token and never touch the cache or the api directly.
 import { api_intear_tokens_get } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
+import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -105,22 +106,32 @@ async function fetch_and_merge_fun(
 
   // 1. durable fields, only for ids we have never stored. empty list
   // means a warm cache, and the request is skipped entirely.
+  // --- WHY --- `fetched` is kept and used as the source of truth for
+  // these rows, rather than reading them back out of the cache right
+  // after writing them. the cache write can legitimately fail (no
+  // indexeddb in this runtime, storage blocked in private mode), and
+  // reading it back would then hand back nothing — leaving every token
+  // with decimals 0 and the contract id as its symbol, which renders
+  // balances like 1.23e+35. using the values we just received makes the
+  // render correct whether or not the cache took the write.
+  const fetched = new Map<string, HUGGIES_CACHED_TOKEN>();
   if (uncached.length > 0) {
     const fresh = await api_intear_tokens_get({
       fields: HUGGIES_DURABLE_FIELDS,
       ids: uncached,
     });
-    await HUGGIES_TOKEN_CACHE.put_many(
-      fresh.rows.map((row) => {
-        const [id, symbol, decimals, icon] = row;
-        return {
-          id,
-          symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
-          decimals: to_number_fun(decimals),
-          icon: typeof icon === "string" && icon.length > 0 ? icon : null,
-        };
-      }),
-    );
+    const to_cache = fresh.rows.map((row) => {
+      const [id, symbol, decimals, icon] = row;
+      const record: HUGGIES_CACHED_TOKEN = {
+        id,
+        symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
+        decimals: to_number_fun(decimals),
+        icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+      };
+      fetched.set(id, record);
+      return record;
+    });
+    await HUGGIES_TOKEN_CACHE.put_many(to_cache);
   }
 
   // 2. volatile fields for every id, so usd values are never stale.
@@ -128,8 +139,10 @@ async function fetch_and_merge_fun(
     fields: HUGGIES_VOLATILE_FIELDS,
     ids: asked,
   });
-  // re-read: step 1 may have just written durable rows we now need.
-  const durable = await HUGGIES_TOKEN_CACHE.get_many(asked);
+  // durable values: what we just fetched wins over the stored copy, so
+  // a failed cache write cannot strip decimals off a token.
+  const durable = new Map(cached);
+  for (const [id, record] of fetched) durable.set(id, record);
 
   for (const row of live.rows) {
     const [id, price_usd, reputation, holders] = row;
