@@ -24,7 +24,7 @@ interface HUGGIES_NAV_LINK {
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
   { href: "swap.html", label: "SWAP", Icon: RefreshCcw },
-  { href: "account-router.html", label: "PROFILE", Icon: User },
+  { href: "account.html", label: "PROFILE", Icon: User },
   { href: "skill.html", label: "SKILL", Icon: GraduationCap },
 ];
 // ========================================

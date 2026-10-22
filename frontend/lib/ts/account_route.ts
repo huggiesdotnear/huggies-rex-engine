@@ -1,6 +1,7 @@
 // ========================================
-// redirect shim for /app/account-router.html. signed-in users
-// → account.html?id=<id>, signed-out → auth.html. does NOT mount
+// account.html fallback routing: the page has no `?id=` of its own, so
+// decide what it is showing. signed in → rewrite the url to
+// account.html?id=<id>, signed out → auth.html. does NOT mount
 // components — the host page loads import.ts for that.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
@@ -43,16 +44,34 @@ function build_account_href_fun(account_id: string): string {
   return `${base}?id=${encodeURIComponent(account_id)}`;
 }
 // ========================================
+// the page's own `?id=`, or null when absent/blank. read here rather
+// than through HUGGIES_ACCOUNT_ID because that module's state is
+// populated by components which run AFTER this routing decision.
+function read_url_account_id_fun(): string | null {
+  if (typeof window === "undefined" || typeof window.location === "undefined") {
+    return null;
+  }
+  const raw = new URLSearchParams(window.location.search).get("id");
+  if (raw === null) return null;
+  const trimmed = raw.trim();
+  return trimmed.length === 0 ? null : trimmed;
+}
+// ========================================
 // ========================================
 // ========================================
 // --- ROUTE ------------------------------
-// inspect auth state and replace-location to the right page.
 // --- WHY --- init() must run BEFORE get_account_id(): init is what
 // rehydrates account_id from localStorage, so without it a fresh
 // page load always looks signed out even when a session sits in
 // storage.
+// --- WHY --- replace (vs assign) keeps this out of history, so back
+// from account.html doesn't land on the bare page that immediately
+// bounces forward again — same trick as index.ts.
+// --- WHY --- a real `?id=` always wins, signed in or not, so shared
+// profile links stay viewable by guests. only the bare page routes.
 function route_fun(): void {
   if (typeof window === "undefined") return;
+  if (read_url_account_id_fun() !== null) return;
   HUGGIES_AUTH.init();
   const account_id = HUGGIES_AUTH.get_account_id();
   const target =
@@ -64,11 +83,8 @@ function route_fun(): void {
 // ========================================
 // ========================================
 // ========================================
-// ========================================
 // --- RUN --------------------------------
-// self-run on import. replace (vs assign) keeps the router out
-// of history, so back doesn't bounce into a page that immediately
-// bounces forward — same trick as index.ts.
+// self-run on import.
 route_fun();
 // ========================================
 // copyright 2026 by sleet.near

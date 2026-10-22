@@ -7,6 +7,22 @@ any account renders for anyone. components read it through
 `frontend/lib/ts/account_id.ts` and render nothing when there is no
 `?id=`.
 
+### BARE PAGE ROUTING
+
+`frontend/lib/ts/account_route.ts` — when `account.html` is opened with
+NO `?id=`, it decides what to show: signed in → rewrites the url to
+`account.html?id=<id>`, signed out → `auth.html`. this is what
+`account-router.html` used to do, folded into the page itself.
+
+loaded BEFORE `import.ts` so components never mount on a page that is
+about to bounce. uses `location.replace`, so it stays out of history and
+back doesn't land on the bare page again.
+
+a real `?id=` always wins over auth — shared profile links stay
+viewable by guests. it reads `?id=` off the url directly rather than via
+`HUGGIES_ACCOUNT_ID`, because that module's state is populated by the
+components which run after this decision.
+
 - `HUGGIES_COMPONENT_ACCOUNT_ID_H1` - <h1> of the account id, left
   aligned with a bottom border.
 - `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE` - the account's
