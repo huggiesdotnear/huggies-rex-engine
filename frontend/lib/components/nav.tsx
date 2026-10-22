@@ -7,7 +7,7 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { Home, RefreshCcw, User, GraduationCap } from "lucide-preact";
+import { Home, LayoutGrid, User, GraduationCap } from "lucide-preact";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -23,7 +23,7 @@ interface HUGGIES_NAV_LINK {
 // account.html with no ?id= to read.
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
-  { href: "swap.html", label: "SWAP", Icon: RefreshCcw },
+  { href: "tools.html", label: "APPS", Icon: LayoutGrid },
   { href: "account.html", label: "PROFILE", Icon: User },
   { href: "skill.html", label: "SKILL", Icon: GraduationCap },
 ];

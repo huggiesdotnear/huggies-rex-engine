@@ -7,7 +7,7 @@ nav
 - index.html - FEED
 - swap.html - SWAP
 - account.html - PROFILE
-- skill.html - SKILL
+- tools.html - APPS
 
 ---
 
@@ -15,9 +15,9 @@ nav
 
 transaction feed
 
-#### SWAP - frontend/app/swap.html
+#### APPS - frontend/app/tools.html
 
-swap componenet
+tool for interacting with near smart contracts
 
 #### ACCOUNT - frontend/app/account.html
 
