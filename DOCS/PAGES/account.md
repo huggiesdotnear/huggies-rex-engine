@@ -1,25 +1,4 @@
-# PAGES
-
-pages and ui layout
-
-nav
-
-- index.html - FEED
-- swap.html - SWAP
-- account-router.html - PROFILE
-- skill.html - SKILL
-
----
-
-#### FEED - frontend/app/index.html
-
-transaction feed
-
-#### SWAP - frontend/app/swap.html
-
-swap componenet
-
-#### ACCOUNT - frontend/app/account.html
+# ACCOUNT
 
 profile/account page - ?id=
 
@@ -89,14 +68,6 @@ wNEAR's icon — which is the actual NEAR logo (the green `#00EC97` "N"),
 not a lookalike. it also asks for `wrap.near` alongside whatever ids were
 requested, so the price and icon cost no extra request. note NEAR has no
 contract id of its own; the `near` balance is native, not an NEP-20 token.
-
-#### SKILL - frontend/app/skill.html
-
-skill info page
-
-### AUTH - frontend/app/auth.html
-
-auth login page, auto redirects to account page if logged in
 
 =====================
 <br/>
