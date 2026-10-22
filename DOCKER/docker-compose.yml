@@ -61,9 +61,23 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: huggies-rex-engine-cloudflared
     restart: unless-stopped
-    # only the flag surface is needed; the token carries the tunnel id
-    # and every route, so this stays working across dashboard edits.
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    # --- WHY the token comes from the environment, not `--token` ---
+    # `command: ... --token ${CLOUDFLARE_TUNNEL_TOKEN}` looks natural
+    # but breaks: compose only auto-loads a `.env` sitting NEXT TO this
+    # compose file (in DOCKER/), and `${...}` is interpolated when
+    # compose parses the file — before the service's env_file is read.
+    # the result was an EMPTY token and a cloudflared container that
+    # just printed its own help text.
+    #
+    # cloudflared reads $TUNNEL_TOKEN by itself, so `.env` defines the
+    # variable under exactly that name and env_file hands it straight
+    # through. no interpolation, so it works from any directory and
+    # cannot half-configure.
+    command: tunnel --no-autoupdate run
+    env_file:
+      # the repo-root `.env` (one level up from this file). it defines
+      # TUNNEL_TOKEN, which is the name cloudflared looks for.
+      - ../.env
     depends_on:
       - huggies-backend
 

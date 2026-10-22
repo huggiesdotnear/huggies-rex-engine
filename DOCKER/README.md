@@ -26,7 +26,8 @@ first time only, put your tunnel token in a `.env` at the repo root
 
 ```sh
 cp .env.example .env
-# then edit .env and paste the token from the cloudflare dashboard
+# then edit .env and set TUNNEL_TOKEN to the token from the cloudflare dashboard
+chmod 600 .env
 ```
 
 then:
@@ -50,7 +51,9 @@ two cloudflare-side things have to match:
    name, not `localhost`. cloudflared runs as its own container, so
    `localhost` there is a different machine.
 2. the token in `.env` is the one from the tunnel's docker install
-   command (`--token ...`).
+   command (`--token ...`), set as `TUNNEL_TOKEN`. that exact name
+   matters — cloudflared reads it from the environment itself, and
+   `docker-compose.yml` passes `.env` straight through.
 
 to debug over plain http instead, uncomment the `ports:` block on the
 `huggies-backend` service in `docker-compose.yml`, then open
