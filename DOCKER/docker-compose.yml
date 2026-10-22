@@ -1,0 +1,74 @@
+# docker-compose.yml — single-service backend.
+#
+# run from the repo root:
+#   docker compose -f DOCKER/docker-compose.yml up -d --build
+#   docker compose -f DOCKER/docker-compose.yml logs -f
+#   docker compose -f DOCKER/docker-compose.yml down
+#
+# there is no persistent state yet: the `static/` frontend bundle is
+# baked into the image, and the frontend talks to the intear api
+# directly from the browser (the backend is never rate limited by
+# it). so there is no vault / db volume to mount here yet.
+
+name: huggies-rex-engine
+services:
+  huggies-backend:
+    build:
+      context: ..
+      dockerfile: DOCKER/Dockerfile
+    image: huggies/huggies-rex-engine:0.1.0
+    container_name: huggies-backend
+    restart: unless-stopped
+
+    ports:
+      # host:container. the container listens on 54733 (HUGGIES_PORT);
+      # change the left side to move the host port, but keep the right
+      # side in sync with HUGGIES_PORT below.
+      - "54733:54733"
+
+    environment:
+      # must be 0.0.0.0 inside a container so the published port is
+      # actually reachable from the host.
+      HUGGIES_HOST: "0.0.0.0"
+      HUGGIES_PORT: "54733"
+      RUST_LOG: "huggies_rex_engine=info"
+
+# ========================================
+# NOTE: wallet sign-in needs a SECURE CONTEXT.
+#
+# http://localhost is a secure context, so opening
+# http://localhost:54733 works for wallet login. any other host
+# (a LAN ip or a public domain over plain http) is NOT a secure
+# context and the wallet sandbox will fail sign-in with
+# "Cannot read properties of undefined (reading 'generateKey')".
+#
+# if you expose this beyond localhost over http, front it with a
+# reverse proxy that terminates https.
+# ========================================
+
+# ----------------------------------------
+# FUTURE: postgres. when the backend starts
+# persisting rows, add a `postgres:` service here and a volume, then
+# add `depends_on: [postgres]` plus a `DATABASE_URL` env var to the
+# backend above (the DATABASE_URL string the compose file will hand
+# the backend should look like:
+#   postgres://huggies:huggies@postgres:5432/huggies
+# ). the backend image needs no change for this — it's just an env
+# var the app reads at startup.
+# ----------------------------------------
+# postgres:
+#   image: postgres:17-alpine
+#   container_name: huggies-postgres
+#   restart: unless-stopped
+#   environment:
+#     POSTGRES_USER: huggies
+#     POSTGRES_PASSWORD: huggies
+#     POSTGRES_DB: huggies
+#   volumes:
+#     - huggies-pgdata:/var/lib/postgresql/data
+#   # not published to the host by default — only the backend needs
+#   # to reach it, over the compose network.
+#
+# volumes:
+#   huggies-pgdata:
+# ========================================
