@@ -4,6 +4,9 @@ some files/folders
 
 - `frontend/` frontend
 - `src/` backend
+- `DOCKER/` - docker setup: multi-stage `Dockerfile`, `docker-compose.yml`.
+  see [`DOCKER/README.md`](../DOCKER/README.md). the frontend bundle is baked
+  into the image at `/app/static`; there is no vault or database volume yet.
 - `middleman/` - ts library for interacting with api's
   - `middleman/intear/` - typed client for the intear api, called
     directly from the browser. does NOT go through our backend, so
