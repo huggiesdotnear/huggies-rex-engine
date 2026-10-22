@@ -10,14 +10,14 @@
 # directly from the browser (the backend is never rate limited by
 # it). so there is no vault / db volume to mount here yet.
 
-name: huggies-rex-engine
+name: huggies-rex-engine-fullstack-backend
 services:
   huggies-backend:
     build:
       context: ..
       dockerfile: DOCKER/Dockerfile
     image: huggies/huggies-rex-engine:0.1.0
-    container_name: huggies-backend
+    container_name: huggies-rex-engine-fullstack-backend
     restart: unless-stopped
 
     ports:
@@ -36,14 +36,17 @@ services:
 # ========================================
 # NOTE: wallet sign-in needs a SECURE CONTEXT.
 #
-# http://localhost is a secure context, so opening
-# http://localhost:54733 works for wallet login. any other host
-# (a LAN ip or a public domain over plain http) is NOT a secure
-# context and the wallet sandbox will fail sign-in with
-# "Cannot read properties of undefined (reading 'generateKey')".
+# the reason: signing a login message uses WebCrypto Ed25519, and
+# `crypto.subtle` is only exposed in a secure context. browsers
+# treat https, http://localhost and http://127.0.0.1 as secure —
+# nothing else. so `http://localhost:54733` signs in fine, while
+# the same container reached by LAN ip, VPN ip or hostname over
+# plain http fails with "Cannot read properties of undefined
+# (reading 'generateKey')".
 #
-# if you expose this beyond localhost over http, front it with a
-# reverse proxy that terminates https.
+# the fix is to terminate TLS in front of this container, on the
+# hostname you actually open the app from. that proxy does not need
+# to live in this file or in the image.
 # ========================================
 
 # ----------------------------------------
@@ -58,7 +61,7 @@ services:
 # ----------------------------------------
 # postgres:
 #   image: postgres:17-alpine
-#   container_name: huggies-postgres
+#   container_name: huggies-rex-engine-postgres
 #   restart: unless-stopped
 #   environment:
 #     POSTGRES_USER: huggies

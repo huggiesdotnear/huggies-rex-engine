@@ -12,7 +12,7 @@ docker build -t huggies-rex-engine -f DOCKER/Dockerfile .
 
 ```sh
 docker run --rm -it \
-  --name huggies-backend \
+  --name huggies-rex-engine-fullstack-backend \
   -p 54733:54733 \
   -e HUGGIES_HOST=0.0.0.0 \
   -e HUGGIES_PORT=54733 \
@@ -35,11 +35,17 @@ docker compose -f DOCKER/docker-compose.yml down
 - the binary binds `0.0.0.0:54733` inside the container and the compose
   mapping is `54733:54733`, so the service is reachable from the host.
 - **wallet sign-in needs a secure context.** open
-  `http://localhost:54733`. browsers only treat `https`,
-  `http://localhost` and `http://127.0.0.1` as secure, so any LAN or
-  public http address fails sign-in with
-  `"Cannot read properties of undefined (reading 'generateKey')"`. to
-  reach it from another machine, front it with an https reverse proxy.
+  `http://localhost:54733` and sign-in works. browsers only treat
+  `https`, `http://localhost` and `http://127.0.0.1` as secure, so the
+  same container reached over any LAN or VPN address on plain http
+  (a private ip, a vpn ip, a public hostname) fails sign-in with
+  `"Cannot read properties of undefined (reading 'generateKey')"`.
+  the reason is that signing the login message uses WebCrypto
+  Ed25519, and `crypto.subtle` only exists in a secure context —
+  there is no port or firewall change that gets around it. to use
+  the app from another device, terminate TLS in front of this
+  container on the hostname you open it from, and use the `https://`
+  url.
 - rebuild after changing `frontend/` — `docker compose ... up -d --build`
   recompiles the bun bundle. if it's already running, `--build` is enough;
   no need to `down` first.
