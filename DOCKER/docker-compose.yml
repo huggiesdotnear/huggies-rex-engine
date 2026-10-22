@@ -1,4 +1,4 @@
-# docker-compose.yml — single-service backend.
+# docker-compose.yml — backend + cloudflare tunnel.
 #
 # run from the repo root:
 #   docker compose -f DOCKER/docker-compose.yml up -d --build
@@ -9,6 +9,12 @@
 # baked into the image, and the frontend talks to the intear api
 # directly from the browser (the backend is never rate limited by
 # it). so there is no vault / db volume to mount here yet.
+#
+# ACCESS: nothing is published to the host on purpose. the app is
+# reachable only through the cloudflare tunnel over https, which is
+# what makes wallet sign-in work (see the secure-context note at the
+# bottom). to reach it another way while debugging, uncomment the
+# `ports:` block on huggies-backend below.
 
 name: huggies-rex-engine-fullstack-backend
 services:
@@ -20,18 +26,46 @@ services:
     container_name: huggies-rex-engine-fullstack-backend
     restart: unless-stopped
 
-    ports:
-      # host:container. the container listens on 54733 (HUGGIES_PORT);
-      # change the left side to move the host port, but keep the right
-      # side in sync with HUGGIES_PORT below.
-      - "54733:54733"
+    # NO `ports:` here on purpose — the app is not published to the
+    # host. cloudflared reaches it over the compose network by
+    # container name (see the tunnel's route below), so port 54733
+    # never touches the host's network stack.
+    #
+    # to debug locally over http, uncomment:
+    # ports:
+    #   - "54733:54733"
 
     environment:
-      # must be 0.0.0.0 inside a container so the published port is
-      # actually reachable from the host.
+      # 0.0.0.0 inside the container so the published/origin port is
+      # reachable from the other containers on this network.
       HUGGIES_HOST: "0.0.0.0"
       HUGGIES_PORT: "54733"
       RUST_LOG: "huggies_rex_engine=info"
+
+  # ----------------------------------------
+  # cloudflare tunnel — the only way in.
+  #
+  # the token below authenticates cloudflared to your tunnel and
+  # fetches its hostname/ingress config from Cloudflare, so the route
+  # that points at this service is configured in the CLOUDFLARE
+  # dashboard, not here. for that dashboard route's "Service URL",
+  # use the container name and port:
+  #
+  #     http://huggies-rex-engine-fullstack-backend:54733
+  #
+  # (NOT localhost — cloudflared is a separate container and has its
+  # own loopback that nothing else is listening on. the container
+  # name resolves over the compose network's internal DNS.)
+  # ----------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: huggies-rex-engine-cloudflared
+    restart: unless-stopped
+    # only the flag surface is needed; the token carries the tunnel id
+    # and every route, so this stays working across dashboard edits.
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - huggies-backend
 
 # ========================================
 # NOTE: wallet sign-in needs a SECURE CONTEXT.
@@ -44,9 +78,10 @@ services:
 # plain http fails with "Cannot read properties of undefined
 # (reading 'generateKey')".
 #
-# the fix is to terminate TLS in front of this container, on the
-# hostname you actually open the app from. that proxy does not need
-# to live in this file or in the image.
+# the cloudflare tunnel in front of this stack is the fix: it
+# terminates TLS at Cloudflare's edge and serves the app on a real
+# https:// hostname, so the browser gets a secure context from any
+# device, anywhere.
 # ========================================
 
 # ----------------------------------------

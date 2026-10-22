@@ -3,3 +3,7 @@
 node_modules
 # static - bun build outputs there, populated at run/deploy time
 /static
+# real secrets (the cloudflare tunnel token lives here). .env.example
+# is the tracked template, .env never is.
+/.env
+.env.local
