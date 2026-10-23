@@ -15,6 +15,11 @@
 // --- WHY --- the legacy single-session key is migrated on read
 // rather than deleted, so a signed-in user upgrading the app keeps
 // their session instead of being bounced to the wallet.
+// --- WHY --- the session still records its network even though the
+// app is mainnet-only. a signature is only meaningful against the
+// RPC it was made on, so the server-side verify needs to know which
+// network to check against — and a session left over from a
+// testnet-era build stays recognisable as such.
 export interface HUGGIES_AUTH_SESSION {
   accountId: string;
   publicKey: string;

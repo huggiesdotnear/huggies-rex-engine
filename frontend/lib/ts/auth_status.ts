@@ -1,7 +1,7 @@
 // ========================================
-// auth state model: account_id, session_network, last_error,
-// subscribers. UI components (auth_button, account_route, etc.)
-// read through HUGGIES_AUTH; this file owns the wallet handshake.
+// auth state model: account_id, last_error, subscribers. UI
+// components (auth_button, account_route, etc.) read through
+// HUGGIES_AUTH; this file owns the wallet handshake.
 // ========================================
 // --- WHY --- @hot-labs/near-connect exposes no synchronous
 // isSignedIn() — its reads are async and can throw when no
@@ -10,24 +10,20 @@
 // load. treat as UI state, never as proof of identity: the
 // real check is a server-side signature verify (not built yet).
 //
-// --- WHY --- near_connect_client() picks a connector per call
-// from getStoredNetworkId(), but the two networks have separate
-// wallet selections and signing state; toggling the network
-// while signed in would leave account_id pointing at a session
-// the active connector knows nothing about. reconcile_fun()
-// deactivates the cross-network session, and each session records
-// the network it was made on so a future server verify uses the
-// matching RPC.
+// --- WHY --- this app is mainnet-only, so there is one connector
+// and one wallet session. near-kit-tool-box/web keeps a separate
+// connector per network and picks between them from the stored
+// network id -- the two share the wallet's storage namespace, and
+// near-connect's signOut() wipes that whole namespace regardless of
+// network, so a toggle could take the other network's session down
+// with it. frontend/lib/ts/network.ts pins the network to mainnet.
 // --- WHY --- a wallet can expose SEVERAL accounts at once (the
 // near-connect sign-in event carries one signed message per
 // account). the first version of this file kept only accounts[0]
 // and threw the rest away, so a second account could never be
 // selected. every account the wallet returns is now kept, each
 // with its own signature, and the active one is just a pointer.
-import {
-  near_connect_client,
-  getStoredNetworkId,
-} from "@near-kit-tool-box/web";
+import { near_connect_client } from "@near-kit-tool-box/web";
 import type { NearConnector } from "@hot-labs/near-connect";
 import { generateNonce } from "near-kit";
 import {
@@ -38,6 +34,7 @@ import {
   HUGGIES_AUTH_SESSIONS,
   type HUGGIES_AUTH_SESSION,
 } from "./auth_sessions";
+import { HUGGIES_NETWORK } from "./network";
 // ========================================
 // ========================================
 // ========================================
@@ -54,8 +51,6 @@ import {
 // connector can emit wallet:signIn during construction when
 // autoConnect finds an injected wallet.
 let account_id: string | null = null;
-// the network the CURRENT session was signed in on.
-let session_network: "mainnet" | "testnet" | null = null;
 // the last error from a failed attempt; cleared on next attempt.
 let last_error: string | null = null;
 // plain array, not Set, so subscribe/unsubscribe ordering is
@@ -172,16 +167,8 @@ function get_session_fun(): HUGGIES_AUTH_SESSION | null {
 // --- WHY --- the dropdown lists them in this order: the account
 // the user is currently acting as belongs at the top, the rest
 // keep the order the wallet returned them in.
-// --- WHY --- only sessions made on the CURRENT network are listed.
-// a session from the other network cannot be verified against the
-// RPC the app is running on, so offering it as a switch target
-// would land the user on an account the app cannot use.
 function list_accounts_fun(): string[] {
-  const current = getStoredNetworkId();
-  const sessions = HUGGIES_AUTH_SESSIONS.load_sessions();
-  const ids = Object.keys(sessions).filter(
-    (id) => sessions[id].network === current,
-  );
+  const ids = HUGGIES_AUTH_SESSIONS.list_account_ids();
   if (account_id === null || !ids.includes(account_id)) return ids;
   return [account_id, ...ids.filter((id) => id !== account_id)];
 }
@@ -207,7 +194,6 @@ async function rollback_connection_fun(
   connector: NearConnector,
 ): Promise<void> {
   clear_session_fun();
-  session_network = null;
   account_id = null;
   try {
     await connector.disconnect();
@@ -226,7 +212,7 @@ async function rollback_connection_fun(
 async function sign_in_fun(): Promise<void> {
   if (last_error !== null) set_error_fun(null);
 
-  const network = getStoredNetworkId();
+  const network = HUGGIES_NETWORK;
   const nonce = make_nonce_fun();
   const connector = near_connect_client();
 
@@ -304,7 +290,6 @@ async function sign_in_fun(): Promise<void> {
       });
     }
 
-    session_network = network;
     account_id = results[0].accountId;
     HUGGIES_AUTH_SESSIONS.save_active(account_id);
     notify_fun();
@@ -359,7 +344,6 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
   const existing = load_session_fun(next_account_id);
   if (existing !== null) {
     account_id = next_account_id;
-    session_network = existing.network;
     HUGGIES_AUTH_SESSIONS.save_active(next_account_id);
     sync_url_account_fun(next_account_id);
     notify_fun();
@@ -368,7 +352,7 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
   }
 
   const connector = near_connect_client();
-  const network = getStoredNetworkId();
+  const network = HUGGIES_NETWORK;
   const nonce = make_nonce_fun();
   try {
     const wallet = await connector.wallet();
@@ -396,7 +380,6 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
       createdAt: Date.now(),
     });
     account_id = signed_account_id;
-    session_network = network;
     HUGGIES_AUTH_SESSIONS.save_active(signed_account_id);
     sync_url_account_fun(signed_account_id);
     notify_fun();
@@ -426,7 +409,6 @@ async function sign_out_fun(): Promise<void> {
     console.info("[auth] disconnect had no wallet to close", err);
   } finally {
     clear_session_fun();
-    session_network = null;
     account_id = null;
     set_error_fun(null);
     notify_fun();
@@ -434,19 +416,8 @@ async function sign_out_fun(): Promise<void> {
 }
 // ========================================
 // pick the account to become active after the current one goes away.
-// --- WHY --- an account whose session was made on the OTHER
-// network must not be picked: its signature is only meaningful
-// against the RPC it was made on, so activating it while the app
-// runs on a different network would show a signed-in state the
-// app cannot actually verify. the network filter keeps the active
-// account and the current network in agreement.
-function pick_fallback_account_fun(
-  network: "mainnet" | "testnet",
-): string | null {
-  const sessions = HUGGIES_AUTH_SESSIONS.load_sessions();
-  const ids = Object.keys(sessions);
-  const matching = ids.find((id) => sessions[id].network === network);
-  return matching ?? null;
+function pick_fallback_account_fun(): string | null {
+  return HUGGIES_AUTH_SESSIONS.list_account_ids()[0] ?? null;
 }
 // ========================================
 // ========================================
@@ -463,9 +434,7 @@ function remove_account_fun(target_account_id: string): void {
   if (account_id === target_account_id) {
     // the active one went away — fall back to any remaining
     // account so the UI is never left pointing at nothing.
-    const network = getStoredNetworkId();
-    account_id = pick_fallback_account_fun(network);
-    session_network = account_id === null ? null : network;
+    account_id = pick_fallback_account_fun();
     HUGGIES_AUTH_SESSIONS.save_active(account_id);
     if (account_id !== null) sync_url_account_fun(account_id);
   }
@@ -483,11 +452,8 @@ function init_fun(): void {
   // --- WHY --- the state is cleared first. init() can run more
   // than once (the redirect pages and the button component both
   // call it), and a second run must re-derive the state from
-  // storage rather than keep whatever the first run decided — a
-  // network switch between the two runs must not leave a stale
-  // account id behind.
+  // storage rather than keep whatever the first run decided.
   account_id = null;
-  session_network = null;
 
   // --- WHY --- the active account is a pointer we store separately
   // from the sessions, so switching accounts does not rewrite any
@@ -497,21 +463,12 @@ function init_fun(): void {
   const sessions = HUGGIES_AUTH_SESSIONS.load_sessions();
   const stored_ids = Object.keys(sessions);
   const active = HUGGIES_AUTH_SESSIONS.load_active();
-  const current = getStoredNetworkId();
-  // --- WHY --- only an account whose session was made on the
-  // CURRENT network can be adopted here. a session left over from
-  // the other network is kept in storage (switching back restores
-  // it) but must not be activated, since its signature is only
-  // verifiable against the RPC it was made on.
   const chosen =
-    active !== null &&
-    sessions[active] !== undefined &&
-    sessions[active].network === current
+    active !== null && sessions[active] !== undefined
       ? active
-      : (stored_ids.find((id) => sessions[id].network === current) ?? null);
+      : (stored_ids[0] ?? null);
   if (chosen !== null) {
     account_id = chosen;
-    session_network = sessions[chosen].network;
     HUGGIES_AUTH_SESSIONS.save_active(chosen);
   }
 
@@ -531,42 +488,11 @@ function init_fun(): void {
   // mirror external sign-out (from the wallet UI itself).
   connector.on("wallet:signOut", () => {
     clear_session_fun();
-    session_network = null;
     account_id = null;
     notify_fun();
   });
 
-  reconcile_fun();
   notify_fun();
-}
-// ========================================
-// drop a session that belongs to a network other than the one
-// currently selected.
-// --- WHY --- reconcile runs from outside sign-in (after a
-// network toggle), so subscribers get no other chance to
-// repaint — must notify when it changes something.
-// --- WHY --- the sessions are NOT deleted here. they were made on
-// the other network, but each is still a valid signature — it is
-// just not usable while the app runs on a different network.
-// dropping them would throw away the user's login, so switching
-// the network back restores the accounts instantly.
-function reconcile_fun(): void {
-  const current = getStoredNetworkId();
-  if (session_network !== null && session_network !== current) {
-    // --- WHY --- the session is NOT deleted here. it was made on
-    // the other network, but it is still a valid signature — it is
-    // just not usable while the app runs on a different network.
-    // dropping it would throw away the user's login, so switching
-    // the network back restores the account instantly.
-    // --- WHY --- the fallback is filtered by the CURRENT network,
-    // so a session made on the old network can never be activated
-    // here — its signature is only verifiable against the RPC it
-    // was made on.
-    account_id = pick_fallback_account_fun(current);
-    session_network = account_id === null ? null : current;
-    HUGGIES_AUTH_SESSIONS.save_active(account_id);
-    notify_fun();
-  }
 }
 // ========================================
 // public surface, in one place so the component has a single
@@ -577,7 +503,6 @@ export const HUGGIES_AUTH = {
   switch_account: switch_account_fun,
   remove_account: remove_account_fun,
   subscribe: subscribe_fun,
-  reconcile: reconcile_fun,
   init: init_fun,
   get_account_id: get_account_id_fun,
   is_signed_in: is_signed_in_fun,

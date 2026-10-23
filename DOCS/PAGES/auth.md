@@ -32,16 +32,30 @@ each session keeps the exact `message` + `nonce` + `recipient` + `network`
 that was signed, because a NEP-413 signature is not self-describing: a
 server cannot verify it without them.
 
-### NETWORK SCOPING
+### NETWORK
 
-each session records the network it was made on, and only sessions from
-the CURRENT network are selectable. a signature is only meaningful
-against the RPC it was made on, so activating a mainnet session while the
-app runs on testnet would show a signed-in state the app cannot verify.
+this app is MAINNET ONLY. there is no network toggle.
 
-switching the network DEACTIVATES the session but keeps it in storage —
-toggling back restores the account instantly, with no wallet popup.
-`HUGGIES_AUTH.reconcile()` does this, and the network button calls it.
+`frontend/lib/ts/network.ts` owns that decision. it calls the package's
+`setNetwork_mainnet()` on import, so the stored `network_id` is mainnet
+before anything reads it.
+
+the pin matters because the package's `getStoredNetworkId()` defaults to
+mainnet only when the key is ABSENT — a returning user who once toggled to
+testnet still has "testnet" stored and would land on the testnet
+connector.
+
+mainnet-only also removes a whole class of near-connect trouble: the
+package keeps a separate connector per network, and those two connectors
+share the `selected-wallet` key and the wallet's own storage namespace
+(`<walletId>:`). near-connect's `signOut()` wipes that whole namespace
+regardless of network, so a toggle could take the other network's wallet
+session down with it. one network means one connector, one wallet
+session, nothing to reason about.
+
+each session still records the network it was made on, because a
+signature is only meaningful against the RPC it was made on — a
+server-side verify needs to know which one to check against.
 
 ### SWITCHING
 

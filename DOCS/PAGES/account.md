@@ -72,7 +72,8 @@ v2) deposits, via `rhea_ammv2_get_deposits_fun_json` from
 when there is no `?id=`, still loading, or no non-zero deposit — the view
 returns keys for tokens the account touched once, mostly `"0"`, so key
 count alone would show an empty section. rhea contract is
-`v2.ref-finance.near` mainnet / `ref-finance-101.testnet` testnet.
+`v2.ref-finance.near` — this app is mainnet only (see
+[`auth.md`](./auth.md)).
 
 metadata endpoint is intear `GET /tokens?ids=...&fields=...`. it takes up
 to 2000 ids per request. `limit` requires a `sort`.

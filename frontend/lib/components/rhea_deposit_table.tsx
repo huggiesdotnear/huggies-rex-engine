@@ -8,7 +8,7 @@
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
-import { near_kit_client, getStoredNetworkId } from "@near-kit-tool-box/web";
+import { near_kit_client } from "@near-kit-tool-box/web";
 import {
   rhea_ammv2_get_deposits_fun_json,
   rhea_ammv2_contractid,
@@ -17,14 +17,18 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
+import { HUGGIES_NETWORK } from "../ts/network";
 import { huggies_balance_row_fun } from "../ts/balance_row";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../ts/token_info";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the rhea (ref finance v2) contract for the selected network.
+// the rhea (ref finance v2) contract for this app's network.
+// --- WHY --- the network is pinned to mainnet (lib/ts/network.ts),
+// so this is the mainnet contract. the helper still takes a network
+// argument because the contract ids differ per network.
 function rhea_contract_id_fun(): string {
-  return rhea_ammv2_contractid(getStoredNetworkId());
+  return rhea_ammv2_contractid(HUGGIES_NETWORK);
 }
 // ========================================
 // ========================================
@@ -67,9 +71,11 @@ async function fetch_deposit_entries_fun(
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE_FUN() {
   // ========================================
-  const [rows, set_rows] = use_state<
-    ReadonlyArray<{ id: string; raw: string; info: TOKEN_INFO }> | null
-  >(null);
+  const [rows, set_rows] = use_state<ReadonlyArray<{
+    id: string;
+    raw: string;
+    info: TOKEN_INFO;
+  }> | null>(null);
   const [error, set_error] = use_state<string | null>(null);
 
   const account_id = HUGGIES_ACCOUNT_ID.get_account_id();
@@ -115,7 +121,11 @@ function HUGGIES_COMPONENT_RHEA_DEPOSIT_TABLE_FUN() {
           <table data-huggies-rhea-account={account_id}>
             <tbody>
               {rows?.map((row) =>
-                huggies_balance_row_fun({ id: row.id, raw: row.raw, info: row.info }),
+                huggies_balance_row_fun({
+                  id: row.id,
+                  raw: row.raw,
+                  info: row.info,
+                }),
               )}
             </tbody>
           </table>

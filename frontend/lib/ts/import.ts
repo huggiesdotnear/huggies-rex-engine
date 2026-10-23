@@ -5,9 +5,13 @@
 // matching id, so side-effect imports here are no-ops elsewhere.
 // ========================================
 
+// pin the network to mainnet before anything reads it.
+// --- WHY --- this app is mainnet-only. the pin has to happen before
+// the first near_connect_client() call, and some pages load
+// account_route.ts (which inits auth) ahead of this file.
+import "./network";
 import "../components/nav";
 import "../components/random_slogan_p";
-import "../components/network_button";
 import "../components/auth_button";
 import "../components/account_id_h1";
 import "../components/account_direct_balance_table";
