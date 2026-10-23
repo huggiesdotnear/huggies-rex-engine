@@ -1,6 +1,6 @@
 # huggies-rex-engine
 
-💩 near defi trading engine
+💩 near agentic engine
 
 bun/frontend
 
