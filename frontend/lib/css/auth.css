@@ -1,0 +1,97 @@
+/*==================================*/
+/* AUTH BUTTON + ACCOUNT DROPDOWN */
+/* the account list that drops down from the auth button. sits in */
+/* normal flow under the button rather than floating, so it never */
+/* covers the nav or the rest of the page.                       */
+/*                                                                  */
+/* the menu items reuse the base button look, but at a smaller     */
+/* padding and a left-aligned label — a full-width button with a  */
+/* long account id reads as a wall of text.                        */
+/*                                                                  */
+/* the active account is marked with a filled dot so the current  */
+/* one is obvious at a glance; the others use an empty dot.        */
+/*==================================*/
+[data-huggies-auth-root] {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+}
+/*----------------------*/
+[data-huggies-auth-menu] {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 10px;
+  background-color: var(--color-backend-light);
+  border: 2px solid var(--color-middle);
+  border-radius: 12px;
+}
+/*----------------------*/
+[data-huggies-auth-menu-label] {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--color-backend);
+}
+/*----------------------*/
+/* one account row: the pick button plus its remove button. */
+/* the row is a flex line so the ✕ sits at the far right instead  */
+/* of dropping onto its own line under a full-width pick button.  */
+[data-huggies-auth-account] {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+/*----------------------*/
+[data-huggies-auth-account] > button {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/*----------------------*/
+/* the ✕ that forgets one account. square, so it lines up with  */
+/* the row's height instead of stretching to the column width.   */
+[data-huggies-auth-account] > button.huggies-auth-account-remove {
+  flex: 0 0 auto;
+  width: 38px;
+  padding: 8px 0;
+  font-size: 13px;
+  text-align: center;
+}
+/*----------------------*/
+/* the account the app is currently acting as. */
+/* the filled dot plus a bolder label, so it reads as "current"   */
+/* even without relying on the dot's color alone.                  */
+[data-huggies-auth-account] > button.huggies-auth-account-active {
+  font-weight: 700;
+  background-color: var(--color-middle);
+  color: var(--color-fontend);
+  border-color: var(--color-middle-dark);
+}
+/*----------------------*/
+/* ADD ACCOUNT / SIGN OUT keep the base button look but sit       */
+/* inside the menu, so they lose the menu's outer margins.        */
+[data-huggies-auth-menu] > button {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+/*==================================*/

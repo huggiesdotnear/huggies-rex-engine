@@ -33,6 +33,8 @@ skill info page
 
 auth login page, auto redirects to account page if logged in
 
+multi-account sign in — see [`auth.md`](./auth.md)
+
 =====================
 <br/>
 copyright 2026 by sleet.near

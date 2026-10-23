@@ -23,6 +23,7 @@ import {
   setNetwork_mainnet,
   NETWORK_STORAGE_KEY,
 } from "@near-kit-tool-box/web";
+import { HUGGIES_AUTH } from "../ts/auth_status";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -84,7 +85,15 @@ function HUGGIES_COMPONENT_NETWORK_BUTTON_FUN() {
   const [current, set_current] = use_state(getStoredNetworkId());
 
   const on_click_fun = () => {
-    set_current(toggle_fun());
+    const next = toggle_fun();
+    set_current(next);
+    // --- WHY --- the signed-in session was made on the OLD
+    // network, so its signature is not usable on the new one.
+    // reconcile() deactivates it so the auth button stops showing
+    // a signed-in account the app cannot actually verify. the
+    // session itself is kept, so toggling back restores the
+    // account without another wallet popup.
+    HUGGIES_AUTH.reconcile();
   };
 
   return (
