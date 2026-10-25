@@ -55,15 +55,25 @@ RUN bun install
 #
 # `find` instead of a `./**/*.html` glob: globstar is not enabled in
 # the default sh that runs this, so the glob would silently match
-# nothing and we'd ship an empty static folder.
-RUN mkdir -p static \
+# nothing and we'd ship an empty static folder. `find` also picks up
+# the nested pages under app/contracts/ and app/tokens/.
+#
+# --- WHY: build from INSIDE frontend/ ---
+# bun derives the entry path from the current working directory, so
+# building here makes `frontend/app/account.html` land at
+# `static/app/account.html` — the same layout the local build in the
+# README produces (`cd frontend && bun build ./**/*.html --outdir=../static`).
+# building from the repo root instead would add a `frontend/` prefix to
+# every path and serve the app under /frontend/app/... instead of /app/...
+WORKDIR /src/frontend
+RUN mkdir -p ../static \
     && bun build \
         --entry-naming='[dir]/[name].[ext]' \
         --chunk-naming='[name]-[hash].[ext]' \
         --asset-naming='[name]-[hash].[ext]' \
-        --outdir=static \
+        --outdir=../static \
         --minify \
-        $(find frontend -type f -name '*.html')
+        $(find . -type f -name '*.html')
 
 # ========================================
 # Stage 2: rust builder.
