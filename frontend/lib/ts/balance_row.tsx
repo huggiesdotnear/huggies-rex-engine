@@ -9,6 +9,8 @@
 // different. one row renderer, one appearance.
 import type { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
+import { token_detail_href_fun } from "./token_link";
+import { current_app_depth_fun } from "./app_depth";
 // ========================================
 // ========================================
 // --- ICON ------------------------------
@@ -57,31 +59,30 @@ export function huggies_balance_row_fun(props: {
   tag?: string;
 }): preact.JSX.Element {
   const { id, raw, info, usd_value, pinned, tag } = props;
-  const usd =
-    usd_value ?? HUGGIES_AMOUNT_FORMAT.balance_usd(raw, info);
+  const usd = usd_value ?? HUGGIES_AMOUNT_FORMAT.balance_usd(raw, info);
   return (
     <tr key={id} class={pinned === true ? "is-pinned" : undefined}>
       <td>
         <div class="huggies-row-head">
           {huggies_token_icon_fun(info.icon, info.symbol)}
           <span class="huggies-ticker">{info.symbol}</span>
-          {tag !== undefined && (
-            <span class="huggies-pinned-tag">{tag}</span>
-          )}
+          {tag !== undefined && <span class="huggies-pinned-tag">{tag}</span>}
           <span class="huggies-amounts">
             <span class="huggies-amount">
               {HUGGIES_AMOUNT_FORMAT.balance(raw, info)}
             </span>
-            <span class="huggies-usd">
-              {HUGGIES_AMOUNT_FORMAT.usd(usd)}
-            </span>
+            <span class="huggies-usd">{HUGGIES_AMOUNT_FORMAT.usd(usd)}</span>
           </span>
         </div>
         {/* the full contract id stays selectable and copyable, and is
             in the title so a clipped id can still be read. */}
-        <div class="huggies-contract" title={id}>
+        <a
+          class="huggies-contract"
+          title={id}
+          href={token_detail_href_fun(id, current_app_depth_fun())}
+        >
           {id}
-        </div>
+        </a>
       </td>
     </tr>
   );

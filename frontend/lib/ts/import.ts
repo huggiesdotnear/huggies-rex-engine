@@ -16,4 +16,12 @@ import "../components/auth_button";
 import "../components/account_id_h1";
 import "../components/account_direct_balance_table";
 import "../components/rhea_deposit_table";
+import "../components/account_rhea_dcl_balance_table";
+import "../components/account_rhea_amm_lp_table";
+import "../components/account_intear_balance_table";
+import "../components/account_intear_lp_table";
+import "../components/contract_page";
+import "../components/contract_discover";
+import "../components/token_discover";
+import "../components/token_detail_page";
 // ========================================

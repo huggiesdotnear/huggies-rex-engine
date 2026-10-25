@@ -1,0 +1,109 @@
+/*==================================*/
+/* discover page: searchable token results and contract cards */
+/*==================================*/
+.huggies-discover-section {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 28px;
+}
+.huggies-discover-section h2 {
+  text-align: left;
+  font-size: 18px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+.huggies-token-search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.huggies-token-search span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.huggies-token-search input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  padding: 9px 10px;
+  font: inherit;
+}
+.huggies-token-results {
+  display: flex;
+  flex-direction: column;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.huggies-token-result {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  padding: 9px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+.huggies-token-result-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.huggies-token-result-icon.is-empty {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+}
+.huggies-token-result-copy,
+.huggies-token-result-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.huggies-token-result-copy span,
+.huggies-token-result-copy code,
+.huggies-token-result-values span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-token-result-copy code {
+  font-size: 10px;
+  opacity: 0.55;
+}
+.huggies-token-result-values {
+  align-items: flex-end;
+  font-size: 12px;
+  opacity: 0.8;
+}
+.huggies-contract-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.huggies-contract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 9px;
+}
+.huggies-contract-card code {
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/*==================================*/

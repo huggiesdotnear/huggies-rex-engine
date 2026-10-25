@@ -1,0 +1,117 @@
+/*==================================*/
+/* token detail page: metadata, indexed holders, and dex pools */
+/*==================================*/
+.huggies-token-detail {
+  width: 100%;
+  text-align: left;
+}
+.huggies-token-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.huggies-token-detail-header h1,
+.huggies-token-detail-header p {
+  margin: 0;
+}
+.huggies-token-detail-header p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.75;
+}
+.huggies-token-detail-header code {
+  font-size: 10px;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+}
+.huggies-token-detail-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+.huggies-token-meta {
+  border-top: 1px solid #474747;
+  border-bottom: 1px solid #474747;
+  padding: 8px 0;
+}
+.huggies-token-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+.huggies-token-main-pool-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.huggies-token-description,
+.huggies-token-socials {
+  margin: 12px 0;
+}
+.huggies-token-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.huggies-token-holders,
+.huggies-token-pools {
+  margin-top: 20px;
+}
+.huggies-token-holders h2,
+.huggies-token-pools h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+.huggies-token-holders .huggies-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+}
+.huggies-token-holders table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.huggies-token-holders th,
+.huggies-token-holders td {
+  text-align: left;
+  padding: 6px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-token-holders button {
+  margin-top: 8px;
+}
+.huggies-token-pools ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.huggies-token-pools li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.huggies-token-pools code {
+  font-size: 10px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+}
+/*==================================*/

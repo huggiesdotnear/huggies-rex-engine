@@ -174,4 +174,22 @@
   font-size: 13px;
   opacity: 0.8;
 }
+/* --- LP position rows --- */
+.huggies-balance-table .huggies-lp-row-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+.huggies-balance-table .huggies-lp-pair {
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-balance-table .huggies-lp-shares {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 /*==================================*/

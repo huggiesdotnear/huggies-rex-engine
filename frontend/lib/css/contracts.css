@@ -1,0 +1,70 @@
+/*==================================*/
+.huggies-contract-page {
+  width: 900px;
+  max-width: 92vw;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.huggies-contract-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.huggies-contract-meta div {
+  padding: 0.65rem;
+  border: 1px solid var(--color-border, currentColor);
+  border-radius: 0.5rem;
+}
+
+.huggies-contract-meta dt {
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+.huggies-contract-meta dd {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.huggies-contract-pools section {
+  margin-bottom: 1rem;
+}
+
+.huggies-contract-reserve {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.huggies-contract-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.huggies-contract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  text-decoration: none;
+}
+
+.huggies-contract-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.huggies-contract-errors {
+  margin-top: 1.5rem;
+}
+
+.huggies-contract-errors li {
+  overflow-wrap: anywhere;
+}
+/*==================================*/

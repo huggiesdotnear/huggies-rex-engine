@@ -7,7 +7,7 @@ nav
 - index.html - FEED
 - swap.html - SWAP
 - account.html - PROFILE
-- tools.html - APPS
+- discover.html - DISCOVER
 
 ---
 
@@ -15,9 +15,15 @@ nav
 
 transaction feed
 
-#### APPS - frontend/app/tools.html
+#### DISCOVER - frontend/app/discover.html
 
-tool for interacting with near smart contracts
+searchable token list and links to supported smart contracts
+
+#### TOKEN - frontend/app/tokens/token.html
+
+token metadata, indexed holders, and dex pools - ?id=
+
+see [`token.md`](./token.md)
 
 #### ACCOUNT - frontend/app/account.html
 
@@ -34,6 +40,12 @@ skill info page
 auth login page, auto redirects to account page if logged in
 
 multi-account sign in — see [`auth.md`](./auth.md)
+
+#### CONTRACTS - frontend/app/contracts/contract.html
+
+smart-contract details, pools, active-account internal balances, and LP positions
+
+see [`contracts.md`](./contracts.md)
 
 =====================
 <br/>
