@@ -32,7 +32,7 @@ export function list_contract_cards_fun(): HUGGIES_CONTRACT_CARD[] {
     {
       key: "sputnik-dao",
       title: "Sputnik DAO",
-      contract_id: "huggies.sputnik-dao.near",
+      contract_id: "sputnik-dao.near",
       page: "sputnik-dao.html",
     },
     {
@@ -46,7 +46,7 @@ export function list_contract_cards_fun(): HUGGIES_CONTRACT_CARD[] {
 // ========================================
 // the directory of the current page below frontend/app/, as a path
 // segment list. [] means the page sits directly in frontend/app/.
-// --- WHY --- the contract pages live in frontend/app/contracts/, so a
+// --- WHY --- the contract pages live in frontend/app/contract/, so a
 // link to one has to be relative to the page you are ON, not to a
 // fixed depth. a depth-only rule breaks the moment the same component
 // is mounted from a third directory.
@@ -92,10 +92,10 @@ function relative_href_fun(
 }
 // ========================================
 // build the href for one contract page, relative to the page the link
-// is rendered on. the contract pages live in frontend/app/contracts/,
+// is rendered on. the contract pages live in frontend/app/contract/,
 // so the href is that directory relative to the current page.
 export function contract_page_href_fun(page: string): string {
-  return relative_href_fun(current_app_dir_segments_fun(), ["contracts"], page);
+  return relative_href_fun(current_app_dir_segments_fun(), ["contract"], page);
 }
 // ========================================
 // copyright 2026 by sleet.near

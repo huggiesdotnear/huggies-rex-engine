@@ -4,11 +4,10 @@
 import { near_kit_client } from "@near-kit-tool-box/web";
 import {
   near_kit_contract_view_fun_json,
-  rhea_ammv2_get_pool_shares_batch_fun_json,
+  rhea_ammv2_get_number_of_pools_fun_json,
 } from "../../../middleman/near_kit_tool_box";
 // ========================================
 const HUGGIES_RHEA_AMM_POOL_LIMIT = 500;
-const HUGGIES_RHEA_AMM_SHARE_BATCH_LIMIT = 100;
 // ========================================
 export interface HUGGIES_RHEA_AMM_POOL {
   pool_id: number;
@@ -19,22 +18,28 @@ export interface HUGGIES_RHEA_AMM_POOL {
 }
 export interface HUGGIES_RHEA_AMM_DATA {
   pools: HUGGIES_RHEA_AMM_POOL[];
-  deposits: Record<string, string>;
-  shares: Record<string, string>;
+  total_pools: number;
   errors: string[];
 }
 // ========================================
-// load Rhea pools, active-account deposits, and per-pool LP shares.
-export async function load_rhea_amm_page_fun(
-  account_id: string | null,
-): Promise<HUGGIES_RHEA_AMM_DATA> {
+// load the live Rhea AMM pool collection and the contract pool count.
+export async function load_rhea_amm_page_fun(): Promise<HUGGIES_RHEA_AMM_DATA> {
   const contract_id = "v2.ref-finance.near";
   const near = near_kit_client();
   const errors: string[] = [];
   let pools: HUGGIES_RHEA_AMM_POOL[] = [];
-  let deposits: Record<string, string> = {};
-  const shares: Record<string, string> = {};
+  let total_pools = 0;
 
+  try {
+    total_pools = await rhea_ammv2_get_number_of_pools_fun_json(
+      near,
+      contract_id,
+    );
+  } catch (err) {
+    errors.push(
+      `pool count: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
   try {
     const raw = await near_kit_contract_view_fun_json<
       Array<{
@@ -57,46 +62,8 @@ export async function load_rhea_amm_page_fun(
   } catch (err) {
     errors.push(`pools: ${err instanceof Error ? err.message : String(err)}`);
   }
-
-  if (account_id !== null) {
-    try {
-      const value = await near_kit_contract_view_fun_json<
-        Record<string, string>
-      >(near, contract_id, "get_deposits", { account_id });
-      deposits = value;
-    } catch (err) {
-      errors.push(
-        `deposits: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-    for (
-      let offset = 0;
-      offset < pools.length;
-      offset += HUGGIES_RHEA_AMM_SHARE_BATCH_LIMIT
-    ) {
-      const batch = pools.slice(
-        offset,
-        offset + HUGGIES_RHEA_AMM_SHARE_BATCH_LIMIT,
-      );
-      try {
-        const values = await rhea_ammv2_get_pool_shares_batch_fun_json(
-          near,
-          contract_id,
-          batch.map((pool) => pool.pool_id),
-          account_id,
-        );
-        values.forEach((value, index) => {
-          const pool = batch[index];
-          if (pool !== undefined) shares[String(pool.pool_id)] = value;
-        });
-      } catch (err) {
-        errors.push(
-          `shares ${offset}-${offset + batch.length - 1}: ${err instanceof Error ? err.message : String(err)}`,
-        );
-      }
-    }
-  }
-  return { pools, deposits, shares, errors };
+  if (total_pools === 0) total_pools = pools.length;
+  return { pools, total_pools, errors };
 }
 // ========================================
 // copyright 2026 by sleet.near

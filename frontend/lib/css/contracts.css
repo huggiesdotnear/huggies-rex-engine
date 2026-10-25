@@ -1,6 +1,6 @@
 /*==================================*/
-/* the contract page root. width:100% keeps it inside main()'s
-   500px column — the old fixed 900px broke out of the column. */
+/* smart-contract pages: stats, pool browsers, DAO controls. */
+/*==================================*/
 .huggies-contract-page {
   width: 100%;
   max-width: 100%;
@@ -8,38 +8,146 @@
   text-align: left;
   min-width: 0;
 }
-
 .huggies-contract-meta {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.75rem;
+  margin: 0 0 1.25rem;
 }
-
 .huggies-contract-meta div {
-  padding: 0.65rem;
-  border: 1px solid var(--color-border, currentColor);
-  border-radius: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
 }
-
 .huggies-contract-meta dt {
-  font-size: 0.75em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   opacity: 0.7;
 }
-
 .huggies-contract-meta dd {
-  margin: 0.25rem 0 0;
+  margin: 0.3rem 0 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+.huggies-contract-pool-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.huggies-contract-pool-controls label,
+.huggies-dao-selector label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.huggies-contract-pool-controls span,
+.huggies-dao-selector span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.huggies-contract-pool-controls input,
+.huggies-contract-pool-controls select,
+.huggies-dao-selector input,
+.huggies-dao-selector select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 0.7rem;
+  font: inherit;
+}
+.huggies-contract-pool-count {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  opacity: 0.75;
+}
+.huggies-contract-pool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.huggies-contract-pool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  min-width: 0;
+}
+.huggies-contract-pool-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.huggies-contract-pool-token {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.huggies-contract-pool-token a {
   overflow-wrap: anywhere;
 }
-
-.huggies-contract-pools section {
-  margin-bottom: 1rem;
-}
-
-.huggies-contract-reserve {
-  display: block;
+.huggies-contract-pool-token code {
+  font-size: 11px;
+  opacity: 0.7;
   overflow-wrap: anywhere;
 }
-
+.huggies-dao-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.huggies-dao-selector-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.huggies-dao-selector-row input {
+  min-width: 0;
+}
+.huggies-dao-selector button {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  background: #ffffff;
+  color: #2d2d2d;
+  font-weight: 700;
+  cursor: pointer;
+}
+.huggies-dao-balance-card {
+  grid-column: 1 / -1;
+}
+.huggies-dao-balance-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 16px;
+}
+.huggies-dao-balance-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.huggies-dao-balance-card li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0;
+}
+.huggies-dao-balance-card a,
+.huggies-dao-balance-card code {
+  overflow-wrap: anywhere;
+}
 .huggies-contract-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -47,7 +155,6 @@
   width: 100%;
   min-width: 0;
 }
-
 .huggies-contract-card {
   display: flex;
   flex-direction: column;
@@ -57,19 +164,101 @@
   border-radius: 0.5rem;
   text-decoration: none;
 }
-
 .huggies-contract-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1.5rem;
 }
-
 .huggies-contract-errors {
   margin-top: 1.5rem;
 }
-
 .huggies-contract-errors li {
+  overflow-wrap: anywhere;
+}
+.huggies-pumpopoly-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.huggies-pumpopoly-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.huggies-pumpopoly-card.is-balance {
+  background: rgba(0, 198, 215, 0.16);
+  border-color: rgba(0, 198, 215, 0.5);
+}
+.huggies-pumpopoly-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.huggies-pumpopoly-value {
+  font-size: 26px;
+  line-height: 1.1;
+}
+.huggies-pumpopoly-sub {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.65;
+}
+.huggies-pumpopoly-raw {
+  font-size: 10px;
+  opacity: 0.5;
+  overflow-wrap: anywhere;
+}
+.huggies-pumpopoly-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.huggies-pumpopoly-info div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+}
+.huggies-pumpopoly-info span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+.huggies-pumpopoly-info code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.huggies-pumpopoly-nfts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.huggies-pumpopoly-nfts li {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+}
+.huggies-pumpopoly-nfts code {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.huggies-pumpopoly-invite {
+  margin-top: 1rem;
+  font-size: 13px;
   overflow-wrap: anywhere;
 }
 /*==================================*/

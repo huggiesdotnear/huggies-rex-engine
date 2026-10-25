@@ -44,35 +44,16 @@ underneath them.
 ## TOKEN DISCOVER
 
 `frontend/app/discover.html` lists supported contracts and a searchable
-token list. the initial list uses `GET /tokens` ordered by market cap;
-search uses `GET /tokens/search` after a short debounce. stale responses
-are ignored.
+token list. the initial list uses `GET /tokens` ordered by 24-hour usd
+volume; search uses `GET /tokens/search` after a short debounce. stale
+responses are ignored.
 
-### EMOJI SPOTLIGHT
-
-above the general token list, discover shows an **EMOJI SPOTLIGHT**
-section with the meme tokens from the emojifi project
-(<https://gitlab.com/sleet-dev/sleet_vibe/emojifi>). the list is the
-single source of truth in `lib/ts/emoji_tokens.ts` (`HUGGIES_EMOJI_TOKENS`),
-which the emoji memory match game page also reads, so the game and the
-spotlight always show the same memes.
-
-| emoji | token                              |
-| ----- | ---------------------------------- |
-| 🐶    | `token.0xshitzu.near`              |
-| 💩    | `shit-1170.meme-cooking.near`      |
-| 🐲    | `blackdragon.tkn.near`             |
-| 🦆    | `duct-1078.meme-cooking.near`      |
-| 🗳️    | `vote-1737.meme-cooking.near`      |
-| 🍂    | `nearvember-337.meme-cooking.near` |
-| 🌸    | `poppy-0.meme-cooking-test.near`   |
-| 🍳    | meme cooking (dao, no token)       |
-
-the spotlight rows are fetched live from INTEAR `GET /tokens` with
-`ids=[...]` (`lib/ts/emoji_spotlight_fetch.ts`), and each row shows the
-emoji, the token icon, the symbol, the price and the holder count, linking
-to the token's detail page. a token INTEAR does not know is left out
-rather than shown with a zero price.
+the meme tokens from the emojifi project
+(<https://gitlab.com/sleet-dev/sleet_vibe/emojifi>) are part of that one
+token list. their ids come from `lib/ts/emoji_tokens.ts`, the same list
+the memory game reads. `lib/ts/token_discover_order.ts` pins those tokens
+to the top of the list and orders every other token by 24-hour volume.
+there is no separate spotlight section and no emoji column.
 
 ### TOKEN ICONS
 

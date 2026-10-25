@@ -56,7 +56,7 @@ RUN bun install
 # `find` instead of a `./**/*.html` glob: globstar is not enabled in
 # the default sh that runs this, so the glob would silently match
 # nothing and we'd ship an empty static folder. `find` also picks up
-# the nested pages under app/contracts/ and app/tokens/.
+# the nested pages under app/contract/ and app/tokens/.
 #
 # --- WHY: build from INSIDE frontend/ ---
 # bun derives the entry path from the current working directory, so

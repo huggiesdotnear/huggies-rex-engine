@@ -16,6 +16,7 @@ export interface HUGGIES_TOKEN_SEARCH_RESULT {
   price_usd: number;
   reputation: string;
   holders: number;
+  volume_usd_24h: number;
 }
 const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "name",
@@ -25,6 +26,7 @@ const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "price_usd",
   "reputation",
   "holders",
+  "volume_usd_24h",
 ] as const;
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
@@ -59,6 +61,7 @@ function map_token_search_row_fun(
     price_usd: to_finite_number_fun(cell.price_usd),
     reputation: typeof reputation === "string" ? reputation : "Unknown",
     holders: to_finite_number_fun(cell.holders),
+    volume_usd_24h: to_finite_number_fun(cell.volume_usd_24h),
   };
 }
 // ========================================
@@ -68,7 +71,7 @@ export async function fetch_initial_tokens_fun(): Promise<
 > {
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_SEARCH_FIELDS,
-    sort: { by: "market_cap_usd", desc: true },
+    sort: { by: "volume_usd_24h", desc: true },
     limit: 100,
   });
   return response.rows.map((row) =>

@@ -10,7 +10,7 @@ import {
   type HUGGIES_TOKEN_SEARCH_RESULT,
 } from "../ts/token_search";
 import { token_detail_href_fun } from "../ts/token_link";
-import { HUGGIES_COMPONENT_EMOJI_SPOTLIGHT_FUN } from "./emoji_spotlight";
+import { order_discover_tokens_fun } from "../ts/token_discover_order";
 // ========================================
 const HUGGIES_TOKEN_SEARCH_DELAY_MS = 350;
 // ========================================
@@ -32,6 +32,7 @@ function token_result_row_fun(
       </span>
       <span class="huggies-token-result-values">
         <span>${token.price_usd.toLocaleString()}</span>
+        <span>${token.volume_usd_24h.toLocaleString()} 24H VOLUME</span>
         <span>{token.holders.toLocaleString()} holders</span>
       </span>
     </a>
@@ -50,7 +51,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     let cancelled = false;
     void fetch_initial_tokens_fun()
       .then((rows) => {
-        if (!cancelled) set_tokens(rows);
+        if (!cancelled) set_tokens(order_discover_tokens_fun(rows));
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -68,7 +69,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     const timer = window.setTimeout(() => {
       void search_tokens_fun(trimmed)
         .then((rows) => {
-          if (!cancelled) set_tokens(rows);
+          if (!cancelled) set_tokens(order_discover_tokens_fun(rows));
         })
         .catch((err: unknown) => {
           if (cancelled) return;
@@ -86,7 +87,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     set_query(target.value);
     if (target.value.trim().length === 0) {
       void fetch_initial_tokens_fun()
-        .then((rows) => set_tokens(rows))
+        .then((rows) => set_tokens(order_discover_tokens_fun(rows)))
         .catch((err: unknown) => {
           set_error(err instanceof Error ? err.message : String(err));
         });
@@ -95,8 +96,6 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
 
   return (
     <section class="huggies-token-discover">
-      {/* the emojifi spotlight sits above the general token list. */}
-      <HUGGIES_COMPONENT_EMOJI_SPOTLIGHT_FUN />
       <label class="huggies-token-search">
         <span>SEARCH TOKENS</span>
         <input

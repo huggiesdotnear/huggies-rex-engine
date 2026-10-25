@@ -1,31 +1,55 @@
 /*==================================*/
+/* the emoji memory game: a self-contained light card board inspired
+   by the original emojifi layout, isolated from the app theme. */
+/*==================================*/
+.huggies-emoji-game-body {
+  background: #e0e0e0;
+  color: #2d2d2d;
+}
 .huggies-emoji-game {
+  --game-bg: #e0e0e0;
+  --game-primary: #2d2d2d;
+  --game-accent: #4caf50;
+  --game-matched: #2196f3;
+  --game-shadow-dark: #bebebe;
+  --game-shadow-light: #ffffff;
   width: 100%;
   box-sizing: border-box;
+  padding: clamp(1rem, 5vw, 2.5rem) clamp(1rem, 5vw, 2rem);
+  border-radius: 30px;
+  background: var(--game-bg);
+  color: var(--game-primary);
   text-align: center;
+  box-shadow:
+    10px 10px 30px var(--game-shadow-dark),
+    -10px -10px 30px var(--game-shadow-light);
 }
 .huggies-emoji-game-header h1 {
-  margin: 0 0 0.25rem;
-  color: var(--color-backend);
+  margin: 0 0 0.5rem;
+  color: var(--game-primary);
+  font-family: "Fredoka", "Lilita One", sans-serif;
+  font-weight: 600;
 }
 .huggies-emoji-game-header p {
-  margin: 0 0 1rem;
-  color: #474747;
+  margin: 0 0 1.25rem;
+  color: var(--game-primary);
+  font-family: "Fredoka", "Lilita One", sans-serif;
 }
 .huggies-emoji-game-stats {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin-bottom: 1rem;
-  color: #474747;
+  margin-bottom: 1.25rem;
+  color: var(--game-primary);
+  font-family: "Fredoka", "Lilita One", sans-serif;
 }
 .huggies-emoji-game-stats strong {
-  color: var(--color-backend);
+  color: var(--game-primary);
 }
 .huggies-emoji-game-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(0.4rem, 2vw, 0.75rem);
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.4rem, 2vw, 0.9rem);
 }
 .huggies-emoji-game-card {
   position: relative;
@@ -33,25 +57,28 @@
   min-width: 0;
   padding: 0.25rem;
   border: 0;
-  border-radius: 0.75rem;
-  background: var(--color-backend);
-  color: var(--color-fontend);
-  box-shadow: 0 0.25rem 0 var(--color-backend-light);
+  border-radius: 16px;
+  background: var(--game-primary);
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22);
   cursor: pointer;
+  user-select: none;
   transition:
     transform 0.2s ease,
-    background 0.2s ease;
+    background-color 0.3s ease;
 }
 .huggies-emoji-game-card:hover:not(:disabled),
 .huggies-emoji-game-card:focus-visible:not(:disabled) {
   transform: translateY(-0.125rem);
 }
 .huggies-emoji-game-card.revealed {
-  background: var(--color-middle);
-  box-shadow: 0 0.25rem 0 var(--color-middle-dark);
+  background: var(--game-accent);
 }
 .huggies-emoji-game-card.matched {
-  background: var(--color-middle-dark);
+  background: var(--game-matched);
   cursor: default;
 }
 .huggies-emoji-game-card-face {
@@ -67,29 +94,39 @@
   height: clamp(1rem, 5vw, 1.5rem);
   object-fit: contain;
   border-radius: 50%;
-  background: var(--color-fontend);
+  background: #ffffff;
 }
 .huggies-emoji-game-win {
   margin: 1rem 0;
-  color: var(--color-backend);
+  color: var(--game-accent);
+  font-family: "Fredoka", "Lilita One", sans-serif;
   font-weight: 700;
 }
 .huggies-emoji-game-new-game {
   margin-top: 1rem;
+  border: 0;
+  border-radius: 12px;
+  padding: 0.7rem 1.2rem;
+  background: var(--game-primary);
+  color: #ffffff;
+  font-family: "Fredoka", "Lilita One", sans-serif;
+  cursor: pointer;
 }
 .huggies-emoji-game-footer {
   margin-top: 1.5rem;
   text-align: left;
-  color: #474747;
+  color: var(--game-primary);
+  font-family: "Fredoka", "Lilita One", sans-serif;
 }
 .huggies-emoji-game-footer h2 {
-  color: var(--color-backend);
+  color: var(--game-primary);
+  font-size: 1.25rem;
 }
 .huggies-emoji-game-footer ul {
   padding-left: 1.25rem;
 }
 .huggies-emoji-game-footer a {
-  color: var(--color-middle-dark);
+  color: var(--game-primary);
 }
 @media (max-width: 420px) {
   .huggies-emoji-game-grid {

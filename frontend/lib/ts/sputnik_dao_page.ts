@@ -84,7 +84,6 @@ function parse_proposals_fun(value: unknown): HUGGIES_SPUTNIK_PROPOSAL[] {
 // load a Sputnik DAO's config, policy members, proposals, and balances.
 export async function load_sputnik_dao_page_fun(
   dao_id: string,
-  account_id: string | null,
 ): Promise<HUGGIES_SPUTNIK_DATA> {
   const errors: string[] = [];
   const near = near_kit_client();
@@ -131,26 +130,24 @@ export async function load_sputnik_dao_page_fun(
       `proposals: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
-  if (account_id !== null) {
-    try {
-      const account = await near.rpc.getAccount(dao_id);
-      native_near_balance = account.amount;
-    } catch (err) {
-      errors.push(
-        `native near balance: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-    try {
-      available_amount = await near_kit_contract_view_fun_json<string>(
-        near,
-        dao_id,
-        "get_available_amount",
-      );
-    } catch (err) {
-      errors.push(
-        `available amount: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
+  try {
+    const account = await near.rpc.getAccount(dao_id);
+    native_near_balance = account.amount;
+  } catch (err) {
+    errors.push(
+      `native near balance: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+  try {
+    available_amount = await near_kit_contract_view_fun_json<string>(
+      near,
+      dao_id,
+      "get_available_amount",
+    );
+  } catch (err) {
+    errors.push(
+      `available amount: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
   return {
     config,

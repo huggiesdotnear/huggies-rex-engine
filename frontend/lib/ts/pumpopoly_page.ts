@@ -4,10 +4,13 @@
 import { near_kit_client } from "@near-kit-tool-box/web";
 import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
 // ========================================
+const HUGGIES_PUMPOPOLY_UNIT = 1_000_000_000_000_000_000n;
+// ========================================
 export interface HUGGIES_PUMPOPOLY_PLAYER {
   land_count: number;
   location: number;
   balance: string;
+  balance_human: string;
   account_id: string;
   invites: number;
   invitees: number;
@@ -34,15 +37,34 @@ function parse_count_fun(value: unknown): number {
   return 0;
 }
 // ========================================
+// format a Pumpopoly base-unit balance as a human-readable amount.
+export function format_pumpopoly_balance_fun(raw: string): string {
+  try {
+    const amount = BigInt(raw);
+    const whole = amount / HUGGIES_PUMPOPOLY_UNIT;
+    const fraction = (amount % HUGGIES_PUMPOPOLY_UNIT)
+      .toString()
+      .padStart(18, "0")
+      .replace(/0+$/, "");
+    return fraction.length === 0
+      ? whole.toLocaleString()
+      : `${whole.toLocaleString()}.${fraction}`;
+  } catch {
+    return "0";
+  }
+}
+// ========================================
 // parse a Pumpopoly player view defensively.
 function parse_player_fun(value: unknown): HUGGIES_PUMPOPOLY_PLAYER | null {
   if (typeof value !== "object" || value === null) return null;
   const player = value as Partial<HUGGIES_PUMPOPOLY_PLAYER>;
   if (typeof player.account_id !== "string") return null;
+  const balance = typeof player.balance === "string" ? player.balance : "0";
   return {
     land_count: parse_count_fun(player.land_count),
     location: parse_count_fun(player.location),
-    balance: typeof player.balance === "string" ? player.balance : "0",
+    balance,
+    balance_human: format_pumpopoly_balance_fun(balance),
     account_id: player.account_id,
     invites: parse_count_fun(player.invites),
     invitees: parse_count_fun(player.invitees),
@@ -51,7 +73,7 @@ function parse_player_fun(value: unknown): HUGGIES_PUMPOPOLY_PLAYER | null {
   };
 }
 // ========================================
-// load Pumpopoly player information, NFT holdings, and derived credit score.
+// load Pumpopoly player information and NFT holdings.
 export async function load_pumpopoly_page_fun(
   account_id: string | null,
 ): Promise<HUGGIES_PUMPOPOLY_DATA> {

@@ -14,7 +14,12 @@ import { load_rhea_dcl_page_fun } from "../ts/rhea_dcl_page";
 import { load_intear_dex_page_fun } from "../ts/intear_dex_page";
 import { load_sputnik_dao_page_fun } from "../ts/sputnik_dao_page";
 import { load_pumpopoly_page_fun } from "../ts/pumpopoly_page";
+import { load_dao_account_balances_fun } from "../ts/dao_account_balance";
 import { list_trezu_treasuries_fun } from "../ts/trezu_treasuries";
+import { filter_pools_fun, pool_summary_fun } from "../ts/contract_pool_stats";
+import { current_app_depth_fun } from "../ts/app_depth";
+import { token_detail_href_fun } from "../ts/token_link";
+import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import type { HUGGIES_RHEA_AMM_DATA } from "../ts/rhea_amm_page";
 import type { HUGGIES_RHEA_DCL_DATA } from "../ts/rhea_dcl_page";
 import type { HUGGIES_INTEAR_DATA } from "../ts/intear_dex_page";
@@ -29,6 +34,8 @@ type HUGGIES_CONTRACT_DATA =
   | { kind: "intear-dex"; data: HUGGIES_INTEAR_DATA }
   | { kind: "sputnik-dao"; data: HUGGIES_SPUTNIK_DATA }
   | { kind: "pumpopoly"; data: HUGGIES_PUMPOPOLY_DATA };
+// ========================================
+const HUGGIES_DEFAULT_DAO_ID = "sputnik-dao.near";
 // ========================================
 // narrow an arbitrary string to a known contract key.
 function as_contract_key_fun(
@@ -47,29 +54,25 @@ function as_contract_key_fun(
   return null;
 }
 // ========================================
-// read the contract key from the mount element's data-contract
-// attribute, falling back to the ?id= query of the legacy shared
-// contract.html route.
+// read the contract key from the mount element's data-contract attribute.
 function get_contract_key_fun(): HUGGIES_CONTRACT_KEY {
   if (typeof window === "undefined") return "rhea-amm";
   const el = document.getElementById(
     HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_PAGE,
   );
-  const from_attr = el?.getAttribute("data-contract") ?? null;
-  const from_attr_key = as_contract_key_fun(from_attr);
-  if (from_attr_key !== null) return from_attr_key;
+  const from_attr = as_contract_key_fun(el?.getAttribute("data-contract") ?? null);
+  if (from_attr !== null) return from_attr;
   const from_query = as_contract_key_fun(
     new URLSearchParams(window.location.search).get("id"),
   );
-  if (from_query !== null) return from_query;
-  return "rhea-amm";
+  return from_query ?? "rhea-amm";
 }
 // ========================================
 // read the optional DAO contract id from the page url.
 function get_dao_id_fun(): string {
-  if (typeof window === "undefined") return "huggies.sputnik-dao.near";
+  if (typeof window === "undefined") return HUGGIES_DEFAULT_DAO_ID;
   const id = new URLSearchParams(window.location.search).get("dao_id");
-  return id?.trim() || "huggies.sputnik-dao.near";
+  return id?.trim() || HUGGIES_DEFAULT_DAO_ID;
 }
 // ========================================
 // render a short metadata list.
@@ -88,43 +91,89 @@ function metadata_fun(
   );
 }
 // ========================================
-// render raw reserve rows grouped by DEX.
+// render pool rows with token links and readable reserve amounts.
 function pool_rows_fun(
   rows: ReadonlyArray<{
-    dex: string;
     label: string;
-    reserves: ReadonlyArray<readonly [string, string]>;
+    token_ids: ReadonlyArray<string>;
+    amounts: ReadonlyArray<string>;
   }>,
 ): preact.JSX.Element {
-  const dexes = [...new Set(rows.map((row) => row.dex))];
+  if (rows.length === 0) return <p>NO POOLS MATCH THIS FILTER.</p>;
   return (
-    <div class="huggies-contract-pools">
-      {dexes.map((dex) => (
-        <section>
-          <h3>{dex}</h3>
-          <div class="huggies-scroll">
-            <table>
-              <tbody>
-                {rows
-                  .filter((row) => row.dex === dex)
-                  .map((row) => (
-                    <tr>
-                      <th scope="row">{row.label}</th>
-                      <td>
-                        {row.reserves.map(([token, amount]) => (
-                          <span class="huggies-contract-reserve">
-                            {token}: <code>{amount}</code>
-                          </span>
-                        ))}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+    <div class="huggies-contract-pool-grid">
+      {rows.map((row) => (
+        <article class="huggies-contract-pool-card">
+          <h3>{row.label}</h3>
+          {row.token_ids.map((token_id, index) => (
+            <div class="huggies-contract-pool-token">
+              <a href={token_detail_href_fun(token_id, current_app_depth_fun())}>
+                {token_id}
+              </a>
+              <code>{row.amounts[index] ?? "0"}</code>
+            </div>
+          ))}
+        </article>
       ))}
     </div>
+  );
+}
+// ========================================
+// render the searchable pool browser used by all three dex pages.
+function pool_browser_fun(
+  pools: ReadonlyArray<{
+    label: string;
+    token_ids: ReadonlyArray<string>;
+    amounts: ReadonlyArray<string>;
+  }>,
+  total_pools: number | null = null,
+): preact.JSX.Element {
+  const [query, set_query] = use_state("");
+  const [token_id, set_token_id] = use_state<string | null>(null);
+  const summary = pool_summary_fun(pools);
+  const filtered = filter_pools_fun(pools, query, token_id);
+  return (
+    <>
+      {metadata_fun([
+        [
+          "TOTAL POOLS",
+          (total_pools ?? summary.total_pools).toLocaleString(),
+        ],
+        ["UNIQUE TOKENS", summary.unique_tokens.toLocaleString()],
+      ])}
+      <section class="huggies-contract-pool-controls">
+        <label>
+          <span>SEARCH TOKEN</span>
+          <input
+            type="search"
+            value={query}
+            placeholder="token account id"
+            onInput={(event) => {
+              set_query((event.currentTarget as HTMLInputElement).value);
+            }}
+          />
+        </label>
+        <label>
+          <span>FILTER TOKEN</span>
+          <select
+            value={token_id ?? ""}
+            onChange={(event) => {
+              const value = (event.currentTarget as HTMLSelectElement).value;
+              set_token_id(value.length === 0 ? null : value);
+            }}
+          >
+            <option value="">ALL TOKENS</option>
+            {summary.token_ids.map((id) => (
+              <option value={id}>{id}</option>
+            ))}
+          </select>
+        </label>
+      </section>
+      <p class="huggies-contract-pool-count">
+        SHOWING {filtered.length} OF {pools.length} POOLS
+      </p>
+      {pool_rows_fun(filtered)}
+    </>
   );
 }
 // ========================================
@@ -133,7 +182,6 @@ function render_contract_fun(
   key: HUGGIES_CONTRACT_KEY,
   data: HUGGIES_CONTRACT_DATA | null,
   account_id: string | null,
-  errors: string[],
 ): preact.JSX.Element {
   const cards = list_contract_cards_fun();
   const card = cards.find((item) => item.key === key);
@@ -151,12 +199,9 @@ function render_contract_fun(
 
   if (data.kind === "rhea-amm") {
     const rows = data.data.pools.map((pool) => ({
-      dex: pool.dex || "rhea-amm",
       label: `POOL ${pool.pool_id}`,
-      reserves: pool.token_ids.map((token, index) => [
-        token,
-        pool.amounts[index] ?? "0",
-      ]) as ReadonlyArray<readonly [string, string]>,
+      token_ids: pool.token_ids,
+      amounts: pool.amounts,
     }));
     return (
       <section>
@@ -164,46 +209,18 @@ function render_contract_fun(
         {metadata_fun([
           ["CONTRACT", contract_id],
           ["ACTIVE ACCOUNT", account_id ?? "NOT SIGNED IN"],
-          ["POOL COUNT", `${data.data.pools.length} (SCOPE: FIRST 500)`],
         ])}
         <h2>POOLS / LIQUIDITY</h2>
-        {pool_rows_fun(rows)}
-        <h2>INTERNAL BALANCES</h2>
-        {Object.entries(data.data.deposits).length === 0 ? (
-          <p>NO INTERNAL BALANCES</p>
-        ) : (
-          <ul>
-            {Object.entries(data.data.deposits).map(([token, amount]) => (
-              <li>
-                {token}: <code>{amount}</code>
-              </li>
-            ))}
-          </ul>
-        )}
-        <h2>LP POSITIONS</h2>
-        {Object.entries(data.data.shares).length === 0 ? (
-          <p>NO LP POSITIONS</p>
-        ) : (
-          <ul>
-            {Object.entries(data.data.shares).map(([pool_id, amount]) => (
-              <li>
-                POOL {pool_id}: <code>{amount}</code>
-              </li>
-            ))}
-          </ul>
-        )}
+        {pool_browser_fun(rows, data.data.total_pools)}
       </section>
     );
   }
 
   if (data.kind === "rhea-dcl-v2") {
     const rows = data.data.pools.map((pool) => ({
-      dex: "rhea-dcl-v2",
       label: pool.pool_id,
-      reserves: [
-        [pool.token_x, pool.total_x],
-        [pool.token_y, pool.total_y],
-      ] as ReadonlyArray<readonly [string, string]>,
+      token_ids: [pool.token_x, pool.token_y],
+      amounts: [pool.total_x, pool.total_y],
     }));
     return (
       <section>
@@ -211,46 +228,18 @@ function render_contract_fun(
         {metadata_fun([
           ["CONTRACT", contract_id],
           ["ACTIVE ACCOUNT", account_id ?? "NOT SIGNED IN"],
-          ["POOL COUNT", `${data.data.pools.length} (SCOPE: FIRST 500)`],
         ])}
         <h2>POOLS / LIQUIDITY</h2>
-        {pool_rows_fun(rows)}
-        <h2>INTERNAL BALANCES</h2>
-        {Object.entries(data.data.assets).length === 0 ? (
-          <p>NO INTERNAL BALANCES</p>
-        ) : (
-          <ul>
-            {Object.entries(data.data.assets).map(([token, amount]) => (
-              <li>
-                {token}: <code>{amount}</code>
-              </li>
-            ))}
-          </ul>
-        )}
-        <h2>LP POSITIONS</h2>
-        {data.data.liquidities.length === 0 ? (
-          <p>NO LP POSITIONS</p>
-        ) : (
-          <ul>
-            {data.data.liquidities.map((liquidity, index) => (
-              <li>
-                <code>{JSON.stringify(liquidity)}</code>
-              </li>
-            ))}
-          </ul>
-        )}
+        {pool_browser_fun(rows)}
       </section>
     );
   }
 
   if (data.kind === "intear-dex") {
-    const rows = data.data.pools.map((pool, index) => ({
-      dex: "slimedragon.near/xyk",
-      label: `POOL ${index} (${pool.kind})`,
-      reserves: pool.assets.map((asset) => [
-        asset.asset_id,
-        asset.balance,
-      ]) as ReadonlyArray<readonly [string, string]>,
+    const rows = data.data.pools.map((pool) => ({
+      label: `POOL ${pool.pool_id} (${pool.kind})`,
+      token_ids: pool.token_ids,
+      amounts: pool.amounts,
     }));
     return (
       <section>
@@ -259,34 +248,9 @@ function render_contract_fun(
           ["CONTRACT", contract_id],
           ["LIVE POOL DEX", "slimedragon.near/xyk"],
           ["ACTIVE ACCOUNT", account_id ?? "NOT SIGNED IN"],
-          ["POOL COUNT", `${data.data.pools.length} (SCOPE: FIRST 71)`],
         ])}
         <h2>POOLS / LIQUIDITY</h2>
-        {pool_rows_fun(rows)}
-        <h2>INTERNAL BALANCES</h2>
-        {data.data.assets.length === 0 ? (
-          <p>NO INTERNAL BALANCES</p>
-        ) : (
-          <ul>
-            {data.data.assets.map((asset) => (
-              <li>
-                {asset.asset_id}: <code>{asset.balance}</code>
-              </li>
-            ))}
-          </ul>
-        )}
-        <h2>LP POSITIONS</h2>
-        {data.data.shares.length === 0 ? (
-          <p>NO LP POSITIONS</p>
-        ) : (
-          <ul>
-            {data.data.shares.map((amount, index) => (
-              <li>
-                POOL {index}: <code>{amount ?? "0"}</code>
-              </li>
-            ))}
-          </ul>
-        )}
+        {pool_browser_fun(rows)}
       </section>
     );
   }
@@ -342,33 +306,185 @@ function render_contract_fun(
       {metadata_fun([
         ["CONTRACT", contract_id],
         ["ACTIVE ACCOUNT", account_id ?? "NOT SIGNED IN"],
-        ["LAND COUNT", String(player?.land_count ?? 0)],
-        ["BOARD POSITION", String(player?.location ?? 0)],
-        ["INVITES", String(player?.invites ?? 0)],
-        ["INVITEES", String(player?.invitees ?? 0)],
-        ["CREDIT SCORE", String(data.data.credit_score)],
-        ["NFT COUNT", String(data.data.nft_count)],
-        ["BALANCE", player?.balance ?? "0"],
       ])}
+      <div class="huggies-pumpopoly-cards">
+        <article class="huggies-pumpopoly-card is-balance">
+          <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
+          <strong class="huggies-pumpopoly-value">
+            {player?.balance_human ?? "0"}
+          </strong>
+          <span class="huggies-pumpopoly-sub">
+            PUMPOPOLY TOKENS
+          </span>
+          {player !== null && (
+            <code class="huggies-pumpopoly-raw">{player.balance}</code>
+          )}
+        </article>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">LAND</span>
+          <strong class="huggies-pumpopoly-value">
+            {player?.land_count ?? 0}
+          </strong>
+          <span class="huggies-pumpopoly-sub">IN-GAME PLOTS</span>
+        </article>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">BOARD POSITION</span>
+          <strong class="huggies-pumpopoly-value">
+            {player?.location ?? 0}
+          </strong>
+          <span class="huggies-pumpopoly-sub">SQUARE</span>
+        </article>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">CREDIT SCORE</span>
+          <strong class="huggies-pumpopoly-value">
+            {data.data.credit_score}
+          </strong>
+          <span class="huggies-pumpopoly-sub">LAND + INVITES</span>
+        </article>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">NFTS HELD</span>
+          <strong class="huggies-pumpopoly-value">
+            {data.data.nft_count}
+          </strong>
+          <span class="huggies-pumpopoly-sub">PUMPOPOLY NFTS</span>
+        </article>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">INVITES</span>
+          <strong class="huggies-pumpopoly-value">
+            {player?.invites ?? 0}
+          </strong>
+          <span class="huggies-pumpopoly-sub">
+            {player?.invitees ?? 0} INVITEES
+          </span>
+        </article>
+      </div>
       <h2>ACCOUNT INFO</h2>
-      <p>
-        INVITED BY: {player?.invited_by || "NONE"} / LAST MOVE:{" "}
-        {player?.last_move || "UNKNOWN"}
-      </p>
+      <div class="huggies-pumpopoly-info">
+        <div>
+          <span>INVITED BY</span>
+          <code>{player?.invited_by || "NONE"}</code>
+        </div>
+        <div>
+          <span>LAST MOVE</span>
+          <code>{player?.last_move || "UNKNOWN"}</code>
+        </div>
+      </div>
       <h2>NFT HOLDINGS</h2>
       {data.data.nft_token_ids.length === 0 ? (
         <p>NO NFTS</p>
       ) : (
-        <ul>
+        <ul class="huggies-pumpopoly-nfts">
           {data.data.nft_token_ids.map((token_id) => (
-            <li>{token_id}</li>
+            <li>
+              <code>{token_id}</code>
+            </li>
           ))}
         </ul>
       )}
       {invite_link !== "" && (
-        <p>
+        <p class="huggies-pumpopoly-invite">
           INVITE LINK: <a href={invite_link}>{invite_link}</a>
         </p>
+      )}
+    </section>
+  );
+}
+// ========================================
+// render the DAO selector and signed-in account balances.
+function dao_selector_fun(
+  dao_id: string,
+  account_id: string | null,
+  balances: ReadonlyArray<{
+    token_id: string;
+    amount: string;
+    decimals: number;
+  }>,
+): preact.JSX.Element {
+  const [input_id, set_input_id] = use_state<string>(dao_id);
+  const [treasuries, set_treasuries] = use_state<
+    ReadonlyArray<{ daoId: string; config: { name?: unknown } | null }>
+  >([]);
+  use_effect(() => {
+    if (account_id === null) return;
+    let cancelled = false;
+    void list_trezu_treasuries_fun(account_id)
+      .then((rows) => {
+        if (!cancelled) set_treasuries(rows);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [account_id]);
+  const open_dao_fun = (next_id: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("dao_id", next_id);
+    window.location.href = url.toString();
+  };
+  return (
+    <section class="huggies-dao-selector">
+      <label>
+        <span>DAO ACCOUNT ID</span>
+        <div class="huggies-dao-selector-row">
+          <input
+            type="text"
+            value={input_id}
+            placeholder="dao.near"
+            onInput={(event) => {
+              set_input_id((event.currentTarget as HTMLInputElement).value);
+            }}
+          />
+          <button type="button" onClick={() => open_dao_fun(input_id.trim())}>
+            OPEN DAO
+          </button>
+        </div>
+      </label>
+      {treasuries.length > 0 && (
+        <label>
+          <span>YOUR DAOS</span>
+          <select
+            value={dao_id}
+            onChange={(event) => {
+              open_dao_fun((event.currentTarget as HTMLSelectElement).value);
+            }}
+          >
+            {treasuries.map((treasury) => (
+              <option value={treasury.daoId}>
+                {typeof treasury.config?.name === "string"
+                  ? `${treasury.config.name} (${treasury.daoId})`
+                  : treasury.daoId}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {account_id !== null && (
+        <div class="huggies-dao-balance-card">
+          <h2>YOUR DAO BALANCE</h2>
+          {balances.length === 0 ? (
+            <p>NO DAO BALANCES</p>
+          ) : (
+            <ul>
+              {balances.map((balance) => (
+                <li>
+                  <a
+                    href={token_detail_href_fun(
+                      balance.token_id,
+                      current_app_depth_fun(),
+                    )}
+                  >
+                    {balance.token_id}
+                  </a>
+                  <code>
+                    {HUGGIES_AMOUNT_FORMAT.balance(balance.amount, {
+                      decimals: balance.decimals,
+                    })}
+                  </code>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
     </section>
   );
@@ -379,7 +495,11 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
   const [data, set_data] = use_state<HUGGIES_CONTRACT_DATA | null>(null);
   const [account_id, set_account_id] = use_state<string | null>(null);
   const [errors, set_errors] = use_state<string[]>([]);
+  const [dao_balances, set_dao_balances] = use_state<
+    ReadonlyArray<{ token_id: string; amount: string; decimals: number }>
+  >([]);
   const key = get_contract_key_fun();
+  const dao_id = get_dao_id_fun();
 
   use_effect(() => {
     HUGGIES_AUTH.init();
@@ -395,26 +515,18 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
     set_data(null);
     const load = async (): Promise<HUGGIES_CONTRACT_DATA> => {
       if (key === "rhea-amm") {
-        const value = await load_rhea_amm_page_fun(account_id);
-        return { kind: key, data: value };
+        return { kind: key, data: await load_rhea_amm_page_fun() };
       }
       if (key === "rhea-dcl-v2") {
-        const value = await load_rhea_dcl_page_fun(account_id);
-        return { kind: key, data: value };
+        return { kind: key, data: await load_rhea_dcl_page_fun() };
       }
       if (key === "intear-dex") {
-        const value = await load_intear_dex_page_fun(account_id);
-        return { kind: key, data: value };
+        return { kind: key, data: await load_intear_dex_page_fun() };
       }
       if (key === "sputnik-dao") {
-        const value = await load_sputnik_dao_page_fun(
-          get_dao_id_fun(),
-          account_id,
-        );
-        return { kind: key, data: value };
+        return { kind: key, data: await load_sputnik_dao_page_fun(dao_id) };
       }
-      const value = await load_pumpopoly_page_fun(account_id);
-      return { kind: key, data: value };
+      return { kind: key, data: await load_pumpopoly_page_fun(account_id) };
     };
     void load()
       .then((value) => {
@@ -429,35 +541,32 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
     return () => {
       cancelled = true;
     };
-  }, [key, account_id]);
+  }, [key, dao_id, account_id]);
 
   use_effect(() => {
     if (key !== "sputnik-dao" || account_id === null) return;
-    void list_trezu_treasuries_fun(account_id)
-      .then((treasuries) => {
-        set_errors((current) => [
-          ...current,
-          `treasuries: ${treasuries
-            .map((treasury) => {
-              const name = treasury.config?.name;
-              return name === undefined
-                ? treasury.daoId
-                : `${treasury.daoId} (${name})`;
-            })
-            .join(", ")}`,
-        ]);
+    let cancelled = false;
+    void load_dao_account_balances_fun(dao_id, account_id)
+      .then((rows) => {
+        if (!cancelled) set_dao_balances(rows);
       })
       .catch((err: unknown) => {
+        if (cancelled) return;
         set_errors((current) => [
           ...current,
-          `treasuries: ${err instanceof Error ? err.message : String(err)}`,
+          `dao balances: ${err instanceof Error ? err.message : String(err)}`,
         ]);
       });
-  }, [key, account_id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [key, dao_id, account_id]);
 
   return (
     <div class="huggies-contract-page huggies-page">
-      {render_contract_fun(key, data, account_id, errors)}
+      {key === "sputnik-dao" &&
+        dao_selector_fun(dao_id, account_id, dao_balances)}
+      {render_contract_fun(key, data, account_id)}
       {errors.length > 0 && (
         <details class="huggies-contract-errors">
           <summary>DATA LIMITATIONS</summary>

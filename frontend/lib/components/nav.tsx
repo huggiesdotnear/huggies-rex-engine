@@ -7,7 +7,7 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { Home, LayoutGrid, User, GraduationCap, Gamepad2 } from "lucide-preact";
+import { Home, LayoutGrid, User, GraduationCap } from "lucide-preact";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -24,7 +24,6 @@ interface HUGGIES_NAV_LINK {
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
   { href: "discover.html", label: "DISCOVER", Icon: LayoutGrid },
-  { href: "game.html", label: "GAME", Icon: Gamepad2 },
   { href: "account.html", label: "PROFILE", Icon: User },
   { href: "skill.html", label: "SKILL", Icon: GraduationCap },
 ];

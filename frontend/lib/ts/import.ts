@@ -25,6 +25,5 @@ import "../components/contract_discover";
 import "../components/token_discover";
 import "../components/token_detail_page";
 import "../components/emoji_match_game";
-import "../components/emoji_spotlight";
 import "../components/shit_1170_page";
 // ========================================

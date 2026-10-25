@@ -5,7 +5,6 @@ pages and ui layout
 nav
 
 - index.html - FEED
-- game.html - GAME
 - account.html - PROFILE
 - discover.html - DISCOVER
 
@@ -19,8 +18,8 @@ transaction feed
 
 searchable token list and links to supported smart contracts
 
-the emojifi meme-token spotlight sits above the token list — see
-[`token.md`](./token.md#emoji-spotlight)
+the token list is ordered by 24-hour volume, with the emojifi meme
+tokens pinned to the top — see [`token.md`](./token.md)
 
 #### TOKEN - frontend/app/tokens/token.html
 
@@ -57,9 +56,9 @@ auth login page, auto redirects to account page if logged in
 
 multi-account sign in — see [`auth.md`](./auth.md)
 
-#### CONTRACTS - frontend/app/contracts/
+#### CONTRACTS - frontend/app/contract/
 
-one html file per smart contract, served under `/app/contracts/`:
+one html file per smart contract, served under `/app/contract/`:
 
 - `rhea-amm.html`
 - `rhea-dcl-v2.html`
@@ -71,7 +70,7 @@ smart-contract details, pools, active-account internal balances, and LP position
 
 the page reads the contract from the `data-contract` attribute on its
 mount element, so each file has a plain url. the legacy
-`frontend/app/contracts/contract.html?id=<contract-key>` route still works
+`frontend/app/contract/contract.html?id=<contract-key>` route still works
 as a fallback.
 
 see [`contracts.md`](./contracts.md)
