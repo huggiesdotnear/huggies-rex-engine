@@ -6,8 +6,13 @@ import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
-import { intear_xyk_pool_count_fun } from "../ts/intear_xyk_pool_count";
-import { intear_xyk_pool_shares_fun } from "../ts/intear_xyk_pool_shares";
+import { near_kit_client } from "@near-kit-tool-box/web";
+import {
+  NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
+  NEAR_KIT_INTEAR_DEX_XYK_DEX_ID,
+  intear_dex_xyk_get_pool_count_fun_json,
+  intear_dex_xyk_get_pool_shares_fun_json,
+} from "../../../middleman/near_kit_tool_box";
 // ========================================
 const HUGGIES_INTEAR_XYK_POOL_LIMIT = 71;
 const HUGGIES_INTEAR_XYK_SHARES_PAGE_SIZE = 100;
@@ -21,8 +26,13 @@ interface HUGGIES_INTEAR_LP_ROW {
 async function fetch_intear_lp_rows_fun(
   account_id: string,
 ): Promise<ReadonlyArray<HUGGIES_INTEAR_LP_ROW>> {
+  const near = near_kit_client();
   const count = Math.min(
-    await intear_xyk_pool_count_fun(),
+    await intear_dex_xyk_get_pool_count_fun_json(
+      near,
+      NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
+      NEAR_KIT_INTEAR_DEX_XYK_DEX_ID,
+    ),
     HUGGIES_INTEAR_XYK_POOL_LIMIT,
   );
   if (count === 0) return [];
@@ -41,9 +51,15 @@ async function fetch_intear_lp_rows_fun(
       },
       (_, index) => start_index + index,
     );
-    const shares = await intear_xyk_pool_shares_fun(account_id, page_ids);
+    const shares = await intear_dex_xyk_get_pool_shares_fun_json(
+      near,
+      NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
+      NEAR_KIT_INTEAR_DEX_XYK_DEX_ID,
+      page_ids,
+      account_id,
+    );
     for (let index = 0; index < shares.length; index += 1) {
-      const value = shares[index];
+      const value = shares[index]?.shares;
       if (value === null || value === undefined || value === "0") continue;
       rows.push({ pool_id: start_index + index, shares: value });
     }

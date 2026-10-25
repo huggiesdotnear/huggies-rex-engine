@@ -2,7 +2,7 @@
 // data loader for the Sputnik DAO contract page.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
-import { contract_view_fun } from "./contract_view";
+import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
 // ========================================
 export interface HUGGIES_SPUTNIK_ROLE {
   name: string;
@@ -87,6 +87,7 @@ export async function load_sputnik_dao_page_fun(
   account_id: string | null,
 ): Promise<HUGGIES_SPUTNIK_DATA> {
   const errors: string[] = [];
+  const near = near_kit_client();
   let config: Record<string, unknown> = {};
   let roles: HUGGIES_SPUTNIK_ROLE[] = [];
   let proposals: HUGGIES_SPUTNIK_PROPOSAL[] = [];
@@ -94,7 +95,8 @@ export async function load_sputnik_dao_page_fun(
   let available_amount = "";
 
   try {
-    config = await contract_view_fun<Record<string, unknown>>(
+    config = await near_kit_contract_view_fun_json<Record<string, unknown>>(
+      near,
       dao_id,
       "get_config",
     );
@@ -103,17 +105,26 @@ export async function load_sputnik_dao_page_fun(
   }
   try {
     roles = parse_roles_fun(
-      await contract_view_fun<unknown>(dao_id, "get_policy"),
+      await near_kit_contract_view_fun_json<unknown>(
+        near,
+        dao_id,
+        "get_policy",
+      ),
     );
   } catch (err) {
     errors.push(`policy: ${err instanceof Error ? err.message : String(err)}`);
   }
   try {
     proposals = parse_proposals_fun(
-      await contract_view_fun<unknown>(dao_id, "get_proposals", {
-        from_index: 0,
-        limit: 100,
-      }),
+      await near_kit_contract_view_fun_json<unknown>(
+        near,
+        dao_id,
+        "get_proposals",
+        {
+          from_index: 0,
+          limit: 100,
+        },
+      ),
     );
   } catch (err) {
     errors.push(
@@ -122,7 +133,7 @@ export async function load_sputnik_dao_page_fun(
   }
   if (account_id !== null) {
     try {
-      const account = await near_kit_client().rpc.getAccount(dao_id);
+      const account = await near.rpc.getAccount(dao_id);
       native_near_balance = account.amount;
     } catch (err) {
       errors.push(
@@ -130,7 +141,8 @@ export async function load_sputnik_dao_page_fun(
       );
     }
     try {
-      available_amount = await contract_view_fun<string>(
+      available_amount = await near_kit_contract_view_fun_json<string>(
+        near,
         dao_id,
         "get_available_amount",
       );

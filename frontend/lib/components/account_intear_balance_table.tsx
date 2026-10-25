@@ -9,8 +9,12 @@ import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { huggies_balance_row_fun } from "../ts/balance_row";
-import { intear_registered_assets_fun } from "../ts/intear_registered_assets";
-import { intear_asset_token_id_fun } from "../ts/intear_asset_token_id";
+import { near_kit_client } from "@near-kit-tool-box/web";
+import {
+  NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
+  intear_dex_asset_token_id_fun,
+  intear_dex_engine_registered_assets_of_fun_json,
+} from "../../../middleman/near_kit_tool_box";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../ts/token_info";
 // ========================================
 interface HUGGIES_INTEAR_ROW {
@@ -23,16 +27,23 @@ interface HUGGIES_INTEAR_ROW {
 async function fetch_intear_rows_fun(
   account_id: string,
 ): Promise<ReadonlyArray<HUGGIES_INTEAR_ROW>> {
-  const assets = await intear_registered_assets_fun(account_id);
-  const nonzero = assets.filter(([, raw]) => raw !== "0");
+  const registered = await intear_dex_engine_registered_assets_of_fun_json(
+    near_kit_client(),
+    NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
+    account_id,
+    null,
+    0,
+    500,
+  );
+  const nonzero = registered.filter((row) => row.balance !== "0");
   if (nonzero.length === 0) return [];
-  const ids = nonzero.map(([asset_id]) => intear_asset_token_id_fun(asset_id));
+  const ids = nonzero.map((row) => intear_dex_asset_token_id_fun(row.asset_id));
   const info_map = await HUGGIES_TOKEN_INFO.get(ids);
   const rows: Array<HUGGIES_INTEAR_ROW> = [];
-  for (const [asset_id, raw] of nonzero) {
-    const id = intear_asset_token_id_fun(asset_id);
+  for (const row of nonzero) {
+    const id = intear_dex_asset_token_id_fun(row.asset_id);
     const info = info_map.get(id);
-    if (info !== undefined) rows.push({ id, raw, info });
+    if (info !== undefined) rows.push({ id, raw: row.balance, info });
   }
   rows.sort(
     (a, b) =>

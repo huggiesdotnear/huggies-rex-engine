@@ -9,7 +9,8 @@ import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { huggies_balance_row_fun } from "../ts/balance_row";
-import { rhea_dcl_user_assets_fun } from "../ts/rhea_dcl_user_assets";
+import { near_kit_client } from "@near-kit-tool-box/web";
+import { rhea_dclv2_list_user_assets_fun_json } from "../../../middleman/near_kit_tool_box";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../ts/token_info";
 // ========================================
 interface HUGGIES_RHEA_DCL_ROW {
@@ -22,7 +23,11 @@ interface HUGGIES_RHEA_DCL_ROW {
 async function fetch_rhea_dcl_rows_fun(
   account_id: string,
 ): Promise<ReadonlyArray<HUGGIES_RHEA_DCL_ROW>> {
-  const assets = await rhea_dcl_user_assets_fun(account_id);
+  const assets = await rhea_dclv2_list_user_assets_fun_json(
+    near_kit_client(),
+    "dclv2.ref-labs.near",
+    account_id,
+  );
   const nonzero = Object.entries(assets).filter(([, raw]) => raw !== "0");
   if (nonzero.length === 0) return [];
   const info_map = await HUGGIES_TOKEN_INFO.get(nonzero.map(([id]) => id));

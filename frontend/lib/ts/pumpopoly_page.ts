@@ -1,7 +1,8 @@
 // ========================================
 // data loader for the Pumpopoly contract page.
 // ========================================
-import { contract_view_fun } from "./contract_view";
+import { near_kit_client } from "@near-kit-tool-box/web";
+import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
 // ========================================
 export interface HUGGIES_PUMPOPOLY_PLAYER {
   land_count: number;
@@ -55,13 +56,15 @@ export async function load_pumpopoly_page_fun(
   account_id: string | null,
 ): Promise<HUGGIES_PUMPOPOLY_DATA> {
   const errors: string[] = [];
+  const near = near_kit_client();
   let player: HUGGIES_PUMPOPOLY_PLAYER | null = null;
   let nft_token_ids: string[] = [];
 
   if (account_id !== null) {
     try {
       player = parse_player_fun(
-        await contract_view_fun<unknown>(
+        await near_kit_contract_view_fun_json<unknown>(
+          near,
           "world.pumpopoly.near",
           "view_player",
           { account_id },
@@ -73,11 +76,13 @@ export async function load_pumpopoly_page_fun(
       );
     }
     try {
-      const raw = await contract_view_fun<Array<{ token_id?: unknown }>>(
-        "nft.pumpopoly.near",
-        "nft_tokens_for_owner",
-        { account_id, from_index: "0", limit: 500 },
-      );
+      const raw = await near_kit_contract_view_fun_json<
+        Array<{ token_id?: unknown }>
+      >(near, "nft.pumpopoly.near", "nft_tokens_for_owner", {
+        account_id,
+        from_index: "0",
+        limit: 500,
+      });
       nft_token_ids = raw
         .map((token) => token.token_id)
         .filter((token_id): token_id is string => typeof token_id === "string");

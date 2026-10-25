@@ -12,7 +12,8 @@
 // intear `price_usd`, and the pool is shown next to it so the two can
 // be compared.
 // ========================================
-import { contract_view_fun } from "./contract_view";
+import { near_kit_client } from "@near-kit-tool-box/web";
+import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
 import {
   HUGGIES_SHIT_DECIMALS,
   HUGGIES_SHIT_MAIN_POOL,
@@ -91,7 +92,8 @@ function raw_to_human_fun(raw: string, decimals: number): number {
 // ========================================
 // fetch the ref finance pool this token is priced against.
 async function fetch_shit_pool_fun(): Promise<HUGGIES_SHIT_POOL | null> {
-  const pool = await contract_view_fun<HUGGIES_SHIT_POOL>(
+  const pool = await near_kit_contract_view_fun_json<HUGGIES_SHIT_POOL>(
+    near_kit_client(),
     HUGGIES_REF_CONTRACT_ID,
     "get_pool",
     { pool_id: HUGGIES_SHIT_POOL_ID },

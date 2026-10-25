@@ -1,8 +1,11 @@
 // ========================================
 // data loader for the Rhea AMM contract page.
 // ========================================
-import { contract_view_fun } from "./contract_view";
-import { rhea_amm_pool_shares_batch_fun } from "./rhea_amm_pool_shares";
+import { near_kit_client } from "@near-kit-tool-box/web";
+import {
+  near_kit_contract_view_fun_json,
+  rhea_ammv2_get_pool_shares_batch_fun_json,
+} from "../../../middleman/near_kit_tool_box";
 // ========================================
 const HUGGIES_RHEA_AMM_POOL_LIMIT = 500;
 const HUGGIES_RHEA_AMM_SHARE_BATCH_LIMIT = 100;
@@ -26,20 +29,21 @@ export async function load_rhea_amm_page_fun(
   account_id: string | null,
 ): Promise<HUGGIES_RHEA_AMM_DATA> {
   const contract_id = "v2.ref-finance.near";
+  const near = near_kit_client();
   const errors: string[] = [];
   let pools: HUGGIES_RHEA_AMM_POOL[] = [];
   let deposits: Record<string, string> = {};
   const shares: Record<string, string> = {};
 
   try {
-    const raw = await contract_view_fun<
+    const raw = await near_kit_contract_view_fun_json<
       Array<{
         pool_kind: string;
         token_account_ids: string[];
         amounts: string[];
         shares_total_supply: string;
       }>
-    >(contract_id, "get_pools", {
+    >(near, contract_id, "get_pools", {
       from_index: 0,
       limit: HUGGIES_RHEA_AMM_POOL_LIMIT,
     });
@@ -56,11 +60,9 @@ export async function load_rhea_amm_page_fun(
 
   if (account_id !== null) {
     try {
-      const value = await contract_view_fun<Record<string, string>>(
-        contract_id,
-        "get_deposits",
-        { account_id },
-      );
+      const value = await near_kit_contract_view_fun_json<
+        Record<string, string>
+      >(near, contract_id, "get_deposits", { account_id });
       deposits = value;
     } catch (err) {
       errors.push(
@@ -77,7 +79,9 @@ export async function load_rhea_amm_page_fun(
         offset + HUGGIES_RHEA_AMM_SHARE_BATCH_LIMIT,
       );
       try {
-        const values = await rhea_amm_pool_shares_batch_fun(
+        const values = await rhea_ammv2_get_pool_shares_batch_fun_json(
+          near,
+          contract_id,
           batch.map((pool) => pool.pool_id),
           account_id,
         );

@@ -5,7 +5,7 @@ import { get_cached_pools_fun, put_cached_pools_fun } from "./pool_cache";
 import { load_rhea_amm_page_fun } from "./rhea_amm_page";
 import { load_rhea_dcl_page_fun } from "./rhea_dcl_page";
 import { load_intear_dex_page_fun } from "./intear_dex_page";
-import { intear_asset_token_id_fun } from "./intear_asset_token_id";
+import { intear_dex_asset_token_id_fun } from "../../../middleman/near_kit_tool_box";
 import {
   HUGGIES_POOL_DEX_NAMES,
   HUGGIES_POOL_SCOPE_LABELS,
@@ -64,7 +64,7 @@ function map_intear_pools_fun(
   return pools.map((pool, pool_id) => {
     const token_ids = pool.assets.map((asset) => {
       try {
-        return intear_asset_token_id_fun(asset.asset_id);
+        return intear_dex_asset_token_id_fun(asset.asset_id);
       } catch {
         return asset.asset_id;
       }

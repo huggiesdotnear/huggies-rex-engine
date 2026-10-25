@@ -12,7 +12,10 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
 import { HUGGIES_NETWORK } from "../ts/network";
 import { near_kit_client } from "@near-kit-tool-box/web";
-import { rhea_amm_pool_shares_batch_fun } from "../ts/rhea_amm_pool_shares";
+import {
+  rhea_ammv2_get_number_of_pools_fun_json,
+  rhea_ammv2_get_pool_shares_batch_fun_json,
+} from "../../../middleman/near_kit_tool_box";
 // ========================================
 const HUGGIES_RHEA_AMM_POOL_CAP = 500;
 const HUGGIES_RHEA_AMM_BATCH_LIMIT = 100;
@@ -29,13 +32,10 @@ async function fetch_rhea_amm_rows_fun(
 ): Promise<ReadonlyArray<HUGGIES_RHEA_AMM_ROW>> {
   const near = near_kit_client();
   const contract_id = rhea_ammv2_contractid(HUGGIES_NETWORK);
-  const pool_count = await near.view<number>(
+  const pool_count = await rhea_ammv2_get_number_of_pools_fun_json(
+    near,
     contract_id,
-    "get_number_of_pools",
   );
-  if (typeof pool_count !== "number" || !Number.isFinite(pool_count)) {
-    throw new Error("Rhea get_number_of_pools returned an invalid value");
-  }
   const checked_pool_count = Math.min(
     Math.max(0, Math.trunc(pool_count)),
     HUGGIES_RHEA_AMM_POOL_CAP,
@@ -61,7 +61,12 @@ async function fetch_rhea_amm_rows_fun(
       },
       (_value, index) => offset + index,
     );
-    const shares = await rhea_amm_pool_shares_batch_fun(pool_ids, account_id);
+    const shares = await rhea_ammv2_get_pool_shares_batch_fun_json(
+      near,
+      contract_id,
+      pool_ids,
+      account_id,
+    );
     shares.forEach((amount, index) => {
       if (amount === "0") return;
       const pool_id = pool_ids[index];
