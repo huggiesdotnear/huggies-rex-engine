@@ -1,0 +1,137 @@
+/*==================================*/
+/* unified token amount display: the shared account/holders amount
+   block, and the emojifi spotlight on the discover page.
+   the holders table reuses the account table's look (same class names
+   where the meaning matches), so the two tables read the same. */
+/*==================================*/
+/* --- account row: raw unit amount --- */
+/* the exact on-chain integer, printed under the decimal amount. */
+.huggies-balance-table .huggies-unit-amount {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  padding-left: 26px;
+  font-variant-numeric: tabular-nums;
+}
+/* --- holders table --- */
+/* the holders table has five columns, so it cannot use the account
+   table's single stacked column. the account cell stays wide and the
+   three amount columns share what is left. */
+.huggies-token-holders table {
+  table-layout: fixed;
+}
+.huggies-token-holders th.huggies-holder-rank,
+.huggies-token-holders td.huggies-holder-rank {
+  width: 34px;
+  text-align: right;
+  opacity: 0.6;
+}
+.huggies-token-holders th.huggies-holder-account,
+.huggies-token-holders td.huggies-holder-account {
+  width: 34%;
+}
+.huggies-token-holders th.huggies-holder-unit,
+.huggies-token-holders td.huggies-holder-unit {
+  width: 26%;
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-token-holders th.huggies-holder-amount,
+.huggies-token-holders td.huggies-holder-amount {
+  width: 22%;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-token-holders th.huggies-holder-usd,
+.huggies-token-holders td.huggies-holder-usd {
+  width: 18%;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+/* the holder column headers stay in the small uppercase label style
+   the rest of the token page uses. */
+.huggies-token-holders th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/* =================================== */
+/* --- emojifi spotlight --- */
+/* the spotlight sits above the general token list on discover. */
+.huggies-emoji-spotlight {
+  text-align: left;
+  margin-bottom: 18px;
+}
+.huggies-emoji-spotlight-title {
+  text-align: left;
+  font-size: 15px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+.huggies-emoji-spotlight-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 420px;
+  overflow-y: auto;
+  width: 100%;
+  min-width: 0;
+}
+.huggies-emoji-spotlight-row {
+  display: grid;
+  grid-template-columns: 28px 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  padding: 9px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+.huggies-emoji-spotlight-emoji {
+  font-size: 20px;
+  line-height: 1;
+  text-align: center;
+}
+.huggies-emoji-spotlight-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.huggies-emoji-spotlight-icon.is-empty {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+}
+.huggies-emoji-spotlight-copy,
+.huggies-emoji-spotlight-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.huggies-emoji-spotlight-copy span,
+.huggies-emoji-spotlight-copy code,
+.huggies-emoji-spotlight-values span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-emoji-spotlight-copy code {
+  font-size: 10px;
+  opacity: 0.55;
+}
+.huggies-emoji-spotlight-values {
+  align-items: flex-end;
+  font-size: 12px;
+  opacity: 0.8;
+}
+/*==================================*/

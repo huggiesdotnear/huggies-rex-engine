@@ -1,10 +1,15 @@
 /*==================================*/
+/* the single 500px column every page renders into.
+   flex-start (not center) so a long page starts at the top
+   instead of being vertically centered around the viewport.
+   the fixed bottom nav is cleared by body's 100px padding-bottom,
+   which sits below this 100vh box. */
 main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 500px;
   max-width: 90vw;
   box-sizing: border-box;
@@ -13,5 +18,17 @@ main {
   margin-bottom: 20px;
   /*----------------------*/
   /*border: 1px solid purple;*/
+}
+/*==================================*/
+/* shared page-content wrapper.
+   every page body sits inside this so nested content can never
+   break out of the main column: width:100% + min-width:0 keeps
+   grids and long ids from stretching the flex item. */
+.huggies-page {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  min-width: 0;
 }
 /*==================================*/

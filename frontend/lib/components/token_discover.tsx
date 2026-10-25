@@ -10,6 +10,7 @@ import {
   type HUGGIES_TOKEN_SEARCH_RESULT,
 } from "../ts/token_search";
 import { token_detail_href_fun } from "../ts/token_link";
+import { HUGGIES_COMPONENT_EMOJI_SPOTLIGHT_FUN } from "./emoji_spotlight";
 // ========================================
 const HUGGIES_TOKEN_SEARCH_DELAY_MS = 350;
 // ========================================
@@ -94,6 +95,8 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
 
   return (
     <section class="huggies-token-discover">
+      {/* the emojifi spotlight sits above the general token list. */}
+      <HUGGIES_COMPONENT_EMOJI_SPOTLIGHT_FUN />
       <label class="huggies-token-search">
         <span>SEARCH TOKENS</span>
         <input

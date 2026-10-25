@@ -16,6 +16,9 @@ import { load_token_pools_fun } from "../ts/token_pools";
 import { pool_scope_label_fun } from "../ts/pool_load";
 import { token_detail_href_fun } from "../ts/token_link";
 import { current_app_depth_fun } from "../ts/app_depth";
+import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
+import { token_holder_row_fun } from "../ts/token_holder_row";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
 import type { HUGGIES_POOL } from "../ts/pool";
 // ========================================
 // read the token id from the page query string.
@@ -35,20 +38,6 @@ function token_metadata_row_fun(
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
-  );
-}
-// ========================================
-// render one indexed holder row.
-function holder_row_fun(holder: HUGGIES_TOKEN_HOLDER): preact.JSX.Element {
-  return (
-    <tr>
-      <td>
-        <a href={`../account.html?id=${encodeURIComponent(holder.account_id)}`}>
-          {holder.account_id}
-        </a>
-      </td>
-      <td>{holder.balance}</td>
-    </tr>
   );
 }
 // ========================================
@@ -91,6 +80,9 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
   const [pools, set_pools] = use_state<HUGGIES_POOL[]>([]);
   const [loading_more, set_loading_more] = use_state(false);
   const [error, set_error] = use_state<string | null>(null);
+  // the token's decimals and price, needed to turn a raw holder
+  // balance into a readable amount and a usd value.
+  const [info, set_info] = use_state<HUGGIES_TOKEN_INFO | null>(null);
 
   use_effect(() => {
     if (token_id === null) return;
@@ -100,14 +92,16 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
       fetch_token_detail_fun(token_id),
       fetch_token_holders_fun(token_id, null),
       load_token_pools_fun(token_id),
+      HUGGIES_TOKEN_INFO.get([token_id]),
     ])
-      .then(([token, holder_page, token_pools]) => {
+      .then(([token, holder_page, token_pools, info_map]) => {
         if (cancelled) return;
         set_detail(token);
         set_holders(holder_page.rows);
         set_holder_total(holder_page.total);
         set_next_cursor(holder_page.next_cursor);
         set_pools(token_pools);
+        set_info(info_map.get(token_id) ?? null);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -179,6 +173,14 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
           </a>
         )}
       </section>
+      {detail.id === HUGGIES_SHIT_TOKEN_ID && (
+        <a
+          class="huggies-token-special-link"
+          href={`${"../".repeat(current_app_depth_fun())}shit-1170.html`}
+        >
+          OPEN THE $SHIT HOLDERS PAGE
+        </a>
+      )}
       {detail.description !== null && (
         <p class="huggies-token-description">{detail.description}</p>
       )}
@@ -197,11 +199,40 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
           <table>
             <thead>
               <tr>
-                <th>ACCOUNT</th>
-                <th>BALANCE</th>
+                <th class="huggies-holder-rank">#</th>
+                <th class="huggies-holder-account">ACCOUNT</th>
+                <th class="huggies-holder-unit">UNITS</th>
+                <th class="huggies-holder-amount">BALANCE</th>
+                <th class="huggies-holder-usd">USD</th>
               </tr>
             </thead>
-            <tbody>{holders.map((holder) => holder_row_fun(holder))}</tbody>
+            <tbody>
+              {holders.map((holder, index) =>
+                info === null ? (
+                  <tr key={holder.account_id}>
+                    <td class="huggies-holder-rank">{index + 1}</td>
+                    <td class="huggies-holder-account">
+                      <a
+                        href={`${"../".repeat(current_app_depth_fun())}account.html?id=${encodeURIComponent(holder.account_id)}`}
+                      >
+                        {holder.account_id}
+                      </a>
+                    </td>
+                    <td class="huggies-holder-unit">{holder.balance}</td>
+                    <td class="huggies-holder-amount">—</td>
+                    <td class="huggies-holder-usd">—</td>
+                  </tr>
+                ) : (
+                  token_holder_row_fun({
+                    key: holder.account_id,
+                    rank: index + 1,
+                    account_id: holder.account_id,
+                    balance: holder.balance,
+                    info,
+                  })
+                ),
+              )}
+            </tbody>
           </table>
         </div>
         {next_cursor !== null && (

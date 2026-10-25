@@ -5,7 +5,7 @@ pages and ui layout
 nav
 
 - index.html - FEED
-- swap.html - SWAP
+- game.html - GAME
 - account.html - PROFILE
 - discover.html - DISCOVER
 
@@ -19,11 +19,27 @@ transaction feed
 
 searchable token list and links to supported smart contracts
 
+the emojifi meme-token spotlight sits above the token list — see
+[`token.md`](./token.md#emoji-spotlight)
+
 #### TOKEN - frontend/app/tokens/token.html
 
 token metadata, indexed holders, and dex pools - ?id=
 
 see [`token.md`](./token.md)
+
+#### $SHIT - frontend/app/tokens/shit-1170.html
+
+the dedicated SHIT-1170 holders page - all indexed holders with the
+known-holder type tags and filters
+
+see [`shit-1170.md`](./shit-1170.md)
+
+#### GAME - frontend/app/game.html
+
+the emojifi emoji memory-match game
+
+see [`game.md`](./game.md)
 
 #### ACCOUNT - frontend/app/account.html
 
@@ -41,9 +57,22 @@ auth login page, auto redirects to account page if logged in
 
 multi-account sign in — see [`auth.md`](./auth.md)
 
-#### CONTRACTS - frontend/app/contracts/contract.html
+#### CONTRACTS - frontend/app/contracts/
+
+one html file per smart contract, served under `/app/contracts/`:
+
+- `rhea-amm.html`
+- `rhea-dcl-v2.html`
+- `intear-dex.html`
+- `sputnik-dao.html`
+- `pumpopoly.html`
 
 smart-contract details, pools, active-account internal balances, and LP positions
+
+the page reads the contract from the `data-contract` attribute on its
+mount element, so each file has a plain url. the legacy
+`frontend/app/contracts/contract.html?id=<contract-key>` route still works
+as a fallback.
 
 see [`contracts.md`](./contracts.md)
 

@@ -5,6 +5,7 @@ import {
   api_intear_holders_get,
   api_intear_tokens_get,
 } from "../../../middleman";
+import { token_row_by_name_fun } from "./token_row_by_name";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,
@@ -33,6 +34,11 @@ function to_finite_number_fun(value: unknown): number {
 }
 // ========================================
 // fetch one token's complete metadata record.
+// --- WHY --- the row is read by column NAME, not by index: the api
+// always returns `account_id` as the first column, even when it was
+// not requested, so a fixed index read is shifted by one — which put
+// the token id in the name slot and the icon data uri in the price
+// slot, so the icon never rendered.
 export async function fetch_token_detail_fun(
   token_id: string,
 ): Promise<HUGGIES_TOKEN_DETAIL | null> {
@@ -42,33 +48,30 @@ export async function fetch_token_detail_fun(
   });
   const row = response.rows[0];
   if (row === undefined) return null;
-  const [
-    name,
-    symbol,
-    decimals,
-    icon,
-    price_usd,
-    reputation,
-    holders,
-    liquidity_usd,
-    market_cap_usd,
-    socials,
-    description,
-    main_pool,
-    main_pool_url,
-  ] = row;
+  const cell = token_row_by_name_fun(response.columns, row);
+  const name = cell.name;
+  const symbol = cell.symbol;
+  const icon = cell.icon;
+  const socials = cell.socials;
+  const description = cell.description;
+  const main_pool = cell.main_pool;
+  const main_pool_url = cell.main_pool_url;
   return {
     id: token_id,
-    name: typeof name === "string" ? name : token_id,
-    symbol: typeof symbol === "string" ? symbol : token_id,
-    decimals: to_finite_number_fun(decimals),
-    icon: typeof icon === "string" ? icon : null,
-    price_usd: to_finite_number_fun(price_usd),
-    reputation: typeof reputation === "string" ? reputation : "Unknown",
-    holders: to_finite_number_fun(holders),
-    liquidity_usd: to_finite_number_fun(liquidity_usd),
-    market_cap_usd: to_finite_number_fun(market_cap_usd),
-    socials: socials !== null && typeof socials === "object" ? socials : {},
+    name: typeof name === "string" && name.length > 0 ? name : token_id,
+    symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : token_id,
+    decimals: to_finite_number_fun(cell.decimals),
+    icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+    price_usd: to_finite_number_fun(cell.price_usd),
+    reputation:
+      typeof cell.reputation === "string" ? cell.reputation : "Unknown",
+    holders: to_finite_number_fun(cell.holders),
+    liquidity_usd: to_finite_number_fun(cell.liquidity_usd),
+    market_cap_usd: to_finite_number_fun(cell.market_cap_usd),
+    socials:
+      socials !== null && typeof socials === "object"
+        ? (socials as Record<string, string>)
+        : {},
     description: typeof description === "string" ? description : null,
     main_pool: typeof main_pool === "string" ? main_pool : null,
     main_pool_url: typeof main_pool_url === "string" ? main_pool_url : null,

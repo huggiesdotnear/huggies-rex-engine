@@ -6,6 +6,7 @@
 @import url(./colors.css);
 @import url(./font.css);
 @import url(./body.css);
+@import url(./links.css);
 @import url(./button.css);
 /*@import url(./footer.css);*/
 @import url(./main.css);
@@ -15,4 +16,7 @@
 @import url(./contracts.css);
 @import url(./discover.css);
 @import url(./token.css);
+@import url(./token_amount.css);
+@import url(./game.css);
+@import url(./shit-1170.css);
 /*==================================*/

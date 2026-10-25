@@ -5,7 +5,10 @@ import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_AUTH } from "../ts/auth_status";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { list_contract_cards_fun } from "../ts/contract_cards";
+import {
+  contract_page_href_fun,
+  list_contract_cards_fun,
+} from "../ts/contract_cards";
 import { load_rhea_amm_page_fun } from "../ts/rhea_amm_page";
 import { load_rhea_dcl_page_fun } from "../ts/rhea_dcl_page";
 import { load_intear_dex_page_fun } from "../ts/intear_dex_page";
@@ -27,19 +30,38 @@ type HUGGIES_CONTRACT_DATA =
   | { kind: "sputnik-dao"; data: HUGGIES_SPUTNIK_DATA }
   | { kind: "pumpopoly"; data: HUGGIES_PUMPOPOLY_DATA };
 // ========================================
-// read the contract key from the page url.
+// narrow an arbitrary string to a known contract key.
+function as_contract_key_fun(
+  value: string | null,
+): HUGGIES_CONTRACT_KEY | null {
+  if (value === null) return null;
+  if (
+    value === "rhea-amm" ||
+    value === "rhea-dcl-v2" ||
+    value === "intear-dex" ||
+    value === "sputnik-dao" ||
+    value === "pumpopoly"
+  ) {
+    return value;
+  }
+  return null;
+}
+// ========================================
+// read the contract key from the mount element's data-contract
+// attribute, falling back to the ?id= query of the legacy shared
+// contract.html route.
 function get_contract_key_fun(): HUGGIES_CONTRACT_KEY {
   if (typeof window === "undefined") return "rhea-amm";
-  const key = new URLSearchParams(window.location.search).get("id");
-  if (
-    key === "rhea-amm" ||
-    key === "rhea-dcl-v2" ||
-    key === "intear-dex" ||
-    key === "sputnik-dao" ||
-    key === "pumpopoly"
-  ) {
-    return key;
-  }
+  const el = document.getElementById(
+    HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_PAGE,
+  );
+  const from_attr = el?.getAttribute("data-contract") ?? null;
+  const from_attr_key = as_contract_key_fun(from_attr);
+  if (from_attr_key !== null) return from_attr_key;
+  const from_query = as_contract_key_fun(
+    new URLSearchParams(window.location.search).get("id"),
+  );
+  if (from_query !== null) return from_query;
   return "rhea-amm";
 }
 // ========================================
@@ -434,7 +456,7 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
   }, [key, account_id]);
 
   return (
-    <div class="huggies-contract-page">
+    <div class="huggies-contract-page huggies-page">
       {render_contract_fun(key, data, account_id, errors)}
       {errors.length > 0 && (
         <details class="huggies-contract-errors">
@@ -448,7 +470,7 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
       )}
       <nav class="huggies-contract-links" aria-label="smart contracts">
         {list_contract_cards_fun().map((card) => (
-          <a href={card.route}>{card.title}</a>
+          <a href={contract_page_href_fun(card.page)}>{card.title}</a>
         ))}
       </nav>
     </div>

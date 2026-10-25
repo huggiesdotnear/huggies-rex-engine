@@ -1,0 +1,102 @@
+/*==================================*/
+.huggies-emoji-game {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+.huggies-emoji-game-header h1 {
+  margin: 0 0 0.25rem;
+  color: var(--color-backend);
+}
+.huggies-emoji-game-header p {
+  margin: 0 0 1rem;
+  color: #474747;
+}
+.huggies-emoji-game-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  color: #474747;
+}
+.huggies-emoji-game-stats strong {
+  color: var(--color-backend);
+}
+.huggies-emoji-game-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.4rem, 2vw, 0.75rem);
+}
+.huggies-emoji-game-card {
+  position: relative;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--color-backend);
+  color: var(--color-fontend);
+  box-shadow: 0 0.25rem 0 var(--color-backend-light);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+.huggies-emoji-game-card:hover:not(:disabled),
+.huggies-emoji-game-card:focus-visible:not(:disabled) {
+  transform: translateY(-0.125rem);
+}
+.huggies-emoji-game-card.revealed {
+  background: var(--color-middle);
+  box-shadow: 0 0.25rem 0 var(--color-middle-dark);
+}
+.huggies-emoji-game-card.matched {
+  background: var(--color-middle-dark);
+  cursor: default;
+}
+.huggies-emoji-game-card-face {
+  display: block;
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+  line-height: 1;
+}
+.huggies-emoji-game-card-icon {
+  position: absolute;
+  right: 0.3rem;
+  bottom: 0.3rem;
+  width: clamp(1rem, 5vw, 1.5rem);
+  height: clamp(1rem, 5vw, 1.5rem);
+  object-fit: contain;
+  border-radius: 50%;
+  background: var(--color-fontend);
+}
+.huggies-emoji-game-win {
+  margin: 1rem 0;
+  color: var(--color-backend);
+  font-weight: 700;
+}
+.huggies-emoji-game-new-game {
+  margin-top: 1rem;
+}
+.huggies-emoji-game-footer {
+  margin-top: 1.5rem;
+  text-align: left;
+  color: #474747;
+}
+.huggies-emoji-game-footer h2 {
+  color: var(--color-backend);
+}
+.huggies-emoji-game-footer ul {
+  padding-left: 1.25rem;
+}
+.huggies-emoji-game-footer a {
+  color: var(--color-middle-dark);
+}
+@media (max-width: 420px) {
+  .huggies-emoji-game-grid {
+    gap: 0.35rem;
+  }
+  .huggies-emoji-game-card {
+    border-radius: 0.5rem;
+  }
+}
+/*==================================*/

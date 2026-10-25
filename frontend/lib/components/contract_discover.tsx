@@ -3,14 +3,20 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { list_contract_cards_fun } from "../ts/contract_cards";
+import {
+  contract_page_href_fun,
+  list_contract_cards_fun,
+} from "../ts/contract_cards";
 // ========================================
 // shared smart-contract discover component.
 function HUGGIES_COMPONENT_CONTRACT_DISCOVER_FUN() {
   return (
     <div class="huggies-contract-cards">
       {list_contract_cards_fun().map((card) => (
-        <a class="huggies-contract-card" href={card.route}>
+        <a
+          class="huggies-contract-card"
+          href={contract_page_href_fun(card.page)}
+        >
           <strong>{card.title}</strong>
           <code>{card.contract_id}</code>
         </a>
