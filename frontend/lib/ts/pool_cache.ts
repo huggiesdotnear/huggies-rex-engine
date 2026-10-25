@@ -1,7 +1,8 @@
 // ========================================
-// indexeddb pool cache with one object store per supported dex.
+// indexeddb pool cache: one store per supported dex, holding every pool.
 // ========================================
 import {
+  HUGGIES_POOL_CACHE_TTL_MS,
   HUGGIES_POOL_STORE_NAMES,
   type HUGGIES_POOL,
   type HUGGIES_POOL_CACHE,
@@ -9,8 +10,7 @@ import {
 } from "./pool";
 // ========================================
 const HUGGIES_POOL_DB_NAME = "huggies_pools";
-const HUGGIES_POOL_DB_VERSION = 2;
-const HUGGIES_POOL_CACHE_TTL_MS = 5 * 60 * 1000;
+const HUGGIES_POOL_DB_VERSION = 3;
 const HUGGIES_POOL_CACHE_KEY = "cache";
 let pool_db_promise: Promise<IDBDatabase> | null = null;
 // ========================================
@@ -36,35 +36,31 @@ function open_pool_db_fun(): Promise<IDBDatabase> {
   return pool_db_promise;
 }
 // ========================================
-// read fresh cached pools for one dex.
+// read one dex's cached pool collection, with its metadata.
 export async function get_cached_pools_fun(
   dex: HUGGIES_POOL_DEX,
-): Promise<HUGGIES_POOL[]> {
+): Promise<HUGGIES_POOL_CACHE | null> {
   try {
     const db = await open_pool_db_fun();
     const store_name = HUGGIES_POOL_STORE_NAMES[dex];
-    return await new Promise<HUGGIES_POOL[]>((resolve) => {
+    return await new Promise<HUGGIES_POOL_CACHE | null>((resolve) => {
       const request = db
         .transaction(store_name, "readonly")
         .objectStore(store_name)
         .get(HUGGIES_POOL_CACHE_KEY);
       request.onsuccess = () => {
         const row = request.result as HUGGIES_POOL_CACHE | undefined;
-        if (
-          row === undefined ||
-          typeof row.fetched_at_millis !== "number" ||
-          Date.now() - row.fetched_at_millis >= HUGGIES_POOL_CACHE_TTL_MS
-        ) {
-          resolve([]);
+        if (row === undefined || typeof row.fetched_at_millis !== "number") {
+          resolve(null);
           return;
         }
-        resolve(row.pools ?? []);
+        resolve(row);
       };
-      request.onerror = () => resolve([]);
+      request.onerror = () => resolve(null);
     });
   } catch (err) {
     console.warn("[pool_cache] read failed", err);
-    return [];
+    return null;
   }
 }
 // ========================================
@@ -72,6 +68,7 @@ export async function get_cached_pools_fun(
 export async function put_cached_pools_fun(
   dex: HUGGIES_POOL_DEX,
   pools: ReadonlyArray<HUGGIES_POOL>,
+  total_pools: number,
 ): Promise<void> {
   try {
     const db = await open_pool_db_fun();
@@ -83,6 +80,8 @@ export async function put_cached_pools_fun(
       store.put({
         key: HUGGIES_POOL_CACHE_KEY,
         fetched_at_millis: Date.now(),
+        total_pools,
+        cached_pools: pools.length,
         pools,
       });
       tx.oncomplete = () => resolve();
@@ -92,6 +91,16 @@ export async function put_cached_pools_fun(
   } catch (err) {
     console.warn("[pool_cache] write failed", err);
   }
+}
+// ========================================
+// tell whether a cached collection is stale and needs a refresh.
+export function pool_cache_is_stale_fun(
+  cache: HUGGIES_POOL_CACHE,
+): boolean {
+  return (
+    Date.now() - cache.fetched_at_millis >= HUGGIES_POOL_CACHE_TTL_MS ||
+    cache.cached_pools < cache.total_pools
+  );
 }
 // ========================================
 // copyright 2026 by sleet.near

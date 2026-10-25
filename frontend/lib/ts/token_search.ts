@@ -1,11 +1,14 @@
 // ========================================
-// fuzzy token search with a stable ordered initial token list.
+// fuzzy token search with a sortable token list.
 // ========================================
 import {
   api_intear_tokens_get,
-  api_intear_tokens_search,
 } from "../../../middleman";
 import { token_row_by_name_fun } from "./token_row_by_name";
+import {
+  HUGGIES_DEFAULT_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT,
+} from "./token_sort";
 // ========================================
 export interface HUGGIES_TOKEN_SEARCH_RESULT {
   id: string;
@@ -17,6 +20,7 @@ export interface HUGGIES_TOKEN_SEARCH_RESULT {
   reputation: string;
   holders: number;
   volume_usd_24h: number;
+  market_cap_usd: number;
 }
 const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "name",
@@ -27,6 +31,7 @@ const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "reputation",
   "holders",
   "volume_usd_24h",
+  "market_cap_usd",
 ] as const;
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
@@ -40,8 +45,8 @@ function to_finite_number_fun(value: unknown): number {
 // always returns `account_id` as the first column, even when it was
 // not requested, so a fixed index read is shifted by one — which is
 // what made every token render without its icon (the icon slot got
-// the price, which is not a string) and every symbol fall back to the
-// token id.
+// the price, which is not a string) and every symbol fall back to
+// the token id.
 function map_token_search_row_fun(
   columns: ReadonlyArray<string>,
   row: readonly (string | number | null)[],
@@ -62,30 +67,17 @@ function map_token_search_row_fun(
     reputation: typeof reputation === "string" ? reputation : "Unknown",
     holders: to_finite_number_fun(cell.holders),
     volume_usd_24h: to_finite_number_fun(cell.volume_usd_24h),
+    market_cap_usd: to_finite_number_fun(cell.market_cap_usd),
   };
 }
 // ========================================
-// fetch the initial ordered token list.
-export async function fetch_initial_tokens_fun(): Promise<
-  HUGGIES_TOKEN_SEARCH_RESULT[]
-> {
+// fetch the initial token list in the chosen sort order.
+export async function fetch_initial_tokens_fun(
+  sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
+): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_SEARCH_FIELDS,
-    sort: { by: "volume_usd_24h", desc: true },
-    limit: 100,
-  });
-  return response.rows.map((row) =>
-    map_token_search_row_fun(response.columns, row),
-  );
-}
-// ========================================
-// fetch fuzzy token search results for a query.
-export async function search_tokens_fun(
-  query: string,
-): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
-  const response = await api_intear_tokens_search({
-    q: query,
-    fields: HUGGIES_TOKEN_SEARCH_FIELDS,
+    sort: { by: sort, desc: true },
     limit: 100,
   });
   return response.rows.map((row) =>

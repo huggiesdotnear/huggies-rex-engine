@@ -1,3 +1,106 @@
+/* --- shared balance panel ---
+   the panel is the balance table look under a different wrapper, so
+   the contract pages and the dao page show balances exactly like the
+   account page does. */
+.huggies-balance-panel {
+  margin-top: 20px;
+}
+.huggies-balance-panel .huggies-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.huggies-balance-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  table-layout: fixed;
+}
+.huggies-balance-panel td {
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  vertical-align: top;
+  width: 100%;
+}
+.huggies-balance-panel .huggies-row-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.huggies-balance-panel .huggies-token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+.huggies-balance-panel .huggies-token-icon--empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.huggies-balance-panel .huggies-ticker {
+  font-weight: bold;
+  flex: none;
+  white-space: nowrap;
+}
+.huggies-balance-panel .huggies-amounts {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.huggies-balance-panel .huggies-amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.huggies-balance-panel .huggies-usd {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.huggies-balance-panel .huggies-unit-amount {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.5;
+  display: block;
+  padding-left: 26px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-balance-panel .huggies-contract {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.35;
+  margin-top: 2px;
+  padding-left: 26px;
+}
+.huggies-balance-panel tfoot th {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.huggies-balance-panel .huggies-total-usd {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-balance-panel p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
+}
 /*==================================*/
 /* account page: account id h1 + balance tables
    the balance table look lives on .huggies-balance-table, NOT on a
@@ -5,6 +108,109 @@
    deposits, anything added later) shares one appearance by adding that
    class. scoping these to a mount id instead would mean restating all
    of it per component, which is how the two tables drifted apart. */
+/* --- shared balance panel ---
+   the panel is the balance table look under a different wrapper, so
+   the contract pages and the dao page show balances exactly like the
+   account page does. */
+.huggies-balance-panel {
+  margin-top: 20px;
+}
+.huggies-balance-panel .huggies-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.huggies-balance-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  table-layout: fixed;
+}
+.huggies-balance-panel td {
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  vertical-align: top;
+  width: 100%;
+}
+.huggies-balance-panel .huggies-row-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.huggies-balance-panel .huggies-token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+.huggies-balance-panel .huggies-token-icon--empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.huggies-balance-panel .huggies-ticker {
+  font-weight: bold;
+  flex: none;
+  white-space: nowrap;
+}
+.huggies-balance-panel .huggies-amounts {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.huggies-balance-panel .huggies-amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.huggies-balance-panel .huggies-usd {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.huggies-balance-panel .huggies-unit-amount {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.5;
+  display: block;
+  padding-left: 26px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-balance-panel .huggies-contract {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.35;
+  margin-top: 2px;
+  padding-left: 26px;
+}
+.huggies-balance-panel tfoot th {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.huggies-balance-panel .huggies-total-usd {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-balance-panel p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
+}
 /*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
   /* body centers text; the heading reads better flush left. */
@@ -17,6 +223,12 @@
   border-bottom: 1px solid #474747;
   padding-bottom: 8px;
   margin-bottom: 16px;
+  /* a long account id wraps instead of stretching the page. */
+  font-family: monospace;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
 }
 /* --- shared table block --- */
 .huggies-balance-table {
@@ -124,15 +336,15 @@
   white-space: nowrap;
   opacity: 0.85;
 }
-/* the full contract id on its own line, clipped so one long id cannot
-   stretch the row. the complete value stays in the title tooltip. */
+/* the full contract id on its own line. it wraps so one long id
+   cannot stretch the row, and the complete value stays selectable. */
 .huggies-balance-table .huggies-contract {
   font-family: monospace;
   font-size: 11px;
   opacity: 0.55;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.35;
   margin-top: 2px;
   padding-left: 26px;
 }
@@ -187,9 +399,123 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* a long dcl pool id wraps inside the pair cell instead of stretching
+   the row past the page. */
+.huggies-balance-table .huggies-contract,
+.huggies-balance-table .huggies-lp-pool-id {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.6;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.35;
+}
 .huggies-balance-table .huggies-lp-shares {
   margin-left: auto;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+/* --- shared balance panel ---
+   the panel is the balance table look under a different wrapper, so
+   the contract pages and the dao page show balances exactly like the
+   account page does. */
+.huggies-balance-panel {
+  margin-top: 20px;
+}
+.huggies-balance-panel .huggies-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.huggies-balance-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  table-layout: fixed;
+}
+.huggies-balance-panel td {
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  vertical-align: top;
+  width: 100%;
+}
+.huggies-balance-panel .huggies-row-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.huggies-balance-panel .huggies-token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+.huggies-balance-panel .huggies-token-icon--empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.huggies-balance-panel .huggies-ticker {
+  font-weight: bold;
+  flex: none;
+  white-space: nowrap;
+}
+.huggies-balance-panel .huggies-amounts {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.huggies-balance-panel .huggies-amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.huggies-balance-panel .huggies-usd {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.huggies-balance-panel .huggies-unit-amount {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.5;
+  display: block;
+  padding-left: 26px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-balance-panel .huggies-contract {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.35;
+  margin-top: 2px;
+  padding-left: 26px;
+}
+.huggies-balance-panel tfoot th {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.huggies-balance-panel .huggies-total-usd {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-balance-panel p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
 }
 /*==================================*/

@@ -14,13 +14,13 @@ financial advice.
 `frontend/lib/css/game.css` styles the game and must be imported by
 `frontend/lib/css/import.css`.
 
-the game page is visually isolated from the rest of the app: the page body
-carries the `huggies-emoji-game-body` class and the game board uses its own
-light palette (`--game-bg`, `--game-primary`, `--game-accent`, `--game-matched`),
-so the shared theme rules cannot leak into the board. the layout follows the
-original emojifi project — a rounded light card with a four-by-four grid,
-one accent color for revealed cards and one for matched cards.
+the board keeps the emojifi shape — a four-by-four grid of square cards —
+but every colour comes from the app's own palette, so the game reads as part
+of the site rather than a pasted-in page. the emojifi light background was
+dropped because it fought the app's red.
 
-=====================
-<br/>
-copyright 2026 by sleet.near
+## THE GAME LINK
+
+the game is not in the nav. it is linked from the bottom of the discover
+page, under the auth button, as a quiet easter egg — see
+`lib/components/game_link.tsx`.

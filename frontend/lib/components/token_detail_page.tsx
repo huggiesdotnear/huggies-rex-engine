@@ -13,11 +13,11 @@ import type {
   HUGGIES_TOKEN_HOLDER,
 } from "../ts/token_detail";
 import { load_token_pools_fun } from "../ts/token_pools";
-import { pool_scope_label_fun } from "../ts/pool_load";
 import { token_detail_href_fun } from "../ts/token_link";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
+import { format_price_usd_fun } from "../ts/token_price_format";
 import { token_holder_row_fun } from "../ts/token_holder_row";
 import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
 import type { HUGGIES_POOL } from "../ts/pool";
@@ -85,19 +85,10 @@ function pool_row_fun(
   );
 }
 // ========================================
-// render the bounded pool scope for one dex.
-function pool_scope_fun(pool: HUGGIES_POOL): preact.JSX.Element {
-  return (
-    <p class="huggies-token-pool-scope">
-      {pool.dex_name}: {pool_scope_label_fun(pool.dex)}
-    </p>
-  );
-}
-// ========================================
 // token detail page component.
 function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
   const token_id = token_id_from_url_fun();
-  const [input_id, set_input_id] = use_state(token_id ?? "");
+  const [input_id, set_input_id] = use_state<string>(token_id ?? "");
   const [detail, set_detail] = use_state<HUGGIES_TOKEN_DETAIL | null>(null);
   const [holders, set_holders] = use_state<HUGGIES_TOKEN_HOLDER[]>([]);
   const [holder_total, set_holder_total] = use_state(0);
@@ -177,23 +168,21 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
       <section class="huggies-token-search-card">
         <label>
           <span>TOKEN ACCOUNT ID</span>
-          <div class="huggies-token-search-row">
-            <input
-              type="text"
-              value={input_id}
-              placeholder="token.near"
-              onInput={(event) => {
-                set_input_id((event.currentTarget as HTMLInputElement).value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") open_token_fun();
-              }}
-            />
-            <button type="button" onClick={open_token_fun}>
-              OPEN TOKEN
-            </button>
-          </div>
+          <input
+            type="text"
+            value={input_id}
+            placeholder="token.near"
+            onInput={(event) => {
+              set_input_id((event.currentTarget as HTMLInputElement).value);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") open_token_fun();
+            }}
+          />
         </label>
+        <button type="button" onClick={open_token_fun}>
+          OPEN TOKEN
+        </button>
       </section>
       {token_id === null ? (
         <p>TOKEN ID MISSING</p>
@@ -220,7 +209,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
           <section class="huggies-token-meta">
             {token_metadata_row_fun(
               "PRICE",
-              `$${detail.price_usd.toLocaleString()}`,
+              format_price_usd_fun(detail.price_usd),
             )}
             {token_metadata_row_fun("REPUTATION", detail.reputation)}
             {token_metadata_row_fun(
@@ -229,11 +218,11 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
             )}
             {token_metadata_row_fun(
               "LIQUIDITY",
-              `$${detail.liquidity_usd.toLocaleString()}`,
+              format_price_usd_fun(detail.liquidity_usd),
             )}
             {token_metadata_row_fun(
               "MARKET CAP",
-              `$${detail.market_cap_usd.toLocaleString()}`,
+              format_price_usd_fun(detail.market_cap_usd),
             )}
             {token_metadata_row_fun("DECIMALS", String(detail.decimals))}
             {detail.main_pool !== null &&
@@ -329,15 +318,9 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
             {pools.length === 0 ? (
               <p>NO POOLS FOUND</p>
             ) : (
-              <>
-                {[...new Set(pools.map((pool) => pool.dex))].map((dex) => {
-                  const first = pools.find((pool) => pool.dex === dex);
-                  return first === undefined ? null : pool_scope_fun(first);
-                })}
-                <ul>
-                  {pools.map((pool) => pool_row_fun(pool, pool_info))}
-                </ul>
-              </>
+              <ul>
+                {pools.map((pool) => pool_row_fun(pool, pool_info))}
+              </ul>
             )}
           </section>
         </>

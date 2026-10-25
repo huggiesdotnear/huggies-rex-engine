@@ -6,9 +6,16 @@ the token id comes from the `?id=` query parameter. the page shows the
 indexed token metadata (name, symbol, decimals, icon, price, reputation,
 holders, liquidity, market cap, socials, description, and main pool when
 available), indexed holders with cursor pagination, and pools that contain
-the token across Rhea AMM, Rhea DCL, and INTEAR DEX/XYK. pool results are
-explicitly scoped to the first 500 Rhea AMM pools, first 500 Rhea DCL pools,
-and first 71 INTEAR DEX/XYK pools; pools outside those ranges are not shown.
+the token across Rhea AMM, Rhea DCL, and INTEAR DEX/XYK.
+
+the pool list is complete: the pool cache holds every pool each dex has,
+so a token's pools are found across the whole collection rather than a
+truncated first page. prices use `lib/ts/token_price_format.ts`, which
+grows the decimal count as a price gets smaller, so a token priced at
+0.00000012 does not read as a bare zero.
+
+the token id box at the top of the page is pre-filled with the token the
+page is showing and opens any other token when submitted.
 
 ## INDEXED HOLDERS
 
@@ -44,9 +51,22 @@ underneath them.
 ## TOKEN DISCOVER
 
 `frontend/app/discover.html` lists supported contracts and a searchable
-token list. the initial list uses `GET /tokens` ordered by 24-hour usd
-volume; search uses `GET /tokens/search` after a short debounce. stale
-responses are ignored.
+token list. the list can be sorted by **24-hour volume** or **market cap**
+with the shared sort control (`lib/components/sort_control.tsx`); the
+initial list uses `GET /tokens` in the chosen order. price is not shown in
+the list — it belongs on the token's own page.
+
+the fetched list is cached in IndexedDB (`lib/ts/token_list_cache.ts`), one
+entry per sort order. a revisit shows the cached list instantly, and the
+search box filters that cached copy locally rather than asking the api on
+every keystroke.
+
+## TOKEN LIST CACHE
+
+the token list lives in IndexedDB database `huggies_token_list`, store
+`lists`, keyed by the sort order it was fetched in. each entry holds the
+sort, the fetch time, and the full token rows. a cached list is served for
+one minute; after that the list is refetched and the cache replaced.
 
 the meme tokens from the emojifi project
 (<https://gitlab.com/sleet-dev/sleet_vibe/emojifi>) are part of that one
@@ -77,11 +97,28 @@ object store for each supported dex:
 - `pools_rhea_dcl`
 - `pools_intear_xyk`
 
-each entry is keyed by dex and pool id and stores the pool contract, its
-token ids, and raw token amounts. each dex store also records its fetch
-timestamp. a revisit reuses the cached dex pool collection for five
-minutes, then refreshes it from the contract so pool data does not stay
-permanently stale.
+each store holds that dex's **complete** pool collection, plus the pool
+count the contract reported and the number of pools actually cached. a
+collection is served straight from the cache when it is complete and less
+than five minutes old; a stale collection is still served immediately
+while a fresh copy is fetched in the background, so a search never waits
+on the chain.
+
+> --- WHY --- the cache holds every pool, not a first page. a token's
+> pool list and a pool search both run over the whole collection, so a
+> truncated cache would silently hide pools.
+
+## DEX POOL COUNTS
+
+the dex pages show the number of pools each dex actually holds:
+
+- Rhea AMM — `get_number_of_pools` (about 8991 on mainnet)
+- Rhea DCL — no count view exists, so the pages are walked until one
+  comes back short (about 6087 on mainnet)
+- INTEAR DEX / XYK — `get_pool_count` (302 on mainnet)
+
+Rhea AMM pages 2000 pools per call, Rhea DCL 500, and INTEAR 50 — a bigger
+INTEAR page runs the sub-dex out of gas.
 
 =====================
 <br/>

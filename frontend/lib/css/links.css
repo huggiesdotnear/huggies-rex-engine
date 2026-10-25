@@ -3,16 +3,28 @@
    scoped to main / .huggies-page so the fixed bottom nav keeps its
    own look (nav links are NOT underlined). links inherit the page
    text color instead of the browser default blue/purple, which is
-   unreadable on the red background. */
+   unreadable on the red background.
+
+   --- WHY --- links are NOT underlined by default. a page of cards
+   and rows is mostly links, and underlining every one of them turns
+   the page into a wall of stripes. an underline is added back only
+   where the link is the content itself, through .huggies-link-underline
+   or by hovering a card link. */
+/*==================================*/
 main a,
 .huggies-page a {
   color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
   overflow-wrap: anywhere;
 }
-main a:hover,
-.huggies-page a:hover {
+/* the opt-in underline, for links that are the content. */
+main a.huggies-link-underline,
+.huggies-page a.huggies-link-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+main a.huggies-link-underline:hover,
+.huggies-page a.huggies-link-underline:hover {
   text-decoration-thickness: 2px;
 }
 /* a code chip inside a link keeps its own small size, so the link

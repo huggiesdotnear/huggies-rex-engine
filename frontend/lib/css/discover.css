@@ -16,11 +16,21 @@
   padding-bottom: 6px;
   margin-bottom: 10px;
 }
+/* --- controls row: search + sort side by side --- */
+.huggies-token-discover-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-bottom: 12px;
+}
 .huggies-token-search {
   display: flex;
+  flex: 1 1 180px;
+  min-width: 0;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 .huggies-token-search span {
   font-family: Arial, Helvetica, sans-serif;
@@ -31,30 +41,71 @@
   width: 100%;
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 6px;
-  background: transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
   color: inherit;
-  padding: 9px 10px;
+  padding: 10px 12px;
   font: inherit;
 }
+.huggies-token-search input:focus {
+  outline: 2px solid var(--color-middle);
+  outline-offset: 1px;
+}
+/* --- shared sort control --- */
+.huggies-sort-control {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.huggies-sort-button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.huggies-sort-button.is-active {
+  opacity: 1;
+  background: var(--color-middle);
+  color: var(--color-fontend);
+}
+/* --- token rows --- */
 .huggies-token-results {
   display: flex;
   flex-direction: column;
-  max-height: 420px;
+  max-height: 460px;
   overflow-y: auto;
   width: 100%;
   min-width: 0;
+  gap: 6px;
 }
 .huggies-token-result {
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: inherit;
   text-decoration: none;
   text-align: left;
-  padding: 9px 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.huggies-token-result:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.24);
 }
 .huggies-token-result-icon {
   width: 32px;
@@ -86,9 +137,11 @@
 }
 .huggies-token-result-values {
   align-items: flex-end;
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
 }
+/* --- contract cards --- */
 .huggies-contract-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -102,8 +155,12 @@
   color: inherit;
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 6px;
-  padding: 9px;
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.huggies-contract-card:hover {
+  border-color: rgba(255, 255, 255, 0.45);
 }
 .huggies-contract-card code {
   font-size: 10px;

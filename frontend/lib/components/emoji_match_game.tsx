@@ -135,12 +135,16 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
         <p>Match all eight meme pairs.</p>
       </header>
       <div class="huggies-emoji-game-stats">
-        <span>
-          SCORE: <strong>{matched_pairs}</strong>/8
-        </span>
-        <span>
-          MOVES: <strong>{moves}</strong>
-        </span>
+        <div class="huggies-emoji-game-stat">
+          <strong>
+            {matched_pairs}/{HUGGIES_EMOJI_TOKENS.length}
+          </strong>
+          <span>PAIRS MATCHED</span>
+        </div>
+        <div class="huggies-emoji-game-stat">
+          <strong>{moves}</strong>
+          <span>MOVES</span>
+        </div>
       </div>
       <div class="huggies-emoji-game-grid" role="grid" aria-label="Memory game">
         {cards.map((card) => {

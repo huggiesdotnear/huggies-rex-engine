@@ -6,13 +6,19 @@ import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import {
   fetch_initial_tokens_fun,
-  search_tokens_fun,
   type HUGGIES_TOKEN_SEARCH_RESULT,
 } from "../ts/token_search";
 import { token_detail_href_fun } from "../ts/token_link";
 import { order_discover_tokens_fun } from "../ts/token_discover_order";
-// ========================================
-const HUGGIES_TOKEN_SEARCH_DELAY_MS = 350;
+import {
+  HUGGIES_DEFAULT_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT,
+} from "../ts/token_sort";
+import {
+  get_cached_token_list_fun,
+  put_cached_token_list_fun,
+} from "../ts/token_list_cache";
+import { huggies_sort_control_fun } from "./sort_control";
 // ========================================
 // render one token result as a link to its detail page.
 function token_result_row_fun(
@@ -31,27 +37,56 @@ function token_result_row_fun(
         <code>{token.id}</code>
       </span>
       <span class="huggies-token-result-values">
-        <span>${token.price_usd.toLocaleString()}</span>
-        <span>${token.volume_usd_24h.toLocaleString()} 24H VOLUME</span>
-        <span>{token.holders.toLocaleString()} holders</span>
+        <span>${token.volume_usd_24h.toLocaleString()} VOL</span>
+        <span>${token.market_cap_usd.toLocaleString()} MCAP</span>
       </span>
     </a>
   );
 }
 // ========================================
+// filter the cached list by a search query.
+function filter_tokens_fun(
+  tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
+  query: string,
+): HUGGIES_TOKEN_SEARCH_RESULT[] {
+  const needle = query.trim().toLowerCase();
+  if (needle.length === 0) return [...tokens];
+  return tokens.filter(
+    (token) =>
+      token.symbol.toLowerCase().includes(needle) ||
+      token.name.toLowerCase().includes(needle) ||
+      token.id.toLowerCase().includes(needle),
+  );
+}
+// ========================================
 // searchable token list component.
 function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
-  const [tokens, set_tokens] = use_state<HUGGIES_TOKEN_SEARCH_RESULT[] | null>(
-    null,
-  );
+  const [all_tokens, set_all_tokens] = use_state<
+    HUGGIES_TOKEN_SEARCH_RESULT[] | null
+  >(null);
   const [query, set_query] = use_state("");
+  const [sort, set_sort] = use_state<HUGGIES_TOKEN_SORT>(
+    HUGGIES_DEFAULT_TOKEN_SORT,
+  );
   const [error, set_error] = use_state<string | null>(null);
 
   use_effect(() => {
     let cancelled = false;
-    void fetch_initial_tokens_fun()
-      .then((rows) => {
-        if (!cancelled) set_tokens(order_discover_tokens_fun(rows));
+    set_error(null);
+    // --- WHY --- the list is cached in indexeddb, so a revisit shows
+    // it instantly and the search filters that cached copy locally
+    // instead of asking the api on every keystroke.
+    void get_cached_token_list_fun(sort)
+      .then((cached) => {
+        if (cached !== null && !cancelled) {
+          set_all_tokens(cached);
+          return;
+        }
+        return fetch_initial_tokens_fun(sort).then((rows) => {
+          if (cancelled) return;
+          set_all_tokens(rows);
+          void put_cached_token_list_fun(sort, rows);
+        });
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -60,51 +95,32 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [sort]);
 
-  use_effect(() => {
-    const trimmed = query.trim();
-    if (trimmed.length === 0) return;
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      void search_tokens_fun(trimmed)
-        .then((rows) => {
-          if (!cancelled) set_tokens(order_discover_tokens_fun(rows));
-        })
-        .catch((err: unknown) => {
-          if (cancelled) return;
-          set_error(err instanceof Error ? err.message : String(err));
-        });
-    }, HUGGIES_TOKEN_SEARCH_DELAY_MS);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [query]);
-
-  const on_input_fun = (event: Event) => {
-    const target = event.currentTarget as HTMLInputElement;
-    set_query(target.value);
-    if (target.value.trim().length === 0) {
-      void fetch_initial_tokens_fun()
-        .then((rows) => set_tokens(order_discover_tokens_fun(rows)))
-        .catch((err: unknown) => {
-          set_error(err instanceof Error ? err.message : String(err));
-        });
-    }
-  };
+  const tokens =
+    all_tokens === null
+      ? null
+      : order_discover_tokens_fun(filter_tokens_fun(all_tokens, query), sort);
 
   return (
     <section class="huggies-token-discover">
-      <label class="huggies-token-search">
-        <span>SEARCH TOKENS</span>
-        <input
-          type="search"
-          value={query}
-          placeholder="name or symbol"
-          onInput={on_input_fun}
-        />
-      </label>
+      <div class="huggies-token-discover-controls">
+        <label class="huggies-token-search">
+          <span>SEARCH TOKENS</span>
+          <input
+            type="search"
+            value={query}
+            placeholder="name or symbol"
+            onInput={(event) => {
+              set_query((event.currentTarget as HTMLInputElement).value);
+            }}
+          />
+        </label>
+        {huggies_sort_control_fun({
+          sort,
+          on_sort: (next) => set_sort(next),
+        })}
+      </div>
       {error !== null && <p>{error}</p>}
       {tokens === null ? (
         <p>LOADING TOKENS...</p>

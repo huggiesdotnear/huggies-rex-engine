@@ -5,7 +5,7 @@
 // it replaces frontend/lib/ts/intear_borsh.ts, which decoded the same
 // shapes with a second, parallel copy of the borsh reader.
 //
-// the shapes mirror `xyk_dex_types` in the INTEAR DEX source:
+// the shapes mirror the `xyk` types in the INTEAR DEX source:
 //   https://github.com/INTEARnear/dex/tree/main/dexes/xyk/types
 // ========================================
 import { BorshReader } from "./near_kit_borsh";
@@ -16,6 +16,7 @@ import type {
 } from "../types/intear_dex_xyk_types";
 // ========================================
 // read a `FeeReceiver`.
+// the variants are Account / Pool / Community.
 function near_kit_read_fee_receiver_fun(reader: BorshReader): number {
   const variant = reader.u8();
   if (variant === 0) {
@@ -42,6 +43,13 @@ function near_kit_skip_current_fees_fun(reader: BorshReader): void {
 
 // ========================================
 // skip a `FeeAmount` — the v2 per-receiver fee rule.
+// the variants are Fixed / Scheduled / Dynamic:
+//   Fixed(fraction)              -> u32
+//   Scheduled(start, end, curve) -> (u64, u32) + (u64, u32) + u8
+//   Dynamic(min, max)            -> u32 + u32
+// --- WHY --- this shape is the contract's own `FeeAmount` enum. an
+// earlier version of this decoder used a different layout, which made
+// every pool fail to decode and left the INTEAR DEX page empty.
 function near_kit_skip_fee_amount_fun(reader: BorshReader): void {
   const variant = reader.u8();
   if (variant === 0) {
@@ -65,7 +73,7 @@ function near_kit_skip_fee_amount_fun(reader: BorshReader): void {
 }
 
 // ========================================
-// skip a `FeeConfiguration`.
+// skip a `FeeConfiguration` — the v1 or v2 rule set.
 function near_kit_skip_fee_configuration_fun(reader: BorshReader): void {
   const variant = reader.u8();
   if (variant === 0) {
@@ -97,6 +105,13 @@ function near_kit_read_asset_with_balance_fun(
 
 // ========================================
 // read a `PoolView`.
+// the variants are Private / Public / Launch / LaunchV2.
+// --- WHY --- the field order follows the contract's own `PoolView`:
+// assets, then fees, then fee_configuration, then the variant's own
+// trailing fields. the launch pools carry a `phantom_liquidity` u128
+// that comes AFTER the fee blocks, not right after the assets — reading
+// it early shifts every following read by 16 bytes and makes the rest
+// of the list undecodable.
 export function near_kit_read_intear_pool_view_fun(
   reader: BorshReader,
 ): INTEAR_DEX_XYK_POOL_VIEW_TYPE {
@@ -130,6 +145,12 @@ export function near_kit_read_intear_pool_view_fun(
     reader.u8();
   } else if (variant === 1) {
     total_shares = reader.option((item) => item.u128().toString());
+  } else if (variant === 2) {
+    // phantom_liquidity_near
+    reader.u128();
+  } else {
+    // phantom_liquidity
+    reader.u128();
   }
 
   const kind =

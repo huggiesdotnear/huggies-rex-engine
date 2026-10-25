@@ -36,7 +36,8 @@ see [`shit-1170.md`](./shit-1170.md)
 
 #### GAME - frontend/app/game.html
 
-the emojifi emoji memory-match game
+the emojifi emoji memory-match game, in the huggies style. linked as a
+quiet easter egg at the bottom of the discover page, not in the nav.
 
 see [`game.md`](./game.md)
 

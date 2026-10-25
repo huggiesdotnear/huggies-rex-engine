@@ -1,5 +1,5 @@
 /*==================================*/
-/* smart-contract pages: stats, pool browsers, DAO controls. */
+/* smart-contract pages: stats, pool browser, dao, pumpopoly. */
 /*==================================*/
 .huggies-contract-page {
   width: 100%;
@@ -8,6 +8,14 @@
   text-align: left;
   min-width: 0;
 }
+.huggies-contract-page h2 {
+  text-align: left;
+  font-size: 18px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin: 20px 0 10px;
+}
+/* --- metadata list --- */
 .huggies-contract-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -31,30 +39,232 @@
   overflow-wrap: anywhere;
   font-weight: 700;
 }
-.huggies-contract-pool-controls {
+/* --- pool stats --- */
+.huggies-pool-stats,
+.huggies-dao-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 0.75rem;
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 }
-.huggies-contract-pool-controls label,
-.huggies-dao-selector label {
+.huggies-pool-stat,
+.huggies-dao-stat {
   display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.huggies-pool-stat-value,
+.huggies-dao-stat-value {
+  font-size: 26px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-pool-stat-label,
+.huggies-dao-stat-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/* --- pool controls --- */
+.huggies-pool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin: 1rem 0 0.6rem;
+}
+.huggies-pool-search {
+  display: flex;
+  flex: 1 1 200px;
+  min-width: 0;
   flex-direction: column;
   gap: 0.35rem;
 }
-.huggies-contract-pool-controls span,
-.huggies-dao-selector span {
+.huggies-pool-search span {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   letter-spacing: 0.06em;
   opacity: 0.75;
 }
-.huggies-contract-pool-controls input,
-.huggies-contract-pool-controls select,
-.huggies-dao-selector input,
-.huggies-dao-selector select {
+.huggies-pool-search input {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 0.7rem;
+  font: inherit;
+}
+/* the type filters are a row of buttons, not a dropdown: a dex has
+   thousands of tokens and a list that long cannot be scanned. */
+.huggies-pool-filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.huggies-pool-filter {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.huggies-pool-filter.is-active {
+  opacity: 1;
+  background: var(--color-middle);
+  color: var(--color-fontend);
+}
+.huggies-pool-count {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  opacity: 0.75;
+  margin: 0 0 0.75rem;
+}
+/* --- pool cards --- */
+.huggies-pool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.75rem;
+}
+.huggies-pool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  min-width: 0;
+}
+.huggies-pool-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+.huggies-pool-card-num {
+  font-size: 10px;
+  opacity: 0.6;
+  overflow-wrap: anywhere;
+}
+.huggies-pool-card-tokens {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.huggies-pool-card-token {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.2rem 0.5rem;
+  align-items: baseline;
+  min-width: 0;
+}
+.huggies-pool-card-token a {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-pool-card-amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+/* the full token id wraps instead of stretching the card. */
+.huggies-pool-card-id-full {
+  grid-column: 1 / -1;
+  font-size: 10px;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+.huggies-pool-card-link {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+/* --- dao ---
+   the dao header matches the account page's heading: the name on one
+   line, the account id under it, and a rule between them and the
+   page's content. */
+.huggies-dao-header {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+.huggies-dao-header h1 {
+  margin: 0 0 0.2rem;
+  font-size: 24px;
+}
+.huggies-dao-header code {
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+}
+.huggies-dao-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.huggies-dao-selector-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.huggies-dao-input,
+.huggies-dao-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.huggies-dao-input span,
+.huggies-dao-select span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.huggies-dao-input input,
+.huggies-dao-select select {
+  width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
@@ -62,92 +272,117 @@
   color: inherit;
   padding: 0.7rem;
   font: inherit;
+  font-family: monospace;
+  font-size: 13px;
 }
-.huggies-contract-pool-count {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  opacity: 0.75;
-}
-.huggies-contract-pool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
-}
-.huggies-contract-pool-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.12);
-  min-width: 0;
-}
-.huggies-contract-pool-card h3 {
-  margin: 0;
-  font-size: 16px;
-}
-.huggies-contract-pool-token {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-.huggies-contract-pool-token a {
-  overflow-wrap: anywhere;
-}
-.huggies-contract-pool-token code {
-  font-size: 11px;
-  opacity: 0.7;
-  overflow-wrap: anywhere;
-}
-.huggies-dao-selector {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 0.85rem;
-  margin-bottom: 1.25rem;
-  padding: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.12);
-}
-.huggies-dao-selector-row {
-  display: flex;
-  gap: 0.5rem;
-}
-.huggies-dao-selector-row input {
-  min-width: 0;
-}
-.huggies-dao-selector button {
+.huggies-dao-open {
   border: 0;
   border-radius: 8px;
-  padding: 0.65rem 0.8rem;
+  padding: 0.7rem 0.8rem;
   background: #ffffff;
   color: #2d2d2d;
   font-weight: 700;
   cursor: pointer;
 }
-.huggies-dao-balance-card {
-  grid-column: 1 / -1;
+.huggies-dao-open:hover {
+  background: #e9e9e9;
 }
-.huggies-dao-balance-card h2 {
+.huggies-dao-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.huggies-dao-role {
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  min-width: 0;
+}
+.huggies-dao-role h3 {
   margin: 0 0 0.5rem;
   font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
-.huggies-dao-balance-card ul {
+.huggies-dao-empty {
   margin: 0;
-  padding-left: 1.1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.6;
 }
-.huggies-dao-balance-card li {
+.huggies-dao-members {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.huggies-dao-members li {
+  min-width: 0;
+}
+.huggies-dao-members a {
+  display: block;
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+.huggies-dao-proposals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.huggies-dao-proposal {
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  min-width: 0;
+}
+.huggies-dao-proposal header {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.3rem 0;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
 }
-.huggies-dao-balance-card a,
-.huggies-dao-balance-card code {
+.huggies-dao-proposal-id {
+  font-weight: 700;
+}
+.huggies-dao-proposal-status {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+}
+.huggies-dao-proposal p {
+  margin: 0 0 0.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
+.huggies-dao-proposal footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.65;
+  flex-wrap: wrap;
+}
+.huggies-dao-proposal footer a {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/* --- contract cards + links --- */
 .huggies-contract-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -176,6 +411,7 @@
 .huggies-contract-errors li {
   overflow-wrap: anywhere;
 }
+/* --- pumpopoly --- */
 .huggies-pumpopoly-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -228,6 +464,7 @@
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
+  min-width: 0;
 }
 .huggies-pumpopoly-info span {
   font-family: Arial, Helvetica, sans-serif;
@@ -238,6 +475,7 @@
 .huggies-pumpopoly-info code {
   font-size: 12px;
   overflow-wrap: anywhere;
+  word-break: break-all;
 }
 .huggies-pumpopoly-nfts {
   list-style: none;
@@ -255,6 +493,7 @@
 .huggies-pumpopoly-nfts code {
   font-size: 11px;
   overflow-wrap: anywhere;
+  word-break: break-all;
 }
 .huggies-pumpopoly-invite {
   margin-top: 1rem;
