@@ -8,7 +8,8 @@ do not add classes here as they are something not written in stone.
 
 ```html
 <main>
-<!--==========================================--><h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1"></h1>
+<!--==========================================-->
+<h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1"></h1>
 <!--==========================================-->
 <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
 <!--==========================================-->
