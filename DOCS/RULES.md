@@ -6,7 +6,6 @@
 - please no camel case only snake_case or SCREAMING_SNAKE.
 - very important if i have a section of 4 lines of `========================================` as a commnet do not remove that. and follow the pattern on where those are so that when you create new files you add them.
 - frontend/lib/ts/import.ts is for components only, no other ts file should be impoted here and no other ts file should import components ts files
-- comment style: file headers are ≤ 6 lines (file purpose only, no implementation); functions have a single-line summary comment above them; non-obvious behavior (race conditions, library quirks, irreversible side effects, known-bug workarounds) gets a `// --- WHY ---` block of ≤ 4 lines placed *inline next to the relevant line*, never in the file header. never delete an existing WHY note — if it's already there, it's because the next reader needs the warning.
 
 =====================
 <br/>
