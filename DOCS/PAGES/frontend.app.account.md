@@ -1,14 +1,21 @@
 # frontend/app/account.html ?id={account_id}
 
-HUGGIES_COMPONENT_ACCOUNT_ID_H1
-
-HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE
-
-HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE
-
-HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE
-
-HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE
+```html
+<main>
+<!--==========================================--><h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1"></h1>
+<!--==========================================-->
+<div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
+<!--==========================================-->
+<div id="HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE"></div>
+<!--==========================================-->
+<div id="HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE"></div>
+<!--==========================================-->
+<div id="HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE"></div>
+<!--==========================================-->
+</main>
+<nav id="HUGGIES_COMPONENT_NAV"></nav>
+<div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+```
 
 =====================
 <br/>
