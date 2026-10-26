@@ -1,6 +1,6 @@
 // ========================================
-// dedicated SHIT token page: the holder tabs with the share of the
-// supply each group holds, the full holder list, and the token
+// dedicated SHIT token page: the holder tabs, the share of the supply
+// each group of holders holds, the full holder list, and the token
 // metadata at the bottom of the page.
 // ========================================
 import { render } from "preact";
@@ -141,10 +141,9 @@ function render_filters_fun(
 // ========================================
 // render the share of the supply each group of holders holds.
 //
-// the rows are the old SHIT info page's holder cards: a white card
-// with a coloured stripe down its left edge for the type, the icon and
-// the name on the left, and the count and the percentage on the right.
-// the row of the ACTIVE tab is the active one.
+// the groups are a grid of flat white cards, the old SHIT info page's
+// `.filter-btn` look, with a coloured stripe down the left edge for
+// the type. the card of the ACTIVE tab is the filled-in one.
 function render_groups_fun(
   groups: HUGGIES_SHIT_HOLDER_GROUP[],
   active_filter: HUGGIES_SHIT_ACTIVE_FILTER,
@@ -311,10 +310,10 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
   // the share of the supply each group of holders holds.
   const groups = shit_holder_groups_fun(holders);
 
-  if (loading) return <div class="huggies-shit-page">LOADING SHIT...</div>;
+  if (loading) return <div class="huggies-shit">LOADING SHIT...</div>;
 
   return (
-    <div class="huggies-shit-page huggies-page">
+    <div class="huggies-shit">
       {error !== null && <p class="huggies-shit-error">{error}</p>}
       <header class="huggies-shit-header">
         <h1>{HUGGIES_SHIT_TOKEN_ID}</h1>

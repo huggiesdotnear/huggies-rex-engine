@@ -1,9 +1,10 @@
 /*==================================*/
 /* $SHIT token page: holder tabs, the share of the supply each group */
 /* holds, the holder rows, and the metadata block at the bottom.       */
+/* the page column itself is the standard `main` / `.huggies-page` —   */
+/* this file only styles what is inside it.                            */
 /*==================================*/
-.huggies-shit-page {
-  width: 100%;
+.huggies-shit {
   text-align: left;
 }
 /*==================================*/
@@ -26,44 +27,57 @@
 }
 /*==================================*/
 /* the holder tabs */
-/* one emoji per holder type, all on a single row — the same tabs the  */
-/* original SHIT holder app has. they are its `.filter-btn` look: a   */
-/* white fill, an 8px radius and a 2px border. the percentage of each  */
-/* group lives in the HOLDERS BY GROUP list, not on the tab, so the    */
-/* tabs stay small.                                                    */
+/* one emoji per holder type, in the old page's `.filter-btn` look:   */
+/* a white fill, a 2px border and an 8px radius. the old page's        */
+/* `.filter-buttons` had its `display:flex` commented out, so its      */
+/* buttons flowed as inline blocks and wrapped into a centred grid —  */
+/* that is the layout here too, but on a fixed grid so every tab is    */
+/* the same width and the row spans the whole column.                  */
 /*==================================*/
 .huggies-shit-tabs {
-  display: flex;
+  display: grid;
+  /* seven tabs, one row, each an equal share of the column */
+  grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   margin-bottom: 12px;
 }
 .huggies-shit-tab {
   /* --- WHY --- the global button rule pins every button to the page
-  column width. these tabs are a row of small squares, so the width is
-  reset here and the flex row shares the column out between them. */
+  column width. these tabs are grid cells, so the width is reset here
+  and the grid hands out the columns instead. */
   width: auto;
   max-width: none;
-  flex: 1 1 0;
   min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 2px solid #dddddd;
   border-radius: 8px;
-  background: #ffffff;
+  /* --- WHY --- `background-color`, not the `background` shorthand. the
+  global button rule sets `background-color`, and a shorthand in one
+  rule does not reliably beat a longhand in another — the shorthand
+  resets every background longhand it does not name, but the longhand
+  in the other rule still wins on specificity and order. naming the
+  longhand directly is what makes the active fill land. */
+  background-color: #ffffff;
   color: inherit;
   font-size: 16px;
   line-height: 1;
   padding: 8px 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* --- WHY --- an explicit list, not `transition: all`. `all` also
+  transitions `background-color`, and the active fill then animates in
+  over 200ms — which reads as the fill not landing at all on a slow
+  frame. the fill is a state, not an effect: it should be there the
+  moment the tab changes. only the border animates. */
+  transition: border-color 0.2s ease;
 }
 .huggies-shit-tab:hover {
   border-color: var(--color-backend);
-  background: #f5f5f5;
+  background-color: #f5f5f5;
 }
 .huggies-shit-tab.is-active {
-  background: var(--color-middle);
+  background-color: var(--color-middle);
   border-color: var(--color-middle);
   color: #06181a;
 }
@@ -87,26 +101,35 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  /* the old page centres its filter row */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  /* three across, so six groups sit in two even rows */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
 .huggies-shit-group {
+  /* --- WHY --- the name sits on its own line above the numbers. three
+  across on a 500px column leaves each card about 145px, which is not
+  enough for the icon, the name, the count and the percentage on one
+  line — the names came out as "VA…" and "BU…". stacked, the name has
+  the whole width of the card. */
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
   box-sizing: border-box;
-  width: 100%;
-  padding: 8px 14px;
+  min-width: 0;
+  padding: 8px 10px;
   border: 2px solid #dddddd;
   border-left-width: 4px;
   border-radius: 8px;
-  background: #ffffff;
+  background-color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
-  transition: all 0.2s ease;
+  /* --- WHY --- an explicit list, not `transition: all`. `all` also
+  transitions `background-color`, and the active fill then animates in
+  over 200ms — which reads as the fill not landing at all on a slow
+  frame. the fill is a state, not an effect: it should be there the
+  moment the tab changes. only the border animates. */
+  transition: border-color 0.2s ease;
 }
 /* the coloured stripe down the left of a group row */
 .huggies-shit-group.is-dev {
@@ -134,7 +157,7 @@
    look — the border and the fill both turn. --- */
 .huggies-shit-group.is-active {
   border-color: var(--color-middle);
-  background: var(--color-middle);
+  background-color: var(--color-middle);
 }
 .huggies-shit-group.is-active .huggies-shit-group-name,
 .huggies-shit-group.is-active .huggies-shit-group-count,
@@ -144,42 +167,41 @@
 .huggies-shit-group-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
+  gap: 6px;
   min-width: 0;
 }
 .huggies-shit-group-icon {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
   flex: none;
 }
 .huggies-shit-group-name {
   color: #2d2d2d;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .huggies-shit-group-right {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: none;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
 }
 .huggies-shit-group-count {
   color: #666666;
-  font-size: 12px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 .huggies-shit-group-percent {
   /* --- WHY --- the share is the number the reader came for, so it is
-  the one thing in the row that never shrinks. the name takes the
-  slack instead and ellipsizes. */
-  min-width: 52px;
+  the one thing in the row that never shrinks. */
   text-align: right;
   color: #4caf50;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
