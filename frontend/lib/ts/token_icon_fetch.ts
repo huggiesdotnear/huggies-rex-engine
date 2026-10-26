@@ -69,12 +69,15 @@ export async function fetch_token_icons_fun(
   const out = new Map<string, string>();
   if (wanted.length === 0) return out;
 
-  // the ids we already have an icon for cost nothing to serve.
+  // the ids we already know about cost nothing to serve.
+  // --- WHY --- a CACHED record whose icon is null means the api
+  // answered for that token and it has no icon. treating it as
+  // "missing" made the page refetch on every single load: 23 of the
+  // top 300 tokens have no icon at all, so those 23 were missing
+  // forever and dragged the whole 300-token page with them. only a
+  // token that is NOT in the cache at all is missing.
   const cached = await HUGGIES_TOKEN_CACHE.get_many(wanted);
-  const missing = wanted.filter((id) => {
-    const hit = cached.get(id);
-    return hit === undefined || hit.icon === null;
-  });
+  const missing = wanted.filter((id) => !cached.has(id));
   for (const [id, hit] of cached) {
     if (hit.icon !== null) out.set(id, hit.icon);
   }

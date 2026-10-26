@@ -140,6 +140,13 @@ and the token page share one cache.
 > ascending. those are fetched by id over **POST**, whose body has a
 > 64KB limit rather than a url limit, so they fit in one request.
 
+> --- WHY --- a cached record whose icon is **null** means the api
+> answered for that token and it has no icon. it must not count as
+> "missing". 23 of the top 300 tokens have no icon at all, so treating
+> those as missing made them missing forever — and dragged the whole
+> 300-token page with them, so the icon page was refetched on every
+> single load. only a token that is not in the cache at all is missing.
+
 ### THE BACKGROUND REQUEST BUG
 
 > --- WHY --- the discover page used to call the api in the background
