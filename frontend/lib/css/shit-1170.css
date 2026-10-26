@@ -307,17 +307,6 @@
   border-left: 3px solid rgba(255, 255, 255, 0.3);
 }
 /*==================================*/
-/* legend */
-.huggies-shit-legend {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  line-height: 1.7;
-  opacity: 0.8;
-}
-/*==================================*/
 /* the metadata block at the bottom of the page */
 .huggies-shit-metadata {
   margin-top: 24px;

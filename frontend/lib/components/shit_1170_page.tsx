@@ -112,6 +112,9 @@ function render_metadata_fun(
 }
 // ========================================
 // render the filter tabs: one emoji per holder type.
+//
+// the tooltip on each tab is what the legend used to say — hovering
+// the emoji explains what that group of holders is.
 function render_filters_fun(
   active_filter: HUGGIES_SHIT_ACTIVE_FILTER,
   on_filter_fun: (filter: HUGGIES_SHIT_ACTIVE_FILTER) => void,
@@ -129,7 +132,7 @@ function render_filters_fun(
           }
           aria-selected={filter.key === active_filter}
           aria-label={filter.label}
-          title={filter.label}
+          title={`${filter.label} — ${filter.description}`}
           onClick={() => on_filter_fun(filter.key)}
         >
           {filter.icon !== "" ? filter.icon : "💩"}
@@ -213,26 +216,6 @@ function render_holder_fun(
         </span>
       </td>
     </tr>
-  );
-}
-// ========================================
-// the legend that explains the holder types.
-function render_legend_fun(): preact.JSX.Element {
-  return (
-    <p class="huggies-shit-legend">
-      🔄 dex accounts
-      <br />
-      👤 regular holders
-      <br />
-      🏦 huggies holding accounts
-      <br />
-      👨‍💻 all my "dev" accounts for full transparency
-      <br />
-      🖼️ these near accounts are/were available as NFTs on{" "}
-      <a href="https://namesky.app/" target="_blank" rel="noreferrer">
-        NAMESKY
-      </a>
-    </p>
   );
 }
 // ========================================
@@ -356,7 +339,6 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
             {loading_more ? "LOADING..." : "LOAD MORE"}
           </button>
         )}
-        {render_legend_fun()}
       </section>
       {summary !== null && render_metadata_fun(summary, price_ref)}
     </div>
