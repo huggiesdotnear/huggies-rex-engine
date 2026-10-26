@@ -140,26 +140,41 @@ function render_filters_fun(
 }
 // ========================================
 // render the share of the supply each group of holders holds.
+//
+// the rows are the old SHIT info page's holder cards: a white card
+// with a coloured stripe down its left edge for the type, the icon and
+// the name on the left, and the count and the percentage on the right.
+// the row of the ACTIVE tab is the active one.
 function render_groups_fun(
   groups: HUGGIES_SHIT_HOLDER_GROUP[],
+  active_filter: HUGGIES_SHIT_ACTIVE_FILTER,
 ): preact.JSX.Element {
   return (
     <section class="huggies-shit-groups">
       <h2>HOLDERS BY GROUP</h2>
       <ul class="huggies-shit-groups-list">
         {groups.map((group) => (
-          <li key={group.type} class={`is-${group.type}`}>
-            <span class="huggies-shit-groups-icon">
-              {shit_holder_icon_fun(group.type)}
+          <li
+            key={group.type}
+            class={`huggies-shit-group is-${group.type}${
+              group.type === active_filter ? " is-active" : ""
+            }`}
+          >
+            <span class="huggies-shit-group-left">
+              <span class="huggies-shit-group-icon">
+                {shit_holder_icon_fun(group.type)}
+              </span>
+              <span class="huggies-shit-group-name">
+                {shit_holder_type_label_fun(group.type)}
+              </span>
             </span>
-            <span class="huggies-shit-groups-name">
-              {shit_holder_type_label_fun(group.type)}
-            </span>
-            <span class="huggies-shit-groups-count">
-              {group.count.toLocaleString()}
-            </span>
-            <span class="huggies-shit-groups-percent">
-              {group.percent_formatted}
+            <span class="huggies-shit-group-right">
+              <span class="huggies-shit-group-count">
+                {group.count.toLocaleString()}
+              </span>
+              <span class="huggies-shit-group-percent">
+                {group.percent_formatted}
+              </span>
             </span>
           </li>
         ))}
@@ -304,7 +319,7 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
       <header class="huggies-shit-header">
         <h1>{HUGGIES_SHIT_TOKEN_ID}</h1>
       </header>
-      {render_groups_fun(groups)}
+      {render_groups_fun(groups, active_filter)}
       <section class="huggies-shit-holders">
         <h2>
           HOLDERS (

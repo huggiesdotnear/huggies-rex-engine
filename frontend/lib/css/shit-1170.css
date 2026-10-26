@@ -67,6 +67,11 @@
 }
 /*==================================*/
 /* the share of the supply each group holds */
+/* the rows are the old SHIT info page's holder cards: a white card    */
+/* with a coloured stripe down its left edge for the type, the icon    */
+/* and the name on the left, the count and the percentage on the       */
+/* right. the row of the ACTIVE tab is the active one.                 */
+/*==================================*/
 .huggies-shit-groups {
   margin-bottom: 14px;
 }
@@ -76,48 +81,93 @@
   border-bottom: 1px solid #474747;
   padding-bottom: 6px;
 }
-/* the per-group list */
 .huggies-shit-groups-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
 }
-.huggies-shit-groups-list li {
+.huggies-shit-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #ffffff;
+  border-left: 4px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: transform 0.15s ease;
+}
+/* the coloured stripe down the left of a group card */
+.huggies-shit-group.is-dev {
+  border-left-color: #8ef0a0;
+}
+.huggies-shit-group.is-dex {
+  border-left-color: #2196f3;
+}
+.huggies-shit-group.is-nft {
+  border-left-color: #ff9800;
+}
+.huggies-shit-group.is-vault {
+  border-left-color: var(--color-middle);
+}
+.huggies-shit-group.is-burn {
+  border-left-color: var(--color-backend);
+}
+.huggies-shit-group.is-regular {
+  border-left-color: #999999;
+}
+/* --- WHY --- the group of the ACTIVE tab is the one that is picked
+   out. the tabs and the group list show the same thing from two
+   sides, so the reader can see at a glance which filter the list
+   under them is filtered by. --- */
+.huggies-shit-group.is-active {
+  outline: 2px solid var(--color-middle);
+  outline-offset: -2px;
+}
+.huggies-shit-group-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-.huggies-shit-groups-icon {
-  font-size: 13px;
-  line-height: 1;
-  width: 16px;
-  flex: none;
-  text-align: center;
-}
-.huggies-shit-groups-name {
+  gap: 10px;
   flex: 1;
   min-width: 0;
-  letter-spacing: 0.06em;
+}
+.huggies-shit-group-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex: none;
+}
+.huggies-shit-group-name {
+  color: #2d2d2d;
+  font-weight: 600;
+  font-size: 14px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.huggies-shit-groups-count {
+.huggies-shit-group-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex: none;
-  opacity: 0.6;
+}
+.huggies-shit-group-count {
+  color: #666666;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
-.huggies-shit-groups-percent {
+.huggies-shit-group-percent {
   /* --- WHY --- the share is the number the reader came for, so it is
   the one thing in the row that never shrinks. the name takes the
   slack instead and ellipsizes. */
-  flex: none;
   min-width: 52px;
   text-align: right;
+  color: #4caf50;
+  font-size: 16px;
   font-weight: bold;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
