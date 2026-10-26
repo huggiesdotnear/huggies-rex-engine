@@ -24,7 +24,7 @@ token — see [`token.md`](./token.md)
 
 #### TOKEN - frontend/app/tokens/token.html
 
-token metadata, indexed holders, and dex pools - ?id=
+token metadata and indexed holders - ?id=
 
 see [`token.md`](./token.md)
 

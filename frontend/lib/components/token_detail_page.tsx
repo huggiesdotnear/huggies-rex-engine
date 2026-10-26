@@ -1,5 +1,5 @@
 // ========================================
-// token metadata, indexed holders, and dex pools detail page.
+// token metadata and indexed holders detail page.
 // ========================================
 import { render } from "preact";
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
@@ -12,15 +12,11 @@ import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDER,
 } from "../ts/token_detail";
-import { load_token_pools_fun } from "../ts/token_pools";
-import { token_detail_href_fun } from "../ts/token_link";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
-import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { format_price_usd_fun } from "../ts/token_price_format";
 import { token_holder_row_fun } from "../ts/token_holder_row";
 import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
-import type { HUGGIES_POOL } from "../ts/pool";
 // ========================================
 // read the token id from the page query string.
 function token_id_from_url_fun(): string | null {
@@ -42,49 +38,6 @@ function token_metadata_row_fun(
   );
 }
 // ========================================
-// render one pool card.
-function pool_row_fun(
-  pool: HUGGIES_POOL,
-  info_map: Map<string, HUGGIES_TOKEN_INFO>,
-): preact.JSX.Element {
-  return (
-    <li class="huggies-token-pool-card">
-      <header>
-        <strong>{pool.dex_name}</strong>
-        <span>POOL {pool.pool_id}</span>
-      </header>
-      <div class="huggies-token-pool-tokens">
-        {pool.token_ids.map((token_id, index) => {
-          const token_info = info_map.get(token_id);
-          const raw = pool.amounts[index] ?? "0";
-          const human =
-            token_info === undefined
-              ? raw
-              : HUGGIES_AMOUNT_FORMAT.balance(raw, token_info);
-          return (
-            <div class="huggies-token-pool-token">
-              <a href={token_detail_href_fun(token_id, current_app_depth_fun())}>
-                {token_info?.symbol ?? token_id}
-              </a>
-              <span title={token_id}>{human}</span>
-            </div>
-          );
-        })}
-      </div>
-      {pool.dex === "rhea_amm" && (
-        <a
-          class="huggies-token-pool-link"
-          href={`https://app.rhea.finance/pool/${pool.pool_id}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          VIEW ON RHEA
-        </a>
-      )}
-    </li>
-  );
-}
-// ========================================
 // token detail page component.
 function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
   const token_id = token_id_from_url_fun();
@@ -93,13 +46,9 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
   const [holders, set_holders] = use_state<HUGGIES_TOKEN_HOLDER[]>([]);
   const [holder_total, set_holder_total] = use_state(0);
   const [next_cursor, set_next_cursor] = use_state<string | null>(null);
-  const [pools, set_pools] = use_state<HUGGIES_POOL[]>([]);
   const [loading_more, set_loading_more] = use_state(false);
   const [error, set_error] = use_state<string | null>(null);
   const [info, set_info] = use_state<HUGGIES_TOKEN_INFO | null>(null);
-  const [pool_info, set_pool_info] = use_state<Map<string, HUGGIES_TOKEN_INFO>>(
-    new Map(),
-  );
 
   use_effect(() => {
     if (token_id === null) return;
@@ -108,27 +57,15 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
     void Promise.all([
       fetch_token_detail_fun(token_id),
       fetch_token_holders_fun(token_id, null),
-      load_token_pools_fun(token_id),
       HUGGIES_TOKEN_INFO.get([token_id]),
     ])
-      .then(([token, holder_page, token_pools, info_map]) => {
+      .then(([token, holder_page, info_map]) => {
         if (cancelled) return;
         set_detail(token);
         set_holders(holder_page.rows);
         set_holder_total(holder_page.total);
         set_next_cursor(holder_page.next_cursor);
-        set_pools(token_pools);
         set_info(info_map.get(token_id) ?? null);
-        // every token that appears in one of the token's pools, so the
-        // pool cards can show symbols and human-readable reserves.
-        const pool_token_ids = [
-          ...new Set(token_pools.flatMap((pool) => pool.token_ids)),
-        ];
-        void HUGGIES_TOKEN_INFO.get(pool_token_ids)
-          .then((pool_map) => {
-            if (!cancelled) set_pool_info(pool_map);
-          })
-          .catch(() => undefined);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -311,16 +248,6 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
               >
                 {loading_more ? "LOADING..." : "LOAD MORE"}
               </button>
-            )}
-          </section>
-          <section class="huggies-token-pools">
-            <h2>POOLS ({pools.length})</h2>
-            {pools.length === 0 ? (
-              <p>NO POOLS FOUND</p>
-            ) : (
-              <ul>
-                {pools.map((pool) => pool_row_fun(pool, pool_info))}
-              </ul>
             )}
           </section>
         </>

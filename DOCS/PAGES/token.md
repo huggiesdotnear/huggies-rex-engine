@@ -5,14 +5,11 @@ token detail page - `frontend/app/tokens/token.html?id=<token_id>`
 the token id comes from the `?id=` query parameter. the page shows the
 indexed token metadata (name, symbol, decimals, icon, price, reputation,
 holders, liquidity, market cap, socials, description, and main pool when
-available), indexed holders with cursor pagination, and pools that contain
-the token across Rhea AMM, Rhea DCL, and INTEAR DEX/XYK.
+available) and the indexed holders with cursor pagination.
 
-the pool list is complete: the pool cache holds every pool each dex has,
-so a token's pools are found across the whole collection rather than a
-truncated first page. prices use `lib/ts/token_price_format.ts`, which
-grows the decimal count as a price gets smaller, so a token priced at
-0.00000012 does not read as a bare zero.
+prices use `lib/ts/token_price_format.ts`, which grows the decimal count
+as a price gets smaller, so a token priced at 0.00000012 does not read as
+a bare zero.
 
 the token id box at the top of the page is pre-filled with the token the
 page is showing and opens any other token when submitted.
@@ -246,9 +243,9 @@ than five minutes old; a stale collection is still served immediately
 while a fresh copy is fetched in the background, so a search never waits
 on the chain.
 
-> --- WHY --- the cache holds every pool, not a first page. a token's
-> pool list and a pool search both run over the whole collection, so a
-> truncated cache would silently hide pools.
+> --- WHY --- the cache holds every pool, not a first page. a pool
+> search runs over the whole collection, so a truncated cache would
+> silently hide pools.
 
 ## DEX POOL COUNTS
 
