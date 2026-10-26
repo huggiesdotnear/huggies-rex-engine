@@ -9,6 +9,8 @@
 - see [DOCS/PAGES/README.md](./DOCS/PAGES/README.md) for pages
 - see [DOCS/ROUTES.md](./DOCS/ROUTES.md) for routes
 - see [DOCS/RULES.md](./DOCS/RULES.md) for rules
+- rule: do not tocuh this file.
+- rule: take some of the rules in the RULES.md with a grain of salt becuase i let my agent edit that file.
 
 WORKFLOW
 
