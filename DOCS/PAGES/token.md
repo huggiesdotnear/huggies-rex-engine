@@ -52,28 +52,35 @@ underneath them.
 
 `frontend/app/discover.html` lists supported contracts and a searchable
 token list. the list can be sorted by **24-hour volume** or **market cap**
-with the shared sort control (`lib/components/sort_control.tsx`); the
-initial list uses `GET /tokens` in the chosen order. price is not shown in
-the list — it belongs on the token's own page.
+with the shared sort control (`lib/components/sort_control.tsx`), and the
+direction can be flipped between **ASC** and **DESC** with the arrow button
+next to the sort keys. the initial list uses `GET /tokens` in the chosen
+order. price is not shown in the list — it belongs on the token's own page.
 
 the fetched list is cached in IndexedDB (`lib/ts/token_list_cache.ts`), one
-entry per sort order. a revisit shows the cached list instantly, and the
-search box filters that cached copy locally rather than asking the api on
-every keystroke.
+entry per sort **and** direction pair. a revisit shows the cached list
+instantly, and the search box filters that cached copy locally rather than
+asking the api on every keystroke.
 
 ## TOKEN LIST CACHE
 
 the token list lives in IndexedDB database `huggies_token_list`, store
-`lists`, keyed by the sort order it was fetched in. each entry holds the
-sort, the fetch time, and the full token rows. a cached list is served for
-one minute; after that the list is refetched and the cache replaced.
+`lists`, keyed by the sort order and direction it was fetched in
+(`<sort>:<direction>`). each entry holds the sort, the direction, the fetch
+time, and the full token rows. a cached list is served for one minute;
+after that the list is refetched and the cache replaced.
 
 the meme tokens from the emojifi project
 (<https://gitlab.com/sleet-dev/sleet_vibe/emojifi>) are part of that one
 token list. their ids come from `lib/ts/emoji_tokens.ts`, the same list
-the memory game reads. `lib/ts/token_discover_order.ts` pins those tokens
-to the top of the list and orders every other token by 24-hour volume.
-there is no separate spotlight section and no emoji column.
+the memory game reads.
+
+> --- WHY --- the meme tokens are **not** pinned to the top of the list.
+> they used to be, which meant the list never actually followed the chosen
+> sort — a meme token with tiny volume sat above the biggest one, and
+> flipping the direction could not fix it. every token now sorts by the
+> chosen field and direction, so the sort the reader picked is the sort
+> they see. there is no separate spotlight section and no emoji column.
 
 ### TOKEN ICONS
 

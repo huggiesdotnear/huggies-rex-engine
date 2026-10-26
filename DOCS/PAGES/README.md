@@ -18,8 +18,8 @@ transaction feed
 
 searchable token list and links to supported smart contracts
 
-the token list is ordered by 24-hour volume, with the emojifi meme
-tokens pinned to the top — see [`token.md`](./token.md)
+the token list is ordered by 24-hour volume or market cap, in either
+direction — see [`token.md`](./token.md)
 
 #### TOKEN - frontend/app/tokens/token.html
 

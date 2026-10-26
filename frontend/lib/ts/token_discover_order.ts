@@ -1,23 +1,33 @@
 // ========================================
-// order a token list by the chosen sort, keeping spotlight tokens first.
+// order a token list by the chosen sort field and direction.
 // ========================================
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./token_search";
-import { emoji_token_entries_fun } from "./emoji_token_entries";
-import type { HUGGIES_TOKEN_SORT } from "./token_sort";
+import {
+  HUGGIES_DEFAULT_TOKEN_SORT,
+  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  type HUGGIES_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT_DIRECTION,
+} from "./token_sort";
 // ========================================
-// order one page of tokens by the chosen field and keep spotlight tokens first.
+// order a token list by the chosen field and direction.
+// --- WHY --- the emojifi meme tokens are NOT pinned to the top here.
+// they used to be, which meant the list never actually followed the
+// chosen sort: a meme token with tiny volume sat above the biggest
+// one, and no direction could fix it. they now sort like every other
+// token, so the sort the reader picked is the sort they see.
 export function order_discover_tokens_fun(
   tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
-  sort: HUGGIES_TOKEN_SORT = "volume_usd_24h",
+  sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
+  direction: HUGGIES_TOKEN_SORT_DIRECTION =
+    HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
 ): HUGGIES_TOKEN_SEARCH_RESULT[] {
-  const spotlight_ids = new Set(
-    emoji_token_entries_fun().map((entry) => entry.token_id),
-  );
+  const sign = direction === "asc" ? 1 : -1;
   return [...tokens].sort((a, b) => {
-    const spotlight_delta =
-      Number(spotlight_ids.has(b.id)) - Number(spotlight_ids.has(a.id));
-    if (spotlight_delta !== 0) return spotlight_delta;
-    return b[sort] - a[sort];
+    const delta = (a[sort] - b[sort]) * sign;
+    if (delta !== 0) return delta;
+    // a stable tiebreak, so equal values keep a fixed order instead of
+    // shuffling on every re-render.
+    return a.id.localeCompare(b.id);
   });
 }
 // ========================================

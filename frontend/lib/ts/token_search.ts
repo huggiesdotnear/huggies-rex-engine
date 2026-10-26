@@ -7,7 +7,9 @@ import {
 import { token_row_by_name_fun } from "./token_row_by_name";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
+  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   type HUGGIES_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "./token_sort";
 // ========================================
 export interface HUGGIES_TOKEN_SEARCH_RESULT {
@@ -74,10 +76,12 @@ function map_token_search_row_fun(
 // fetch the initial token list in the chosen sort order.
 export async function fetch_initial_tokens_fun(
   sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
+  direction: HUGGIES_TOKEN_SORT_DIRECTION =
+    HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
 ): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_SEARCH_FIELDS,
-    sort: { by: sort, desc: true },
+    sort: { by: sort, desc: direction === "desc" },
     limit: 100,
   });
   return response.rows.map((row) =>

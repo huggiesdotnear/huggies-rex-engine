@@ -12,7 +12,9 @@ import { token_detail_href_fun } from "../ts/token_link";
 import { order_discover_tokens_fun } from "../ts/token_discover_order";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
+  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   type HUGGIES_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "../ts/token_sort";
 import {
   get_cached_token_list_fun,
@@ -68,6 +70,9 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   const [sort, set_sort] = use_state<HUGGIES_TOKEN_SORT>(
     HUGGIES_DEFAULT_TOKEN_SORT,
   );
+  const [direction, set_direction] = use_state<HUGGIES_TOKEN_SORT_DIRECTION>(
+    HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  );
   const [error, set_error] = use_state<string | null>(null);
 
   use_effect(() => {
@@ -76,16 +81,16 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     // --- WHY --- the list is cached in indexeddb, so a revisit shows
     // it instantly and the search filters that cached copy locally
     // instead of asking the api on every keystroke.
-    void get_cached_token_list_fun(sort)
+    void get_cached_token_list_fun(sort, direction)
       .then((cached) => {
         if (cached !== null && !cancelled) {
           set_all_tokens(cached);
           return;
         }
-        return fetch_initial_tokens_fun(sort).then((rows) => {
+        return fetch_initial_tokens_fun(sort, direction).then((rows) => {
           if (cancelled) return;
           set_all_tokens(rows);
-          void put_cached_token_list_fun(sort, rows);
+          void put_cached_token_list_fun(sort, direction, rows);
         });
       })
       .catch((err: unknown) => {
@@ -95,12 +100,16 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     return () => {
       cancelled = true;
     };
-  }, [sort]);
+  }, [sort, direction]);
 
   const tokens =
     all_tokens === null
       ? null
-      : order_discover_tokens_fun(filter_tokens_fun(all_tokens, query), sort);
+      : order_discover_tokens_fun(
+          filter_tokens_fun(all_tokens, query),
+          sort,
+          direction,
+        );
 
   return (
     <section class="huggies-token-discover">
@@ -118,7 +127,9 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
         </label>
         {huggies_sort_control_fun({
           sort,
+          direction,
           on_sort: (next) => set_sort(next),
+          on_direction: (next) => set_direction(next),
         })}
       </div>
       {error !== null && <p>{error}</p>}

@@ -2,7 +2,11 @@
 // the indexeddb cache for the discover token list.
 // ========================================
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./token_search";
-import type { HUGGIES_TOKEN_SORT } from "./token_sort";
+import {
+  token_sort_cache_key_fun,
+  type HUGGIES_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT_DIRECTION,
+} from "./token_sort";
 // ========================================
 const HUGGIES_TOKEN_LIST_DB_NAME = "huggies_token_list";
 const HUGGIES_TOKEN_LIST_DB_VERSION = 1;
@@ -15,6 +19,7 @@ export interface HUGGIES_TOKEN_LIST_CACHE {
   key: string;
   fetched_at_millis: number;
   sort: HUGGIES_TOKEN_SORT;
+  direction: HUGGIES_TOKEN_SORT_DIRECTION;
   tokens: HUGGIES_TOKEN_SEARCH_RESULT[];
 }
 // ========================================
@@ -43,6 +48,7 @@ function open_db_fun(): Promise<IDBDatabase> {
 // read one cached token list.
 export async function get_cached_token_list_fun(
   sort: HUGGIES_TOKEN_SORT,
+  direction: HUGGIES_TOKEN_SORT_DIRECTION,
 ): Promise<HUGGIES_TOKEN_SEARCH_RESULT[] | null> {
   try {
     const db = await open_db_fun();
@@ -51,7 +57,7 @@ export async function get_cached_token_list_fun(
         const request = db
           .transaction(HUGGIES_TOKEN_LIST_STORE, "readonly")
           .objectStore(HUGGIES_TOKEN_LIST_STORE)
-          .get(sort);
+          .get(token_sort_cache_key_fun(sort, direction));
         request.onsuccess = () => {
           const row = request.result as HUGGIES_TOKEN_LIST_CACHE | undefined;
           if (
@@ -76,6 +82,7 @@ export async function get_cached_token_list_fun(
 // replace one cached token list.
 export async function put_cached_token_list_fun(
   sort: HUGGIES_TOKEN_SORT,
+  direction: HUGGIES_TOKEN_SORT_DIRECTION,
   tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
 ): Promise<void> {
   try {
@@ -83,9 +90,10 @@ export async function put_cached_token_list_fun(
     await new Promise<void>((resolve) => {
       const tx = db.transaction(HUGGIES_TOKEN_LIST_STORE, "readwrite");
       tx.objectStore(HUGGIES_TOKEN_LIST_STORE).put({
-        key: sort,
+        key: token_sort_cache_key_fun(sort, direction),
         fetched_at_millis: Date.now(),
         sort,
+        direction,
         tokens,
       });
       tx.oncomplete = () => resolve();
