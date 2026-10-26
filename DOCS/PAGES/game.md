@@ -7,6 +7,13 @@ shuffles sixteen cards into a four-by-four grid, reveals one card per click,
 and flips mismatched cards back after 800ms. Matching pairs stay revealed,
 the score counts matched pairs, and the move counter records every reveal.
 
+the turn logic lives in `frontend/lib/components/emoji_match_game.tsx` and
+follows the emojifi original: one card is held, the second card is compared
+against it, and a mismatch flips both back down after 800ms. the pending
+unflip timer is kept in a ref, not in an effect, because an effect cleanup
+would cancel the timer the moment the board re-renders and the cards would
+stay face-up forever.
+
 The page also lists the meme tokens. Each token links to its token detail
 page, and the page includes the original game's disclaimer that this is not
 financial advice.

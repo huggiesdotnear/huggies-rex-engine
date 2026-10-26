@@ -2,7 +2,11 @@
 // eight-pair emoji memory match game component.
 // ========================================
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
+import {
+  useEffect as use_effect,
+  useRef as use_ref,
+  useState as use_state,
+} from "preact/hooks";
 import { HUGGIES_EMOJI_TOKENS } from "../ts/emoji_tokens";
 import { token_detail_href_fun } from "../ts/token_link";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
@@ -35,7 +39,7 @@ function new_emoji_cards_fun(): HUGGIES_EMOJI_CARD[] {
 }
 // ========================================
 // emoji memory match game component.
-function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
+export function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
   const [cards, set_cards] =
     use_state<HUGGIES_EMOJI_CARD[]>(new_emoji_cards_fun);
   const [first_id, set_first_id] = use_state<number | null>(null);
@@ -43,6 +47,9 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
   const [matched_pairs, set_matched_pairs] = use_state(0);
   const [moves, set_moves] = use_state(0);
   const [icons, set_icons] = use_state<Record<string, string>>({});
+  // the pending unflip timer, held in a ref so a re-render can never
+  // cancel it the way an effect cleanup does.
+  const unflip_timer_ref = use_ref<number | null>(null);
 
   const token_ids = HUGGIES_EMOJI_TOKENS.map((token) => token.token_id).filter(
     (token_id): token_id is string => token_id !== null,
@@ -67,42 +74,28 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
     };
   }, []);
 
+  // clear the pending unflip when the component goes away.
   use_effect(() => {
-    if (first_id === null || board_locked) return;
-    const second = cards.find(
-      (card) => card.id !== first_id && card.revealed && !card.matched,
+    return () => {
+      if (unflip_timer_ref.current !== null) {
+        window.clearTimeout(unflip_timer_ref.current);
+        unflip_timer_ref.current = null;
+      }
+    };
+  }, []);
+
+  // flip two cards back down after a mismatch.
+  const unflip_pair_fun = (first: number, second: number) => {
+    set_cards((current) =>
+      current.map((card) =>
+        card.id === first || card.id === second
+          ? { ...card, revealed: false }
+          : card,
+      ),
     );
-    if (second === undefined) return;
-
-    const first = cards.find((card) => card.id === first_id);
-    if (first === undefined) return;
-
-    if (first.emoji === second.emoji) {
-      set_cards((current) =>
-        current.map((card) =>
-          card.id === first_id || card.id === second.id
-            ? { ...card, revealed: true, matched: true }
-            : card,
-        ),
-      );
-      set_first_id(null);
-      set_matched_pairs((current) => current + 1);
-    } else {
-      set_board_locked(true);
-      const timeout = window.setTimeout(() => {
-        set_cards((current) =>
-          current.map((card) =>
-            card.id === first_id || card.id === second.id
-              ? { ...card, revealed: false }
-              : card,
-          ),
-        );
-        set_first_id(null);
-        set_board_locked(false);
-      }, 800);
-      return () => window.clearTimeout(timeout);
-    }
-  }, [cards, first_id, board_locked]);
+    set_first_id(null);
+    set_board_locked(false);
+  };
 
   const reveal_card_fun = (card_id: number) => {
     if (board_locked) return;
@@ -115,10 +108,43 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
         item.id === card_id ? { ...item, revealed: true } : item,
       ),
     );
-    if (first_id === null) set_first_id(card_id);
+
+    // first card of a turn: hold it and wait for the second.
+    if (first_id === null) {
+      set_first_id(card_id);
+      return;
+    }
+
+    // second card of a turn: compare it against the held card.
+    const first = cards.find((item) => item.id === first_id);
+    if (first === undefined) return;
+
+    if (first.emoji === card.emoji) {
+      set_cards((current) =>
+        current.map((item) =>
+          item.id === first_id || item.id === card_id
+            ? { ...item, revealed: true, matched: true }
+            : item,
+        ),
+      );
+      set_first_id(null);
+      set_matched_pairs((current) => current + 1);
+      return;
+    }
+
+    // no match: hold the board, then flip both cards back down.
+    set_board_locked(true);
+    unflip_timer_ref.current = window.setTimeout(() => {
+      unflip_timer_ref.current = null;
+      unflip_pair_fun(first_id, card_id);
+    }, 800);
   };
 
   const new_game_fun = () => {
+    if (unflip_timer_ref.current !== null) {
+      window.clearTimeout(unflip_timer_ref.current);
+      unflip_timer_ref.current = null;
+    }
     set_cards(new_emoji_cards_fun());
     set_first_id(null);
     set_board_locked(false);
