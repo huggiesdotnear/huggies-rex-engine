@@ -16,7 +16,6 @@ import { current_app_depth_fun } from "../ts/app_depth";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { format_price_usd_fun } from "../ts/token_price_format";
 import { token_holder_row_fun } from "../ts/token_holder_row";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
 // ========================================
 // read the token id from the page query string.
 function token_id_from_url_fun(): string | null {
@@ -162,27 +161,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
               format_price_usd_fun(detail.market_cap_usd),
             )}
             {token_metadata_row_fun("DECIMALS", String(detail.decimals))}
-            {detail.main_pool !== null &&
-              token_metadata_row_fun("MAIN POOL", detail.main_pool)}
-            {detail.main_pool_url !== null && (
-              <a
-                class="huggies-token-main-pool-link"
-                href={detail.main_pool_url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                OPEN MAIN POOL
-              </a>
-            )}
           </section>
-          {detail.id === HUGGIES_SHIT_TOKEN_ID && (
-            <a
-              class="huggies-token-special-link"
-              href={`${"../".repeat(current_app_depth_fun())}shit-1170.html`}
-            >
-              OPEN THE $SHIT HOLDERS PAGE
-            </a>
-          )}
           {detail.description !== null && (
             <section class="huggies-token-description-card">
               <h2>DESCRIPTION:</h2>

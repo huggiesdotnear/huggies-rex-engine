@@ -126,12 +126,6 @@
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.huggies-token-main-pool-link {
-  display: inline-block;
-  margin-top: 4px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-}
 /* --- about card --- */
 .huggies-token-description-card {
   margin: 1rem 0;

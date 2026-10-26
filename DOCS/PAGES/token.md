@@ -4,8 +4,8 @@ token detail page - `frontend/app/tokens/token.html?id=<token_id>`
 
 the token id comes from the `?id=` query parameter. the page shows the
 indexed token metadata (name, symbol, decimals, icon, price, reputation,
-holders, liquidity, market cap, socials, description, and main pool when
-available) and the indexed holders with cursor pagination.
+holders, liquidity, market cap, socials, and description when available)
+and the indexed holders with cursor pagination.
 
 prices use `lib/ts/token_price_format.ts`, which shows two decimals and
 rounds a price that is real but rounds away to `0.00`.
@@ -57,6 +57,24 @@ underneath them.
 the token's own description is shown under a **DESCRIPTION:** heading,
 above the social links. it is a single block of text, not a card with a
 title, so it reads as part of the token's own metadata.
+
+## THE $SHIT EASTER EGG
+
+the $SHIT token's own page carries a quiet **💩 $SHIT** link under the
+auth button, pointing at the dedicated $SHIT holders page. it is the
+same treatment as the emoji game link on the discover page: small, low
+contrast, and only a little brighter on hover.
+
+> --- WHY --- the link used to sit in the middle of the token page as a
+> button reading "OPEN THE $SHIT HOLDERS PAGE", which was a loud,
+> obvious link to a page that already exists one click away in the nav.
+> as an easter egg under the auth button it has to be looked for, which
+> is the whole point of it being one.
+
+the mount div is on every token page, so the component checks the token
+id itself and renders nothing for any other token. the link is relative
+and resolves against the page it sits on, so it works from any depth
+below `app/`.
 
 ## TOKEN DISCOVER
 
