@@ -8,7 +8,7 @@
 // pin the network to mainnet before anything reads it.
 // --- WHY --- this app is mainnet-only. the pin has to happen before
 // the first near_connect_client() call, and some pages load
-// account_route.ts (which inits auth) ahead of this file.
+// app_page_account_route.ts (which inits auth) ahead of this file.
 import "./network";
 import "../components/nav";
 import "../components/random_slogan_p";

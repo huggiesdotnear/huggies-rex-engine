@@ -45,7 +45,7 @@ function build_account_href_fun(account_id: string): string {
 }
 // ========================================
 // the page's own `?id=`, or null when absent/blank. read here rather
-// than through HUGGIES_ACCOUNT_ID because that module's state is
+// than through HUGGIES_APP_PAGE_ACCOUNT_ID because that module's state is
 // populated by components which run AFTER this routing decision.
 function read_url_account_id_fun(): string | null {
   if (typeof window === "undefined" || typeof window.location === "undefined") {

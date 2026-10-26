@@ -1,6 +1,6 @@
 // ========================================
 // auth state model: account_id, last_error, subscribers. UI
-// components (auth_button, account_route, etc.) read through
+// components (auth_button, app_page_account_route, etc.) read through
 // HUGGIES_AUTH; this file owns the wallet handshake.
 // ========================================
 // --- WHY --- @hot-labs/near-connect exposes no synchronous

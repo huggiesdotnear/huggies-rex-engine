@@ -25,7 +25,7 @@ const HUGGIES_NEAR_ID = "near";
 // --- TYPES ------------------------------
 // one row ready to render: the raw balance plus the info needed to
 // show it.
-export interface HUGGIES_BALANCE_ENTRY {
+export interface HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY {
   id: string;
   raw: string;
   usd_value: number;
@@ -39,7 +39,7 @@ export interface HUGGIES_BALANCE_ENTRY {
 // usd floor is applied to everything including Reputable tokens: live
 // data shows Reputable tokens priced at 1e-8, so reputation alone would
 // leave pure dust in the table.
-function keep_entry_fun(entry: HUGGIES_BALANCE_ENTRY): boolean {
+function keep_entry_fun(entry: HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY): boolean {
   if (entry.info.reputation === HUGGIES_SPAM_REPUTATION) return false;
   if (entry.id === HUGGIES_NEAR_ID) return true;
   return entry.usd_value >= HUGGIES_MIN_USD_BALANCE;
@@ -47,14 +47,14 @@ function keep_entry_fun(entry: HUGGIES_BALANCE_ENTRY): boolean {
 // ========================================
 // apply the policy to a list of entries.
 function filter_entries_fun(
-  entries: ReadonlyArray<HUGGIES_BALANCE_ENTRY>,
-): ReadonlyArray<HUGGIES_BALANCE_ENTRY> {
+  entries: ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY>,
+): ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY> {
   return entries.filter(keep_entry_fun);
 }
 // ========================================
 // ========================================
 // the filter policy in one object.
-export const HUGGIES_BALANCE_FILTER = {
+export const HUGGIES_APP_PAGE_ACCOUNT_BALANCE_FILTER = {
   filter: filter_entries_fun,
   min_usd: HUGGIES_MIN_USD_BALANCE,
 };

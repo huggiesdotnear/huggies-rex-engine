@@ -64,7 +64,7 @@ function rhea_amm_contract_id_fun(): string {
 // ========================================
 // --- TYPES ------------------------------
 // one token holding in one of the tables.
-export interface HUGGIES_ACCOUNT_BALANCE {
+export interface HUGGIES_APP_PAGE_ACCOUNT_BALANCE {
   id: string;
   raw: string;
   info: TOKEN_INFO;
@@ -72,16 +72,16 @@ export interface HUGGIES_ACCOUNT_BALANCE {
 }
 // ========================================
 // the four tables the account page shows.
-export interface HUGGIES_ACCOUNT_PAGE_DATA {
+export interface HUGGIES_APP_PAGE_ACCOUNT_DATA {
   // direct + native balances from the intear api. the native NEAR row
   // is pinned into this one.
-  direct: ReadonlyArray<HUGGIES_ACCOUNT_BALANCE>;
+  direct: ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_BALANCE>;
   // rhea amm (ref finance v2) balances held for the account.
-  rhea_amm: ReadonlyArray<HUGGIES_ACCOUNT_BALANCE>;
+  rhea_amm: ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_BALANCE>;
   // rhea dcl v2 internal balances.
-  rhea_dcl: ReadonlyArray<HUGGIES_ACCOUNT_BALANCE>;
+  rhea_dcl: ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_BALANCE>;
   // intear dex internal balances.
-  intear: ReadonlyArray<HUGGIES_ACCOUNT_BALANCE>;
+  intear: ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_BALANCE>;
   // one message per source that failed. a failed source is empty, and
   // the others still show.
   errors: ReadonlyArray<string>;
@@ -89,7 +89,7 @@ export interface HUGGIES_ACCOUNT_PAGE_DATA {
 // ========================================
 // --- RAW RESULT ------------------------
 // one source's raw balances, before any token metadata is attached.
-interface HUGGIES_ACCOUNT_RAW {
+interface HUGGIES_APP_PAGE_ACCOUNT_RAW {
   balances: Map<string, string>;
   error: string | null;
 }
@@ -103,7 +103,7 @@ interface HUGGIES_ACCOUNT_RAW {
 // other three tables intact.
 async function fetch_raw_direct_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_RAW> {
+): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
   try {
     const response = await api_intear_balances_get({
       account: account_id,
@@ -128,7 +128,7 @@ async function fetch_raw_direct_fun(
 // the rhea amm (ref finance v2) balances held for the account.
 async function fetch_raw_rhea_amm_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_RAW> {
+): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
   try {
     const deposits = await rhea_ammv2_get_deposits_fun_json(
       near_kit_client(),
@@ -152,7 +152,7 @@ async function fetch_raw_rhea_amm_fun(
 // the rhea dcl v2 internal balances.
 async function fetch_raw_rhea_dcl_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_RAW> {
+): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
   try {
     const assets = await rhea_dclv2_list_user_assets_fun_json(
       near_kit_client(),
@@ -176,7 +176,7 @@ async function fetch_raw_rhea_dcl_fun(
 // the intear dex internal balances.
 async function fetch_raw_intear_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_RAW> {
+): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
   try {
     const registered = await intear_dex_engine_registered_assets_of_fun_json(
       near_kit_client(),
@@ -213,9 +213,9 @@ async function fetch_raw_intear_fun(
 // made four volatile /tokens calls for token sets that overlapped.
 // the union of every id the page touches is fetched in one call, and
 // every source is answered from that one map.
-async function load_account_page_fun(
+async function app_page_account_load_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_PAGE_DATA> {
+): Promise<HUGGIES_APP_PAGE_ACCOUNT_DATA> {
   const [direct, rhea_amm, rhea_dcl, intear] = await Promise.all([
     fetch_raw_direct_fun(account_id),
     fetch_raw_rhea_amm_fun(account_id),
@@ -232,9 +232,9 @@ async function load_account_page_fun(
 
   // attach the metadata and work out each row's usd value.
   const build = (
-    source: HUGGIES_ACCOUNT_RAW,
-  ): Array<HUGGIES_ACCOUNT_BALANCE> => {
-    const out: Array<HUGGIES_ACCOUNT_BALANCE> = [];
+    source: HUGGIES_APP_PAGE_ACCOUNT_RAW,
+  ): Array<HUGGIES_APP_PAGE_ACCOUNT_BALANCE> => {
+    const out: Array<HUGGIES_APP_PAGE_ACCOUNT_BALANCE> = [];
     for (const [id, raw] of source.balances) {
       const info = info_map.get(id);
       if (info === undefined) continue;
@@ -266,8 +266,8 @@ async function load_account_page_fun(
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_ACCOUNT_PAGE = {
-  load: load_account_page_fun,
+export const HUGGIES_APP_PAGE_ACCOUNT = {
+  load: app_page_account_load_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

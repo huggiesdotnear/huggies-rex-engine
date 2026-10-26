@@ -11,7 +11,7 @@ import { HUGGIES_AUTH } from "./auth_status";
 // --- HELPERS ----------------------------
 // count directory levels below /app/ so a bare href can be
 // prefixed with the right number of "../". mirrors nav.tsx and
-// account_route.ts; three callers is enough to keep each inline.
+// app_page_account_route.ts; three callers is enough to keep each inline.
 function current_depth_after_app_fun(): number {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return 0;

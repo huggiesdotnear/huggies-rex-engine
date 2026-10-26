@@ -3,7 +3,7 @@
 what the account page fetches, and where.
 
 the answer to "what does this page request?" is
-[`frontend/lib/ts/account_page.ts`](../../frontend/lib/ts/account_page.ts).
+[`frontend/lib/ts/app_page_account.ts`](../../frontend/lib/ts/app_page_account.ts).
 that file is the page's ONLY loader — every fetch the page makes
 happens in it, and no component fetches anything.
 
@@ -51,7 +51,7 @@ one call for every token on the page, every load.
 | intear dex | `HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE` | request 4 |
 
 the components read the loaded data from
-[`frontend/lib/ts/account_page_store.ts`](../../frontend/lib/ts/account_page_store.ts)
+[`frontend/lib/ts/app_page_account_store.ts`](../../frontend/lib/ts/app_page_account_store.ts)
 and fetch nothing themselves.
 
 ## WHY IT WAS FOUR TIMES THE REQUESTS
@@ -77,7 +77,7 @@ other three tables intact, and the message lands in `data.errors`.
 
 ## THE CHECK
 
-[`frontend/lib/ts/account_page.test.tsx`](../../frontend/lib/ts/account_page.test.tsx)
+[`frontend/lib/ts/app_page_account.test.tsx`](../../frontend/lib/ts/app_page_account.test.tsx)
 drives the real loader and asserts the page makes one balances request,
 at most one durable token request, exactly one volatile token request,
 and no duplicate urls.

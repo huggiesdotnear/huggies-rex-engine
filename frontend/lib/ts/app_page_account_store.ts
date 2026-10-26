@@ -4,19 +4,19 @@
 //
 // the components on this page do not fetch. they read this store. that
 // is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/account_page.ts), so there is exactly one set of
+// loader (lib/ts/app_page_account.ts), so there is exactly one set of
 // requests.
 //
-// the store has the same shape as lib/ts/account_id.ts: plain module
+// the store has the same shape as lib/ts/app_page_account_id.ts: plain module
 // state, a subscribe/unsubscribe pair, and a notify that a throwing
 // subscriber cannot break.
-import { HUGGIES_ACCOUNT_PAGE } from "./account_page";
-import type { HUGGIES_ACCOUNT_PAGE_DATA } from "./account_page";
+import { HUGGIES_APP_PAGE_ACCOUNT } from "./app_page_account";
+import type { HUGGIES_APP_PAGE_ACCOUNT_DATA } from "./app_page_account";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // null until the load finishes. components render nothing until then.
-let data: HUGGIES_ACCOUNT_PAGE_DATA | null = null;
+let data: HUGGIES_APP_PAGE_ACCOUNT_DATA | null = null;
 // the account id the current load was for, so a new account id starts a
 // new load and clears the old data.
 let loaded_account_id: string | null = null;
@@ -34,7 +34,7 @@ function notify_fun(): void {
     try {
       listener();
     } catch (err) {
-      console.error("[account_page_store] listener failed", err);
+      console.error("[app_page_account_store] listener failed", err);
     }
   }
 }
@@ -58,14 +58,14 @@ function subscribe_fun(listener: () => void): () => void {
 // --- WHY --- the components used to each trigger their own fetch, so
 // "the page loaded" was really "four loads happened, at four different
 // times". one loader, one load, one request list.
-async function load_fun(account_id: string): Promise<void> {
+async function app_page_account_store_load_fun(account_id: string): Promise<void> {
   if (loading && loaded_account_id === account_id) return;
   loading = true;
   loaded_account_id = account_id;
   data = null;
   notify_fun();
   try {
-    const result = await HUGGIES_ACCOUNT_PAGE.load(account_id);
+    const result = await HUGGIES_APP_PAGE_ACCOUNT.load(account_id);
     // a load for an older account id must not overwrite a newer one.
     if (loaded_account_id !== account_id) return;
     data = result;
@@ -88,7 +88,7 @@ async function load_fun(account_id: string): Promise<void> {
 // ========================================
 // --- READ ------------------------------
 // the loaded data, or null while it is still loading.
-function get_data_fun(): HUGGIES_ACCOUNT_PAGE_DATA | null {
+function get_data_fun(): HUGGIES_APP_PAGE_ACCOUNT_DATA | null {
   return data;
 }
 // ========================================
@@ -98,8 +98,8 @@ function is_loading_fun(): boolean {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_ACCOUNT_PAGE_STORE = {
-  load: load_fun,
+export const HUGGIES_APP_PAGE_ACCOUNT_STORE = {
+  load: app_page_account_store_load_fun,
   subscribe: subscribe_fun,
   get_data: get_data_fun,
   is_loading: is_loading_fun,

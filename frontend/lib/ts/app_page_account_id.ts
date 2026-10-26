@@ -70,7 +70,7 @@ function get_account_id_fun(): string | null {
 // ========================================
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_ACCOUNT_ID = {
+export const HUGGIES_APP_PAGE_ACCOUNT_ID = {
   init: init_fun,
   subscribe: subscribe_fun,
   get_account_id: get_account_id_fun,
