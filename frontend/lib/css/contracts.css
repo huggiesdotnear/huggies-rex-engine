@@ -39,15 +39,13 @@
   overflow-wrap: anywhere;
   font-weight: 700;
 }
-/* --- pool stats --- */
-.huggies-pool-stats,
+/* --- dao stats --- */
 .huggies-dao-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
-.huggies-pool-stat,
 .huggies-dao-stat {
   display: flex;
   flex-direction: column;
@@ -57,155 +55,16 @@
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.14);
 }
-.huggies-pool-stat-value,
 .huggies-dao-stat-value {
   font-size: 26px;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
-.huggies-pool-stat-label,
 .huggies-dao-stat-label {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   letter-spacing: 0.06em;
   opacity: 0.7;
-}
-/* --- pool controls --- */
-.huggies-pool-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.6rem;
-  margin: 1rem 0 0.6rem;
-}
-.huggies-pool-search {
-  display: flex;
-  flex: 1 1 200px;
-  min-width: 0;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.huggies-pool-search span {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  opacity: 0.75;
-}
-.huggies-pool-search input {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
-  padding: 0.7rem;
-  font: inherit;
-}
-/* the type filters are a row of buttons, not a dropdown: a dex has
-   thousands of tokens and a list that long cannot be scanned. */
-.huggies-pool-filters {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.15);
-}
-.huggies-pool-filter {
-  width: auto;
-  max-width: none;
-  margin: 0;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: inherit;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  opacity: 0.6;
-}
-.huggies-pool-filter.is-active {
-  opacity: 1;
-  background: var(--color-middle);
-  color: var(--color-fontend);
-}
-.huggies-pool-count {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  opacity: 0.75;
-  margin: 0 0 0.75rem;
-}
-/* --- pool cards --- */
-.huggies-pool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 0.75rem;
-}
-.huggies-pool-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.12);
-  min-width: 0;
-}
-.huggies-pool-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  opacity: 0.8;
-}
-.huggies-pool-card-num {
-  font-size: 10px;
-  opacity: 0.6;
-  overflow-wrap: anywhere;
-}
-.huggies-pool-card-tokens {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.huggies-pool-card-token {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.2rem 0.5rem;
-  align-items: baseline;
-  min-width: 0;
-}
-.huggies-pool-card-token a {
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.huggies-pool-card-amount {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  text-align: right;
-}
-/* the full token id wraps instead of stretching the card. */
-.huggies-pool-card-id-full {
-  grid-column: 1 / -1;
-  font-size: 10px;
-  opacity: 0.55;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
-.huggies-pool-card-link {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.05em;
 }
 /* --- dao ---
    the dao header matches the account page's heading: the name on one
@@ -381,6 +240,17 @@
 .huggies-dao-proposal footer a {
   overflow-wrap: anywhere;
   word-break: break-all;
+}
+/* --- coming soon ---
+   the dex pages that are not built yet. they show the contract id
+   under the notice so the page still says WHICH contract it is. */
+.huggies-contract-coming-soon-id {
+  margin: 0.4rem 0 0;
+}
+.huggies-contract-coming-soon-id code {
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
 }
 /* --- contract links --- */
 /* --- WHY --- the contract CARDS are styled in discover.css. they are

@@ -14,19 +14,22 @@ one html file per contract, all under `frontend/app/contract/`:
 
 served at `/app/contract/<contract>.html`.
 
-the page picks the contract from the `data-contract` attribute on the
-mount element (`<div id="HUGGIES_COMPONENT_CONTRACT_PAGE"
-data-contract="rhea-amm">`), not from a query string, so each file has a
-plain, shareable url.
+each page has its OWN component and its OWN mount id, so there is no
+shared contract page that switches on a contract key:
 
-`frontend/app/contract/contract.html?id=<contract-key>` still works as a
-legacy fallback: the component falls back to the `?id=` query when the
-mount element has no `data-contract` attribute. no internal link points
-at it any more.
+- `lib/components/contract_rhea_amm_page.tsx` — `HUGGIES_COMPONENT_CONTRACT_RHEA_AMM_PAGE`
+- `lib/components/contract_rhea_dcl_v2_page.tsx` — `HUGGIES_COMPONENT_CONTRACT_RHEA_DCL_V2_PAGE`
+- `lib/components/contract_intear_dex_page.tsx` — `HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_PAGE`
+- `lib/components/contract_sputnik_dao_page.tsx` — `HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE`
+- `lib/components/contract_pumpopoly_page.tsx` — `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PAGE`
 
-`frontend/app/contract/discover.html` was removed — the contract cards
-live on the main discover page (`frontend/app/discover.html`), and
-nothing linked to the contracts-only page.
+the shared chrome lives in `lib/components/contract_layout.tsx`: the page
+wrapper, the signed-in account's balance panel, the data-limitations box
+and the links to the other contracts.
+
+`frontend/app/contract/contract.html` was removed — it was a single page
+that switched on a `?id=` contract key, which is the shape this page set
+moved away from.
 
 ## Contract keys
 
@@ -36,9 +39,19 @@ nothing linked to the contracts-only page.
 - `sputnik-dao` — Sputnik DAO selected by `dao_id` (default `sputnik-dao.near`)
 - `pumpopoly` — `world.pumpopoly.near`
 
-Every page shows the contract's pools through one shared pool browser (`lib/components/pool_browser.tsx`): stat cards for **total pools** and **unique tokens**, a token search box, a token filter dropdown, and a pool card grid. The pool list is complete — every pool the dex holds, cached in IndexedDB — so the search is instant and nothing is hidden by a truncation.
+the keys are used by the discover cards (`lib/ts/contract_cards.ts`) to
+link to the pages. they are not read by the pages themselves anymore.
 
-Rhea AMM reports its pool count through `get_number_of_pools`; Rhea DCL has no count view, so its pages are walked until one comes back short; INTEAR DEX/XYK reports through `get_pool_count`.
+## Dex pages
+
+the three dex pages (Rhea AMM, Rhea DCL v2, INTEAR DEX) are placeholders
+for now. each one shows its title as the h1, then `COMING SOON`, then
+its contract id. the pool browser they used to share is gone — the pool
+data it showed was wrong.
+
+the per-dex data loaders (`lib/ts/rhea_amm_page.ts`,
+`lib/ts/rhea_dcl_page.ts`, `lib/ts/intear_dex_page.ts`) stay, because the
+account page still uses them to scan for LP positions.
 
 the contract pages do not list LP positions. there is no clean way to ask a dex "every pool this account has a position in", so that per-pool scan lives only on the account page, where it is bounded and labeled.
 

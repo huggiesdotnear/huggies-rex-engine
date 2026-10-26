@@ -68,12 +68,12 @@ one html file per smart contract, served under `/app/contract/`:
 - `sputnik-dao.html`
 - `pumpopoly.html`
 
-smart-contract details, pools, active-account internal balances, and LP positions
+smart-contract details, active-account internal balances, and LP positions
 
-the page reads the contract from the `data-contract` attribute on its
-mount element, so each file has a plain url. the legacy
-`frontend/app/contract/contract.html?id=<contract-key>` route still works
-as a fallback.
+each page has its own component and mount id — there is no shared
+contract page that switches on a contract key. the three dex pages
+(rhea-amm, rhea-dcl-v2, intear-dex) are placeholders for now and say
+`COMING SOON`.
 
 see [`contracts.md`](./contracts.md)
 
