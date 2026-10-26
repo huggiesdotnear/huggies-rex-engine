@@ -45,11 +45,12 @@
   white-space: nowrap;
 }
 .huggies-balance-panel .huggies-amounts {
-  margin-left: auto;
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+  margin-top: 2px;
+  padding-left: 26px;
 }
 .huggies-balance-panel .huggies-amount {
   font-variant-numeric: tabular-nums;
@@ -62,23 +63,15 @@
   white-space: nowrap;
   opacity: 0.85;
 }
-.huggies-balance-panel .huggies-unit-amount {
-  font-family: monospace;
-  font-size: 10px;
-  opacity: 0.5;
-  display: block;
-  padding-left: 26px;
-  font-variant-numeric: tabular-nums;
-}
 .huggies-balance-panel .huggies-contract {
   font-family: monospace;
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.55;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  line-height: 1.35;
-  margin-top: 2px;
-  padding-left: 26px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .huggies-balance-panel tfoot th {
   text-align: left;
@@ -155,11 +148,12 @@
   white-space: nowrap;
 }
 .huggies-balance-panel .huggies-amounts {
-  margin-left: auto;
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+  margin-top: 2px;
+  padding-left: 26px;
 }
 .huggies-balance-panel .huggies-amount {
   font-variant-numeric: tabular-nums;
@@ -172,23 +166,15 @@
   white-space: nowrap;
   opacity: 0.85;
 }
-.huggies-balance-panel .huggies-unit-amount {
-  font-family: monospace;
-  font-size: 10px;
-  opacity: 0.5;
-  display: block;
-  padding-left: 26px;
-  font-variant-numeric: tabular-nums;
-}
 .huggies-balance-panel .huggies-contract {
   font-family: monospace;
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.55;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  line-height: 1.35;
-  margin-top: 2px;
-  padding-left: 26px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .huggies-balance-panel tfoot th {
   text-align: left;
@@ -284,7 +270,9 @@
   vertical-align: top;
   width: 100%;
 }
-/* --- one row, stacked --- */
+/* --- one row, stacked ---
+   row one: icon, ticker, contract id. row two: the balance and the
+   usd value. */
 .huggies-balance-table .huggies-row-head {
   display: flex;
   align-items: center;
@@ -317,13 +305,27 @@
   background-color: rgba(255, 255, 255, 0.2);
   flex: none;
 }
-/* balance + usd sit right, and keep their digits aligned. */
+/* the contract id sits on row one, clipped so a 64-char id cannot push
+   the row past the page. the title holds the complete value. */
+.huggies-balance-table .huggies-contract {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+/* the balance and the usd value are row two. they keep their digits
+   aligned and never wrap. */
 .huggies-balance-table .huggies-amounts {
-  margin-left: auto;
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+  margin-top: 2px;
+  padding-left: 26px;
 }
 .huggies-balance-table .huggies-amount {
   font-variant-numeric: tabular-nums;
@@ -335,18 +337,6 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   opacity: 0.85;
-}
-/* the full contract id on its own line. it wraps so one long id
-   cannot stretch the row, and the complete value stays selectable. */
-.huggies-balance-table .huggies-contract {
-  font-family: monospace;
-  font-size: 11px;
-  opacity: 0.55;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  line-height: 1.35;
-  margin-top: 2px;
-  padding-left: 26px;
 }
 /* --- pinned NEAR row --- */
 .huggies-balance-table tr.is-pinned td {
@@ -433,11 +423,12 @@
   white-space: nowrap;
 }
 .huggies-balance-panel .huggies-amounts {
-  margin-left: auto;
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+  margin-top: 2px;
+  padding-left: 26px;
 }
 .huggies-balance-panel .huggies-amount {
   font-variant-numeric: tabular-nums;
@@ -450,23 +441,15 @@
   white-space: nowrap;
   opacity: 0.85;
 }
-.huggies-balance-panel .huggies-unit-amount {
-  font-family: monospace;
-  font-size: 10px;
-  opacity: 0.5;
-  display: block;
-  padding-left: 26px;
-  font-variant-numeric: tabular-nums;
-}
 .huggies-balance-panel .huggies-contract {
   font-family: monospace;
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.55;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  line-height: 1.35;
-  margin-top: 2px;
-  padding-left: 26px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .huggies-balance-panel tfoot th {
   text-align: left;

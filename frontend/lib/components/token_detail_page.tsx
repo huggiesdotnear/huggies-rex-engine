@@ -191,7 +191,6 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
                   <tr>
                     <th class="huggies-holder-rank">#</th>
                     <th class="huggies-holder-account">ACCOUNT</th>
-                    <th class="huggies-holder-unit">UNITS</th>
                     <th class="huggies-holder-amount">BALANCE</th>
                     <th class="huggies-holder-usd">USD</th>
                   </tr>
@@ -208,7 +207,6 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
                             {holder.account_id}
                           </a>
                         </td>
-                        <td class="huggies-holder-unit">{holder.balance}</td>
                         <td class="huggies-holder-amount">—</td>
                         <td class="huggies-holder-usd">—</td>
                       </tr>

@@ -1,8 +1,7 @@
 // ========================================
 // the holders table row: rank, account, and the unified token amount
-// (raw unit amount, decimal amount, usd value). renders through the
-// same amount display the account balance rows use, so the two
-// tables cannot drift apart.
+// (decimal amount, usd value). renders through the same amount display
+// the account balance rows use, so the two tables cannot drift apart.
 import { token_amount_display_fun } from "./token_amount_display";
 import { current_app_depth_fun } from "./app_depth";
 import type { HUGGIES_TOKEN_INFO } from "./token_info";
@@ -28,7 +27,6 @@ export function token_holder_row_fun(props: {
       <td class="huggies-holder-account">
         <a href={account_href}>{account_id}</a>
       </td>
-      <td class="huggies-holder-unit">{amount.unit}</td>
       <td class="huggies-holder-amount">{amount.decimal}</td>
       <td class="huggies-holder-usd">{amount.usd}</td>
     </tr>

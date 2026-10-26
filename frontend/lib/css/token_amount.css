@@ -3,23 +3,10 @@
    block. the holders table reuses the account table's look (same class
    names where the meaning matches), so the two tables read the same. */
 /*==================================*/
-/* --- account row: raw unit amount --- */
-/* the exact on-chain integer, printed under the decimal amount. */
-.huggies-balance-table .huggies-unit-amount {
-  font-family: monospace;
-  font-size: 10px;
-  opacity: 0.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-  padding-left: 26px;
-  font-variant-numeric: tabular-nums;
-}
 /* --- holders table --- */
-/* the holders table has five columns, so it cannot use the account
+/* the holders table has four columns, so it cannot use the account
    table's single stacked column. the account cell stays wide and the
-   three amount columns share what is left. */
+   two amount columns share what is left. */
 .huggies-token-holders table {
   table-layout: fixed;
 }
@@ -31,7 +18,7 @@
 }
 .huggies-token-holders th.huggies-holder-account,
 .huggies-token-holders td.huggies-holder-account {
-  width: 34%;
+  width: 40%;
 }
 /* a long account id wraps inside its cell instead of stretching the
    table, so the columns keep their widths. */
@@ -46,22 +33,14 @@
   font-family: monospace;
   font-size: 10px;
 }
-.huggies-token-holders th.huggies-holder-unit,
-.huggies-token-holders td.huggies-holder-unit {
-  width: 26%;
-  font-family: monospace;
-  font-size: 11px;
-  opacity: 0.7;
-  font-variant-numeric: tabular-nums;
-}
 .huggies-token-holders th.huggies-holder-amount,
 .huggies-token-holders td.huggies-holder-amount {
-  width: 22%;
+  width: 30%;
   font-variant-numeric: tabular-nums;
 }
 .huggies-token-holders th.huggies-holder-usd,
 .huggies-token-holders td.huggies-holder-usd {
-  width: 18%;
+  width: 30%;
   text-align: right;
   font-variant-numeric: tabular-nums;
   opacity: 0.85;

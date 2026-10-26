@@ -1,8 +1,8 @@
 // ========================================
-// the shared row shape for every account balance table: icon, ticker,
-// balance and usd on one line, the contract id clipped underneath.
-// both the direct balance table and the rhea deposit table render
-// through this, so the two cannot drift apart.
+// the shared row shape for every account balance table: icon, ticker
+// and contract id on one line, the human balance and usd value on the
+// next. both the direct balance table and the rhea amm balance table
+// render through this, so the two cannot drift apart.
 // --- WHY --- this exists because they already did drift: both tables
 // had their own copy of this markup, and when the styling moved to a
 // shared class the copies were the reason the tables still looked
@@ -49,6 +49,8 @@ export function huggies_token_icon_fun(
 // --- ROW -------------------------------
 // one token, every field stacked in a single cell so the table never
 // needs horizontal scrolling.
+// row one: icon, ticker, contract id. row two: the human balance and
+// the usd value.
 // --- WHY --- keyed by token id, not symbol: symbols are not unique
 // (two different tokens can share one, verified on live data).
 export function huggies_balance_row_fun(props: {
@@ -61,7 +63,7 @@ export function huggies_balance_row_fun(props: {
 }): preact.JSX.Element {
   const { id, raw, info, usd_value, pinned, tag } = props;
   // the one shared amount presentation, so the account row and the
-  // holders table always show the same three numbers the same way.
+  // holders table always show the same numbers the same way.
   const amount = token_amount_display_fun(raw, info);
   return (
     <tr key={id} class={pinned === true ? "is-pinned" : undefined}>
@@ -70,28 +72,25 @@ export function huggies_balance_row_fun(props: {
           {huggies_token_icon_fun(info.icon, info.symbol)}
           <span class="huggies-ticker">{info.symbol}</span>
           {tag !== undefined && <span class="huggies-pinned-tag">{tag}</span>}
-          <span class="huggies-amounts">
-            <span class="huggies-amount">{amount.decimal}</span>
-            <span class="huggies-usd">
-              {usd_value === undefined
-                ? amount.usd
-                : HUGGIES_AMOUNT_FORMAT.usd(usd_value)}
-            </span>
+          {/* the full contract id sits on row one, clipped so a long id
+              cannot push the row wider than the page. the title holds
+              the complete value and the text stays selectable. */}
+          <a
+            class="huggies-contract"
+            title={id}
+            href={token_detail_href_fun(id, current_app_depth_fun())}
+          >
+            {id}
+          </a>
+        </div>
+        <div class="huggies-amounts">
+          <span class="huggies-amount">{amount.decimal}</span>
+          <span class="huggies-usd">
+            {usd_value === undefined
+              ? amount.usd
+              : HUGGIES_AMOUNT_FORMAT.usd(usd_value)}
           </span>
         </div>
-        {/* the raw on-chain unit amount sits under the decimal one, so
-            the exact integer is always visible next to its readable
-            form. */}
-        <span class="huggies-unit-amount">{amount.unit}</span>
-        {/* the full contract id stays selectable and copyable, and is
-            in the title so a clipped id can still be read. */}
-        <a
-          class="huggies-contract"
-          title={id}
-          href={token_detail_href_fun(id, current_app_depth_fun())}
-        >
-          {id}
-        </a>
       </td>
     </tr>
   );
