@@ -386,35 +386,6 @@
   font-size: 13px;
   opacity: 0.8;
 }
-/* --- LP position rows --- */
-.huggies-balance-table .huggies-lp-row-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  min-width: 0;
-}
-.huggies-balance-table .huggies-lp-pair {
-  font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* a long dcl pool id wraps inside the pair cell instead of stretching
-   the row past the page. */
-.huggies-balance-table .huggies-contract,
-.huggies-balance-table .huggies-lp-pool-id {
-  font-family: monospace;
-  font-size: 11px;
-  opacity: 0.6;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  line-height: 1.35;
-}
-.huggies-balance-table .huggies-lp-shares {
-  margin-left: auto;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
 /* --- shared balance panel ---
    the panel is the balance table look under a different wrapper, so
    the contract pages and the dao page show balances exactly like the
