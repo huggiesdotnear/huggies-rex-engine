@@ -22,7 +22,7 @@ import {
 } from "../ts/tokens_page_shit_1170_holder_groups";
 import { fetch_shit_price_ref_fun } from "../ts/tokens_page_shit_1170_price_ref";
 import { fetch_shit_summary_fun } from "../ts/tokens_page_shit_1170_summary";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_token";
 import type { HUGGIES_SHIT_SUMMARY } from "../ts/tokens_page_shit_1170_summary";
 import type { HUGGIES_SHIT_PRICE_REF } from "../ts/tokens_page_shit_1170_price_ref";
 // ========================================
@@ -30,6 +30,19 @@ import type { HUGGIES_SHIT_PRICE_REF } from "../ts/tokens_page_shit_1170_price_r
 type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_TYPE | "all";
 // ========================================
 // --- HELPERS ----------------------------
+// read the api's total supply as a bigint, so the percent math stays
+// exact. a malformed value reads as zero, which makes every percent
+// zero rather than NaN.
+// --- WHY --- the supply carries 18 decimals, so it does not fit in a
+// double without losing digits.
+function bigint_or_zero_fun(value: string): bigint {
+  try {
+    return BigInt(value);
+  } catch {
+    return 0n;
+  }
+}
+// ========================================
 // the link to the account page of one holder.
 function holder_account_href_fun(account_id: string, depth: number): string {
   const prefix = "../".repeat(Math.max(0, depth));
@@ -69,7 +82,10 @@ function render_metadata_fun(
       <div class="huggies-token-meta">
         {shit_meta_row_fun("PRICE", format_price_usd_fun(price_usd))}
         {shit_meta_row_fun("HOLDERS", summary.holders.toLocaleString())}
-        {shit_meta_row_fun("TOTAL SUPPLY", shit_total_supply_formatted_fun())}
+        {shit_meta_row_fun(
+          "TOTAL SUPPLY",
+          shit_total_supply_formatted_fun(summary.total_supply),
+        )}
         {shit_meta_row_fun("DECIMALS", String(summary.decimals))}
         {shit_meta_row_fun("REPUTATION", summary.reputation)}
         {shit_meta_row_fun(
@@ -238,20 +254,40 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
   // --- WHY --- the holder price depends on the price, so the first
   // page is loaded only once the price is known — otherwise every usd
   // column would render as "$0.00".
+  //
+  // --- WHY --- the summary loads FIRST and alone. it carries the
+  // token's decimals, its total supply and its main pool, all of
+  // which the price reference and the holder rows need. nothing about
+  // the token is hardcoded, so the holder math cannot start before
+  // the api has answered.
   use_effect(() => {
     let cancelled = false;
     set_loading(true);
     set_error(null);
-    void Promise.all([fetch_shit_summary_fun(), fetch_shit_price_ref_fun()])
-      .then(async ([loaded_summary, loaded_price_ref]) => {
+    void fetch_shit_summary_fun()
+      .then(async (loaded_summary) => {
         if (cancelled) return;
         set_summary(loaded_summary);
+        const decimals = loaded_summary?.decimals ?? 18;
+        const total_supply_raw = bigint_or_zero_fun(
+          loaded_summary?.total_supply_raw ?? "0",
+        );
+        const loaded_price_ref = await fetch_shit_price_ref_fun(
+          loaded_summary?.main_pool ?? null,
+          decimals,
+        );
+        if (cancelled) return;
         set_price_ref(loaded_price_ref);
         const price_usd =
           loaded_price_ref.price_usd > 0
             ? loaded_price_ref.price_usd
             : (loaded_summary?.price_usd ?? 0);
-        const page = await fetch_shit_holders_fun(null, price_usd);
+        const page = await fetch_shit_holders_fun(
+          null,
+          price_usd,
+          decimals,
+          total_supply_raw,
+        );
         if (cancelled) return;
         set_holders(page.rows);
         set_holder_total(page.total);
@@ -273,7 +309,12 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
     set_loading_more(true);
     const cursor = next_cursor;
     const price_usd = price_ref?.price_usd ?? summary?.price_usd ?? 0;
-    void fetch_shit_holders_fun(cursor, price_usd)
+    void fetch_shit_holders_fun(
+      cursor,
+      price_usd,
+      summary?.decimals ?? 18,
+      bigint_or_zero_fun(summary?.total_supply_raw ?? "0"),
+    )
       .then((page) => {
         set_holders((current) => [...current, ...page.rows]);
         set_holder_total(page.total);
@@ -291,7 +332,10 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
       : holders.filter((holder) => holder.type === active_filter);
 
   // the share of the supply each group of holders holds.
-  const groups = shit_holder_groups_fun(holders);
+  const groups = shit_holder_groups_fun(
+    holders,
+    bigint_or_zero_fun(summary?.total_supply_raw ?? "0"),
+  );
 
   if (loading) return <div class="huggies-shit">LOADING SHIT...</div>;
 

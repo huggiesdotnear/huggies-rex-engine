@@ -23,7 +23,7 @@ import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { HUGGIES_APP_PAGE_ACCOUNT_BALANCE_FILTER } from "../ts/app_page_account_balance_filter";
 import { HUGGIES_APP_PAGE_ACCOUNT_BALANCE_SORT } from "../ts/app_page_account_balance_sort";
-import { huggies_balance_row_fun } from "../ts/balance_row";
+import { huggies_balance_row_fun } from "./balance_row";
 import type { HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY } from "../ts/app_page_account_balance_filter";
 import type { HUGGIES_APP_PAGE_ACCOUNT_SORT_BY } from "../ts/app_page_account_balance_sort";
 // ========================================

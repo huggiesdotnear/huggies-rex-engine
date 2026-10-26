@@ -15,7 +15,7 @@ import type {
 import { current_app_depth_fun } from "../ts/app_depth";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { format_price_usd_fun } from "../ts/tokens_page_token_price_format";
-import { token_holder_row_fun } from "../ts/tokens_page_token_holder_row";
+import { token_holder_row_fun } from "./token_holder_row";
 // ========================================
 // read the token id from the page query string.
 function token_id_from_url_fun(): string | null {

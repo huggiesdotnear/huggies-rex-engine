@@ -14,11 +14,7 @@
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
 import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
-import {
-  HUGGIES_SHIT_DECIMALS,
-  HUGGIES_SHIT_MAIN_POOL,
-  HUGGIES_SHIT_TOKEN_ID,
-} from "./shit_config";
+import { HUGGIES_SHIT_TOKEN_ID } from "./shit_token";
 // ========================================
 // the price api that answers a raw price string for a token id.
 const HUGGIES_PRICE_API_URL = "https://prices.intear.tech/price";
@@ -26,14 +22,22 @@ const HUGGIES_PRICE_API_URL = "https://prices.intear.tech/price";
 // the ref finance contract that owns the pools.
 const HUGGIES_REF_CONTRACT_ID = "v2.ref-finance.near";
 // ========================================
-// the ref pool id of the SHIT/wNEAR pool.
-const HUGGIES_SHIT_POOL_ID = 5767;
-// ========================================
 // the token id of the pool's other side.
 const HUGGIES_SHIT_POOL_PAIR_TOKEN_ID = "wrap.near";
 // ========================================
 // decimals of the pool's other token.
 const HUGGIES_SHIT_POOL_PAIR_DECIMALS = 24;
+// ========================================
+// pull the numeric pool id out of the api's pool label, e.g.
+// "REF-5767" -> 5767.
+// --- WHY --- the intear api reports the main pool as a label, and the
+// ref finance get_pool view wants the bare number.
+function pool_id_from_label_fun(label: string): number | null {
+  const match = label.match(/(\d+)\s*$/);
+  if (match === null) return null;
+  const id = Number.parseInt(match[1], 10);
+  return Number.isFinite(id) ? id : null;
+}
 // ========================================
 // one pool as the ref finance view returns it.
 export interface HUGGIES_SHIT_POOL {
@@ -91,12 +95,14 @@ function raw_to_human_fun(raw: string, decimals: number): number {
 }
 // ========================================
 // fetch the ref finance pool this token is priced against.
-async function fetch_shit_pool_fun(): Promise<HUGGIES_SHIT_POOL | null> {
+async function fetch_shit_pool_fun(
+  pool_id: number,
+): Promise<HUGGIES_SHIT_POOL | null> {
   const pool = await near_kit_contract_view_fun_json<HUGGIES_SHIT_POOL>(
     near_kit_client(),
     HUGGIES_REF_CONTRACT_ID,
     "get_pool",
-    { pool_id: HUGGIES_SHIT_POOL_ID },
+    { pool_id },
   );
   if (!Array.isArray(pool.token_account_ids)) return null;
   return pool;
@@ -104,7 +110,14 @@ async function fetch_shit_pool_fun(): Promise<HUGGIES_SHIT_POOL | null> {
 // ========================================
 // --- PUBLIC -----------------------------
 // fetch the price and the LP-pool reference for the SHIT token.
-export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF> {
+//
+// the pool comes from the intear api (its label, e.g. "REF-5767") and
+// the token's decimals from the same place, so nothing about the
+// token is hardcoded here.
+export async function fetch_shit_price_ref_fun(
+  main_pool: string | null,
+  decimals: number,
+): Promise<HUGGIES_SHIT_PRICE_REF> {
   const empty: HUGGIES_SHIT_PRICE_REF = {
     price_usd: 0,
     pool_id: null,
@@ -113,7 +126,7 @@ export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF
     pool_pair_amount: null,
     pool_implied_price_usd: null,
     pool_tvl_usd: null,
-    pool_label: null,
+    pool_label: main_pool,
     pool_error: null,
   };
   // the price is the important half — a missing pool must not hide it.
@@ -123,14 +136,23 @@ export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF
   } catch {
     price_usd = 0;
   }
+  // --- WHY --- the pool label is the api's own answer ("REF-5767"),
+  // and the bare number in it is what the ref finance view wants.
+  const pool_id = main_pool === null ? null : pool_id_from_label_fun(main_pool);
+  if (pool_id === null) {
+    return {
+      ...empty,
+      price_usd,
+      pool_error: "the api reported no main pool for this token",
+    };
+  }
   let pool: HUGGIES_SHIT_POOL | null = null;
   try {
-    pool = await fetch_shit_pool_fun();
+    pool = await fetch_shit_pool_fun(pool_id);
   } catch (err: unknown) {
     return {
       ...empty,
       price_usd,
-      pool_label: HUGGIES_SHIT_MAIN_POOL,
       pool_error: err instanceof Error ? err.message : String(err),
     };
   }
@@ -138,7 +160,6 @@ export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF
     return {
       ...empty,
       price_usd,
-      pool_label: HUGGIES_SHIT_MAIN_POOL,
       pool_error: "pool view returned no usable pool",
     };
   }
@@ -149,7 +170,6 @@ export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF
     return {
       ...empty,
       price_usd,
-      pool_label: HUGGIES_SHIT_MAIN_POOL,
       pool_error: "pool does not contain the token",
     };
   }
@@ -157,7 +177,7 @@ export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF
   const pair_token_id = pool.token_account_ids[pair_index];
   const shit_amount = raw_to_human_fun(
     pool.amounts[shit_index] ?? "0",
-    HUGGIES_SHIT_DECIMALS,
+    decimals,
   );
   const pair_amount = raw_to_human_fun(
     pool.amounts[pair_index] ?? "0",
@@ -174,14 +194,14 @@ export async function fetch_shit_price_ref_fun(): Promise<HUGGIES_SHIT_PRICE_REF
     shit_amount > 0 ? (pair_amount * pair_price) / shit_amount : null;
   return {
     price_usd,
-    pool_id: HUGGIES_SHIT_POOL_ID,
+    pool_id,
     pool_pair_token_id: pair_token_id,
     pool_shit_amount: shit_amount,
     pool_pair_amount: pair_amount,
     pool_implied_price_usd: implied_price,
     pool_tvl_usd:
       implied_price === null ? null : shit_amount * implied_price * 2,
-    pool_label: HUGGIES_SHIT_MAIN_POOL,
+    pool_label: main_pool,
     pool_error: null,
   };
 }

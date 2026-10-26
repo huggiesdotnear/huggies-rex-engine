@@ -11,7 +11,7 @@ import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "../ts/app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
-import { huggies_balance_row_fun } from "../ts/balance_row";
+import { huggies_balance_row_fun } from "./balance_row";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

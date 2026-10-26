@@ -4,7 +4,7 @@
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { current_app_depth_fun } from "../ts/app_depth";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_token";
 // ========================================
 // the token id on the page, or null when there is none.
 function token_id_from_url_fun(): string | null {

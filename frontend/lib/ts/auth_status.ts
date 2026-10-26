@@ -16,7 +16,7 @@
 // network id -- the two share the wallet's storage namespace, and
 // near-connect's signOut() wipes that whole namespace regardless of
 // network, so a toggle could take the other network's session down
-// with it. frontend/lib/ts/network.ts pins the network to mainnet.
+// with it. frontend/lib/ts/hello.ts pins the network to mainnet.
 // --- WHY --- a wallet can expose SEVERAL accounts at once (the
 // near-connect sign-in event carries one signed message per
 // account). the first version of this file kept only accounts[0]
@@ -34,7 +34,6 @@ import {
   HUGGIES_AUTH_SESSIONS,
   type HUGGIES_AUTH_SESSION,
 } from "./auth_sessions";
-import { HUGGIES_NETWORK } from "./network";
 // ========================================
 // ========================================
 // ========================================
@@ -43,6 +42,15 @@ import { HUGGIES_NETWORK } from "./network";
 // frontend/lib/ts/auth_sessions.ts, which also owns the migration
 // from the old single-session key.
 // ========================================
+// ========================================
+// --- CONFIG -----------------------------
+// the network this app signs on. mainnet-only — frontend/lib/ts/hello.ts
+// pins the stored network id to mainnet before anything reads it.
+// --- WHY --- the session still records its network even though the
+// app is mainnet-only: a signature is only meaningful against the
+// RPC it was made on, so the server-side verify needs to know which
+// network to check against.
+const network = "mainnet" as const;
 // ========================================
 // ========================================
 // --- STATE ------------------------------
@@ -212,7 +220,6 @@ async function rollback_connection_fun(
 async function sign_in_fun(): Promise<void> {
   if (last_error !== null) set_error_fun(null);
 
-  const network = HUGGIES_NETWORK;
   const nonce = make_nonce_fun();
   const connector = near_connect_client();
 
@@ -352,7 +359,6 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
   }
 
   const connector = near_connect_client();
-  const network = HUGGIES_NETWORK;
   const nonce = make_nonce_fun();
   try {
     const wallet = await connector.wallet();

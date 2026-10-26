@@ -9,7 +9,9 @@
 // --- WHY --- this app is mainnet-only. the pin has to happen before
 // the first near_connect_client() call, and some pages load
 // app_page_account_route.ts (which inits auth) ahead of this file.
-import "./network";
+// the pages under app/contract/ and app/tokens/ do not load
+// hello.ts themselves, so it is imported here for them.
+import "./hello";
 import "../components/nav";
 import "../components/random_slogan_p";
 import "../components/auth_button";

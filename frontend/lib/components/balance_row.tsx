@@ -7,11 +7,11 @@
 // had their own copy of this markup, and when the styling moved to a
 // shared class the copies were the reason the tables still looked
 // different. one row renderer, one appearance.
-import type { HUGGIES_TOKEN_INFO } from "./token_info";
-import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
-import { token_amount_display_fun } from "./token_amount_display";
-import { token_detail_href_fun } from "./token_link";
-import { current_app_depth_fun } from "./app_depth";
+import type { HUGGIES_TOKEN_INFO } from "../ts/token_info";
+import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
+import { token_amount_display_fun } from "../ts/token_amount_display";
+import { token_detail_href_fun } from "../ts/token_link";
+import { current_app_depth_fun } from "../ts/app_depth";
 // ========================================
 // ========================================
 // --- ICON ------------------------------

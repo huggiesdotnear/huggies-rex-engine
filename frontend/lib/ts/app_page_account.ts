@@ -44,7 +44,6 @@ import {
 import { api_intear_balances_get } from "../../../middleman";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
-import { HUGGIES_NETWORK } from "./network";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "./token_info";
 // ========================================
 // ========================================
@@ -57,8 +56,10 @@ const HUGGIES_BALANCE_SOURCES = ["direct", "native"] as const;
 // the rhea dcl v2 contract.
 const HUGGIES_RHEA_DCL_CONTRACT_ID = "dclv2.ref-labs.near";
 // the rhea amm contract for this app's network.
+// --- WHY --- this app is mainnet-only, so the network is a literal
+// here rather than a value read from somewhere.
 function rhea_amm_contract_id_fun(): string {
-  return rhea_ammv2_contractid(HUGGIES_NETWORK);
+  return rhea_ammv2_contractid("mainnet");
 }
 // ========================================
 // ========================================

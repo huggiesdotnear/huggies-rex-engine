@@ -4,9 +4,8 @@
 // the holder list is grouped by the known-holder type (dev, dex, nft,
 // vault, burn) plus the regular holders. this module adds up the raw
 // balance of every holder in a group and turns it into a share of the
-// 1,000,000,000 SHIT total supply.
+// SHIT total supply, which comes from the intear api.
 // ========================================
-import { HUGGIES_SHIT_TOTAL_SUPPLY_RAW } from "./shit_config";
 import type { HUGGIES_SHIT_HOLDER } from "./tokens_page_shit_1170_holders";
 import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./tokens_page_shit_1170_known_holders";
 // ========================================
@@ -39,12 +38,13 @@ function format_group_percent_fun(percent: number): string {
 }
 // ========================================
 // the share of the total supply a raw balance holds, in percent.
-function raw_percent_fun(raw: bigint): number {
+function raw_percent_fun(raw: bigint, total_supply_raw: bigint): number {
   // --- WHY --- the raw balance and the raw supply are both 18-decimal
   // integers, so the ratio is computed on BigInt and only then scaled
   // to a percent. doing it in floating point loses the sub-0.001%
   // groups this page still has to show.
-  const scaled = (raw * 10_000n) / HUGGIES_SHIT_TOTAL_SUPPLY_RAW;
+  if (total_supply_raw <= 0n) return 0;
+  const scaled = (raw * 10_000n) / total_supply_raw;
   return Number(scaled) / 100;
 }
 // ========================================
@@ -53,6 +53,7 @@ function raw_percent_fun(raw: bigint): number {
 // total supply.
 export function shit_holder_groups_fun(
   holders: ReadonlyArray<HUGGIES_SHIT_HOLDER>,
+  total_supply_raw: bigint,
 ): HUGGIES_SHIT_HOLDER_GROUP[] {
   const raw_totals = new Map<HUGGIES_SHIT_HOLDER_ROW_TYPE, bigint>();
   const counts = new Map<HUGGIES_SHIT_HOLDER_ROW_TYPE, number>();
@@ -70,7 +71,7 @@ export function shit_holder_groups_fun(
     (type) => (counts.get(type) ?? 0) > 0,
   ).map((type) => {
     const raw_total = raw_totals.get(type) ?? 0n;
-    const percent = raw_percent_fun(raw_total);
+    const percent = raw_percent_fun(raw_total, total_supply_raw);
     return {
       type,
       count: counts.get(type) ?? 0,

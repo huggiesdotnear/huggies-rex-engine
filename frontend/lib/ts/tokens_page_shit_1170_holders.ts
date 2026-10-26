@@ -2,12 +2,7 @@
 // INTEAR all-holders fetch and display formatting for the SHIT page.
 // ========================================
 import { api_intear_holders_get } from "../../../middleman";
-import {
-  HUGGIES_SHIT_DECIMALS,
-  HUGGIES_SHIT_TOKEN_ID,
-  HUGGIES_SHIT_TOTAL_SUPPLY,
-  HUGGIES_SHIT_TOTAL_SUPPLY_RAW,
-} from "./shit_config";
+import { HUGGIES_SHIT_TOKEN_ID } from "./shit_token";
 import {
   HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
   shit_holder_type_fun,
@@ -85,7 +80,7 @@ function format_percent_fun(percent: number): string {
 }
 // ========================================
 // the share of the total supply a raw balance holds, in percent.
-function balance_percent_fun(balance: string): number {
+function balance_percent_fun(balance: string, total_supply_raw: bigint): number {
   // --- WHY --- the raw balance and the raw supply are both 18-decimal
   // integers, so the ratio is computed on BigInt and only then scaled
   // to a percent. doing it in floating point loses the sub-0.001%
@@ -96,15 +91,22 @@ function balance_percent_fun(balance: string): number {
   } catch {
     raw = 0n;
   }
-  const scaled = (raw * 10_000n) / HUGGIES_SHIT_TOTAL_SUPPLY_RAW;
+  if (total_supply_raw <= 0n) return 0;
+  const scaled = (raw * 10_000n) / total_supply_raw;
   return Number(scaled) / 100;
 }
 // ========================================
 // --- PUBLIC -----------------------------
 // fetch one cursor page of SHIT holders, classified and formatted.
+//
+// the token's decimals and total supply come from the intear api (via
+// the summary), not from a local constant, so the page's numbers are
+// always the ones the api reports.
 export async function fetch_shit_holders_fun(
   cursor: string | null,
   price_usd: number,
+  decimals: number,
+  total_supply_raw: bigint,
 ): Promise<HUGGIES_SHIT_HOLDERS_PAGE> {
   const response = await api_intear_holders_get({
     token: HUGGIES_SHIT_TOKEN_ID,
@@ -114,9 +116,9 @@ export async function fetch_shit_holders_fun(
   const rows = response.rows.map((row) => {
     const account_id = row[0];
     const balance = row[1];
-    const amount = raw_to_human_fun(balance, HUGGIES_SHIT_DECIMALS);
+    const amount = raw_to_human_fun(balance, decimals);
     const usd_value = amount * price_usd;
-    const percent = balance_percent_fun(balance);
+    const percent = balance_percent_fun(balance, total_supply_raw);
     return {
       account_id,
       balance,
@@ -163,8 +165,12 @@ export function shit_holder_type_label_fun(
 }
 // ========================================
 // the human-readable total supply, for the summary block.
-export function shit_total_supply_formatted_fun(): string {
-  return HUGGIES_SHIT_TOTAL_SUPPLY.toLocaleString();
+// --- WHY --- the supply comes from the intear api, so the number shown
+// is the one the api reports rather than a local constant.
+export function shit_total_supply_formatted_fun(total_supply: string): string {
+  const value = Number(total_supply);
+  if (!Number.isFinite(value)) return total_supply;
+  return value.toLocaleString();
 }
 // ========================================
 // copyright 2026 by sleet.near

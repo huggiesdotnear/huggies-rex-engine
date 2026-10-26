@@ -2,7 +2,7 @@
 // token summary fetch for the dedicated SHIT page.
 // ========================================
 import { api_intear_tokens_get } from "../../../middleman";
-import { HUGGIES_SHIT_TOKEN_ID } from "./shit_config";
+import { HUGGIES_SHIT_TOKEN_ID } from "./shit_token";
 // ========================================
 // the metadata fields the summary shows.
 //
@@ -19,6 +19,9 @@ const HUGGIES_SHIT_SUMMARY_FIELDS = [
   "holders",
   "liquidity_usd",
   "market_cap_usd",
+  "total_supply",
+  "total_supply_with_decimals",
+  "main_pool",
 ] as const;
 // ========================================
 // the token summary shown at the top of the page.
@@ -32,12 +35,29 @@ export interface HUGGIES_SHIT_SUMMARY {
   holders: number;
   liquidity_usd: number;
   market_cap_usd: number;
+  // the total supply, in the token's smallest unit, as the raw
+  // decimal string the api reports. the percent math runs on this.
+  total_supply_raw: string;
+  // the total supply, human readable.
+  total_supply: string;
+  // the ref finance pool the token is priced against, e.g. "REF-5767".
+  main_pool: string | null;
 }
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
 function to_finite_number_fun(value: unknown): number {
-  const parsed = typeof value === "number" ? value : Number(String(value));
+  const parsed = typeof value === "number" ? Number(value) : Number(String(value));
   return Number.isFinite(parsed) ? parsed : 0;
+}
+// ========================================
+// read a decimal string the api reports, keeping it as a string so the
+// big-integer math downstream stays exact.
+// --- WHY --- the supply does not fit in a double once it carries 18
+// decimals, and the percent math needs every digit.
+function to_decimal_string_fun(value: unknown, fallback: string): string {
+  if (typeof value === "string" && value.trim().length > 0) return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return fallback;
 }
 // ========================================
 // fetch the SHIT token summary from the intear api.
@@ -62,6 +82,9 @@ export async function fetch_shit_summary_fun(): Promise<HUGGIES_SHIT_SUMMARY | n
     holders,
     liquidity_usd,
     market_cap_usd,
+    total_supply,
+    total_supply_with_decimals,
+    main_pool,
   ] = row;
   return {
     id: HUGGIES_SHIT_TOKEN_ID,
@@ -73,6 +96,9 @@ export async function fetch_shit_summary_fun(): Promise<HUGGIES_SHIT_SUMMARY | n
     holders: to_finite_number_fun(holders),
     liquidity_usd: to_finite_number_fun(liquidity_usd),
     market_cap_usd: to_finite_number_fun(market_cap_usd),
+    total_supply_raw: to_decimal_string_fun(total_supply, "0"),
+    total_supply: to_decimal_string_fun(total_supply_with_decimals, "0"),
+    main_pool: typeof main_pool === "string" ? main_pool : null,
   };
 }
 // ========================================

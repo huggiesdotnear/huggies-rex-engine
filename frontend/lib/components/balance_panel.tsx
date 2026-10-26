@@ -4,7 +4,7 @@
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
-import { huggies_balance_row_fun } from "../ts/balance_row";
+import { huggies_balance_row_fun } from "./balance_row";
 import { api_intear_balances_get } from "../../../middleman";
 // ========================================
 export interface HUGGIES_BALANCE_PANEL_PROPS {

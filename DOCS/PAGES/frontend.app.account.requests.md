@@ -77,7 +77,7 @@ other three tables intact, and the message lands in `data.errors`.
 
 ## THE CHECK
 
-[`frontend/lib/ts/app_page_account.test.tsx`](../../frontend/lib/ts/app_page_account.test.tsx)
+[`frontend/lib/components/app_page_account.test.tsx`](../../frontend/lib/components/app_page_account.test.tsx)
 drives the real loader and asserts the page makes one balances request,
 at most one durable token request, exactly one volatile token request,
 and no duplicate urls.

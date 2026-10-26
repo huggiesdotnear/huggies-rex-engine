@@ -2,9 +2,9 @@
 // the holders table row: rank, account, and the unified token amount
 // (decimal amount, usd value). renders through the same amount display
 // the account balance rows use, so the two tables cannot drift apart.
-import { token_amount_display_fun } from "./token_amount_display";
-import { current_app_depth_fun } from "./app_depth";
-import type { HUGGIES_TOKEN_INFO } from "./token_info";
+import { token_amount_display_fun } from "../ts/token_amount_display";
+import { current_app_depth_fun } from "../ts/app_depth";
+import type { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 // ========================================
 
 // ========================================
