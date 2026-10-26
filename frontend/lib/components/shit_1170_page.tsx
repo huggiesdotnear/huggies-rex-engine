@@ -22,6 +22,7 @@ import {
 } from "../ts/shit_holder_groups";
 import { fetch_shit_price_ref_fun } from "../ts/shit_price_ref";
 import { fetch_shit_summary_fun } from "../ts/shit_summary";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
 import type { HUGGIES_SHIT_SUMMARY } from "../ts/shit_summary";
 import type { HUGGIES_SHIT_PRICE_REF } from "../ts/shit_price_ref";
 // ========================================
@@ -33,12 +34,6 @@ type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_TYPE | "all";
 function holder_account_href_fun(account_id: string, depth: number): string {
   const prefix = "../".repeat(Math.max(0, depth));
   return `${prefix}account.html?id=${encodeURIComponent(account_id)}`;
-}
-// ========================================
-// the link back to the regular token page.
-function shit_token_page_href_fun(depth: number): string {
-  const prefix = "../".repeat(Math.max(0, depth));
-  return `${prefix}tokens/token.html?id=shit-1170.meme-cooking.near`;
 }
 // ========================================
 // format a usd price with enough digits to stay readable.
@@ -112,14 +107,6 @@ function render_metadata_fun(
           LP REFERENCE UNAVAILABLE: {price_ref.pool_error}
         </p>
       )}
-      {summary.description !== null && (
-        <p class="huggies-shit-description">{summary.description}</p>
-      )}
-      <p class="huggies-shit-links">
-        <a href={shit_token_page_href_fun(current_app_depth_fun())}>
-          OPEN FULL TOKEN PAGE
-        </a>
-      </p>
     </section>
   );
 }
@@ -337,6 +324,10 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
   return (
     <div class="huggies-shit-page huggies-page">
       {error !== null && <p class="huggies-shit-error">{error}</p>}
+      <header class="huggies-shit-header">
+        <h1>{HUGGIES_SHIT_TOKEN_ID}</h1>
+      </header>
+      {render_groups_fun(groups)}
       <section class="huggies-shit-holders">
         <h2>
           HOLDERS (
@@ -346,7 +337,6 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
         {render_filters_fun(active_filter, groups, (filter) =>
           set_active_filter(filter),
         )}
-        {render_groups_fun(groups)}
         {filtered_holders.length === 0 ? (
           <p>NO HOLDERS IN THIS CATEGORY</p>
         ) : (

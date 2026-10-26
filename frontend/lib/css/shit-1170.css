@@ -6,16 +6,16 @@
   width: 100%;
   text-align: left;
 }
-.huggies-shit-description {
-  margin: 12px 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  opacity: 0.85;
+/*==================================*/
+/* the page heading: the contract account id */
+.huggies-shit-header {
+  margin-bottom: 16px;
 }
-.huggies-shit-links {
-  margin: 10px 0 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
+.huggies-shit-header h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 .huggies-shit-pool-error,
 .huggies-shit-error {
@@ -26,38 +26,37 @@
 }
 /*==================================*/
 /* the holder tabs */
-/* the tabs scroll sideways on a narrow screen, so a group is always   */
-/* one tap away without the row wrapping into a tall stack.           */
+/* a grid, so every tab gets the same share of the width no matter    */
+/* how long its label is. seven tabs of icon + label + percentage     */
+/* cannot fit on one 500px row, so the grid wraps onto two rows and   */
+/* every tab stays the same size.                                      */
 /*==================================*/
 .huggies-shit-tabs {
-  display: flex;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
   margin-bottom: 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.huggies-shit-tabs::-webkit-scrollbar {
-  display: none;
 }
 .huggies-shit-tab {
   /* --- WHY --- the global button rule pins every button to the page
-  column width. these tabs are a row of small pills, so the width is
-  reset here and the row scrolls instead. */
+  column width. these tabs are a grid of small cells, so the width is
+  reset here and the grid hands out the columns instead. */
   width: auto;
   max-width: none;
-  flex: 0 0 auto;
+  min-width: 0;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 1px;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
+  border-radius: 6px;
   background: transparent;
   color: inherit;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   letter-spacing: 0.06em;
-  padding: 6px 10px;
+  padding: 5px 3px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -77,6 +76,10 @@
 }
 .huggies-shit-tab-label {
   line-height: 1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .huggies-shit-tab-percent {
   font-size: 9px;
