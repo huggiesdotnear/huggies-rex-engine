@@ -102,7 +102,16 @@ async function fetch_and_merge_fun(
   const cached = await HUGGIES_TOKEN_CACHE.get_many(asked);
   // the ids whose symbol/decimals/icon we have never stored. on a warm
   // cache this is empty, so no durable request is made at all.
-  const uncached = asked.filter((id) => !cached.has(id));
+  //
+  // `near` is EXCLUDED on purpose. intear has no `near` entry in
+  // /tokens — it comes back in the response's `missing` list — so it
+  // can never be written to the cache by the api. which used to mean it
+  // was "uncached" on every single load, and every caller that wanted
+  // it fired its own durable request for it. `near` is described
+  // locally and cached explicitly below instead.
+  const uncached = asked.filter(
+    (id) => id !== HUGGIES_NEAR_ID && !cached.has(id),
+  );
 
   // 1. durable fields, only for ids we have never stored. empty list
   // means a warm cache, and the request is skipped entirely.
@@ -143,6 +152,17 @@ async function fetch_and_merge_fun(
   // a failed cache write cannot strip decimals off a token.
   const durable = new Map(cached);
   for (const [id, record] of fetched) durable.set(id, record);
+  // `near` is described locally, so it never needs a durable request.
+  // it goes into the durable map so the render below has its symbol and
+  // decimals.
+  if (asked.includes(HUGGIES_NEAR_ID)) {
+    durable.set(HUGGIES_NEAR_ID, {
+      id: HUGGIES_NEAR_ID,
+      symbol: HUGGIES_NEAR_SYMBOL,
+      decimals: HUGGIES_NEAR_DECIMALS,
+      icon: null,
+    });
+  }
 
   for (const row of live.rows) {
     const [id, price_usd, reputation, holders] = row;
@@ -183,6 +203,22 @@ async function fetch_and_merge_fun(
       holders: 0,
     });
   }
+
+  // `near` is written to the cache so later loads treat it as known.
+  //
+  // --- WHY --- the api has no `near` row, so the loop above never
+  // stores it. without this it stayed uncached forever, and every
+  // caller that wanted it made its own durable request for it. writing
+  // it here closes that hole for good. `wrap.near` is a real token and
+  // is stored by the api response, but it is written here too so the
+  // pair is kept together.
+  const to_store: Array<HUGGIES_CACHED_TOKEN> = [];
+  for (const id of [HUGGIES_NEAR_ID, HUGGIES_WRAP_ID]) {
+    const record = durable.get(id);
+    if (record !== undefined) to_store.push(record);
+  }
+  await HUGGIES_TOKEN_CACHE.put_many(to_store);
+
   return out;
 }
 // ========================================

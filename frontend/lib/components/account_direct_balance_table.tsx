@@ -1,11 +1,16 @@
 // ========================================
 // <table> of an account's token balances from the intear api.
-// reads the `?id=` url parameter through lib/ts/account_id.ts, joins
-// token metadata through lib/ts/token_info.ts (indexeddb-cached),
-// filters through balance_filter.ts and sorts through balance_sort.ts.
-// amounts are rendered human-readable via token_amount_format.ts.
-// one row per token, each field stacked in a single column so the
-// table never needs horizontal scrolling. mounts into
+//
+// this component does NOT fetch. the account page has one loader
+// (lib/ts/account_page.ts) and this component reads its result from the
+// page store (lib/ts/account_page_store.ts). read that file to see what
+// the account page requests.
+//
+// reads the `?id=` url parameter through lib/ts/account_id.ts, filters
+// through balance_filter.ts and sorts through balance_sort.ts. amounts
+// are rendered human-readable via token_amount_format.ts. one row per
+// token, each field stacked in a single column so the table never needs
+// horizontal scrolling. mounts into
 // <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE">.
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
@@ -13,8 +18,7 @@ import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_ACCOUNT_ID } from "../ts/account_id";
-import { api_intear_balances_get } from "../../../middleman";
-import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
+import { HUGGIES_ACCOUNT_PAGE_STORE } from "../ts/account_page_store";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { HUGGIES_BALANCE_FILTER } from "../ts/balance_filter";
 import { HUGGIES_BALANCE_SORT } from "../ts/balance_sort";
@@ -24,12 +28,6 @@ import type { HUGGIES_SORT_BY } from "../ts/balance_sort";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// "direct" is what the account holds itself; "native" is the chain's
-// own NEAR balance, which intear reports as its own source. both come
-// from the SAME /balances request — there is no separate endpoint for
-// the NEAR balance. "rhea" (LP positions) is deliberately left out; a
-// later component covering LP holdings is the place to add it.
-const HUGGIES_BALANCE_SOURCES = ["direct", "native"] as const;
 // the native NEAR row is pinned above the sorted list: it is the gas
 // balance an account cannot function without, so it is not competing
 // for rank with the rest.
@@ -38,47 +36,6 @@ const HUGGIES_NEAR_ID = "near";
 // opening their own account wants to see.
 const HUGGIES_DEFAULT_SORT_BY: HUGGIES_SORT_BY = "usd";
 const HUGGIES_DEFAULT_SORT_DESC = true;
-// ========================================
-// ========================================
-// --- FETCH -----------------------------
-// pull balances, attach metadata, apply the filter, and hand back the
-// entries the table renders plus how many were hidden.
-// --- WHY --- the hidden count is returned rather than recomputed in the
-// component: only here do we know both the pre-filter and post-filter
-// sizes, and the note under the table needs the difference.
-async function fetch_balance_entries_fun(
-  account_id: string,
-): Promise<{
-  entries: ReadonlyArray<HUGGIES_BALANCE_ENTRY>;
-  hidden_count: number;
-}> {
-  const response = await api_intear_balances_get({
-    account: account_id,
-    sources: HUGGIES_BALANCE_SOURCES,
-  });
-
-  const rows = response.balances.rows;
-  // a 0 balance means the account merely touched the token once; it is
-  // not a holding and must not reach the table.
-  const nonzero = rows.filter((row) => row[2] !== "0");
-
-  const info_map = await HUGGIES_TOKEN_INFO.get(nonzero.map((row) => row[0]));
-
-  const entries: Array<HUGGIES_BALANCE_ENTRY> = [];
-  for (const row of nonzero) {
-    const info = info_map.get(row[0]);
-    if (info === undefined) continue;
-    entries.push({
-      id: row[0],
-      raw: row[2],
-      usd_value: HUGGIES_AMOUNT_FORMAT.balance_usd(row[2], info),
-      info,
-    });
-  }
-  const kept = HUGGIES_BALANCE_FILTER.filter(entries);
-  return { entries: kept, hidden_count: entries.length - kept.length };
-}
-// ========================================
 // ========================================
 // ========================================
 // ========================================
@@ -125,49 +82,26 @@ function sort_toggle_fun(
   );
 }
 // ========================================
-// ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
   // ========================================
-  const [entries, set_entries] = use_state<
-    ReadonlyArray<HUGGIES_BALANCE_ENTRY> | null
-  >(null);
-  const [error, set_error] = use_state<string | null>(null);
+  const [, set_revision] = use_state(0);
   const [sort_by, set_sort_by] = use_state<HUGGIES_SORT_BY>(
     HUGGIES_DEFAULT_SORT_BY,
   );
   const [sort_desc, set_sort_desc] = use_state(HUGGIES_DEFAULT_SORT_DESC);
-  const [hidden_count, set_hidden_count] = use_state(0);
 
   const account_id = HUGGIES_ACCOUNT_ID.get_account_id();
 
-  // refetch whenever the page's account id changes (including to null,
-  // which drops the old rows).
+  // the page store owns the load. this component starts it once and
+  // re-renders when it lands.
   use_effect(() => {
-    if (account_id === null) {
-      set_entries(null);
-      set_error(null);
-      set_hidden_count(0);
-      return;
-    }
-    let cancelled = false;
-    set_error(null);
-    void fetch_balance_entries_fun(account_id)
-      .then((result) => {
-        if (cancelled) return;
-        set_entries(result.entries);
-        set_hidden_count(result.hidden_count);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        const message = err instanceof Error ? err.message : String(err);
-        set_entries(null);
-        set_error(message);
-        console.warn("[account_direct_balance_table] balances fetch failed", err);
-      });
-    return () => {
-      cancelled = true;
-    };
+    if (account_id === null) return;
+    const unsubscribe = HUGGIES_ACCOUNT_PAGE_STORE.subscribe(() => {
+      set_revision((revision) => revision + 1);
+    });
+    void HUGGIES_ACCOUNT_PAGE_STORE.load(account_id);
+    return unsubscribe;
   }, [account_id]);
 
   // clicking the active key flips direction; clicking a new key
@@ -184,14 +118,30 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
   // no `?id=` on this url — render nothing.
   if (account_id === null) return <></>;
 
+  const page_data = HUGGIES_ACCOUNT_PAGE_STORE.get_data();
+
   // the native NEAR holding is pulled out of the sortable list and
   // pinned above it; everything else competes on usd or ticker.
-  const all_entries = entries ?? [];
+  const all_entries: Array<HUGGIES_BALANCE_ENTRY> = (page_data?.direct ?? []).map(
+    (balance) => ({
+      id: balance.id,
+      raw: balance.raw,
+      usd_value: balance.usd_value,
+      info: balance.info,
+    }),
+  );
   const near_entry = all_entries.find((entry) => entry.id === HUGGIES_NEAR_ID);
   const rest = all_entries.filter((entry) => entry.id !== HUGGIES_NEAR_ID);
-  const sorted = HUGGIES_BALANCE_SORT.sort(rest, sort_by, sort_desc);
+  // the balance filter hides dust and spam. it runs here so the hidden
+  // count is known for the note under the table.
+  const kept = HUGGIES_BALANCE_FILTER.filter(rest);
+  const hidden_count = rest.length - kept.length;
+  const sorted = HUGGIES_BALANCE_SORT.sort(kept, sort_by, sort_desc);
   // the total covers the pinned row too, so it is not counted twice.
-  const total_usd = all_entries.reduce((sum, entry) => sum + entry.usd_value, 0);
+  const total_usd = all_entries.reduce(
+    (sum, entry) => sum + entry.usd_value,
+    0,
+  );
 
   return (
     <>
@@ -201,7 +151,7 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
       <div class="huggies-scroll">
         <table data-huggies-account={account_id}>
           <tbody>
-            {entries === null && error === null && (
+            {page_data === null && (
               <tr>
                 <td>LOADING...</td>
               </tr>
@@ -222,13 +172,15 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
                 usd_value: entry.usd_value,
               }),
             )}
-            {entries !== null && sorted.length === 0 && near_entry === undefined && (
-              <tr>
-                <td>
-                  NO BALANCES OVER {HUGGIES_BALANCE_FILTER.min_usd} USD
-                </td>
-              </tr>
-            )}
+            {page_data !== null &&
+              sorted.length === 0 &&
+              near_entry === undefined && (
+                <tr>
+                  <td>
+                    NO BALANCES OVER {HUGGIES_BALANCE_FILTER.min_usd} USD
+                  </td>
+                </tr>
+              )}
           </tbody>
           <tfoot>
             <tr>
@@ -247,7 +199,6 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
           {hidden_count} low-value holding{hidden_count === 1 ? "" : "s"} hidden
         </p>
       )}
-      {error !== null && <p data-huggies-balance-error={error}>{error}</p>}
     </>
   );
 }
