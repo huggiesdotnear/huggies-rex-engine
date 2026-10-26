@@ -59,9 +59,8 @@ export function huggies_balance_row_fun(props: {
   info: HUGGIES_TOKEN_INFO;
   usd_value?: number;
   pinned?: boolean;
-  tag?: string;
 }): preact.JSX.Element {
-  const { id, raw, info, usd_value, pinned, tag } = props;
+  const { id, raw, info, usd_value, pinned } = props;
   // the one shared amount presentation, so the account row and the
   // holders table always show the same numbers the same way.
   const amount = token_amount_display_fun(raw, info);
@@ -71,7 +70,6 @@ export function huggies_balance_row_fun(props: {
         <div class="huggies-row-head">
           {huggies_token_icon_fun(info.icon, info.symbol)}
           <span class="huggies-ticker">{info.symbol}</span>
-          {tag !== undefined && <span class="huggies-pinned-tag">{tag}</span>}
           {/* the full contract id sits on row one, clipped so a long id
               cannot push the row wider than the page. the title holds
               the complete value and the text stays selectable. */}

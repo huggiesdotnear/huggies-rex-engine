@@ -295,16 +295,6 @@
   flex: none;
   white-space: nowrap;
 }
-.huggies-balance-table .huggies-pinned-tag {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.2);
-  flex: none;
-}
 /* the contract id sits on row one, clipped so a 64-char id cannot push
    the row past the page. the title holds the complete value. */
 .huggies-balance-table .huggies-contract {

@@ -213,7 +213,6 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
                 info: near_entry.info,
                 usd_value: near_entry.usd_value,
                 pinned: true,
-                tag: "NEAR",
               })}
             {sorted.map((entry) =>
               huggies_balance_row_fun({
