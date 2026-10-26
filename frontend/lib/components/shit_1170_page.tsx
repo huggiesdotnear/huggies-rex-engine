@@ -111,43 +111,30 @@ function render_metadata_fun(
   );
 }
 // ========================================
-// render the filter tabs, each carrying its group's share of supply.
+// render the filter tabs: one emoji per holder type.
 function render_filters_fun(
   active_filter: HUGGIES_SHIT_ACTIVE_FILTER,
-  groups: HUGGIES_SHIT_HOLDER_GROUP[],
   on_filter_fun: (filter: HUGGIES_SHIT_ACTIVE_FILTER) => void,
 ): preact.JSX.Element {
-  // the share of the supply each tab holds, looked up by holder type.
-  const percent_by_type = new Map(
-    groups.map((group) => [group.type, group.percent_formatted]),
-  );
   return (
     <div class="huggies-shit-tabs" role="tablist" aria-label="holder types">
-      {HUGGIES_SHIT_FILTERS.map((filter) => {
-        const percent =
-          filter.key === "all" ? null : (percent_by_type.get(filter.key) ?? null);
-        return (
-          <button
-            type="button"
-            role="tab"
-            class={
-              filter.key === active_filter
-                ? "huggies-shit-tab is-active"
-                : "huggies-shit-tab"
-            }
-            aria-selected={filter.key === active_filter}
-            onClick={() => on_filter_fun(filter.key)}
-          >
-            <span class="huggies-shit-tab-icon">
-              {filter.icon !== "" ? filter.icon : "💩"}
-            </span>
-            <span class="huggies-shit-tab-label">{filter.label}</span>
-            {percent !== null && (
-              <span class="huggies-shit-tab-percent">{percent}</span>
-            )}
-          </button>
-        );
-      })}
+      {HUGGIES_SHIT_FILTERS.map((filter) => (
+        <button
+          type="button"
+          role="tab"
+          class={
+            filter.key === active_filter
+              ? "huggies-shit-tab is-active"
+              : "huggies-shit-tab"
+          }
+          aria-selected={filter.key === active_filter}
+          aria-label={filter.label}
+          title={filter.label}
+          onClick={() => on_filter_fun(filter.key)}
+        >
+          {filter.icon !== "" ? filter.icon : "💩"}
+        </button>
+      ))}
     </div>
   );
 }
@@ -159,16 +146,6 @@ function render_groups_fun(
   return (
     <section class="huggies-shit-groups">
       <h2>HOLDERS BY GROUP</h2>
-      <div class="huggies-shit-groups-bar">
-        {groups.map((group) => (
-          <span
-            key={group.type}
-            class={`huggies-shit-groups-slice is-${group.type}`}
-            style={`width: ${group.percent.toFixed(4)}%`}
-            title={`${shit_holder_type_label_fun(group.type)}: ${group.percent_formatted}`}
-          />
-        ))}
-      </div>
       <ul class="huggies-shit-groups-list">
         {groups.map((group) => (
           <li key={group.type} class={`is-${group.type}`}>
@@ -334,7 +311,7 @@ export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
           {active_filter === "all" ? holder_total : filtered_holders.length}
           {active_filter === "all" ? "" : ` OF ${holder_total}`})
         </h2>
-        {render_filters_fun(active_filter, groups, (filter) =>
+        {render_filters_fun(active_filter, (filter) =>
           set_active_filter(filter),
         )}
         {filtered_holders.length === 0 ? (
