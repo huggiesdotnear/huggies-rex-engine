@@ -1,5 +1,11 @@
 # frontend/app/account.html ?id={account_id}
 
+
+<!--
+this file contains the source of truth for what is on the page.
+do not add classes here as they are something not written in stone.
+-->
+
 ```html
 <main>
 <!--==========================================--><h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1"></h1>
