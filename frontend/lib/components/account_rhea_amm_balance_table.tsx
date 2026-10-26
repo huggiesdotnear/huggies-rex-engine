@@ -69,7 +69,7 @@ async function fetch_balance_entries_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_RHEA_AMM_BALANCE_TABLE_FUN() {
+function HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE_FUN() {
   // ========================================
   const [rows, set_rows] = use_state<ReadonlyArray<{
     id: string;
@@ -98,7 +98,7 @@ function HUGGIES_COMPONENT_RHEA_AMM_BALANCE_TABLE_FUN() {
         const message = err instanceof Error ? err.message : String(err);
         set_rows(null);
         set_error(message);
-        console.warn("[rhea_amm_balance_table] balances fetch failed", err);
+        console.warn("[account_rhea_amm_balance_table] balances fetch failed", err);
       });
     return () => {
       cancelled = true;
@@ -138,12 +138,13 @@ function HUGGIES_COMPONENT_RHEA_AMM_BALANCE_TABLE_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_RHEA_AMM_BALANCE_TABLE;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
     HUGGIES_ACCOUNT_ID.init();
-    render(<HUGGIES_COMPONENT_RHEA_AMM_BALANCE_TABLE_FUN />, el);
+    render(<HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE_FUN />, el);
   }
 }
 // ========================================
