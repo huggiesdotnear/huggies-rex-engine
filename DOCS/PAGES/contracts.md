@@ -56,14 +56,14 @@ the Pumpopoly page reads a player from the `?id=` query parameter — the same s
 
 the page is split into two sections, one per contract it calls. each section's `h2` is the contract id it queries:
 
-- **world.pumpopoly.near** — the `view_player` view. balance, land, board position, credit score and invites, plus who invited the player and their last move.
-- **nft.pumpopoly.near** — the `nft_tokens_for_owner` view. the NFT count and the token ids.
+- **world.pumpopoly.near** — the `view_player` view. the in-game balance leads the section, full width above the cards, then six cards: land, board position, credit score, invites, invited by, and last move.
+- **nft.pumpopoly.near** — the `nft_tokens_for_owner` view. the NFT count card and the token id list.
 
 the h1 is `PUMPOPOLY`, all lowercase to match the site's heading style.
 
 the page ends with a full-width `NEW PLAYERS START HERE` button linking to the Pumpopoly invite for `huggies.near`, the account this app signs players up through. it is not the player being viewed, and there is no separate "INVITE LINK" text label.
 
-Pumpopoly shows NFT count separately from the derived credit score. Credit score is `land_count * 10 + invites * 30`; NFT count is not included. The in-game balance is displayed in human Pumpopoly units alongside the raw contract amount.
+the Pumpopoly token has **24 decimals**, so one unit is 1e24. the balance is shown in human units alongside the raw contract amount. credit score is `land_count * 10 + invites * 30`; the NFT count is not included in it.
 
 =====================
 <br/>

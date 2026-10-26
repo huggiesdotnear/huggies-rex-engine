@@ -4,7 +4,11 @@
 import { near_kit_client } from "@near-kit-tool-box/web";
 import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
 // ========================================
-const HUGGIES_PUMPOPOLY_UNIT = 1_000_000_000_000_000_000n;
+// --- WHY --- the Pumpopoly token has 24 decimals, so one unit is
+// 1e24. dividing by 1e18 showed a balance a million times too big.
+// ========================================
+const HUGGIES_PUMPOPOLY_UNIT = 1_000_000_000_000_000_000_000_000n;
+const HUGGIES_PUMPOPOLY_DECIMALS = 24;
 // ========================================
 export interface HUGGIES_PUMPOPOLY_PLAYER {
   land_count: number;
@@ -44,14 +48,17 @@ function parse_count_fun(value: unknown): number {
 export function format_pumpopoly_balance_fun(raw: string): string {
   try {
     const amount = BigInt(raw);
-    const whole = amount / HUGGIES_PUMPOPOLY_UNIT;
-    const fraction = (amount % HUGGIES_PUMPOPOLY_UNIT)
+    const negative = amount < 0n;
+    const magnitude = negative ? -amount : amount;
+    const whole = magnitude / HUGGIES_PUMPOPOLY_UNIT;
+    const fraction = (magnitude % HUGGIES_PUMPOPOLY_UNIT)
       .toString()
-      .padStart(18, "0")
+      .padStart(HUGGIES_PUMPOPOLY_DECIMALS, "0")
       .replace(/0+$/, "");
+    const sign = negative ? "-" : "";
     return fraction.length === 0
-      ? whole.toLocaleString()
-      : `${whole.toLocaleString()}.${fraction}`;
+      ? `${sign}${whole.toLocaleString()}`
+      : `${sign}${whole.toLocaleString()}.${fraction}`;
   } catch {
     return "0";
   }

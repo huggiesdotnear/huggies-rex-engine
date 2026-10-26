@@ -274,17 +274,17 @@ function render_contract_fun(
     <section>
       <h1>{heading}</h1>
       <h2>world.pumpopoly.near</h2>
+      <div class="huggies-pumpopoly-balance">
+        <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
+        <strong class="huggies-pumpopoly-balance-value">
+          {player?.balance_human ?? "0"}
+        </strong>
+        <span class="huggies-pumpopoly-sub">PUMPOPOLY TOKENS</span>
+        {player !== null && (
+          <code class="huggies-pumpopoly-raw">{player.balance}</code>
+        )}
+      </div>
       <div class="huggies-pumpopoly-cards">
-        <article class="huggies-pumpopoly-card is-balance">
-          <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
-          <strong class="huggies-pumpopoly-value">
-            {player?.balance_human ?? "0"}
-          </strong>
-          <span class="huggies-pumpopoly-sub">PUMPOPOLY TOKENS</span>
-          {player !== null && (
-            <code class="huggies-pumpopoly-raw">{player.balance}</code>
-          )}
-        </article>
         <article class="huggies-pumpopoly-card">
           <span class="huggies-pumpopoly-label">LAND</span>
           <strong class="huggies-pumpopoly-value">
@@ -315,16 +315,18 @@ function render_contract_fun(
             {player?.invitees ?? 0} INVITEES
           </span>
         </article>
-      </div>
-      <div class="huggies-pumpopoly-info">
-        <div>
-          <span>INVITED BY</span>
-          <code>{player?.invited_by || "NONE"}</code>
-        </div>
-        <div>
-          <span>LAST MOVE</span>
-          <code>{player?.last_move || "UNKNOWN"}</code>
-        </div>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">INVITED BY</span>
+          <strong class="huggies-pumpopoly-text">
+            {player?.invited_by || "NONE"}
+          </strong>
+        </article>
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">LAST MOVE</span>
+          <strong class="huggies-pumpopoly-text">
+            {player?.last_move || "UNKNOWN"}
+          </strong>
+        </article>
       </div>
       <h2>nft.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-cards">
