@@ -1,6 +1,6 @@
 // ========================================
 // HUGGIES
-// typed client for our own backend routes under /api/trezu/.
+// typed client for our own backend routes.
 //
 // every call is same-origin against the backend we serve, so the
 // browser never talks to a third party api directly.

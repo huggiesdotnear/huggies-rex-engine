@@ -7,15 +7,21 @@ routes and pages
 every route under `/api/` is prefixed with the api it fronts, so the
 url alone says which backend the route belongs to:
 
+- `/api/huggies/*` - our own routes, nothing is proxied
 - `/api/trezu/*` - our proxy for the trezu api
 - `/api/near/*` - near blockchain interaction
 
 a route with more than one bullet point gets its own file in
 [`ROUTES/`](./ROUTES/).
 
+### `/api/huggies/` - huggies specifics
+
+user info and session managmnets
+
+- `/api/huggies/ping` - liveness check, returns `{ "ok": true, "app": "huggies-rex-engine" }`
+
 ### `/api/trezu/` - trezu specifics
 
-- `/api/trezu/ping` - liveness check, returns `{ "ok": true, "app": "huggies-rex-engine" }`
 - `/api/trezu/user/treasuries` - the treasuries (sputnik daos) an account
   belongs to. proxies `https://api.trezu.app/api/user/treasuries`.
 

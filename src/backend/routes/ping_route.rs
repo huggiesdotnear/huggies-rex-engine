@@ -1,5 +1,5 @@
 // PING_ROUTE
-// GET /api/trezu/ping — basic liveness/ping endpoint. returns
+// GET /api/huggies/ping — basic liveness/ping endpoint. returns
 // { "ok": true, "app": "huggies-rex-engine" } so a future health
 // checker can verify the axum program is up and which app it is.
 // ====================================
