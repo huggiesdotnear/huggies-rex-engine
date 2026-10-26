@@ -8,7 +8,7 @@ import { HUGGIES_AUTH } from "../ts/auth_status";
 import {
   contract_page_href_fun,
   list_contract_cards_fun,
-} from "../ts/contract_cards";
+} from "../ts/app_page_discover_contract_cards";
 import { huggies_balance_panel_fun } from "./balance_panel";
 // ========================================
 export interface HUGGIES_CONTRACT_LAYOUT_PROPS {

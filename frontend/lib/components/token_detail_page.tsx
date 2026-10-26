@@ -7,15 +7,15 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import {
   fetch_token_detail_fun,
   fetch_token_holders_fun,
-} from "../ts/token_detail_fetch";
+} from "../ts/tokens_page_token_detail_fetch";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDER,
-} from "../ts/token_detail";
+} from "../ts/tokens_page_token_detail";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
-import { format_price_usd_fun } from "../ts/token_price_format";
-import { token_holder_row_fun } from "../ts/token_holder_row";
+import { format_price_usd_fun } from "../ts/tokens_page_token_price_format";
+import { token_holder_row_fun } from "../ts/tokens_page_token_holder_row";
 // ========================================
 // read the token id from the page query string.
 function token_id_from_url_fun(): string | null {

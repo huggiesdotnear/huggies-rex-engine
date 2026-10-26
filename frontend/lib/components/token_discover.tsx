@@ -8,22 +8,22 @@ import {
   fetch_all_tokens_fun,
   search_tokens_fun,
   type HUGGIES_TOKEN_SEARCH_RESULT,
-} from "../ts/token_search";
+} from "../ts/app_page_discover_token_search";
 import { token_detail_href_fun } from "../ts/token_link";
-import { order_discover_tokens_fun } from "../ts/token_discover_order";
+import { order_discover_tokens_fun } from "../ts/app_page_discover_token_order";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   token_sort_field_fun,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
-} from "../ts/token_sort";
+} from "../ts/app_page_discover_token_sort";
 import {
   get_cached_token_set_fun,
   put_cached_token_set_fun,
-} from "../ts/token_list_cache";
-import { fetch_token_icons_fun } from "../ts/token_icon_fetch";
-import { pinned_token_ids_fun } from "../ts/pinned_tokens";
+} from "../ts/app_page_discover_token_list_cache";
+import { fetch_token_icons_fun } from "../ts/app_page_discover_token_icon_fetch";
+import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
 import { huggies_sort_control_fun } from "./sort_control";
 // ========================================
 // how long to wait after a keystroke before asking the api. long

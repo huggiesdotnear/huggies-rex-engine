@@ -7,8 +7,8 @@
 // 1,000,000,000 SHIT total supply.
 // ========================================
 import { HUGGIES_SHIT_TOTAL_SUPPLY_RAW } from "./shit_config";
-import type { HUGGIES_SHIT_HOLDER } from "./shit_holders";
-import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./shit_known_holders";
+import type { HUGGIES_SHIT_HOLDER } from "./tokens_page_shit_1170_holders";
+import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./tokens_page_shit_1170_known_holders";
 // ========================================
 // the share of the total supply one group of holders holds.
 export interface HUGGIES_SHIT_HOLDER_GROUP {

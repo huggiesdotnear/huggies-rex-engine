@@ -6,7 +6,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import {
   contract_page_href_fun,
   list_contract_cards_fun,
-} from "../ts/contract_cards";
+} from "../ts/app_page_discover_contract_cards";
 // ========================================
 // shared smart-contract discover component.
 function HUGGIES_COMPONENT_CONTRACT_DISCOVER_FUN() {

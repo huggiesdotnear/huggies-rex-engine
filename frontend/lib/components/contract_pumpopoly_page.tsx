@@ -4,12 +4,12 @@
 import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { load_pumpopoly_page_fun } from "../ts/pumpopoly_page";
+import { load_pumpopoly_page_fun } from "../ts/contract_page_pumpopoly";
 import {
   HUGGIES_PUMPOPOLY_INVITE_ACCOUNT,
   pumpopoly_account_id_from_url_fun,
   pumpopoly_invite_link_fun,
-} from "../ts/pumpopoly_link";
+} from "../ts/contract_page_pumpopoly_link";
 import { huggies_contract_layout_fun } from "./contract_layout";
 // ========================================
 // render the Pumpopoly account selector.

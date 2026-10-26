@@ -7,7 +7,7 @@ import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { current_app_depth_fun } from "../ts/app_depth";
-import { HUGGIES_SHIT_FILTERS } from "../ts/shit_filters";
+import { HUGGIES_SHIT_FILTERS } from "../ts/tokens_page_shit_1170_filters";
 import {
   fetch_shit_holders_fun,
   shit_holder_icon_fun,
@@ -15,16 +15,16 @@ import {
   shit_total_supply_formatted_fun,
   type HUGGIES_SHIT_HOLDER,
   type HUGGIES_SHIT_HOLDER_TYPE,
-} from "../ts/shit_holders";
+} from "../ts/tokens_page_shit_1170_holders";
 import {
   shit_holder_groups_fun,
   type HUGGIES_SHIT_HOLDER_GROUP,
-} from "../ts/shit_holder_groups";
-import { fetch_shit_price_ref_fun } from "../ts/shit_price_ref";
-import { fetch_shit_summary_fun } from "../ts/shit_summary";
+} from "../ts/tokens_page_shit_1170_holder_groups";
+import { fetch_shit_price_ref_fun } from "../ts/tokens_page_shit_1170_price_ref";
+import { fetch_shit_summary_fun } from "../ts/tokens_page_shit_1170_summary";
 import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_config";
-import type { HUGGIES_SHIT_SUMMARY } from "../ts/shit_summary";
-import type { HUGGIES_SHIT_PRICE_REF } from "../ts/shit_price_ref";
+import type { HUGGIES_SHIT_SUMMARY } from "../ts/tokens_page_shit_1170_summary";
+import type { HUGGIES_SHIT_PRICE_REF } from "../ts/tokens_page_shit_1170_price_ref";
 // ========================================
 // the filter currently applied to the holder list.
 type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_TYPE | "all";

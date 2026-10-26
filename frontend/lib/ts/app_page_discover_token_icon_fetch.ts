@@ -5,7 +5,7 @@ import { api_intear_tokens_get } from "../../../middleman";
 import { api_intear_tokens_post } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
-import { HUGGIES_TOKEN_ICON_FIELDS } from "./token_search";
+import { HUGGIES_TOKEN_ICON_FIELDS } from "./app_page_discover_token_search";
 // ========================================
 // how many icons one request may ask for.
 const HUGGIES_ICON_BATCH_SIZE = 300;

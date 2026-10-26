@@ -4,8 +4,8 @@
 import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { load_sputnik_dao_page_fun } from "../ts/sputnik_dao_page";
-import { list_trezu_treasuries_fun } from "../ts/trezu_treasuries";
+import { load_sputnik_dao_page_fun } from "../ts/contract_page_sputnik_dao";
+import { list_trezu_treasuries_fun } from "../ts/contract_page_trezu_treasuries";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { huggies_contract_layout_fun } from "./contract_layout";
 // ========================================

@@ -9,7 +9,7 @@ import { token_row_by_name_fun } from "./token_row_by_name";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,
-} from "./token_detail";
+} from "./tokens_page_token_detail";
 // ========================================
 const HUGGIES_TOKEN_DETAIL_FIELDS = [
   "name",

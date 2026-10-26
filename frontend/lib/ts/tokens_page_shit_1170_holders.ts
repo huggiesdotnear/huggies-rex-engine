@@ -12,7 +12,7 @@ import {
   HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
   shit_holder_type_fun,
   type HUGGIES_SHIT_HOLDER_ROW_TYPE,
-} from "./shit_known_holders";
+} from "./tokens_page_shit_1170_known_holders";
 // ========================================
 // the type of a holder row, after known-holder classification.
 export type HUGGIES_SHIT_HOLDER_TYPE = HUGGIES_SHIT_HOLDER_ROW_TYPE;

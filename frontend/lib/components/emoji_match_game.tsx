@@ -7,7 +7,7 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_EMOJI_TOKENS } from "../ts/emoji_tokens";
+import { HUGGIES_EMOJI_TOKENS } from "../ts/app_page_game_emoji_tokens";
 import { token_detail_href_fun } from "../ts/token_link";
 import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";

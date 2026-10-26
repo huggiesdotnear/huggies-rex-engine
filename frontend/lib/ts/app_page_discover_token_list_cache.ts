@@ -1,7 +1,7 @@
 // ========================================
 // the indexeddb cache for the discover token list.
 // ========================================
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./token_search";
+import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_search";
 // ========================================
 const HUGGIES_TOKEN_LIST_DB_NAME = "huggies_token_list";
 const HUGGIES_TOKEN_LIST_DB_VERSION = 3;

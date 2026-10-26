@@ -1,15 +1,15 @@
 // ========================================
 // order a token list by the chosen sort field and direction.
 // ========================================
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./token_search";
+import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_search";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   token_sort_field_fun,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
-} from "./token_sort";
-import { HUGGIES_PINNED_TOKENS } from "./pinned_tokens";
+} from "./app_page_discover_token_sort";
+import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
 // ========================================
 // order a token list by the chosen field and direction.
 // --- WHY --- there are two kinds of order here, and the sort key picks

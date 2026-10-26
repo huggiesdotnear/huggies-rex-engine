@@ -9,7 +9,7 @@ import { token_row_by_name_fun } from "./token_row_by_name";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   token_sort_field_fun,
-} from "./token_sort";
+} from "./app_page_discover_token_sort";
 // ========================================
 export interface HUGGIES_TOKEN_SEARCH_RESULT {
   id: string;
