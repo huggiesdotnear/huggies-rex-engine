@@ -9,6 +9,7 @@
 - frontend/lib/ts/ holds plain ts only. a file that renders jsx is a component and lives in frontend/lib/components/ (`balance_row.tsx`, `token_holder_row.tsx`), never in frontend/lib/ts/.
 - a ts file that belongs to ONE page is named `<prefix>_<pagename>_<what>.ts` — the prefix says which page owns it. `app_page_<pagename>_<what>.ts` for a page at the top of `app/` (e.g. `app_page_account.ts`, `app_page_discover_token_search.ts`), `contract_page_<what>.ts` for a page under `app/contract/` (e.g. `contract_page_pumpopoly.ts`), `tokens_page_<what>.ts` for a page under `app/tokens/` (e.g. `tokens_page_token_detail.ts`). a ts file used by more than one page keeps a plain name (`token_info.ts`, `balance_row.tsx`, `token_link.ts`).
 - every page has ONE loader: a `<prefix>_<pagename>.ts` that does all of that page's fetching. the components read the loaded data and fetch nothing themselves, so the page's request list is knowable by reading one file.
+- i am sure i mentioned this somewhere but we have clean clear spearteion of logic, the middleman should never import form the frontend logic or have any forntend specify logic. when i am working on the frontend and i ask to add features we may need to add backend or middleman logic. if i ask to remove something form a page only stuff in the fornted should be touchd remove the css and logic for that feature. do not touch the middleman or backend logic for that unless i say or ask first.
 
 =====================
 <br/>
