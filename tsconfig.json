@@ -28,5 +28,12 @@
     "frontend/**/*.ts",
     "frontend/**/*.tsx"
   ],
-  "exclude": ["node_modules", "target", "dist", "build"]
+  "exclude": [
+    "node_modules",
+    "target",
+    "dist",
+    "build",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }

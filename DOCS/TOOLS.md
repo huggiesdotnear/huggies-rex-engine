@@ -53,6 +53,22 @@ obvious:
 always the row's leading column, returned whether or not it is asked
 for. asking for it is a `400 unknown_field`.
 
+> --- WHY --- the url has a byte limit, and it is a **414**, not a
+> `400`. the ids go in the query string of a GET, and past a certain
+> length the request is refused outright:
+>
+> | ids | url | result |
+> |---|---|---|
+> | 170 long ids | 7.9KB | 200 |
+> | 180 long ids | 8.4KB | **414** |
+> | 600 short ids | 7.1KB | 200 |
+>
+> so the limit is on the url BYTES, not on the number of ids. the
+> token ids vary a lot in length — from `wrap.near` to a 64-char hex
+> address plus a `.factory.bridge.near` suffix — so a request must be
+> sized by the encoded url length, not by a fixed id count. see
+> `frontend/lib/ts/token_icon_fetch.ts`.
+
 ## THE ENDPOINTS WE USE
 
 ### GET /tokens

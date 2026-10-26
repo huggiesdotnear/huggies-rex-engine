@@ -8,6 +8,7 @@ import {
 import { token_row_by_name_fun } from "./token_row_by_name";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
+  token_sort_field_fun,
 } from "./token_sort";
 // ========================================
 export interface HUGGIES_TOKEN_SEARCH_RESULT {
@@ -92,7 +93,9 @@ export async function fetch_all_tokens_fun(): Promise<
 > {
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_SEARCH_FIELDS,
-    sort: { by: HUGGIES_DEFAULT_TOKEN_SORT, desc: true },
+    // the api sorts by a real numeric field, never by our `default`
+    // view key — that one is a javascript-side ordering, not a field.
+    sort: { by: token_sort_field_fun(HUGGIES_DEFAULT_TOKEN_SORT), desc: true },
     limit: HUGGIES_TOKEN_SET_LIMIT,
   });
   return response.rows.map((row) =>

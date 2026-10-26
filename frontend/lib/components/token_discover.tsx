@@ -2,7 +2,7 @@
 // searchable token list for the discover page.
 // ========================================
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
+import { useEffect as use_effect, useMemo as use_memo, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import {
   fetch_all_tokens_fun,
@@ -29,8 +29,10 @@ import { huggies_sort_control_fun } from "./sort_control";
 // enough that typing a word is one request, not one per letter.
 const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
 // how many token rows are on screen at once. the list scrolls, so this
-// is how many icons get fetched for it.
-const HUGGIES_VISIBLE_ROWS = 60;
+// is how many icons get fetched for it. it is well above one batch:
+// the api's url limit decides how many ids fit in a single request
+// (see token_icon_fetch.ts), so the visible list spans a few batches.
+const HUGGIES_VISIBLE_ROWS = 300;
 // ========================================
 // render one token result as a link to its detail page.
 function token_result_row_fun(
@@ -61,7 +63,7 @@ function token_result_row_fun(
 }
 // ========================================
 // searchable token list component.
-function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
+export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   const [all_tokens, set_all_tokens] = use_state<
     HUGGIES_TOKEN_SEARCH_RESULT[] | null
   >(null);
@@ -140,24 +142,31 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     };
   }, [query]);
 
-  const tokens =
-    search_rows !== null
-      ? search_rows
-      : all_tokens === null
-        ? null
-        : order_discover_tokens_fun(all_tokens, sort, direction);
+  // --- WHY --- useMemo, not a plain const. the sorted list is the
+  // dependency of the icon effect below, and a plain const builds a
+  // NEW array on every render — so the effect re-fired on every
+  // render and fetched icons in the background forever. useMemo keeps
+  // the same array identity while the inputs are unchanged, so the
+  // effect only runs when the list actually changes.
+  const tokens = use_memo(() => {
+    if (search_rows !== null) return search_rows;
+    if (all_tokens === null) return null;
+    return order_discover_tokens_fun(all_tokens, sort, direction);
+  }, [search_rows, all_tokens, sort, direction]);
 
-  // --- WHY --- icons are fetched only for the rows on screen, in small
-  // batches, and cached in the durable per-token store. asking for the
-  // icon field on every indexed token costs ~21MB, because each icon
-  // is a full base64 data uri.
+  // --- WHY --- icons are fetched only for the rows on screen, and
+  // cached in the durable per-token store. asking for the icon field
+  // on every indexed token costs ~21MB, because each icon is a full
+  // base64 data uri.
+  const visible_ids = use_memo(() => {
+    if (tokens === null) return [];
+    return tokens.slice(0, HUGGIES_VISIBLE_ROWS).map((token) => token.id);
+  }, [tokens]);
   const [icons, set_icons] = use_state<Record<string, string>>({});
   use_effect(() => {
-    if (tokens === null) return;
-    const visible = tokens.slice(0, HUGGIES_VISIBLE_ROWS);
-    const ids = visible.map((token) => token.id);
+    if (visible_ids.length === 0) return;
     let cancelled = false;
-    void fetch_token_icons_fun(ids)
+    void fetch_token_icons_fun(visible_ids)
       .then((found) => {
         if (cancelled) return;
         const next: Record<string, string> = {};
@@ -170,7 +179,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     return () => {
       cancelled = true;
     };
-  }, [tokens]);
+  }, [visible_ids]);
 
   const rows = tokens === null ? null : tokens.map((token) => ({
     ...token,

@@ -51,11 +51,30 @@ underneath them.
 ## TOKEN DISCOVER
 
 `frontend/app/discover.html` lists supported contracts and a searchable
-token list. the list can be sorted by **24-hour volume** or **market cap**
-with the shared sort control (`lib/components/sort_control.tsx`), and the
-direction can be flipped between **ASC** and **DESC** with the arrow button
-next to the sort keys. price is not shown in the list — it belongs on the
-token's own page.
+token list. price is not shown in the list — it belongs on the token's
+own page.
+
+### THE SORT KEYS
+
+three keys, and the direction toggle:
+
+| key | what it does |
+|---|---|
+| **DEFAULT** | our favourite tokens lead, then everything else by volume |
+| **VOLUME** | a strict sort by 24-hour volume |
+| **MARKET CAP** | a strict sort by market cap |
+
+the direction button flips **DESC** / **ASC** for the strict sorts.
+
+> --- WHY --- the earlier versions each got one half of this wrong.
+> pinning the favourites unconditionally meant the strict sorts never
+> really applied — a pinned token with tiny volume sat above the
+> biggest one, and no direction could fix it. dropping the pin
+> entirely meant the favourites were never visible near the top, so a
+> reader who opened the page saw a wall of bridge tokens.
+> **DEFAULT** is the third option that gives the reader both: the
+> landing view has the favourites, and choosing a sort gives them a
+> sort that is actually a sort.
 
 ### THE TOKEN SET
 
@@ -97,12 +116,35 @@ icons are **not** fetched with the token set. the `icon` field is a full
 base64 data uri per token, and asking for it on every indexed token
 costs **~21MB** (against ~720KB for everything else).
 
-instead, the icons of the tokens **actually on screen** are fetched in
-batches of 60 (`lib/ts/token_icon_fetch.ts`) and written into the
-durable per-token store (`huggies_tokens`, see below). a token's icon
-never changes, so it is fetched once and read back from IndexedDB on
-every later visit. visiting a token's own page warms that same store, so
-the discover list and the token page share one cache.
+instead, the icons of the tokens **actually on screen** are fetched
+(`lib/ts/token_icon_fetch.ts`) and written into the durable per-token
+store (`huggies_tokens`, see below). a token's icon never changes, so it
+is fetched once and read back from IndexedDB on every later visit.
+visiting a token's own page warms that same store, so the discover list
+and the token page share one cache.
+
+> --- WHY --- the batches are sized by the length of the URL, not by a
+> fixed count of ids. the api refuses a request whose url is too long
+> with a **414**, and the limit is on the url BYTES: measured on
+> mainnet, 170 ids of ~44 chars each (a 7.9KB url) is accepted, 180
+> ids (8.4KB) is not, and 600 short ids (7.1KB) is accepted. token ids
+> vary a lot in length — from `wrap.near` to a 64-char hex address plus
+> a `.factory.bridge.near` suffix — so a fixed count would either waste
+> requests on short ids or blow the limit on long ones.
+
+### THE BACKGROUND REQUEST BUG
+
+> --- WHY --- the discover page used to call the api in the background
+> **forever**. the icon effect's dependency was the sorted token list,
+> built with a plain `const` — which makes a NEW array on every render.
+> a changed dependency re-fires the effect, so every render kicked off
+> another icon fetch, which set state, which re-rendered, which started
+> another fetch. the list is now built with `useMemo`, so its identity
+> only changes when the inputs actually change, and the effect fires
+> once per real change.
+>
+> `frontend/lib/components/token_discover.test.tsx` is the regression
+> guard: it counts every api call and asserts the count stops moving.
 
 ### TOKEN SEARCH
 
@@ -131,14 +173,13 @@ styled so they stand out, wherever the chosen sort puts them
 - the other meme-cooking tokens
 - `token.0xshitzu.near`
 
-> --- WHY --- marked, not pinned. the marked tokens are styled, but they
-> never override the order: the reader's chosen sort is the order. an
-> earlier version pinned every token the emojifi project lists,
-> including test tokens, and because the pinned block always won the
-> comparison the list never actually followed the chosen sort — a pinned
-> token with tiny volume sat above the biggest one, and no direction
-> could fix it. the list is now strictly sorted by the chosen field and
-> direction, over every token.
+> --- WHY --- the marked list is a short explicit list with a stated
+> reason per entry, not "every token some project happens to list". an
+> earlier version marked every token the emojifi project lists,
+> including test tokens, and because the marked block always won the
+> comparison the list never actually followed the chosen sort — a
+> marked token with tiny volume sat above the biggest one, and no
+> direction could fix it.
 
 our own token is `reputation: "Unknown"` in the api. that matters: a
 `min_reputation=NotFake` filter on the list would **hide it entirely**

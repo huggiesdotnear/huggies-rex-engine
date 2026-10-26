@@ -40,12 +40,30 @@
   gap: 6px;
   margin-bottom: 0;
 }
-/* the sort control's own row. it stretches so its buttons can sit
-   left-aligned on a full-width line. */
+/* the sort control's own row. it is the full width of the column, so
+   the buttons can be spread across it rather than bunched at the left
+   edge under the search box. */
 .huggies-token-discover-sort {
   display: flex;
   width: 100%;
   min-width: 0;
+}
+/* the control itself fills that row, and its buttons share the width
+   evenly — so the sort row reads as one bar, not three small buttons
+   floating in a wide empty space. */
+.huggies-token-discover-sort .huggies-sort-control {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+.huggies-token-discover-sort .huggies-sort-button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+/* the direction button keeps its own width: it is a small toggle, not
+   a third sort key, so it does not share the row evenly with them. */
+.huggies-token-discover-sort .huggies-sort-direction {
+  flex: 0 0 auto;
 }
 .huggies-token-search span {
   font-family: Arial, Helvetica, sans-serif;

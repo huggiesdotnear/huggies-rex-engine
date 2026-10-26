@@ -1,15 +1,25 @@
 // ========================================
-// fetch token icons in small batches and cache them durably.
+// fetch token icons in batches and cache them durably.
 // ========================================
 import { api_intear_tokens_get } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
 import { HUGGIES_TOKEN_ICON_FIELDS } from "./token_search";
 // ========================================
-// how many icons one batch asks for. the api caps an `ids` list at
-// 2,000, but a batch of icons is a base64 data uri per token, so a
-// small batch keeps the response small enough to be cheap.
-const HUGGIES_ICON_BATCH_SIZE = 60;
+// the api refuses a request whose url is too long, with a 414.
+// --- WHY --- the limit is measured on the BYTES of the url, not on the
+// number of ids. measured on mainnet: 170 ids of ~44 chars each (a
+// 7.9KB url) is accepted, 180 ids (8.4KB) is refused with 414, and
+// 600 short ids (7.1KB) is accepted. so the safe batch is not a fixed
+// count — it is however many ids fit in the byte budget below.
+//
+// the token ids vary a lot in length (from `wrap.near` to a 64-char
+// hex address plus a `.factory.bridge.near` suffix), so a fixed count
+// would either waste requests on short ids or blow the limit on long
+// ones. the budget is computed per batch instead.
+const HUGGIES_ICON_URL_BYTE_BUDGET = 7000;
+// the most ids one batch may ask for, whatever the url length.
+const HUGGIES_ICON_MAX_BATCH = 600;
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
 function to_finite_number_fun(value: unknown): number {
@@ -17,14 +27,46 @@ function to_finite_number_fun(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 // ========================================
+// split ids into batches that each fit the url byte budget.
+export function token_icon_batches_fun(
+  ids: ReadonlyArray<string>,
+): string[][] {
+  const batches: string[][] = [];
+  let current: string[] = [];
+  // the part of the url that is not the ids list: the host, the path,
+  // the fields, and the ids key itself.
+  const fixed =
+    "https://api.intea.rs/tokens?fields=" +
+    encodeURIComponent(HUGGIES_TOKEN_ICON_FIELDS.join(",")) +
+    "&ids=";
+  let current_length = fixed.length;
+  for (const id of ids) {
+    // the comma before this id, and the id itself, url-encoded.
+    const cost = encodeURIComponent(id).length + (current.length > 0 ? 1 : 0);
+    if (
+      current.length > 0 &&
+      (current_length + cost > HUGGIES_ICON_URL_BYTE_BUDGET ||
+        current.length >= HUGGIES_ICON_MAX_BATCH)
+    ) {
+      batches.push(current);
+      current = [];
+      current_length = fixed.length;
+    }
+    current.push(id);
+    current_length += cost;
+  }
+  if (current.length > 0) batches.push(current);
+  return batches;
+}
+// ========================================
 // fetch the icons for a set of token ids and cache them durably.
 // --- WHY --- icons are NOT fetched with the token list. asking for the
 // `icon` field on every indexed token costs ~21MB, because each icon
 // is a full base64 data uri. instead the list is fetched without
 // icons, and only the icons of the tokens actually on screen are
-// fetched — in small batches — and written into the durable per-token
-// store, where they are read back on every later visit and never
-// fetched again.
+// fetched — in batches that fit the api's url limit — and written into
+// the durable per-token store, where they are read back on every later
+// visit and never fetched again.
 export async function fetch_token_icons_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, string>> {
@@ -43,8 +85,7 @@ export async function fetch_token_icons_fun(
   }
   if (missing.length === 0) return out;
 
-  for (let start = 0; start < missing.length; start += HUGGIES_ICON_BATCH_SIZE) {
-    const batch = missing.slice(start, start + HUGGIES_ICON_BATCH_SIZE);
+  for (const batch of token_icon_batches_fun(missing)) {
     const response = await api_intear_tokens_get({
       fields: HUGGIES_TOKEN_ICON_FIELDS,
       ids: batch,
