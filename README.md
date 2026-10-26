@@ -9,6 +9,7 @@ bun i
 bunx prettier . --write
 bun tsc --noEmit
 # bun build recursive
+rm -rf static
 cd frontend
 bun build ./**/*.html --outdir=../static --minify
 ```
