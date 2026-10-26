@@ -3,13 +3,11 @@
 // ========================================
 import {
   api_intear_tokens_get,
+  api_intear_tokens_search,
 } from "../../../middleman";
 import { token_row_by_name_fun } from "./token_row_by_name";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
-  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-  type HUGGIES_TOKEN_SORT,
-  type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "./token_sort";
 // ========================================
 export interface HUGGIES_TOKEN_SEARCH_RESULT {
@@ -24,17 +22,27 @@ export interface HUGGIES_TOKEN_SEARCH_RESULT {
   volume_usd_24h: number;
   market_cap_usd: number;
 }
+// ========================================
+// the fields the discover list needs. `icon` is NOT in this list: it is
+// a full base64 data uri, and asking for it on every one of the
+// indexed tokens costs ~21MB. icons are fetched separately, in small
+// batches, and cached in the durable per-token store.
 const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "name",
   "symbol",
   "decimals",
-  "icon",
   "price_usd",
   "reputation",
   "holders",
   "volume_usd_24h",
   "market_cap_usd",
 ] as const;
+// the fields that identify a token, for the icon batch fetch.
+export const HUGGIES_TOKEN_ICON_FIELDS = ["symbol", "decimals", "icon"] as const;
+// ========================================
+// how many tokens one full fetch asks for. the indexed token count is
+// around 7.4k, so this covers every token the api knows.
+const HUGGIES_TOKEN_SET_LIMIT = 10000;
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
 function to_finite_number_fun(value: unknown): number {
@@ -73,16 +81,39 @@ function map_token_search_row_fun(
   };
 }
 // ========================================
-// fetch the initial token list in the chosen sort order.
-export async function fetch_initial_tokens_fun(
-  sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
-  direction: HUGGIES_TOKEN_SORT_DIRECTION =
-    HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
+// fetch EVERY indexed token in one call, without icons.
+// --- WHY --- one call with a high limit, not a paginated walk: the
+// api answers `total` alongside the rows, and the whole set without
+// icons is ~720KB — one request, one cache write, and every sort and
+// every ascending order then works over the complete list instead of
+// over a truncated top-N.
+export async function fetch_all_tokens_fun(): Promise<
+  HUGGIES_TOKEN_SEARCH_RESULT[]
+> {
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_SEARCH_FIELDS,
-    sort: { by: sort, desc: direction === "desc" },
-    limit: 100,
+    sort: { by: HUGGIES_DEFAULT_TOKEN_SORT, desc: true },
+    limit: HUGGIES_TOKEN_SET_LIMIT,
+  });
+  return response.rows.map((row) =>
+    map_token_search_row_fun(response.columns, row),
+  );
+}
+// ========================================
+// search the api for tokens matching a query.
+// --- WHY --- the api has a real search index behind /tokens/search,
+// matching symbol, name, account id and social links. filtering a
+// downloaded list in javascript only ever sees the tokens we happened
+// to download, so a token outside that set was unfindable no matter
+// what the reader typed. this asks the api instead.
+export async function search_tokens_fun(
+  query: string,
+  limit: number = 100,
+): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
+  const response = await api_intear_tokens_search({
+    q: query,
+    fields: HUGGIES_TOKEN_SEARCH_FIELDS,
+    limit,
   });
   return response.rows.map((row) =>
     map_token_search_row_fun(response.columns, row),

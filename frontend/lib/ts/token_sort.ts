@@ -21,13 +21,5 @@ export const HUGGIES_DEFAULT_TOKEN_SORT: HUGGIES_TOKEN_SORT = "volume_usd_24h";
 export const HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION: HUGGIES_TOKEN_SORT_DIRECTION =
   "desc";
 // ========================================
-// the cache key for one sort + direction pair.
-export function token_sort_cache_key_fun(
-  sort: HUGGIES_TOKEN_SORT,
-  direction: HUGGIES_TOKEN_SORT_DIRECTION,
-): string {
-  return `${sort}:${direction}`;
-}
-// ========================================
 // copyright 2026 by sleet.near
 // ========================================

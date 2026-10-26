@@ -5,7 +5,8 @@ import { render } from "preact";
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import {
-  fetch_initial_tokens_fun,
+  fetch_all_tokens_fun,
+  search_tokens_fun,
   type HUGGIES_TOKEN_SEARCH_RESULT,
 } from "../ts/token_search";
 import { token_detail_href_fun } from "../ts/token_link";
@@ -17,10 +18,18 @@ import {
   type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "../ts/token_sort";
 import {
-  get_cached_token_list_fun,
-  put_cached_token_list_fun,
+  get_cached_token_set_fun,
+  put_cached_token_set_fun,
 } from "../ts/token_list_cache";
+import { fetch_token_icons_fun } from "../ts/token_icon_fetch";
 import { huggies_sort_control_fun } from "./sort_control";
+// ========================================
+// how long to wait after a keystroke before asking the api. long
+// enough that typing a word is one request, not one per letter.
+const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
+// how many token rows are on screen at once. the list scrolls, so this
+// is how many icons get fetched for it.
+const HUGGIES_VISIBLE_ROWS = 60;
 // ========================================
 // render one token result as a link to its detail page.
 function token_result_row_fun(
@@ -46,21 +55,6 @@ function token_result_row_fun(
   );
 }
 // ========================================
-// filter the cached list by a search query.
-function filter_tokens_fun(
-  tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
-  query: string,
-): HUGGIES_TOKEN_SEARCH_RESULT[] {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) return [...tokens];
-  return tokens.filter(
-    (token) =>
-      token.symbol.toLowerCase().includes(needle) ||
-      token.name.toLowerCase().includes(needle) ||
-      token.id.toLowerCase().includes(needle),
-  );
-}
-// ========================================
 // searchable token list component.
 function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   const [all_tokens, set_all_tokens] = use_state<
@@ -75,22 +69,25 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   );
   const [error, set_error] = use_state<string | null>(null);
 
+  // --- WHY --- the whole indexed token set is fetched once and cached
+  // in indexeddb, rather than one page per sort. sorting happens in
+  // javascript, so a cached copy per sort field would store the same
+  // 7.4k rows several times over for nothing, and a truncated top-N
+  // list could never show the smallest token in an ascending sort.
   use_effect(() => {
     let cancelled = false;
     set_error(null);
-    // --- WHY --- the list is cached in indexeddb, so a revisit shows
-    // it instantly and the search filters that cached copy locally
-    // instead of asking the api on every keystroke.
-    void get_cached_token_list_fun(sort, direction)
+    void get_cached_token_set_fun()
       .then((cached) => {
-        if (cached !== null && !cancelled) {
-          set_all_tokens(cached);
-          return;
+        if (cached !== null) {
+          if (!cancelled) set_all_tokens(cached);
+          return cached;
         }
-        return fetch_initial_tokens_fun(sort, direction).then((rows) => {
-          if (cancelled) return;
+        return fetch_all_tokens_fun().then((rows) => {
+          if (cancelled) return rows;
           set_all_tokens(rows);
-          void put_cached_token_list_fun(sort, direction, rows);
+          void put_cached_token_set_fun(rows);
+          return rows;
         });
       })
       .catch((err: unknown) => {
@@ -100,16 +97,80 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     return () => {
       cancelled = true;
     };
-  }, [sort, direction]);
+  }, []);
+
+  // --- WHY --- a search asks the api, not the downloaded list. the api
+  // has a real search index behind it; filtering a downloaded list in
+  // javascript only sees the tokens we happened to download, so a
+  // token outside that set was unfindable however the reader typed.
+  const [search_rows, set_search_rows] = use_state<
+    HUGGIES_TOKEN_SEARCH_RESULT[] | null
+  >(null);
+  const [searching, set_searching] = use_state(false);
+  use_effect(() => {
+    const needle = query.trim();
+    if (needle.length === 0) {
+      set_search_rows(null);
+      set_searching(false);
+      return;
+    }
+    let cancelled = false;
+    set_searching(true);
+    const timer = window.setTimeout(() => {
+      void search_tokens_fun(needle)
+        .then((rows) => {
+          if (cancelled) return;
+          set_search_rows(rows);
+          set_searching(false);
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return;
+          set_searching(false);
+          console.warn("[token_discover] search failed", err);
+        });
+    }, HUGGIES_SEARCH_DEBOUNCE_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [query]);
 
   const tokens =
-    all_tokens === null
-      ? null
-      : order_discover_tokens_fun(
-          filter_tokens_fun(all_tokens, query),
-          sort,
-          direction,
-        );
+    search_rows !== null
+      ? search_rows
+      : all_tokens === null
+        ? null
+        : order_discover_tokens_fun(all_tokens, sort, direction);
+
+  // --- WHY --- icons are fetched only for the rows on screen, in small
+  // batches, and cached in the durable per-token store. asking for the
+  // icon field on every indexed token costs ~21MB, because each icon
+  // is a full base64 data uri.
+  const [icons, set_icons] = use_state<Record<string, string>>({});
+  use_effect(() => {
+    if (tokens === null) return;
+    const visible = tokens.slice(0, HUGGIES_VISIBLE_ROWS);
+    const ids = visible.map((token) => token.id);
+    let cancelled = false;
+    void fetch_token_icons_fun(ids)
+      .then((found) => {
+        if (cancelled) return;
+        const next: Record<string, string> = {};
+        for (const [id, icon] of found) next[id] = icon;
+        set_icons(next);
+      })
+      .catch((err: unknown) => {
+        console.warn("[token_discover] icon fetch failed", err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [tokens]);
+
+  const rows = tokens === null ? null : tokens.map((token) => ({
+    ...token,
+    icon: icons[token.id] ?? token.icon,
+  }));
 
   return (
     <section class="huggies-token-discover">
@@ -133,13 +194,14 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
         })}
       </div>
       {error !== null && <p>{error}</p>}
-      {tokens === null ? (
+      {searching && <p class="huggies-token-searching">SEARCHING...</p>}
+      {rows === null ? (
         <p>LOADING TOKENS...</p>
-      ) : tokens.length === 0 ? (
+      ) : rows.length === 0 ? (
         <p>NO TOKENS FOUND</p>
       ) : (
         <div class="huggies-token-results">
-          {tokens.map((token) => token_result_row_fun(token))}
+          {rows.map((token) => token_result_row_fun(token))}
         </div>
       )}
     </section>

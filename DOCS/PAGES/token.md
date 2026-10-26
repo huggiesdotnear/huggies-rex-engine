@@ -54,33 +54,109 @@ underneath them.
 token list. the list can be sorted by **24-hour volume** or **market cap**
 with the shared sort control (`lib/components/sort_control.tsx`), and the
 direction can be flipped between **ASC** and **DESC** with the arrow button
-next to the sort keys. the initial list uses `GET /tokens` in the chosen
-order. price is not shown in the list — it belongs on the token's own page.
+next to the sort keys. price is not shown in the list — it belongs on the
+token's own page.
 
-the fetched list is cached in IndexedDB (`lib/ts/token_list_cache.ts`), one
-entry per sort **and** direction pair. a revisit shows the cached list
-instantly, and the search box filters that cached copy locally rather than
-asking the api on every keystroke.
+### THE TOKEN SET
 
-## TOKEN LIST CACHE
+the list is the **whole indexed token set**, fetched in one call:
 
-the token list lives in IndexedDB database `huggies_token_list`, store
-`lists`, keyed by the sort order and direction it was fetched in
-(`<sort>:<direction>`). each entry holds the sort, the direction, the fetch
-time, and the full token rows. a cached list is served for one minute;
-after that the list is refetched and the cache replaced.
+```
+GET /tokens?fields=...&sort=-volume_usd_24h&limit=10000
+```
 
-the meme tokens from the emojifi project
-(<https://gitlab.com/sleet-dev/sleet_vibe/emojifi>) are part of that one
-token list. their ids come from `lib/ts/emoji_tokens.ts`, the same list
-the memory game reads.
+the api answers with every token it knows (~7,400) and a `total` count.
+one call, not a paginated walk — the whole set without icons is ~720KB.
 
-> --- WHY --- the meme tokens are **not** pinned to the top of the list.
-> they used to be, which meant the list never actually followed the chosen
-> sort — a meme token with tiny volume sat above the biggest one, and
-> flipping the direction could not fix it. every token now sorts by the
-> chosen field and direction, so the sort the reader picked is the sort
-> they see. there is no separate spotlight section and no emoji column.
+> --- WHY --- the list used to be a truncated top-100 per sort field.
+> that made two things impossible: an ascending sort showed the
+> hundred *smallest* tokens of the top-100 (a wall of zero-volume test
+> tokens), and a token outside that top-100 was unfindable however the
+> reader typed. sorting now happens in javascript over the complete
+> set, so every sort and every direction covers every token.
+
+### TOKEN LIST CACHE
+
+the token set is cached in IndexedDB database `huggies_token_list`, store
+`tokens`, under the single key `all`. it holds the sortable fields
+(name, symbol, decimals, price_usd, reputation, holders, volume_usd_24h,
+market_cap_usd) for every token.
+
+one snapshot, **not** one per sort field: sorting happens in javascript,
+so a cached copy per sort would store the same 7,400 rows several times
+over for nothing.
+
+the cached set is served for **five minutes**; after that it is refetched
+and replaced. the volume and market cap numbers in it move, so it cannot
+be kept forever — but it must not be refetched on every visit either,
+which is why it has a short ttl rather than being durable.
+
+### TOKEN ICONS
+
+icons are **not** fetched with the token set. the `icon` field is a full
+base64 data uri per token, and asking for it on every indexed token
+costs **~21MB** (against ~720KB for everything else).
+
+instead, the icons of the tokens **actually on screen** are fetched in
+batches of 60 (`lib/ts/token_icon_fetch.ts`) and written into the
+durable per-token store (`huggies_tokens`, see below). a token's icon
+never changes, so it is fetched once and read back from IndexedDB on
+every later visit. visiting a token's own page warms that same store, so
+the discover list and the token page share one cache.
+
+### TOKEN SEARCH
+
+the search box queries the **api**, not the downloaded list:
+
+```
+GET /tokens/search?q=<query>&fields=...&limit=100
+```
+
+> --- WHY --- the api has a real search index behind `/tokens/search`,
+> matching symbol, name, account id and social links. filtering a
+> downloaded list in javascript only ever sees the tokens we happened
+> to download, so a token outside that set was unfindable however the
+> reader typed. the api search has a hard `limit` of 100 rows.
+
+the search is debounced by 250ms, so typing a word is one request rather
+than one per letter.
+
+### PINNED TOKENS
+
+a short, deliberate list of tokens leads the discover list, whatever the
+sort or direction (`lib/ts/pinned_tokens.ts`):
+
+- `shit-1170.meme-cooking.near` — **our own token**, first
+- the other meme-cooking tokens
+- `token.0xshitzu.near`
+
+> --- WHY --- the pinned block is a short explicit list with a stated
+> reason per entry, not "every token some project happens to list". an
+> earlier version pinned every token the emojifi project lists,
+> including test tokens, and because the pinned block always won the
+> comparison the list never actually followed the chosen sort — a pinned
+> token with tiny volume sat above the biggest one, and no direction
+> could fix it. now only this short list is pinned, and everything
+> after it is sorted strictly.
+
+our own token is `reputation: "Unknown"` in the api. that matters: a
+`min_reputation=NotFake` filter on the list would **hide it entirely**
+(only 87 tokens match that filter, and ours is not one of them).
+
+## TOKEN LIST CACHE (per-token metadata)
+
+the durable, never-expiring half of token metadata — symbol, decimals,
+icon — lives in IndexedDB database `huggies_tokens`, store `tokens`, one
+entry per token id, so any page or component can read metadata without
+refetching. see `lib/ts/token_cache.ts` and `lib/ts/token_info.ts`.
+
+this is the *other* half of the token storage, and the split is the
+point:
+
+| store | contents | lifetime |
+|---|---|---|
+| `huggies_token_list` / `tokens` | every token's sortable numbers | 5 minutes |
+| `huggies_tokens` / `tokens` | every token's icon, symbol, decimals | forever |
 
 ### TOKEN ICONS
 
