@@ -113,6 +113,7 @@ function dao_role_fun(role: {
 function render_contract_fun(
   key: HUGGIES_CONTRACT_KEY,
   data: HUGGIES_CONTRACT_DATA | null,
+  pumpopoly_account_id: string | null,
 ): preact.JSX.Element {
   const cards = list_contract_cards_fun();
   const card = cards.find((item) => item.key === key);
@@ -273,6 +274,7 @@ function render_contract_fun(
   return (
     <section>
       <h1>{heading}</h1>
+      {pumpopoly_account_selector_fun(pumpopoly_account_id)}
       <h2>world.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-balance">
         <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
@@ -350,6 +352,8 @@ function render_contract_fun(
       <a
         class="huggies-pumpopoly-invite"
         href={pumpopoly_invite_link_fun(HUGGIES_PUMPOPOLY_INVITE_ACCOUNT)}
+        target="_blank"
+        rel="noreferrer"
       >
         NEW PLAYERS START HERE
       </a>
@@ -524,9 +528,7 @@ export function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
   return (
     <div class="huggies-contract-page huggies-page">
       {key === "sputnik-dao" && dao_selector_fun(dao_id, account_id)}
-      {key === "pumpopoly" &&
-        pumpopoly_account_selector_fun(pumpopoly_account_id)}
-      {render_contract_fun(key, data)}
+      {render_contract_fun(key, data, pumpopoly_account_id)}
       {/* --- WHY --- no balance panel on the Pumpopoly page. it asked
           for the signed-in account's balances, but the page is about a
           player named in the url, so the panel showed someone else's
