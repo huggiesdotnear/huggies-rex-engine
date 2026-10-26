@@ -16,11 +16,16 @@
   padding-bottom: 6px;
   margin-bottom: 10px;
 }
-/* --- controls row: search + sort side by side --- */
+/* --- controls: search stacked above the sort buttons --- */
+/* --- WHY --- the search box sits on its own row above the sort
+   buttons, not beside them. the page column is 500px wide and the
+   sort row already needs most of it; putting the search beside it
+   squeezed both. stacked, the search gets the full width and the
+   sort buttons get a full row of their own. --- */
 .huggies-token-discover-controls {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.6rem;
   margin-bottom: 12px;
   width: 100%;
@@ -28,11 +33,19 @@
 }
 .huggies-token-search {
   display: flex;
-  flex: 1 1 180px;
+  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 0;
+}
+/* the sort control's own row. it stretches so its buttons can sit
+   left-aligned on a full-width line. */
+.huggies-token-discover-sort {
+  display: flex;
+  width: 100%;
+  min-width: 0;
 }
 .huggies-token-search span {
   font-family: Arial, Helvetica, sans-serif;
@@ -135,6 +148,17 @@
 .huggies-token-result:hover {
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.24);
+}
+/* --- marked tokens: our own and the meme set --- */
+/* --- WHY --- these tokens are MARKED, not pinned. they are styled so
+   they stand out wherever the chosen sort puts them, but they never
+   override the order — the reader's sort is the order. --- */
+.huggies-token-result.is-marked {
+  border-color: var(--color-middle);
+  background: rgba(0, 0, 0, 0.2);
+}
+.huggies-token-result.is-marked strong {
+  color: var(--color-middle);
 }
 .huggies-token-result-icon {
   width: 32px;

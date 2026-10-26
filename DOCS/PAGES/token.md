@@ -121,23 +121,24 @@ GET /tokens/search?q=<query>&fields=...&limit=100
 the search is debounced by 250ms, so typing a word is one request rather
 than one per letter.
 
-### PINNED TOKENS
+### MARKED TOKENS
 
-a short, deliberate list of tokens leads the discover list, whatever the
-sort or direction (`lib/ts/pinned_tokens.ts`):
+a short, deliberate list of tokens is **marked** on the discover list —
+styled so they stand out, wherever the chosen sort puts them
+(`lib/ts/pinned_tokens.ts`):
 
-- `shit-1170.meme-cooking.near` — **our own token**, first
+- `shit-1170.meme-cooking.near` — **our own token**
 - the other meme-cooking tokens
 - `token.0xshitzu.near`
 
-> --- WHY --- the pinned block is a short explicit list with a stated
-> reason per entry, not "every token some project happens to list". an
+> --- WHY --- marked, not pinned. the marked tokens are styled, but they
+> never override the order: the reader's chosen sort is the order. an
 > earlier version pinned every token the emojifi project lists,
 > including test tokens, and because the pinned block always won the
 > comparison the list never actually followed the chosen sort — a pinned
 > token with tiny volume sat above the biggest one, and no direction
-> could fix it. now only this short list is pinned, and everything
-> after it is sorted strictly.
+> could fix it. the list is now strictly sorted by the chosen field and
+> direction, over every token.
 
 our own token is `reputation: "Unknown"` in the api. that matters: a
 `min_reputation=NotFake` filter on the list would **hide it entirely**

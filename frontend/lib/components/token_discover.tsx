@@ -22,6 +22,7 @@ import {
   put_cached_token_set_fun,
 } from "../ts/token_list_cache";
 import { fetch_token_icons_fun } from "../ts/token_icon_fetch";
+import { pinned_token_ids_fun } from "../ts/pinned_tokens";
 import { huggies_sort_control_fun } from "./sort_control";
 // ========================================
 // how long to wait after a keystroke before asking the api. long
@@ -34,9 +35,13 @@ const HUGGIES_VISIBLE_ROWS = 60;
 // render one token result as a link to its detail page.
 function token_result_row_fun(
   token: HUGGIES_TOKEN_SEARCH_RESULT,
+  marked: boolean,
 ): preact.JSX.Element {
+  const row_class = marked
+    ? "huggies-token-result is-marked"
+    : "huggies-token-result";
   return (
-    <a class="huggies-token-result" href={token_detail_href_fun(token.id)}>
+    <a class={row_class} href={token_detail_href_fun(token.id)}>
       {token.icon !== null ? (
         <img class="huggies-token-result-icon" src={token.icon} alt="" />
       ) : (
@@ -171,6 +176,8 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     ...token,
     icon: icons[token.id] ?? token.icon,
   }));
+  // the marked tokens are styled wherever the sort puts them.
+  const marked_ids = pinned_token_ids_fun();
 
   return (
     <section class="huggies-token-discover">
@@ -186,12 +193,14 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
             }}
           />
         </label>
-        {huggies_sort_control_fun({
-          sort,
-          direction,
-          on_sort: (next) => set_sort(next),
-          on_direction: (next) => set_direction(next),
-        })}
+        <div class="huggies-token-discover-sort">
+          {huggies_sort_control_fun({
+            sort,
+            direction,
+            on_sort: (next) => set_sort(next),
+            on_direction: (next) => set_direction(next),
+          })}
+        </div>
       </div>
       {error !== null && <p>{error}</p>}
       {searching && <p class="huggies-token-searching">SEARCHING...</p>}
@@ -201,7 +210,9 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
         <p>NO TOKENS FOUND</p>
       ) : (
         <div class="huggies-token-results">
-          {rows.map((token) => token_result_row_fun(token))}
+          {rows.map((token) =>
+            token_result_row_fun(token, marked_ids.has(token.id)),
+          )}
         </div>
       )}
     </section>
