@@ -123,14 +123,22 @@ is fetched once and read back from IndexedDB on every later visit.
 visiting a token's own page warms that same store, so the discover list
 and the token page share one cache.
 
-> --- WHY --- the batches are sized by the length of the URL, not by a
-> fixed count of ids. the api refuses a request whose url is too long
-> with a **414**, and the limit is on the url BYTES: measured on
-> mainnet, 170 ids of ~44 chars each (a 7.9KB url) is accepted, 180
-> ids (8.4KB) is not, and 600 short ids (7.1KB) is accepted. token ids
-> vary a lot in length — from `wrap.near` to a 64-char hex address plus
-> a `.factory.bridge.near` suffix — so a fixed count would either waste
-> requests on short ids or blow the limit on long ones.
+> --- WHY --- the icon request carries **no ids at all**. the api can
+> return a sorted page of tokens on its own, and that page is the same
+> set of tokens the visible list is made of — the sort and the limit do
+> the work an id list was doing. the url is then ~60 characters.
+>
+> an id list is the worst thing to put in a url: a near account id is
+> 64 hex characters and a token id adds a label on top, so 170 of them
+> are already past the api's ~8KB url limit and the request is refused
+> with a **414**. the limit is on the url BYTES, not the id count —
+> 170 long ids (7.9KB) is accepted, 180 (8.4KB) is not, and 600 short
+> ids (7.1KB) is accepted.
+>
+> a few visible tokens can still fall outside the sorted page — the
+> default view leads with the favourites, and a strict sort may be
+> ascending. those are fetched by id over **POST**, whose body has a
+> 64KB limit rather than a url limit, so they fit in one request.
 
 ### THE BACKGROUND REQUEST BUG
 
@@ -145,6 +153,8 @@ and the token page share one cache.
 >
 > `frontend/lib/components/token_discover.test.tsx` is the regression
 > guard: it counts every api call and asserts the count stops moving.
+> it is a local scratch test and is gitignored — it is not part of the
+> shipped app.
 
 ### TOKEN SEARCH
 

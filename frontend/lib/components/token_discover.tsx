@@ -14,6 +14,7 @@ import { order_discover_tokens_fun } from "../ts/token_discover_order";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  token_sort_field_fun,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "../ts/token_sort";
@@ -162,11 +163,21 @@ export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     if (tokens === null) return [];
     return tokens.slice(0, HUGGIES_VISIBLE_ROWS).map((token) => token.id);
   }, [tokens]);
+  // the page of tokens the api should return the icons for. the api
+  // can serve a sorted page with no ids in the url at all, which is
+  // far cheaper than carrying a list of ids.
+  const icon_sort = use_memo(() => {
+    if (search_rows !== null) return undefined;
+    return {
+      by: token_sort_field_fun(sort),
+      desc: direction === "desc",
+    };
+  }, [search_rows, sort, direction]);
   const [icons, set_icons] = use_state<Record<string, string>>({});
   use_effect(() => {
     if (visible_ids.length === 0) return;
     let cancelled = false;
-    void fetch_token_icons_fun(visible_ids)
+    void fetch_token_icons_fun(visible_ids, icon_sort)
       .then((found) => {
         if (cancelled) return;
         const next: Record<string, string> = {};
@@ -179,7 +190,7 @@ export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     return () => {
       cancelled = true;
     };
-  }, [visible_ids]);
+  }, [visible_ids, icon_sort]);
 
   const rows = tokens === null ? null : tokens.map((token) => ({
     ...token,

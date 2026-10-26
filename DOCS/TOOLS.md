@@ -20,6 +20,7 @@ data the browser can fetch itself.
 | wrapper | endpoint |
 |---|---|
 | `api_intear_tokens_get` | `/tokens` |
+| `api_intear_tokens_post` | `/tokens` (POST — params in a JSON body) |
 | `api_intear_tokens_search` | `/tokens/search` |
 | `api_intear_token_fields` | `/schema` |
 | `api_intear_trades_query` | `/trades` |
@@ -35,6 +36,67 @@ data the browser can fetch itself.
 each wrapper logs a framed block (`=====`) with the url, the status and
 the full response, so a grep for `=====` finds every api call in one
 place.
+
+## HOW TOKEN IDS ARE PASSED
+
+a token id is a NEAR account id, so it is long:
+
+| token id | length |
+|---|---|
+| `wrap.near` | 9 |
+| `token.rhealab.near` | 18 |
+| `dac17f958….factory.bridge.near` | 60 |
+| `17208628f84f5d6ad…e36133a1` | 64 |
+
+`GET /tokens` takes them as a **comma-separated list** in the `ids`
+query parameter:
+
+```
+GET /tokens?fields=symbol,icon&ids=wrap.near,token.rhealab.near
+```
+
+`intear_build_query` turns any array into a csv and url-encodes it, so
+each separating comma costs 3 characters (`%2C`) rather than 1.
+
+> --- WHY --- the url has a byte limit, and going past it is a **414**,
+> not a `400`. the limit is on the url BYTES, not on the number of ids:
+>
+> | ids | url | result |
+> |---|---|---|
+> | 170 long ids | 7.9KB | 200 |
+> | 180 long ids | 8.4KB | **414** |
+> | 600 short ids | 7.1KB | 200 |
+>
+> so a request must be sized by the encoded url length, not by a fixed
+> id count.
+
+> --- WHY --- but usually there is no reason to send ids at all. the api
+> can return a **sorted page** of tokens on its own:
+>
+> ```
+> GET /tokens?fields=symbol,icon&sort=-volume_usd_24h&limit=300
+> ```
+>
+> that url is ~60 characters and it returns the same tokens the visible
+> list is made of. the sort and the limit do the work an id list was
+> doing. ids are only needed when you want a *specific* set that no
+> sorted page would give you.
+
+## POST
+
+`POST /tokens` takes the same params, in a JSON body:
+
+```json
+{ "fields": ["symbol", "icon"], "ids": ["wrap.near", "token.rhealab.near"] }
+```
+
+the body limit is **64KB** (the same as a websocket message), which
+fits about 2,000 ids — against ~170 for a GET. use it when a specific
+id list does not fit in a url.
+
+> --- WHY --- the api caps the body, not the id count: 2,000 ids fit
+> (59KB) and 3,000 do not (89KB). the error is `too_many`, not a
+> `bad_request`.
 
 ## QUERY ENCODING
 
@@ -52,22 +114,6 @@ obvious:
 `account_id` is **not** a requestable field on any endpoint. it is
 always the row's leading column, returned whether or not it is asked
 for. asking for it is a `400 unknown_field`.
-
-> --- WHY --- the url has a byte limit, and it is a **414**, not a
-> `400`. the ids go in the query string of a GET, and past a certain
-> length the request is refused outright:
->
-> | ids | url | result |
-> |---|---|---|
-> | 170 long ids | 7.9KB | 200 |
-> | 180 long ids | 8.4KB | **414** |
-> | 600 short ids | 7.1KB | 200 |
->
-> so the limit is on the url BYTES, not on the number of ids. the
-> token ids vary a lot in length — from `wrap.near` to a 64-char hex
-> address plus a `.factory.bridge.near` suffix — so a request must be
-> sized by the encoded url length, not by a fixed id count. see
-> `frontend/lib/ts/token_icon_fetch.ts`.
 
 ## THE ENDPOINTS WE USE
 
@@ -143,6 +189,7 @@ middleman and so logs the same framed blocks.
 bun bin/intear_tokens_get.ts wrap.near --fields symbol,price_usd --limit 20
 bun bin/intear_tokens_get.ts --sort volume_usd_24h --desc --limit 20
 bun bin/intear_tokens_search.ts shit-1170 --fields symbol,price_usd --limit 10
+bun bin/intear_tokens_post.ts wrap.near --fields symbol,icon
 ```
 
 =====================

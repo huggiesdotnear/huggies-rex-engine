@@ -1,25 +1,14 @@
 // ========================================
-// fetch token icons in batches and cache them durably.
+// fetch token icons and cache them durably.
 // ========================================
 import { api_intear_tokens_get } from "../../../middleman";
+import { api_intear_tokens_post } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
 import { HUGGIES_TOKEN_ICON_FIELDS } from "./token_search";
 // ========================================
-// the api refuses a request whose url is too long, with a 414.
-// --- WHY --- the limit is measured on the BYTES of the url, not on the
-// number of ids. measured on mainnet: 170 ids of ~44 chars each (a
-// 7.9KB url) is accepted, 180 ids (8.4KB) is refused with 414, and
-// 600 short ids (7.1KB) is accepted. so the safe batch is not a fixed
-// count — it is however many ids fit in the byte budget below.
-//
-// the token ids vary a lot in length (from `wrap.near` to a 64-char
-// hex address plus a `.factory.bridge.near` suffix), so a fixed count
-// would either waste requests on short ids or blow the limit on long
-// ones. the budget is computed per batch instead.
-const HUGGIES_ICON_URL_BYTE_BUDGET = 7000;
-// the most ids one batch may ask for, whatever the url length.
-const HUGGIES_ICON_MAX_BATCH = 600;
+// how many icons one request may ask for.
+const HUGGIES_ICON_BATCH_SIZE = 300;
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
 function to_finite_number_fun(value: unknown): number {
@@ -27,36 +16,27 @@ function to_finite_number_fun(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 // ========================================
-// split ids into batches that each fit the url byte budget.
-export function token_icon_batches_fun(
-  ids: ReadonlyArray<string>,
-): string[][] {
-  const batches: string[][] = [];
-  let current: string[] = [];
-  // the part of the url that is not the ids list: the host, the path,
-  // the fields, and the ids key itself.
-  const fixed =
-    "https://api.intea.rs/tokens?fields=" +
-    encodeURIComponent(HUGGIES_TOKEN_ICON_FIELDS.join(",")) +
-    "&ids=";
-  let current_length = fixed.length;
-  for (const id of ids) {
-    // the comma before this id, and the id itself, url-encoded.
-    const cost = encodeURIComponent(id).length + (current.length > 0 ? 1 : 0);
-    if (
-      current.length > 0 &&
-      (current_length + cost > HUGGIES_ICON_URL_BYTE_BUDGET ||
-        current.length >= HUGGIES_ICON_MAX_BATCH)
-    ) {
-      batches.push(current);
-      current = [];
-      current_length = fixed.length;
-    }
-    current.push(id);
-    current_length += cost;
+// turn api rows into cache records, and collect the icons.
+function rows_to_records_fun(
+  rows: ReadonlyArray<readonly (string | number | null)[]>,
+): { records: HUGGIES_CACHED_TOKEN[]; icons: Map<string, string> } {
+  const records: HUGGIES_CACHED_TOKEN[] = [];
+  const icons = new Map<string, string>();
+  for (const row of rows) {
+    const id = String(row[0]);
+    const symbol = row[1];
+    const decimals = row[2];
+    const icon = row[3];
+    const record: HUGGIES_CACHED_TOKEN = {
+      id,
+      symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
+      decimals: to_finite_number_fun(decimals),
+      icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+    };
+    records.push(record);
+    if (record.icon !== null) icons.set(record.id, record.icon);
   }
-  if (current.length > 0) batches.push(current);
-  return batches;
+  return { records, icons };
 }
 // ========================================
 // fetch the icons for a set of token ids and cache them durably.
@@ -64,11 +44,26 @@ export function token_icon_batches_fun(
 // `icon` field on every indexed token costs ~21MB, because each icon
 // is a full base64 data uri. instead the list is fetched without
 // icons, and only the icons of the tokens actually on screen are
-// fetched — in batches that fit the api's url limit — and written into
-// the durable per-token store, where they are read back on every later
-// visit and never fetched again.
+// fetched — and written into the durable per-token store, where they
+// are read back on every later visit and never fetched again.
+//
+// --- WHY --- the request carries NO ids. a list of token ids is the
+// worst thing to put in a url: a near account id is 64 hex characters
+// and a token id adds a label on top, so 170 of them are already past
+// the api's ~8KB url limit and the request is refused with a 414.
+// the api can return a sorted page of tokens without any ids at all,
+// and that is the same set of tokens the visible list is made of —
+// the sort and the limit do the work the id list was doing.
+//
+// --- WHY --- the ids are still used for the leftovers. the sorted page
+// covers the top N by one field, but the visible list may be ordered
+// differently (the default view leads with the favourites, and a
+// strict sort may be ascending), so a token can be on screen and yet
+// outside the page. those few are fetched by id, over POST, whose body
+// has a 64KB limit rather than a url limit.
 export async function fetch_token_icons_fun(
   ids: ReadonlyArray<string>,
+  sort?: { by: string; desc: boolean },
 ): Promise<Map<string, string>> {
   const wanted = [...new Set(ids)];
   const out = new Map<string, string>();
@@ -85,23 +80,33 @@ export async function fetch_token_icons_fun(
   }
   if (missing.length === 0) return out;
 
-  for (const batch of token_icon_batches_fun(missing)) {
+  // 1. the sorted page — no ids in the url at all.
+  // `covered` tracks every id the page answered for, NOT only the ones
+  // with an icon: a token with no icon is still answered, and asking
+  // for it again by id would be a wasted request every single time.
+  const covered = new Set<string>();
+  if (sort !== undefined) {
     const response = await api_intear_tokens_get({
       fields: HUGGIES_TOKEN_ICON_FIELDS,
-      ids: batch,
+      sort: { by: sort.by as "volume_usd_24h", desc: sort.desc },
+      limit: HUGGIES_ICON_BATCH_SIZE,
     });
-    const records: HUGGIES_CACHED_TOKEN[] = [];
-    for (const row of response.rows) {
-      const [id, symbol, decimals, icon] = row;
-      const record: HUGGIES_CACHED_TOKEN = {
-        id,
-        symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
-        decimals: to_finite_number_fun(decimals),
-        icon: typeof icon === "string" && icon.length > 0 ? icon : null,
-      };
-      records.push(record);
-      if (record.icon !== null) out.set(record.id, record.icon);
-    }
+    const { records, icons } = rows_to_records_fun(response.rows);
+    for (const id of records) covered.add(id.id);
+    for (const [id, icon] of icons) out.set(id, icon);
+    await HUGGIES_TOKEN_CACHE.put_many(records);
+  }
+
+  // 2. whatever the page did not cover — by id, over POST.
+  const still_missing = missing.filter((id) => !covered.has(id));
+  if (still_missing.length > 0) {
+    const response = await api_intear_tokens_post({
+      fields: HUGGIES_TOKEN_ICON_FIELDS,
+      ids: still_missing,
+    });
+    const { records, icons } = rows_to_records_fun(response.rows);
+    for (const id of records) covered.add(id.id);
+    for (const [id, icon] of icons) out.set(id, icon);
     await HUGGIES_TOKEN_CACHE.put_many(records);
   }
   return out;

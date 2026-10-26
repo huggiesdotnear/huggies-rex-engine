@@ -7,3 +7,7 @@ node_modules
 # is the tracked template, .env never is.
 /.env
 .env.local
+# runtime checks - local scratch tests, not part of the shipped app.
+# they are run with `bun run <file>.test.tsx` and are never deployed.
+**/*.test.ts
+**/*.test.tsx

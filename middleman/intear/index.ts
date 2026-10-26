@@ -15,7 +15,9 @@
 // ========================================
 
 export * from "./fun/api_intear_get";
+export * from "./fun/api_intear_post";
 export * from "./fun/api_intear_tokens_get";
+export * from "./fun/api_intear_tokens_post";
 export * from "./fun/api_intear_tokens_search";
 export * from "./fun/api_intear_token_fields";
 export * from "./fun/api_intear_trades_query";
