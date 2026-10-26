@@ -26,9 +26,11 @@
 }
 /*==================================*/
 /* the holder tabs */
-/* one emoji per holder type, all on a single row — the same tabs the */
-/* original SHIT holder app has. the percentage of each group lives in */
-/* the HOLDERS BY GROUP list, not on the tab, so the tabs stay small. */
+/* one emoji per holder type, all on a single row — the same tabs the  */
+/* original SHIT holder app has. they are its `.filter-btn` look: a   */
+/* white fill, an 8px radius and a 2px border. the percentage of each  */
+/* group lives in the HOLDERS BY GROUP list, not on the tab, so the    */
+/* tabs stay small.                                                    */
 /*==================================*/
 .huggies-shit-tabs {
   display: flex;
@@ -46,19 +48,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 6px;
-  background: transparent;
+  border: 2px solid #dddddd;
+  border-radius: 8px;
+  background: #ffffff;
   color: inherit;
   font-size: 16px;
   line-height: 1;
-  padding: 6px 0;
+  padding: 8px 0;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 .huggies-shit-tab:hover {
-  border-color: var(--color-middle);
-  background: rgba(0, 198, 215, 0.12);
+  border-color: var(--color-backend);
+  background: #f5f5f5;
 }
 .huggies-shit-tab.is-active {
   background: var(--color-middle);
@@ -67,10 +69,10 @@
 }
 /*==================================*/
 /* the share of the supply each group holds */
-/* the rows are the old SHIT info page's holder cards: a white card    */
-/* with a coloured stripe down its left edge for the type, the icon    */
-/* and the name on the left, the count and the percentage on the       */
-/* right. the row of the ACTIVE tab is the active one.                 */
+/* the rows are the old SHIT info page's flat white buttons — a white  */
+/* fill, an 8px radius and no shadow, the same as its `.filter-btn`.   */
+/* the coloured stripe down the left edge is its `.holder-item` stripe.*/
+/* the row of the ACTIVE tab is the active one.                       */
 /*==================================*/
 .huggies-shit-groups {
   margin-bottom: 14px;
@@ -85,6 +87,11 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* the old page centres its filter row */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
 }
 .huggies-shit-group {
   display: flex;
@@ -93,18 +100,17 @@
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 8px 14px;
+  border: 2px solid #dddddd;
+  border-left-width: 4px;
+  border-radius: 8px;
   background: #ffffff;
-  border-left: 4px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   font-family: Arial, Helvetica, sans-serif;
-  transition: transform 0.15s ease;
+  transition: all 0.2s ease;
 }
-/* the coloured stripe down the left of a group card */
+/* the coloured stripe down the left of a group row */
 .huggies-shit-group.is-dev {
-  border-left-color: #8ef0a0;
+  border-left-color: #4caf50;
 }
 .huggies-shit-group.is-dex {
   border-left-color: #2196f3;
@@ -116,7 +122,7 @@
   border-left-color: var(--color-middle);
 }
 .huggies-shit-group.is-burn {
-  border-left-color: var(--color-backend);
+  border-left-color: #da291c;
 }
 .huggies-shit-group.is-regular {
   border-left-color: #999999;
@@ -124,20 +130,26 @@
 /* --- WHY --- the group of the ACTIVE tab is the one that is picked
    out. the tabs and the group list show the same thing from two
    sides, so the reader can see at a glance which filter the list
-   under them is filtered by. --- */
+   under them is filtered by. it is the old page's `.filter-btn.active`
+   look — the border and the fill both turn. --- */
 .huggies-shit-group.is-active {
-  outline: 2px solid var(--color-middle);
-  outline-offset: -2px;
+  border-color: var(--color-middle);
+  background: var(--color-middle);
+}
+.huggies-shit-group.is-active .huggies-shit-group-name,
+.huggies-shit-group.is-active .huggies-shit-group-count,
+.huggies-shit-group.is-active .huggies-shit-group-percent {
+  color: #06181a;
 }
 .huggies-shit-group-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
 }
 .huggies-shit-group-icon {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
   flex: none;
 }
