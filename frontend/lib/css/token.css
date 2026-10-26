@@ -45,9 +45,12 @@
   font-size: 13px;
 }
 .huggies-token-search-card button {
-  /* --- WHY --- the card is a column flexbox, so a button child
-  stretches to the full width of the card by default. the button is
-  sized to its own text instead. */
+  /* --- WHY --- the global button rule sets a fixed width:500px so
+  buttons line up with the page column. this card is narrower than
+  that, so the button hangs out past its own card. `width:auto` puts
+  the button back on its text, and `align-self:flex-start` keeps it
+  from stretching to fill the card's column instead. */
+  width: auto;
   align-self: flex-start;
   border: 0;
   border-radius: 8px;
