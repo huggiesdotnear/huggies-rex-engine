@@ -171,7 +171,13 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
           {Object.keys(detail.socials).length > 0 && (
             <section class="huggies-token-socials">
               {Object.entries(detail.socials).map(([name, url]) => (
-                <a href={url} target="_blank" rel="noreferrer">
+                <a
+                  key={name}
+                  class="huggies-token-social-link"
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {name.toUpperCase()}
                 </a>
               ))}

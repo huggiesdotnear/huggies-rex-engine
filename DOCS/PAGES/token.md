@@ -58,6 +58,28 @@ the token's own description is shown under a **DESCRIPTION:** heading,
 above the social links. it is a single block of text, not a card with a
 title, so it reads as part of the token's own metadata.
 
+## SOCIAL LINKS
+
+the token's social links are rendered as **buttons** that share the
+page's full width between them: one link fills the row on its own, two
+split it in half, three split it three ways. each button is labelled
+with the platform name in capitals — TWITTER, TELEGRAM, WEBSITE,
+TWITCH — and opens in a new tab.
+
+the buttons are plain `<a>` elements with a button look (border, rounded
+corners, a translucent fill that brightens on hover), not `<button>`
+elements, because they navigate.
+
+> --- WHY --- `flex: 1 1 0` with a `min-width: 0` on each link. a
+> `flex-basis: 0` makes every link start from an equal share of the row
+> regardless of how long its label is, so TWITTER and WEBSITE come out
+> the same width. `min-width: 0` lets a long label shrink instead of
+> forcing the row wider than the page.
+
+INTEAR carries four social keys across the whole token set: `twitter`,
+`telegram`, `website`, and `twitch` (one token). a token can have any
+combination of one, two, or three of them.
+
 ## THE $SHIT EASTER EGG
 
 the $SHIT token's own page carries a quiet **💩 $SHIT** link under the
