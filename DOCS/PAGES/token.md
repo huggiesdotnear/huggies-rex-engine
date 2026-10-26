@@ -7,9 +7,8 @@ indexed token metadata (name, symbol, decimals, icon, price, reputation,
 holders, liquidity, market cap, socials, description, and main pool when
 available) and the indexed holders with cursor pagination.
 
-prices use `lib/ts/token_price_format.ts`, which grows the decimal count
-as a price gets smaller, so a token priced at 0.00000012 does not read as
-a bare zero.
+prices use `lib/ts/token_price_format.ts`, which shows two decimals and
+rounds a price that is real but rounds away to `0.00`.
 
 the token id box at the top of the page is pre-filled with the token the
 page is showing and opens any other token when submitted.
@@ -44,6 +43,20 @@ every place that shows a token amount goes through
 the account balance rows use it too: the decimal amount and the usd value
 sit on the row head as before, and the raw unit amount is printed
 underneath them.
+
+> --- WHY --- an amount below **0.01** is shown as plain `0.00`. the
+> formatter used to grow its decimals to show the first significant
+> digit, so a dust holding read `0.00000034` and its usd value read
+> `$0.00000034` — eight digits of noise on a row whose real value is
+> nothing. a balance that rounds away to zero IS zero as far as a
+> reader is concerned, and the **UNITS** column still carries the exact
+> on-chain integer beside it.
+
+## DESCRIPTION
+
+the token's own description is shown under a **DESCRIPTION:** heading,
+above the social links. it is a single block of text, not a card with a
+title, so it reads as part of the token's own metadata.
 
 ## TOKEN DISCOVER
 

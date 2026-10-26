@@ -10,17 +10,10 @@ import type { HUGGIES_TOKEN_INFO } from "./token_info";
 // decimals for ordinary values (>= 0.01). large amounts read better
 // with fewer, so they get their own smaller cap.
 const HUGGIES_MAX_DISPLAY_DECIMALS = 2;
-// dust gets up to 12 decimals: the floor that decides whether a price
-// the most decimals a tiny amount may expand to. must cover the full
-// exponent range of a 24-decimal token: a real holding can be as small
-// as 1e-24, and a cap below that renders a non-zero balance as "0".
-// 24 is the protocol maximum for NEAR-family tokens.
-const HUGGIES_DUST_MAX_DECIMALS = 24;
-// a usd value at or below this is noise rather than a price, and shows
-// as an em dash. deliberately separate from the decimal cap above: an
-// amount is real even when it is microscopic, but a "price" that small
-// is not worth digits.
-const HUGGIES_USD_FLOOR = 1e-12;
+// a value below this rounds away to zero at two decimals, so it is
+// shown as "0.00" rather than as a long tail of zeros. 0.01 is the
+// smallest amount that still reads as a real number.
+const HUGGIES_DUST_FLOOR = 0.01;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -46,23 +39,18 @@ function group_digits_fun(value: string): string {
 // ========================================
 // render a number with thousands separators and a bounded number of
 // decimals, trimming trailing zeros.
-// --- WHY --- decimal count is chosen from the value's magnitude: a
-// fixed toFixed(n) turns a real $0.00000012 price into a bare "0",
-// which reads as "no price" for a token that does have one. so small
-// values expand (capped) while ordinary and large ones stay at two
-// decimals, which is all a balance or usd figure needs.
+// --- WHY --- a value below 0.01 is shown as plain "0.00". the old
+// rule grew the decimals to show the first significant digit, so a
+// dust holding read "0.00000034" and its usd value read "$0.00000034"
+// — eight digits of noise on a row whose real value is nothing. a
+// balance that rounds away to zero IS zero as far as a reader is
+// concerned, and the raw unit column still carries the exact figure.
 function format_amount_fun(value: number): string {
   if (!Number.isFinite(value)) return "0";
   const abs = Math.abs(value);
-  let decimals: number;
-  if (abs === 0 || abs >= 0.01) {
-    decimals = HUGGIES_MAX_DISPLAY_DECIMALS;
-  } else {
-    // enough decimals to show the first significant digit.
-    const needed = Math.ceil(-Math.log10(abs)) + 1;
-    decimals = Math.min(needed, HUGGIES_DUST_MAX_DECIMALS);
-  }
-  const fixed = value.toFixed(decimals);
+  // below the display floor the value rounds to zero at two decimals.
+  if (abs < HUGGIES_DUST_FLOOR) return "0.00";
+  const fixed = value.toFixed(HUGGIES_MAX_DISPLAY_DECIMALS);
   const trimmed = fixed.includes(".")
     ? fixed.replace(/0+$/, "").replace(/\.$/, "")
     : fixed;
@@ -87,9 +75,11 @@ function format_balance_fun(
 // not print "$0.00" for a token we simply have no price for.
 // --- WHY --- the floor catches a price so small it is numerically
 // meaningless: 1e-30 is not "$0.000...", it is nothing, and showing it
-// as digits would imply a precision the data does not have.
+// as digits would imply a precision the data does not have. a price
+// that is real but rounds away at two decimals is NOT a dash — it is
+// "$0.00", which is what the amount formatter produces for it.
 function format_usd_fun(value: number): string {
-  if (!Number.isFinite(value) || Math.abs(value) < HUGGIES_USD_FLOOR) {
+  if (!Number.isFinite(value) || value === 0) {
     return "—";
   }
   const sign = value < 0 ? "-" : "";

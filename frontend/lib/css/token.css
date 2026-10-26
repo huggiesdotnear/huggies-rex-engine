@@ -1,5 +1,5 @@
 /*==================================*/
-/* token detail page: metadata, indexed holders, and dex pools */
+/* token detail page: metadata and indexed holders */
 /*==================================*/
 .huggies-token-detail {
   width: 100%;
@@ -45,9 +45,13 @@
   font-size: 13px;
 }
 .huggies-token-search-card button {
+  /* --- WHY --- the card is a column flexbox, so a button child
+  stretches to the full width of the card by default. the button is
+  sized to its own text instead. */
+  align-self: flex-start;
   border: 0;
   border-radius: 8px;
-  padding: 0.7rem 0.8rem;
+  padding: 0.7rem 1.1rem;
   background: #ffffff;
   color: #2d2d2d;
   font-weight: 700;

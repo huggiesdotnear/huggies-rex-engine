@@ -1,18 +1,16 @@
 // ========================================
-// format a usd price so a small one never reads as a bare zero.
+// format a usd price for a metadata row.
 // ========================================
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
 // ========================================
-// the smallest price that is shown as a number rather than a dash.
-const HUGGIES_PRICE_FLOOR = 1e-12;
-// ========================================
-// format a usd price with enough decimals to show its first digit.
-// --- WHY --- `toLocaleString` rounds a price like 0.00000012 to "0",
-// which reads as "this token has no price" when it does. the shared
-// amount formatter already grows the decimals as a value gets
-// smaller, so a price uses the same rule as a balance.
+// format a usd price with two decimals, and "0.00" for one that is
+// real but rounds away.
+// --- WHY --- the shared amount formatter used to grow the decimals as a
+// value got smaller, so a price like 0.00000012 kept all its digits. on
+// a metadata row that is noise — the price is "nothing" at that scale —
+// and a token's real price is shown on its own row anyway.
 export function format_price_usd_fun(value: number): string {
-  if (!Number.isFinite(value) || Math.abs(value) < HUGGIES_PRICE_FLOOR) {
+  if (!Number.isFinite(value) || value === 0) {
     return "—";
   }
   return HUGGIES_AMOUNT_FORMAT.usd(value);

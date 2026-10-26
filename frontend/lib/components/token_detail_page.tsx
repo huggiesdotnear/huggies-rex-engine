@@ -185,7 +185,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
           )}
           {detail.description !== null && (
             <section class="huggies-token-description-card">
-              <h2>ABOUT THIS TOKEN</h2>
+              <h2>DESCRIPTION:</h2>
               <p class="huggies-token-description">{detail.description}</p>
             </section>
           )}
