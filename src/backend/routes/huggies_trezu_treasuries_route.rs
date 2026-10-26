@@ -1,9 +1,13 @@
 // HUGGIES_TREZU_TREASURIES_ROUTE
-// GET /api/huggies/treasuries?accountId=<near-account-id>[&includeHidden=true]
+// GET /api/trezu/user/treasuries?accountId=<near-account-id>[&includeHidden=true]
 //
 // proxies the trezu api treasuries list for one account. no upstream
 // auth: trezu's treasuries endpoint is public, our backend just saves
 // the browser from talking to trezu directly.
+//
+// the route path mirrors the upstream trezu path (/api/user/treasuries)
+// under the /api/trezu/* prefix, so the app being talked to is obvious
+// from the url alone.
 //
 // failure modes, all as json:
 //   400 - accountId missing or blank

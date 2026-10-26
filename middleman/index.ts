@@ -5,7 +5,7 @@
 //
 //   intear/   - the intear api at api.intea.rs, called from the
 //               browser so our backend is never rate limited by it.
-//   huggies/  - our own backend routes under /api/huggies/.
+//   huggies/  - our own backend routes under /api/trezu/.
 //   near_kit_tool_box/ - a local stand-in for @near-kit-tool-box/fun,
 //               holding the chain helpers the published package does
 //               not ship yet.

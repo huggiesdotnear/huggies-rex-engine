@@ -1,5 +1,5 @@
 // APP_ROUTER_FUN
-// route map: api (/api/huggies/*) + the static folder served from
+// route map: api (/api/trezu/*) + the static folder served from
 // `/` via ServeDir (the static folder is gitignored — populated by
 // `bun build` in the frontend step).
 //
@@ -77,7 +77,8 @@ pub fn app_router_fun() -> Router {
         .allow_headers(tower_http::cors::Any)
         .max_age(std::time::Duration::from_secs(86400));
     // --------------------------------------------------------
-    // api router: only /api/huggies/* lives here. the static
+    // api router: every /api/* route lives here, each under the
+    // api it fronts (/api/trezu/*, /api/near/*). the static
     // ServeDir lives at `/` as the FALLBACK so any unmatched GET
     // (the html root + every .html page + the js/ + img/ trees)
     // is served from the (gitignored) static folder built by
@@ -85,9 +86,9 @@ pub fn app_router_fun() -> Router {
     // because it's registered on the outer Router.
     // --------------------------------------------------------
     let api_router = Router::new()
-        .route("/api/huggies/ping", get(ping_route))
+        .route("/api/trezu/ping", get(ping_route))
         .route(
-            "/api/huggies/treasuries",
+            "/api/trezu/user/treasuries",
             get(huggies_trezu_treasuries_route),
         );
     // --------------------------------------------------------

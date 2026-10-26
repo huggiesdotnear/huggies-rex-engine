@@ -44,7 +44,7 @@ the contract pages do not list LP positions. there is no clean way to ask a dex 
 
 the signed-in account's balances show on every contract page through the shared balance panel (`lib/components/balance_panel.tsx`), the same component the account page uses.
 
-Sputnik members are derived from `get_policy` roles whose `kind` is `Group`; Sputnik does not expose `get_members`. The DAO page accepts a `dao_id` query parameter and offers a DAO id input and a dropdown of the signed-in account's Trezu treasuries. The optional Trezu treasury listing calls `GET /api/huggies/treasuries?accountId=<id>` and degrades gracefully when the proxy endpoint is unavailable.
+Sputnik members are derived from `get_policy` roles whose `kind` is `Group`; Sputnik does not expose `get_members`. The DAO page accepts a `dao_id` query parameter and offers a DAO id input and a dropdown of the signed-in account's Trezu treasuries. The optional Trezu treasury listing calls `GET /api/trezu/user/treasuries?accountId=<id>` and degrades gracefully when the proxy endpoint is unavailable.
 
 > --- WHY --- the sputnik v2 contract has no internal-balance view, so
 > the account's balance comes from INTEAR's direct balances instead of

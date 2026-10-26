@@ -1,6 +1,6 @@
 // ========================================
 // API_HUGGIES_TREASURIES_GET
-// GET /api/huggies/treasuries — the treasuries (sputnik daos) an
+// GET /api/trezu/user/treasuries — the treasuries (sputnik daos) an
 // account belongs to, proxied through our own backend to trezu.
 //
 // same-origin call to our backend, which forwards to trezu and hands

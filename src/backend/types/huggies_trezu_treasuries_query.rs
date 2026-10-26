@@ -1,5 +1,5 @@
 // HUGGIES_TREZU_TREASURIES_QUERY
-// the query params our /api/huggies/treasuries route accepts. the
+// the query params our /api/trezu/user/treasuries route accepts. the
 // upstream trezu api takes the same two names, so the proxy can
 // forward them without renaming.
 //
