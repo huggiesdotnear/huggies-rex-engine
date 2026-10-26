@@ -7,6 +7,7 @@ nav
 - index.html - FEED
 - account.html - PROFILE
 - discover.html - DISCOVER
+- skill.html - SKILL
 
 ---
 
