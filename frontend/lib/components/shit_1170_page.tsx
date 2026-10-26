@@ -1,6 +1,7 @@
 // ========================================
-// dedicated SHIT token page: summary, price/LP reference, and the
-// full holder list with type filters.
+// dedicated SHIT token page: the holder tabs with the share of the
+// supply each group holds, the full holder list, and the token
+// metadata at the bottom of the page.
 // ========================================
 import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
@@ -15,6 +16,10 @@ import {
   type HUGGIES_SHIT_HOLDER,
   type HUGGIES_SHIT_HOLDER_TYPE,
 } from "../ts/shit_holders";
+import {
+  shit_holder_groups_fun,
+  type HUGGIES_SHIT_HOLDER_GROUP,
+} from "../ts/shit_holder_groups";
 import { fetch_shit_price_ref_fun } from "../ts/shit_price_ref";
 import { fetch_shit_summary_fun } from "../ts/shit_summary";
 import type { HUGGIES_SHIT_SUMMARY } from "../ts/shit_summary";
@@ -44,18 +49,18 @@ function format_price_usd_fun(value: number): string {
   return `$${value.toFixed(8)}`;
 }
 // ========================================
-// render one metadata row of the summary grid.
+// render one metadata row of the metadata grid.
 function shit_meta_row_fun(label: string, value: string): preact.JSX.Element {
   return (
-    <div class="huggies-shit-meta-row">
+    <div class="huggies-token-meta-row">
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
   );
 }
 // ========================================
-// render the token summary block.
-function render_summary_fun(
+// render the token metadata block, at the bottom of the page.
+function render_metadata_fun(
   summary: HUGGIES_SHIT_SUMMARY,
   price_ref: HUGGIES_SHIT_PRICE_REF | null,
 ): preact.JSX.Element {
@@ -64,18 +69,9 @@ function render_summary_fun(
       ? price_ref.price_usd
       : summary.price_usd;
   return (
-    <header class="huggies-shit-summary">
-      <div class="huggies-shit-summary-header">
-        {summary.icon !== null && (
-          <img class="huggies-shit-icon" src={summary.icon} alt="" />
-        )}
-        <div>
-          <h1>{summary.symbol}</h1>
-          <p>{summary.name}</p>
-          <code>{summary.id}</code>
-        </div>
-      </div>
-      <div class="huggies-shit-meta">
+    <section class="huggies-shit-metadata">
+      <h2>TOKEN METADATA</h2>
+      <div class="huggies-token-meta">
         {shit_meta_row_fun("PRICE", format_price_usd_fun(price_usd))}
         {shit_meta_row_fun("HOLDERS", summary.holders.toLocaleString())}
         {shit_meta_row_fun("TOTAL SUPPLY", shit_total_supply_formatted_fun())}
@@ -124,35 +120,87 @@ function render_summary_fun(
           OPEN FULL TOKEN PAGE
         </a>
       </p>
-    </header>
+    </section>
   );
 }
 // ========================================
-// render the filter buttons.
+// render the filter tabs, each carrying its group's share of supply.
 function render_filters_fun(
   active_filter: HUGGIES_SHIT_ACTIVE_FILTER,
+  groups: HUGGIES_SHIT_HOLDER_GROUP[],
   on_filter_fun: (filter: HUGGIES_SHIT_ACTIVE_FILTER) => void,
 ): preact.JSX.Element {
+  // the share of the supply each tab holds, looked up by holder type.
+  const percent_by_type = new Map(
+    groups.map((group) => [group.type, group.percent_formatted]),
+  );
   return (
-    <div class="huggies-shit-filters" role="group" aria-label="holder types">
-      {HUGGIES_SHIT_FILTERS.map((filter) => (
-        <button
-          type="button"
-          class={
-            filter.key === active_filter
-              ? "huggies-shit-filter is-active"
-              : "huggies-shit-filter"
-          }
-          aria-pressed={filter.key === active_filter}
-          onClick={() => on_filter_fun(filter.key)}
-        >
-          {filter.icon !== "" && (
-            <span class="huggies-shit-filter-icon">{filter.icon}</span>
-          )}
-          <span>{filter.label}</span>
-        </button>
-      ))}
+    <div class="huggies-shit-tabs" role="tablist" aria-label="holder types">
+      {HUGGIES_SHIT_FILTERS.map((filter) => {
+        const percent =
+          filter.key === "all" ? null : (percent_by_type.get(filter.key) ?? null);
+        return (
+          <button
+            type="button"
+            role="tab"
+            class={
+              filter.key === active_filter
+                ? "huggies-shit-tab is-active"
+                : "huggies-shit-tab"
+            }
+            aria-selected={filter.key === active_filter}
+            onClick={() => on_filter_fun(filter.key)}
+          >
+            <span class="huggies-shit-tab-icon">
+              {filter.icon !== "" ? filter.icon : "💩"}
+            </span>
+            <span class="huggies-shit-tab-label">{filter.label}</span>
+            {percent !== null && (
+              <span class="huggies-shit-tab-percent">{percent}</span>
+            )}
+          </button>
+        );
+      })}
     </div>
+  );
+}
+// ========================================
+// render the share of the supply each group of holders holds.
+function render_groups_fun(
+  groups: HUGGIES_SHIT_HOLDER_GROUP[],
+): preact.JSX.Element {
+  return (
+    <section class="huggies-shit-groups">
+      <h2>HOLDERS BY GROUP</h2>
+      <div class="huggies-shit-groups-bar">
+        {groups.map((group) => (
+          <span
+            key={group.type}
+            class={`huggies-shit-groups-slice is-${group.type}`}
+            style={`width: ${group.percent.toFixed(4)}%`}
+            title={`${shit_holder_type_label_fun(group.type)}: ${group.percent_formatted}`}
+          />
+        ))}
+      </div>
+      <ul class="huggies-shit-groups-list">
+        {groups.map((group) => (
+          <li key={group.type} class={`is-${group.type}`}>
+            <span class="huggies-shit-groups-icon">
+              {shit_holder_icon_fun(group.type)}
+            </span>
+            <span class="huggies-shit-groups-name">
+              {shit_holder_type_label_fun(group.type)}
+            </span>
+            <span class="huggies-shit-groups-count">
+              {group.count.toLocaleString()}
+            </span>
+            <span class="huggies-shit-groups-percent">
+              {group.percent_formatted}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 // ========================================
@@ -212,7 +260,7 @@ function render_legend_fun(): preact.JSX.Element {
 // ========================================
 // --- COMPONENT --------------------------
 // the dedicated SHIT token page component.
-function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
+export function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
   const [summary, set_summary] = use_state<HUGGIES_SHIT_SUMMARY | null>(null);
   const [price_ref, set_price_ref] = use_state<HUGGIES_SHIT_PRICE_REF | null>(
     null,
@@ -281,11 +329,13 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
       ? holders
       : holders.filter((holder) => holder.type === active_filter);
 
+  // the share of the supply each group of holders holds.
+  const groups = shit_holder_groups_fun(holders);
+
   if (loading) return <div class="huggies-shit-page">LOADING SHIT...</div>;
 
   return (
     <div class="huggies-shit-page huggies-page">
-      {summary !== null && render_summary_fun(summary, price_ref)}
       {error !== null && <p class="huggies-shit-error">{error}</p>}
       <section class="huggies-shit-holders">
         <h2>
@@ -293,9 +343,10 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
           {active_filter === "all" ? holder_total : filtered_holders.length}
           {active_filter === "all" ? "" : ` OF ${holder_total}`})
         </h2>
-        {render_filters_fun(active_filter, (filter) =>
+        {render_filters_fun(active_filter, groups, (filter) =>
           set_active_filter(filter),
         )}
+        {render_groups_fun(groups)}
         {filtered_holders.length === 0 ? (
           <p>NO HOLDERS IN THIS CATEGORY</p>
         ) : (
@@ -326,6 +377,7 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
         )}
         {render_legend_fun()}
       </section>
+      {summary !== null && render_metadata_fun(summary, price_ref)}
     </div>
   );
 }

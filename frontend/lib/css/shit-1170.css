@@ -1,55 +1,10 @@
 /*==================================*/
-/* $SHIT token page: summary, holder filters, and holder rows */
+/* $SHIT token page: holder tabs, the share of the supply each group */
+/* holds, the holder rows, and the metadata block at the bottom.       */
 /*==================================*/
 .huggies-shit-page {
   width: 100%;
   text-align: left;
-}
-.huggies-shit-summary {
-  margin-bottom: 22px;
-}
-.huggies-shit-summary-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.huggies-shit-summary-header h1,
-.huggies-shit-summary-header p {
-  margin: 0;
-}
-.huggies-shit-summary-header h1 {
-  font-size: 24px;
-}
-.huggies-shit-summary-header p {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  opacity: 0.75;
-}
-.huggies-shit-summary-header code {
-  font-size: 10px;
-  opacity: 0.55;
-  overflow-wrap: anywhere;
-}
-.huggies-shit-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex: none;
-}
-.huggies-shit-meta {
-  border-top: 1px solid #474747;
-  border-bottom: 1px solid #474747;
-  padding: 8px 0;
-}
-.huggies-shit-meta-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 4px 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
 }
 .huggies-shit-description {
   margin: 12px 0;
@@ -70,46 +25,161 @@
   color: #ffd7d4;
 }
 /*==================================*/
-/* holder filters */
+/* the holder tabs */
+/* the tabs scroll sideways on a narrow screen, so a group is always   */
+/* one tap away without the row wrapping into a tall stack.           */
 /*==================================*/
-.huggies-shit-filters {
+.huggies-shit-tabs {
   display: flex;
-  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
-.huggies-shit-filter {
+.huggies-shit-tabs::-webkit-scrollbar {
+  display: none;
+}
+.huggies-shit-tab {
+  /* --- WHY --- the global button rule pins every button to the page
+  column width. these tabs are a row of small pills, so the width is
+  reset here and the row scrolls instead. */
+  width: auto;
+  max-width: none;
+  flex: 0 0 auto;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 2px;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
   background: transparent;
   color: inherit;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.06em;
-  padding: 6px 11px;
+  padding: 6px 10px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.huggies-shit-filter:hover {
+.huggies-shit-tab:hover {
   border-color: var(--color-middle);
   background: rgba(0, 198, 215, 0.12);
 }
-.huggies-shit-filter.is-active {
+.huggies-shit-tab.is-active {
   background: var(--color-middle);
   border-color: var(--color-middle);
   color: #06181a;
   font-weight: bold;
 }
-.huggies-shit-filter-icon {
+.huggies-shit-tab-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+.huggies-shit-tab-label {
+  line-height: 1;
+}
+.huggies-shit-tab-percent {
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-shit-tab.is-active .huggies-shit-tab-percent {
+  opacity: 0.9;
+}
+/*==================================*/
+/* the share of the supply each group holds */
+.huggies-shit-groups {
+  margin-bottom: 14px;
+}
+.huggies-shit-groups h2 {
+  text-align: left;
+  font-size: 15px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+/* the stacked bar: one slice per group, sized by its share */
+.huggies-shit-groups-bar {
+  display: flex;
+  width: 100%;
+  height: 14px;
+  margin: 10px 0 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+.huggies-shit-groups-slice {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.huggies-shit-groups-slice.is-dev {
+  background: #8ef0a0;
+}
+.huggies-shit-groups-slice.is-dex {
+  background: #2196f3;
+}
+.huggies-shit-groups-slice.is-nft {
+  background: #ff9800;
+}
+.huggies-shit-groups-slice.is-vault {
+  background: var(--color-middle);
+}
+.huggies-shit-groups-slice.is-burn {
+  background: var(--color-backend);
+}
+.huggies-shit-groups-slice.is-regular {
+  background: rgba(255, 255, 255, 0.45);
+}
+/* the per-group list under the bar */
+.huggies-shit-groups-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.huggies-shit-groups-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.huggies-shit-groups-icon {
   font-size: 13px;
   line-height: 1;
+  width: 16px;
+  flex: none;
+  text-align: center;
+}
+.huggies-shit-groups-name {
+  flex: 1;
+  min-width: 0;
+  letter-spacing: 0.06em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-shit-groups-count {
+  flex: none;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-shit-groups-percent {
+  /* --- WHY --- the share is the number the reader came for, so it is
+  the one thing in the row that never shrinks. the name takes the
+  slack instead and ellipsizes. */
+  flex: none;
+  min-width: 52px;
+  text-align: right;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 /*==================================*/
 /* holder table */
-/*==================================*/
 .huggies-shit-holders h2 {
   text-align: left;
   font-size: 17px;
@@ -210,7 +280,6 @@
 }
 /*==================================*/
 /* legend */
-/*==================================*/
 .huggies-shit-legend {
   margin-top: 16px;
   padding-top: 12px;
@@ -219,5 +288,17 @@
   font-size: 11px;
   line-height: 1.7;
   opacity: 0.8;
+}
+/*==================================*/
+/* the metadata block at the bottom of the page */
+.huggies-shit-metadata {
+  margin-top: 24px;
+}
+.huggies-shit-metadata h2 {
+  text-align: left;
+  font-size: 15px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
 }
 /*==================================*/
