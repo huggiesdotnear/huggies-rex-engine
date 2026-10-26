@@ -17,10 +17,13 @@ export interface HUGGIES_PUMPOPOLY_PLAYER {
   invited_by: string;
   last_move: string;
 }
+export interface HUGGIES_PUMPOPOLY_NFT_DATA {
+  count: number;
+  token_ids: string[];
+}
 export interface HUGGIES_PUMPOPOLY_DATA {
   player: HUGGIES_PUMPOPOLY_PLAYER | null;
-  nft_count: number;
-  nft_token_ids: string[];
+  nft: HUGGIES_PUMPOPOLY_NFT_DATA;
   credit_score: number;
   errors: string[];
 }
@@ -116,8 +119,10 @@ export async function load_pumpopoly_page_fun(
   const invites = player?.invites ?? 0;
   return {
     player,
-    nft_count: nft_token_ids.length,
-    nft_token_ids,
+    nft: {
+      count: nft_token_ids.length,
+      token_ids: nft_token_ids,
+    },
     credit_score: land_count * 10 + invites * 30,
     errors,
   };

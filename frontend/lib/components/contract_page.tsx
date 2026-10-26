@@ -14,6 +14,11 @@ import { load_rhea_dcl_page_fun } from "../ts/rhea_dcl_page";
 import { load_intear_dex_page_fun } from "../ts/intear_dex_page";
 import { load_sputnik_dao_page_fun } from "../ts/sputnik_dao_page";
 import { load_pumpopoly_page_fun } from "../ts/pumpopoly_page";
+import {
+  HUGGIES_PUMPOPOLY_INVITE_ACCOUNT,
+  pumpopoly_account_id_from_url_fun,
+  pumpopoly_invite_link_fun,
+} from "../ts/pumpopoly_link";
 import { list_trezu_treasuries_fun } from "../ts/trezu_treasuries";
 import { pool_summary_fun } from "../ts/contract_pool_stats";
 import { current_app_depth_fun } from "../ts/app_depth";
@@ -60,7 +65,9 @@ function get_contract_key_fun(): HUGGIES_CONTRACT_KEY {
   const el = document.getElementById(
     HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_PAGE,
   );
-  const from_attr = as_contract_key_fun(el?.getAttribute("data-contract") ?? null);
+  const from_attr = as_contract_key_fun(
+    el?.getAttribute("data-contract") ?? null,
+  );
   if (from_attr !== null) return from_attr;
   const from_query = as_contract_key_fun(
     new URLSearchParams(window.location.search).get("id"),
@@ -89,7 +96,9 @@ function dao_role_fun(role: {
         <ul class="huggies-dao-members">
           {role.members.map((member) => (
             <li>
-              <a href={`${"../".repeat(current_app_depth_fun())}account.html?id=${encodeURIComponent(member)}`}>
+              <a
+                href={`${"../".repeat(current_app_depth_fun())}account.html?id=${encodeURIComponent(member)}`}
+              >
                 {member}
               </a>
             </li>
@@ -107,7 +116,13 @@ function render_contract_fun(
 ): preact.JSX.Element {
   const cards = list_contract_cards_fun();
   const card = cards.find((item) => item.key === key);
-  const heading = card?.title ?? key;
+  // --- WHY --- the Pumpopoly h1 is all lowercase to match the site's
+  // heading style. its card title is "Pumpopoly", so it is uppercased
+  // here instead of hardcoding a second spelling of the name.
+  const heading =
+    key === "pumpopoly"
+      ? (card?.title ?? key).toUpperCase()
+      : (card?.title ?? key);
 
   if (data === null) {
     return (
@@ -255,13 +270,13 @@ function render_contract_fun(
   }
 
   const player = data.data.player;
-  const invite_link =
-    player === null
-      ? ""
-      : `https://near.pumpopoly.com/?invite=${encodeURIComponent(player.account_id)}`;
   return (
     <section>
       <h1>{heading}</h1>
+      <p class="huggies-pumpopoly-contract">
+        <code>world.pumpopoly.near</code>
+      </p>
+      <h2>WORLD</h2>
       <div class="huggies-pumpopoly-cards">
         <article class="huggies-pumpopoly-card is-balance">
           <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
@@ -295,13 +310,6 @@ function render_contract_fun(
           <span class="huggies-pumpopoly-sub">LAND + INVITES</span>
         </article>
         <article class="huggies-pumpopoly-card">
-          <span class="huggies-pumpopoly-label">NFTS HELD</span>
-          <strong class="huggies-pumpopoly-value">
-            {data.data.nft_count}
-          </strong>
-          <span class="huggies-pumpopoly-sub">PUMPOPOLY NFTS</span>
-        </article>
-        <article class="huggies-pumpopoly-card">
           <span class="huggies-pumpopoly-label">INVITES</span>
           <strong class="huggies-pumpopoly-value">
             {player?.invites ?? 0}
@@ -311,7 +319,6 @@ function render_contract_fun(
           </span>
         </article>
       </div>
-      <h2>ACCOUNT INFO</h2>
       <div class="huggies-pumpopoly-info">
         <div>
           <span>INVITED BY</span>
@@ -322,23 +329,34 @@ function render_contract_fun(
           <code>{player?.last_move || "UNKNOWN"}</code>
         </div>
       </div>
-      <h2>NFT HOLDINGS</h2>
-      {data.data.nft_token_ids.length === 0 ? (
+      <h2>NFT</h2>
+      <p class="huggies-pumpopoly-contract">
+        <code>nft.pumpopoly.near</code>
+      </p>
+      <div class="huggies-pumpopoly-cards">
+        <article class="huggies-pumpopoly-card">
+          <span class="huggies-pumpopoly-label">NFTS HELD</span>
+          <strong class="huggies-pumpopoly-value">{data.data.nft.count}</strong>
+          <span class="huggies-pumpopoly-sub">PUMPOPOLY NFTS</span>
+        </article>
+      </div>
+      {data.data.nft.token_ids.length === 0 ? (
         <p>NO NFTS</p>
       ) : (
         <ul class="huggies-pumpopoly-nfts">
-          {data.data.nft_token_ids.map((token_id) => (
+          {data.data.nft.token_ids.map((token_id) => (
             <li>
               <code>{token_id}</code>
             </li>
           ))}
         </ul>
       )}
-      {invite_link !== "" && (
-        <p class="huggies-pumpopoly-invite">
-          INVITE LINK: <a href={invite_link}>{invite_link}</a>
-        </p>
-      )}
+      <p class="huggies-pumpopoly-invite">
+        INVITE LINK:{" "}
+        <a href={pumpopoly_invite_link_fun(HUGGIES_PUMPOPOLY_INVITE_ACCOUNT)}>
+          {HUGGIES_PUMPOPOLY_INVITE_ACCOUNT}
+        </a>
+      </p>
     </section>
   );
 }
@@ -414,13 +432,53 @@ function dao_selector_fun(
   );
 }
 // ========================================
+// render the Pumpopoly account selector.
+function pumpopoly_account_selector_fun(
+  account_id: string | null,
+): preact.JSX.Element {
+  const [input_id, set_input_id] = use_state<string>(account_id ?? "");
+  const open_account_fun = () => {
+    const next_id = input_id.trim();
+    if (next_id.length === 0) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("id", next_id);
+    window.location.href = url.toString();
+  };
+  return (
+    <section class="huggies-pumpopoly-selector">
+      <label class="huggies-pumpopoly-input">
+        <span>ACCOUNT ID</span>
+        <input
+          type="text"
+          value={input_id}
+          placeholder="account.near"
+          onInput={(event) => {
+            set_input_id((event.currentTarget as HTMLInputElement).value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") open_account_fun();
+          }}
+        />
+      </label>
+      <button
+        type="button"
+        class="huggies-pumpopoly-open"
+        onClick={open_account_fun}
+      >
+        OPEN ACCOUNT
+      </button>
+    </section>
+  );
+}
+// ========================================
 // shared smart-contract page component.
-function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
+export function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
   const [data, set_data] = use_state<HUGGIES_CONTRACT_DATA | null>(null);
   const [account_id, set_account_id] = use_state<string | null>(null);
   const [errors, set_errors] = use_state<string[]>([]);
   const key = get_contract_key_fun();
   const dao_id = get_dao_id_fun();
+  const pumpopoly_account_id = pumpopoly_account_id_from_url_fun();
 
   use_effect(() => {
     HUGGIES_AUTH.init();
@@ -447,7 +505,10 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
       if (key === "sputnik-dao") {
         return { kind: key, data: await load_sputnik_dao_page_fun(dao_id) };
       }
-      return { kind: key, data: await load_pumpopoly_page_fun(account_id) };
+      return {
+        kind: key,
+        data: await load_pumpopoly_page_fun(pumpopoly_account_id),
+      };
     };
     void load()
       .then((value) => {
@@ -462,13 +523,20 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_FUN() {
     return () => {
       cancelled = true;
     };
-  }, [key, dao_id, account_id]);
+  }, [key, dao_id, pumpopoly_account_id]);
 
   return (
     <div class="huggies-contract-page huggies-page">
       {key === "sputnik-dao" && dao_selector_fun(dao_id, account_id)}
+      {key === "pumpopoly" &&
+        pumpopoly_account_selector_fun(pumpopoly_account_id)}
       {render_contract_fun(key, data)}
-      {account_id !== null && (
+      {/* --- WHY --- no balance panel on the Pumpopoly page. it asked
+          for the signed-in account's balances, but the page is about a
+          player named in the url, so the panel showed someone else's
+          money next to another player's stats. the Pumpopoly cards
+          already carry the player's own token balance. --- */}
+      {key !== "pumpopoly" && account_id !== null && (
         <div class="huggies-balance-table">
           {huggies_balance_panel_fun({
             account_id,

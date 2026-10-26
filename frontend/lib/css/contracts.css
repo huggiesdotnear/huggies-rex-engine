@@ -399,6 +399,70 @@
   overflow-wrap: anywhere;
 }
 /* --- pumpopoly --- */
+.huggies-pumpopoly-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.huggies-pumpopoly-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.huggies-pumpopoly-input span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.huggies-pumpopoly-input input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 0.7rem;
+  font: inherit;
+  font-family: monospace;
+  font-size: 13px;
+}
+.huggies-pumpopoly-open {
+  /* --- WHY --- the global button rule sets a fixed width:500px so
+     buttons line up with the page column. this card is narrower than
+     that, so the button hung out past the card's own edge. `width:100%`
+     resolves against the card's CONTENT box — the same box the input
+     above it fills — so the button lines up with the input and stops
+     exactly at the card's padding. --- */
+  width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+  background: #ffffff;
+  color: #2d2d2d;
+  font-weight: 700;
+  cursor: pointer;
+}
+.huggies-pumpopoly-open:hover {
+  background: #e9e9e9;
+}
+.huggies-pumpopoly-contract {
+  margin: 0 0 0.75rem;
+}
+.huggies-pumpopoly-contract code {
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+}
 .huggies-pumpopoly-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

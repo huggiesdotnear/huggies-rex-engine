@@ -42,13 +42,26 @@ Rhea AMM reports its pool count through `get_number_of_pools`; Rhea DCL has no c
 
 the contract pages do not list LP positions. there is no clean way to ask a dex "every pool this account has a position in", so that per-pool scan lives only on the account page, where it is bounded and labeled.
 
-the signed-in account's balances show on every contract page through the shared balance panel (`lib/components/balance_panel.tsx`), the same component the account page uses.
+the signed-in account's balances show on every contract page through the shared balance panel (`lib/components/balance_panel.tsx`), the same component the account page uses. the Pumpopoly page is the exception — it is about a player named in the url, so it shows that player's stats and no balance panel.
 
 Sputnik members are derived from `get_policy` roles whose `kind` is `Group`; Sputnik does not expose `get_members`. The DAO page accepts a `dao_id` query parameter and offers a DAO id input and a dropdown of the signed-in account's Trezu treasuries. The optional Trezu treasury listing calls `GET /api/trezu/user/treasuries?accountId=<id>` and degrades gracefully when the proxy endpoint is unavailable.
 
 > --- WHY --- the sputnik v2 contract has no internal-balance view, so
 > the account's balance comes from INTEAR's direct balances instead of
 > calling a contract method that does not exist.
+
+## Pumpopoly
+
+the Pumpopoly page reads a player from the `?id=` query parameter — the same shape as the token detail page — through an account id input and an `OPEN ACCOUNT` button. the id in the url is the player the page is about; the signed-in account is not used for the lookup.
+
+the page is split into two sections, one per contract it calls:
+
+- **WORLD** — `world.pumpopoly.near`, the `view_player` view. balance, land, board position, credit score and invites, plus who invited the player and their last move.
+- **NFT** — `nft.pumpopoly.near`, the `nft_tokens_for_owner` view. the NFT count and the token ids.
+
+the h1 is `PUMPOPOLY`, all lowercase to match the site's heading style.
+
+the invite link always points at `huggies.near`, the account this app signs players up through. it is not the player being viewed.
 
 Pumpopoly shows NFT count separately from the derived credit score. Credit score is `land_count * 10 + invites * 30`; NFT count is not included. The in-game balance is displayed in human Pumpopoly units alongside the raw contract amount.
 
