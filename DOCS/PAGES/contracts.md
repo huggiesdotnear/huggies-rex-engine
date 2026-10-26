@@ -54,14 +54,14 @@ Sputnik members are derived from `get_policy` roles whose `kind` is `Group`; Spu
 
 the Pumpopoly page reads a player from the `?id=` query parameter — the same shape as the token detail page — through an account id input and an `OPEN ACCOUNT` button. the id in the url is the player the page is about; the signed-in account is not used for the lookup.
 
-the page is split into two sections, one per contract it calls:
+the page is split into two sections, one per contract it calls. each section's `h2` is the contract id it queries:
 
-- **WORLD** — `world.pumpopoly.near`, the `view_player` view. balance, land, board position, credit score and invites, plus who invited the player and their last move.
-- **NFT** — `nft.pumpopoly.near`, the `nft_tokens_for_owner` view. the NFT count and the token ids.
+- **world.pumpopoly.near** — the `view_player` view. balance, land, board position, credit score and invites, plus who invited the player and their last move.
+- **nft.pumpopoly.near** — the `nft_tokens_for_owner` view. the NFT count and the token ids.
 
 the h1 is `PUMPOPOLY`, all lowercase to match the site's heading style.
 
-the invite link always points at `huggies.near`, the account this app signs players up through. it is not the player being viewed.
+the page ends with a full-width `NEW PLAYERS START HERE` button linking to the Pumpopoly invite for `huggies.near`, the account this app signs players up through. it is not the player being viewed, and there is no separate "INVITE LINK" text label.
 
 Pumpopoly shows NFT count separately from the derived credit score. Credit score is `land_count * 10 + invites * 30`; NFT count is not included. The in-game balance is displayed in human Pumpopoly units alongside the raw contract amount.
 

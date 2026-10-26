@@ -455,14 +455,6 @@
 .huggies-pumpopoly-open:hover {
   background: #e9e9e9;
 }
-.huggies-pumpopoly-contract {
-  margin: 0 0 0.75rem;
-}
-.huggies-pumpopoly-contract code {
-  font-size: 12px;
-  opacity: 0.65;
-  overflow-wrap: anywhere;
-}
 .huggies-pumpopoly-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -547,8 +539,29 @@
   word-break: break-all;
 }
 .huggies-pumpopoly-invite {
-  margin-top: 1rem;
+  /* --- WHY --- a full-width button, not a text link. this is the one
+     thing on the page a NEW visitor wants, and it has to read as a
+     button from across the room. `display:block` plus `width:100%`
+     makes the anchor fill the page column, and `box-sizing` keeps the
+     padding inside that width instead of pushing it past the edge. --- */
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border: 0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #2d2d2d;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
-  overflow-wrap: anywhere;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.huggies-pumpopoly-invite:hover {
+  background: #e9e9e9;
 }
 /*==================================*/

@@ -273,10 +273,7 @@ function render_contract_fun(
   return (
     <section>
       <h1>{heading}</h1>
-      <p class="huggies-pumpopoly-contract">
-        <code>world.pumpopoly.near</code>
-      </p>
-      <h2>WORLD</h2>
+      <h2>world.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-cards">
         <article class="huggies-pumpopoly-card is-balance">
           <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
@@ -329,10 +326,7 @@ function render_contract_fun(
           <code>{player?.last_move || "UNKNOWN"}</code>
         </div>
       </div>
-      <h2>NFT</h2>
-      <p class="huggies-pumpopoly-contract">
-        <code>nft.pumpopoly.near</code>
-      </p>
+      <h2>nft.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-cards">
         <article class="huggies-pumpopoly-card">
           <span class="huggies-pumpopoly-label">NFTS HELD</span>
@@ -351,12 +345,12 @@ function render_contract_fun(
           ))}
         </ul>
       )}
-      <p class="huggies-pumpopoly-invite">
-        INVITE LINK:{" "}
-        <a href={pumpopoly_invite_link_fun(HUGGIES_PUMPOPOLY_INVITE_ACCOUNT)}>
-          {HUGGIES_PUMPOPOLY_INVITE_ACCOUNT}
-        </a>
-      </p>
+      <a
+        class="huggies-pumpopoly-invite"
+        href={pumpopoly_invite_link_fun(HUGGIES_PUMPOPOLY_INVITE_ACCOUNT)}
+      >
+        NEW PLAYERS START HERE
+      </a>
     </section>
   );
 }
