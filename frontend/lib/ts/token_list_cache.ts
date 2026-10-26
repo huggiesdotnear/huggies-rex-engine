@@ -4,11 +4,16 @@
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./token_search";
 // ========================================
 const HUGGIES_TOKEN_LIST_DB_NAME = "huggies_token_list";
-const HUGGIES_TOKEN_LIST_DB_VERSION = 2;
+const HUGGIES_TOKEN_LIST_DB_VERSION = 3;
 // the full sortable token set. one snapshot of every token, NOT one
 // per sort: sorting happens in javascript, so a second cached copy per
 // sort field would be 7,355 rows stored twice for nothing.
 const HUGGIES_TOKEN_SET_STORE = "tokens";
+// the store the old discover page used: one list per sort field. a
+// browser that visited it still has that store, holding stale copies
+// of the whole token set, one per sort. nothing reads it any more, so
+// it is deleted on the next upgrade rather than left to sit there.
+const HUGGIES_TOKEN_LIST_LEGACY_STORE = "lists";
 // the one key the full token set is stored under.
 const HUGGIES_TOKEN_SET_KEY = "all";
 // how long a cached list is served before it is refetched. the volume
@@ -40,6 +45,15 @@ function open_db_fun(): Promise<IDBDatabase> {
       // stores does not throw on the ones already here.
       if (!db.objectStoreNames.contains(HUGGIES_TOKEN_SET_STORE)) {
         db.createObjectStore(HUGGIES_TOKEN_SET_STORE, { keyPath: "key" });
+      }
+      // --- WHY --- the legacy store holds a stale copy of the whole
+      // token set for every sort field the old page cached. nothing
+      // reads it, so it is deleted here — a browser that visited the
+      // old page would otherwise keep several thousand stale rows
+      // forever, and the upgrade is the only moment the version
+      // changes.
+      if (db.objectStoreNames.contains(HUGGIES_TOKEN_LIST_LEGACY_STORE)) {
+        db.deleteObjectStore(HUGGIES_TOKEN_LIST_LEGACY_STORE);
       }
     };
     request.onsuccess = () => resolve(request.result);
