@@ -118,9 +118,9 @@ function dao_selector_fun(props: {
 // ========================================
 // the Sputnik DAO contract page component.
 export function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
-  const [data, set_data] = use_state<
-    Awaited<ReturnType<typeof load_sputnik_dao_page_fun>> | null
-  >(null);
+  const [data, set_data] = use_state<Awaited<
+    ReturnType<typeof load_sputnik_dao_page_fun>
+  > | null>(null);
   const [errors, set_errors] = use_state<string[]>([]);
   const dao_id = get_dao_id_fun();
 

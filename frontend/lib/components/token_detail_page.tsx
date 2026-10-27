@@ -130,11 +130,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
         <>
           <header class="huggies-token-detail-header">
             {detail.icon !== null && (
-              <img
-                class="huggies-token-detail-icon"
-                src={detail.icon}
-                alt=""
-              />
+              <img class="huggies-token-detail-icon" src={detail.icon} alt="" />
             )}
             <div>
               <h1>{detail.symbol}</h1>
@@ -148,10 +144,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_PAGE_FUN() {
               format_price_usd_fun(detail.price_usd),
             )}
             {token_metadata_row_fun("REPUTATION", detail.reputation)}
-            {token_metadata_row_fun(
-              "HOLDERS",
-              detail.holders.toLocaleString(),
-            )}
+            {token_metadata_row_fun("HOLDERS", detail.holders.toLocaleString())}
             {token_metadata_row_fun(
               "LIQUIDITY",
               format_price_usd_fun(detail.liquidity_usd),

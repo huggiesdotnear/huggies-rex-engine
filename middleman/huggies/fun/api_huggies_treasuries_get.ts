@@ -44,7 +44,10 @@ export async function api_huggies_treasuries_get(
     );
     console.log("=============================");
     console.log(" HUGGIES TREASURIES GET FAILED on:", url);
-    console.log("RESPONSE STATUS:", `${response.status} - ${response.statusText}`);
+    console.log(
+      "RESPONSE STATUS:",
+      `${response.status} - ${response.statusText}`,
+    );
     console.log("ERROR:", error.message);
     console.log("=============================");
     throw error;
@@ -59,7 +62,10 @@ export async function api_huggies_treasuries_get(
 
   console.log("=============================");
   console.log(" HUGGIES TREASURIES GET via GET on:", url);
-  console.log("RESPONSE STATUS:", `${response.status} - ${response.statusText}`);
+  console.log(
+    "RESPONSE STATUS:",
+    `${response.status} - ${response.statusText}`,
+  );
   console.log("RESPONSE COUNT:", json.length);
   console.log("=============================");
   return json as HUGGIES_TREASURY[];

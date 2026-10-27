@@ -23,7 +23,9 @@ export function huggies_sort_control_fun(props: {
         <button
           type="button"
           class={
-            option.key === props.sort ? "huggies-sort-button is-active" : "huggies-sort-button"
+            option.key === props.sort
+              ? "huggies-sort-button is-active"
+              : "huggies-sort-button"
           }
           aria-pressed={option.key === props.sort}
           onClick={() => props.on_sort(option.key)}

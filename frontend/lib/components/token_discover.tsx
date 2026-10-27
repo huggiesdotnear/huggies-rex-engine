@@ -2,7 +2,11 @@
 // searchable token list for the discover page.
 // ========================================
 import { render } from "preact";
-import { useEffect as use_effect, useMemo as use_memo, useState as use_state } from "preact/hooks";
+import {
+  useEffect as use_effect,
+  useMemo as use_memo,
+  useState as use_state,
+} from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import {
   fetch_all_tokens_fun,
@@ -192,10 +196,13 @@ export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     };
   }, [visible_ids, icon_sort]);
 
-  const rows = tokens === null ? null : tokens.map((token) => ({
-    ...token,
-    icon: icons[token.id] ?? token.icon,
-  }));
+  const rows =
+    tokens === null
+      ? null
+      : tokens.map((token) => ({
+          ...token,
+          icon: icons[token.id] ?? token.icon,
+        }));
   // the marked tokens are styled wherever the sort puts them.
   const marked_ids = pinned_token_ids_fun();
 

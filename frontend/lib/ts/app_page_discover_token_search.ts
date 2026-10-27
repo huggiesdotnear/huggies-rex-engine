@@ -39,7 +39,11 @@ const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "market_cap_usd",
 ] as const;
 // the fields that identify a token, for the icon batch fetch.
-export const HUGGIES_TOKEN_ICON_FIELDS = ["symbol", "decimals", "icon"] as const;
+export const HUGGIES_TOKEN_ICON_FIELDS = [
+  "symbol",
+  "decimals",
+  "icon",
+] as const;
 // ========================================
 // how many tokens one full fetch asks for. the indexed token count is
 // around 7.4k, so this covers every token the api knows.

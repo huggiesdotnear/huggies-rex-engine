@@ -37,7 +37,9 @@ export async function huggies_parse_error(
       ? raw_error["message"]
       : response.statusText || `HTTP ${response.status}`;
 
-  const error = new Error(`${fallback}: ${code}: ${message}`) as HUGGIES_API_ERROR;
+  const error = new Error(
+    `${fallback}: ${code}: ${message}`,
+  ) as HUGGIES_API_ERROR;
   error.name = "HUGGIES_API_ERROR";
   error.status = response.status;
   error.code = code;

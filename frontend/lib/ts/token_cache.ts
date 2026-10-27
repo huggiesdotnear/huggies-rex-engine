@@ -33,7 +33,10 @@ let db_promise: Promise<IDBDatabase> | null = null;
 function open_db_fun(): Promise<IDBDatabase> {
   if (db_promise !== null) return db_promise;
   db_promise = new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open(HUGGIES_TOKEN_DB_NAME, HUGGIES_TOKEN_DB_VERSION);
+    const request = indexedDB.open(
+      HUGGIES_TOKEN_DB_NAME,
+      HUGGIES_TOKEN_DB_VERSION,
+    );
     request.onupgradeneeded = () => {
       const db = request.result;
       // only create when missing, so a future version bump that adds
@@ -63,7 +66,8 @@ async function get_cached_token_fun(
         .transaction(HUGGIES_TOKEN_STORE, "readonly")
         .objectStore(HUGGIES_TOKEN_STORE)
         .get(id);
-      request.onsuccess = () => resolve((request.result as HUGGIES_CACHED_TOKEN) ?? null);
+      request.onsuccess = () =>
+        resolve((request.result as HUGGIES_CACHED_TOKEN) ?? null);
       request.onerror = () => resolve(null);
     });
   } catch (err) {

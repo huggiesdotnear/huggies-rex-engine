@@ -1,7 +1,8 @@
 // ========================================
 // the shared token sort options used by every token list.
 // ========================================
-export type HUGGIES_TOKEN_SORT = "default" | "volume_usd_24h" | "market_cap_usd";
+export type HUGGIES_TOKEN_SORT =
+  "default" | "volume_usd_24h" | "market_cap_usd";
 // ========================================
 // the sort direction of a token list.
 export type HUGGIES_TOKEN_SORT_DIRECTION = "asc" | "desc";

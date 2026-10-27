@@ -39,7 +39,9 @@ export interface HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY {
 // usd floor is applied to everything including Reputable tokens: live
 // data shows Reputable tokens priced at 1e-8, so reputation alone would
 // leave pure dust in the table.
-function keep_entry_fun(entry: HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY): boolean {
+function keep_entry_fun(
+  entry: HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY,
+): boolean {
   if (entry.info.reputation === HUGGIES_SPAM_REPUTATION) return false;
   if (entry.id === HUGGIES_NEAR_ID) return true;
   return entry.usd_value >= HUGGIES_MIN_USD_BALANCE;

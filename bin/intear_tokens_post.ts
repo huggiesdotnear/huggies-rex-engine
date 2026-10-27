@@ -52,9 +52,7 @@ const limit_raw = flags.get("--limit");
 // or not it is asked for. defaulting to it here would 400.
 const schema_fields = await api_intear_token_fields();
 const requested =
-  fields_raw !== undefined
-    ? fields_raw.split(",")
-    : ["symbol", "price_usd"];
+  fields_raw !== undefined ? fields_raw.split(",") : ["symbol", "price_usd"];
 for (const field of requested) {
   if (!schema_fields.includes(field)) {
     console.error(

@@ -80,7 +80,10 @@ function format_percent_fun(percent: number): string {
 }
 // ========================================
 // the share of the total supply a raw balance holds, in percent.
-function balance_percent_fun(balance: string, total_supply_raw: bigint): number {
+function balance_percent_fun(
+  balance: string,
+  total_supply_raw: bigint,
+): number {
   // --- WHY --- the raw balance and the raw supply are both 18-decimal
   // integers, so the ratio is computed on BigInt and only then scaled
   // to a percent. doing it in floating point loses the sub-0.001%

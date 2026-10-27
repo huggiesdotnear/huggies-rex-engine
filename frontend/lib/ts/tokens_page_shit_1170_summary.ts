@@ -46,7 +46,8 @@ export interface HUGGIES_SHIT_SUMMARY {
 // ========================================
 // parse a numeric API value without rendering NaN or Infinity.
 function to_finite_number_fun(value: unknown): number {
-  const parsed = typeof value === "number" ? Number(value) : Number(String(value));
+  const parsed =
+    typeof value === "number" ? Number(value) : Number(String(value));
   return Number.isFinite(parsed) ? parsed : 0;
 }
 // ========================================

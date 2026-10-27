@@ -57,14 +57,12 @@ export function huggies_balance_panel_fun(
   props: HUGGIES_BALANCE_PANEL_PROPS,
 ): preact.JSX.Element {
   const sources = props.sources ?? ["direct", "native"];
-  const [entries, set_entries] = use_state<
-    ReadonlyArray<{
-      id: string;
-      raw: string;
-      info: HUGGIES_TOKEN_INFO;
-      usd_value: number;
-    }> | null
-  >(null);
+  const [entries, set_entries] = use_state<ReadonlyArray<{
+    id: string;
+    raw: string;
+    info: HUGGIES_TOKEN_INFO;
+    usd_value: number;
+  }> | null>(null);
   const [error, set_error] = use_state<string | null>(null);
 
   use_effect(() => {

@@ -30,8 +30,7 @@ import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
 export function order_discover_tokens_fun(
   tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
   sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
-  direction: HUGGIES_TOKEN_SORT_DIRECTION =
-    HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  direction: HUGGIES_TOKEN_SORT_DIRECTION = HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
 ): HUGGIES_TOKEN_SEARCH_RESULT[] {
   const field = token_sort_field_fun(sort);
   const sign = direction === "asc" ? 1 : -1;

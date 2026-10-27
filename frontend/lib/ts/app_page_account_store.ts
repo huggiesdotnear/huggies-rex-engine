@@ -58,7 +58,9 @@ function subscribe_fun(listener: () => void): () => void {
 // --- WHY --- the components used to each trigger their own fetch, so
 // "the page loaded" was really "four loads happened, at four different
 // times". one loader, one load, one request list.
-async function app_page_account_store_load_fun(account_id: string): Promise<void> {
+async function app_page_account_store_load_fun(
+  account_id: string,
+): Promise<void> {
   if (loading && loaded_account_id === account_id) return;
   loading = true;
   loaded_account_id = account_id;

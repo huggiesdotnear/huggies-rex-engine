@@ -12,14 +12,14 @@ written-down version of the same thing.
 
 ## THE REQUESTS
 
-| # | what | how |
-|---|---|---|
-| 1 | direct + native balances | `GET /balances?account=<id>&sources=direct,native` |
-| 2 | rhea amm balances | near view `v2.ref-finance.near.get_deposits` |
-| 3 | rhea dcl v2 balances | near view `dclv2.ref-labs.near.list_user_assets` |
-| 4 | intear dex balances | near view `dex.intear.near.registered_assets_of` |
-| 5 | token metadata, durable | `GET /tokens?fields=symbol,decimals,icon&ids=<new>` |
-| 6 | token metadata, volatile | `GET /tokens?fields=price_usd,reputation,holders&ids=<all>` |
+| #   | what                     | how                                                         |
+| --- | ------------------------ | ----------------------------------------------------------- |
+| 1   | direct + native balances | `GET /balances?account=<id>&sources=direct,native`          |
+| 2   | rhea amm balances        | near view `v2.ref-finance.near.get_deposits`                |
+| 3   | rhea dcl v2 balances     | near view `dclv2.ref-labs.near.list_user_assets`            |
+| 4   | intear dex balances      | near view `dex.intear.near.registered_assets_of`            |
+| 5   | token metadata, durable  | `GET /tokens?fields=symbol,decimals,icon&ids=<new>`         |
+| 6   | token metadata, volatile | `GET /tokens?fields=price_usd,reputation,holders&ids=<all>` |
 
 requests 1-4 are the four data sources. they are four different
 contracts, so they are four requests — they cannot be merged. they run
@@ -43,12 +43,12 @@ one call for every token on the page, every load.
 
 ## THE FOUR TABLES
 
-| table | component | source |
-|---|---|---|
-| direct + native | `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE` | request 1 |
-| rhea amm | `HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE` | request 2 |
-| rhea dcl v2 | `HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE` | request 3 |
-| intear dex | `HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE` | request 4 |
+| table           | component                                          | source    |
+| --------------- | -------------------------------------------------- | --------- |
+| direct + native | `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE`   | request 1 |
+| rhea amm        | `HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE` | request 2 |
+| rhea dcl v2     | `HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE` | request 3 |
+| intear dex      | `HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE`   | request 4 |
 
 the components read the loaded data from
 [`frontend/lib/ts/app_page_account_store.ts`](../../frontend/lib/ts/app_page_account_store.ts)
@@ -66,7 +66,7 @@ overlapped, and two of them were **byte-identical** — two tables wanted
 
 `near` made it worse. it has no row in the api's `/tokens` response —
 it comes back in the `missing` list — so it could never be written to
-the durable cache. it therefore looked uncached on *every* load, and
+the durable cache. it therefore looked uncached on _every_ load, and
 every caller that wanted it made its own durable request for it. it is
 now cached explicitly, so it is treated as known after the first load.
 
