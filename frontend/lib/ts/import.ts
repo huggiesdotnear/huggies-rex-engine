@@ -28,7 +28,6 @@ import "../components/contract_page_pumpopoly_account_selector";
 import "../components/contract_page_pumpopoly_player_stats";
 import "../components/contract_page_pumpopoly_nft_list";
 import "../components/contract_page_pumpopoly_invite";
-import "../components/contract_page_pumpopoly_contract_links";
 import "../components/contract_discover";
 import "../components/token_discover";
 import "../components/token_detail_page";

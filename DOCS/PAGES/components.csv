@@ -13,6 +13,5 @@ frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUN
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS,request 1,the balance and the six world cards,renders nothing when there is no account id; shows an error card where the data would be when the player call fails
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST,request 2,the nft count and the token id table,"one column of token ids, capped at 420px and scrolled; sorts by token id as a string, ascending or descending; shows an error card where the data would be when the nft call fails"
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE,none — the link is a constant,the "new players start here" link,built from a constant invite code
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS,none — the contract list is a constant,the links to the other contract pages,
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,

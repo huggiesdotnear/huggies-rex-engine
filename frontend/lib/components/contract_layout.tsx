@@ -1,14 +1,9 @@
 // ========================================
 // the chrome every smart-contract page shares: the page wrapper,
-// the signed-in account's balance panel, the data-limitations box
-// and the links to the other contracts.
+// the signed-in account's balance panel and the data-limitations box.
 // ========================================
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_AUTH } from "../ts/auth_status";
-import {
-  contract_page_href_fun,
-  list_contract_cards_fun,
-} from "../ts/app_page_discover_contract_cards";
 import { huggies_balance_panel_fun } from "./balance_panel";
 // ========================================
 export interface HUGGIES_CONTRACT_LAYOUT_PROPS {
@@ -56,11 +51,6 @@ export function huggies_contract_layout_fun(
           </ul>
         </details>
       )}
-      <nav class="huggies-contract-links" aria-label="smart contracts">
-        {list_contract_cards_fun().map((card) => (
-          <a href={contract_page_href_fun(card.page)}>{card.title}</a>
-        ))}
-      </nav>
     </div>
   );
 }

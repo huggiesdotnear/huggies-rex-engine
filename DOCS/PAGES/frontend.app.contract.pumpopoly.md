@@ -15,8 +15,6 @@ the page shows one pumpopoly player account info, taken from the `?id=` url para
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS"></div>
-  <!--==========================================-->
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
 <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
