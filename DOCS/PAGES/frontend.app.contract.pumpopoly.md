@@ -1,6 +1,6 @@
 # frontend/app/contract/pumpopoly.html ?id={account_id}
 
-the page shows one Pumpopoly player, taken from the `?id=` url parameter.
+the page shows one pumpopoly player account info, taken from the `?id=` url parameter.
 
 ```html
 <main>
