@@ -2,6 +2,8 @@ page,component,source,what it shows,notes
 frontend/index.html,HUGGIES_COMPONENT_RANDOM_SLOGAN_P,none — the slogan is a constant,one random slogan from HUGGIES_SLOGANS,chosen at random; the page then redirects to the feed after 1.5s
 frontend/app/index.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",hrefs are resolved at render time so a nav on a nested page still points back at the bare filenames under /app/
 frontend/app/index.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,shows LOGIN when signed out and the shortened account id when signed in
+frontend/app/auth.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the login button and the account menu,"the page's one component; shows LOGIN when signed out and the shortened account id when signed in; clicking it when signed in opens the account menu — one row per known account to switch to, a ✕ to forget one account, ADD ACCOUNT and SIGN OUT"
+frontend/app/auth.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
 frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_ID_H1,none — it reads the url,the account id the page is about,renders nothing when there is no ?id= on the url
 frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE,request 1,the direct and native token balances,one row per token with the fields stacked in one column so the table never scrolls sideways
 frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE,request 2,the rhea amm (ref finance v2) balances,

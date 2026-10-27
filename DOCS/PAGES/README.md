@@ -49,7 +49,7 @@ everything for that page. no component fetches anything.
 - [`requests.csv`](./requests.csv) - the requests each page makes
 - [`frontend.index.md`](./frontend.index.md) - `frontend/index.html`
 - [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - FEED
-- [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html`
+- [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html` - AUTH
 - [`frontend.app.discover.md`](./frontend.app.discover.md) - `frontend/app/discover.html`
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
