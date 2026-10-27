@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "bun test frontend/"
+  },
   "dependencies": {
     "@near-kit-tool-box/fun": "0.2.1",
     "@near-kit-tool-box/web": "0.2.1",

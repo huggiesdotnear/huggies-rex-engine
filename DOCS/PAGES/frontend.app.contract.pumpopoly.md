@@ -41,6 +41,10 @@ the `?id=` is read through
 [`frontend/lib/ts/page_account_id.ts`](../../frontend/lib/ts/page_account_id.ts),
 the shared module every page reads it through.
 
+the page keeps listening: signing in fills in the player without a
+reload, and signing out takes it away again. a `?id=` on the url is
+final — a sign-in never replaces the player the link points at.
+
 ## the components
 
 | component                                               | what it shows                         |

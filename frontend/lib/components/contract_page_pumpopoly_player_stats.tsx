@@ -31,6 +31,17 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS_FUN() {
 
   const account_id = HUGGIES_PAGE_ACCOUNT_ID.get_account_id();
 
+  // --- WHY --- the page's id can change under us: the page opened
+  // signed out, so it had no player, and a later sign-in fills it in.
+  // without this subscription the component would keep the old id and
+  // never ask for the new player's data.
+  use_effect(() => {
+    const unsubscribe = HUGGIES_PAGE_ACCOUNT_ID.subscribe(() => {
+      set_revision((revision) => revision + 1);
+    });
+    return unsubscribe;
+  }, []);
+
   // the store owns the load. this component starts it once and
   // re-renders when it lands.
   use_effect(() => {

@@ -7,7 +7,8 @@
 // two pages cannot drift apart on how they read the url.
 //
 // the signed-in account is only a FALLBACK. a real `?id=` always wins,
-// so shared profile links stay viewable by guests.
+// so shared profile links stay viewable by guests. and when the url had
+// no id at all, the page keeps listening: signing in later fills it in.
 //
 // the same shape as lib/ts/app_page_account_id.ts and
 // lib/ts/auth_status.ts: plain module state, a subscribe/unsubscribe
@@ -17,16 +18,23 @@ import { HUGGIES_AUTH } from "./auth_status";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
-// the id the page is about. null until init() resolves one, and it
-// stays null on a page with no `?id=` and nobody signed in — components
+// the id the page is about. null until an id is resolved, and it stays
+// null on a page with no `?id=` and nobody signed in — components
 // render nothing in that case.
 let account_id: string | null = null;
-// true once the id has been resolved. after that the page does not
-// re-resolve, so a `?id=` cannot be overwritten by a late sign-in.
-let resolved = false;
+// true when the URL carried an `?id=` of its own.
+//
+// --- WHY --- this is separate from "do we have an id". a url id is
+// final: a sign-in must never replace the player the link points at.
+// but when the url had no id and nobody was signed in, the page is
+// still waiting for one, and a later sign-in SHOULD light it up. one
+// flag for both would freeze the second case.
+let has_url_id = false;
 // plain array so subscribe/unsubscribe ordering is stable, matching
 // auth_status.ts.
 const listeners: Array<() => void> = [];
+// the unsubscribe from the auth subscription, so it is set up once.
+let auth_unsubscribe: (() => void) | null = null;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -70,7 +78,7 @@ function read_url_account_id_fun(): string | null {
 }
 // ========================================
 // --- INIT -------------------------------
-// resolve the id once: the url first, then the signed-in account as a
+// resolve the id: the url first, then the signed-in account as a
 // fallback.
 //
 // --- WHY --- init() must run BEFORE get_account_id(): init is what
@@ -84,28 +92,56 @@ function read_url_account_id_fun(): string | null {
 // module clears and re-derives its own state on init, so asking it for
 // the account before that would read a stale value.
 //
-// safe to call more than once: the id is resolved once and kept, so a
+// safe to call more than once: a url id is kept once set, so a
 // re-render or a second import cannot blank an id we already have.
 function init_fun(): void {
-  if (resolved) return;
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return;
   }
   const from_url = read_url_account_id_fun();
   if (from_url !== null) {
-    account_id = from_url;
-    resolved = true;
+    // the url names the player. this is final — a sign-in must not
+    // replace it.
+    has_url_id = true;
+    if (account_id !== from_url) {
+      account_id = from_url;
+      notify_fun();
+    }
+    return;
+  }
+  // no `?id=` on the url — fall back to whoever is signed in.
+  HUGGIES_AUTH.init();
+  adopt_signed_in_fun();
+  // --- WHY --- listen for a later sign-in. the page opened signed out,
+  // so it had no player to show; when the reader signs in, the page
+  // should show them without a reload. the url id case returns above
+  // and never subscribes, so a sign-in cannot steal the page's player.
+  if (auth_unsubscribe === null) {
+    auth_unsubscribe = HUGGIES_AUTH.subscribe(() => {
+      adopt_signed_in_fun();
+    });
+  }
+}
+// ========================================
+// take the signed-in account as the page's id, if there is one and the
+// page is not already showing someone else.
+function adopt_signed_in_fun(): void {
+  // a url id is final — never override it.
+  if (has_url_id) return;
+  const signed_in = HUGGIES_AUTH.get_account_id();
+  // --- WHY --- a sign-out clears the page. the id came from the
+  // session, and the session is gone, so the page has no player to show
+  // any more. without this the page kept showing the signed-out
+  // player's balance and nfts.
+  if (signed_in === null) {
+    if (account_id === null) return;
+    account_id = null;
     notify_fun();
     return;
   }
-  // no `?id=` — fall back to whoever is signed in.
-  HUGGIES_AUTH.init();
-  const signed_in = HUGGIES_AUTH.get_account_id();
-  if (signed_in !== null) {
-    account_id = signed_in;
-    resolved = true;
-    notify_fun();
-  }
+  if (account_id === signed_in) return;
+  account_id = signed_in;
+  notify_fun();
 }
 // ========================================
 // --- READ ------------------------------
