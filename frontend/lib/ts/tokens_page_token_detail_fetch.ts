@@ -6,6 +6,7 @@ import {
   api_intear_tokens_get,
 } from "../../../middleman";
 import { token_row_by_name_fun } from "./token_row_by_name";
+import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,
@@ -15,7 +16,7 @@ const HUGGIES_TOKEN_DETAIL_FIELDS = [
   "name",
   "symbol",
   "decimals",
-  "icon",
+  "icon_hash",
   "price_usd",
   "reputation",
   "holders",
@@ -51,7 +52,7 @@ export async function fetch_token_detail_fun(
   const cell = token_row_by_name_fun(response.columns, row);
   const name = cell.name;
   const symbol = cell.symbol;
-  const icon = cell.icon;
+  const icon_hash = cell.icon_hash;
   const socials = cell.socials;
   const description = cell.description;
   const main_pool = cell.main_pool;
@@ -61,7 +62,7 @@ export async function fetch_token_detail_fun(
     name: typeof name === "string" && name.length > 0 ? name : token_id,
     symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : token_id,
     decimals: to_finite_number_fun(cell.decimals),
-    icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+    icon: token_icon_url_fun(icon_hash_of_fun(icon_hash)),
     price_usd: to_finite_number_fun(cell.price_usd),
     reputation:
       typeof cell.reputation === "string" ? cell.reputation : "Unknown",

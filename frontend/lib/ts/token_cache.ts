@@ -1,10 +1,17 @@
 // ========================================
 // the durable, never-expiring half of token metadata: symbol,
-// decimals, icon. a tokens object store holds one entry per token id
-// so any page or component can read metadata without refetching.
+// decimals, icon hash. a tokens object store holds one entry per token
+// id so any page or component can read metadata without refetching.
 // volatile data (price_usd, reputation) is deliberately NOT cached —
 // it moves constantly and is refetched on each load. see
 // lib/ts/token_info.ts for the read-through path that combines the two.
+//
+// --- WHY --- the icon is stored as its HASH, not as the image. the
+// api's `icon` field is a full inline data uri — a couple of kilobytes
+// per token — and storing that for every token in the app is megabytes
+// of indexeddb. the `icon_hash` field is 16 characters, and the icon
+// itself is served from a content-addressed url that the browser
+// caches for a year. see lib/ts/token_icon_url.ts.
 //
 // the indexeddb mechanics live in lib/ts/indexed_db_store.ts — this
 // file only says WHICH store this cache is and what a row looks like.
@@ -25,11 +32,14 @@ const HUGGIES_TOKEN_STORE_CONFIG = {
 // --- SHAPE ------------------------------
 // one row in the tokens store. keyed by `id`. these are the fields
 // that do not change for the life of a token.
+//
+// `icon_hash` is the api's icon hash, not an image. it is turned into
+// a url by lib/ts/token_icon_url.ts.
 export interface HUGGIES_CACHED_TOKEN {
   id: string;
   symbol: string;
   decimals: number;
-  icon: string | null;
+  icon_hash: string | null;
 }
 // ========================================
 // ========================================
@@ -40,9 +50,10 @@ export interface HUGGIES_CACHED_TOKEN {
 async function get_cached_token_fun(
   id: string,
 ): Promise<HUGGIES_CACHED_TOKEN | null> {
-  const found = await HUGGIES_INDEXED_DB_STORE.get_many<
-    HUGGIES_CACHED_TOKEN
-  >(HUGGIES_TOKEN_STORE_CONFIG, [id]);
+  const found = await HUGGIES_INDEXED_DB_STORE.get_many<HUGGIES_CACHED_TOKEN>(
+    HUGGIES_TOKEN_STORE_CONFIG,
+    [id],
+  );
   return found.get(id) ?? null;
 }
 // ========================================
@@ -64,10 +75,7 @@ async function get_cached_tokens_fun(
 async function put_cached_tokens_fun(
   tokens: ReadonlyArray<HUGGIES_CACHED_TOKEN>,
 ): Promise<void> {
-  await HUGGIES_INDEXED_DB_STORE.put_many(
-    HUGGIES_TOKEN_STORE_CONFIG,
-    tokens,
-  );
+  await HUGGIES_INDEXED_DB_STORE.put_many(HUGGIES_TOKEN_STORE_CONFIG, tokens);
 }
 // ========================================
 // ========================================

@@ -7,6 +7,7 @@
 import { api_intear_tokens_get } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
+import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -16,10 +17,13 @@ import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
 // every load, so it stays a small field set.
 const HUGGIES_VOLATILE_FIELDS = ["price_usd", "reputation", "holders"] as const;
 // durable: fixed for a token's life, cached in indexeddb forever.
-// `icon` is a full inline svg data uri and makes up almost the entire
-// payload — 336KB for ~100 tokens with the icons, ~10KB without — so
-// these fields are only ever requested for ids we have not cached.
-const HUGGIES_DURABLE_FIELDS = ["symbol", "decimals", "icon"] as const;
+//
+// `icon_hash` and not `icon`: the icon field is a full inline svg data
+// uri and makes up almost the entire payload — 336KB for ~100 tokens
+// with the icons, ~10KB without. the hash is 16 characters, and the
+// icon itself is served from a content-addressed url the browser
+// caches for a year. see lib/ts/token_icon_url.ts.
+const HUGGIES_DURABLE_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
 // --- WHY --- intear has NO `near` entry in /tokens (it comes back in
 // the response's `missing` list), so the chain's own token has to be
 // described here or the native balance cannot be rendered at all. 24
@@ -129,13 +133,24 @@ async function fetch_and_merge_fun(
       fields: HUGGIES_DURABLE_FIELDS,
       ids: uncached,
     });
+    // --- WHY --- the row is read by column NAME, not by index: the api
+    // always returns `account_id` as the first column, even when it was
+    // not requested, so a fixed index read is shifted by one.
+    const columns = fresh.columns;
+    const id_at = columns.indexOf("account_id");
+    const symbol_at = columns.indexOf("symbol");
+    const decimals_at = columns.indexOf("decimals");
+    const hash_at = columns.indexOf("icon_hash");
     const to_cache = fresh.rows.map((row) => {
-      const [id, symbol, decimals, icon] = row;
+      const id = String(id_at >= 0 ? row[id_at] : row[0]);
+      const symbol = symbol_at >= 0 ? row[symbol_at] : row[1];
+      const decimals = decimals_at >= 0 ? row[decimals_at] : row[2];
+      const hash = hash_at >= 0 ? row[hash_at] : row[3];
       const record: HUGGIES_CACHED_TOKEN = {
         id,
         symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
         decimals: to_number_fun(decimals),
-        icon: typeof icon === "string" && icon.length > 0 ? icon : null,
+        icon_hash: icon_hash_of_fun(hash),
       };
       fetched.set(id, record);
       return record;
@@ -160,7 +175,7 @@ async function fetch_and_merge_fun(
       id: HUGGIES_NEAR_ID,
       symbol: HUGGIES_NEAR_SYMBOL,
       decimals: HUGGIES_NEAR_DECIMALS,
-      icon: null,
+      icon_hash: null,
     });
   }
 
@@ -171,7 +186,7 @@ async function fetch_and_merge_fun(
       id,
       symbol: base?.symbol ?? id,
       decimals: base?.decimals ?? 0,
-      icon: base?.icon ?? null,
+      icon: token_icon_url_fun(base?.icon_hash ?? null),
       price_usd: to_number_fun(price_usd),
       reputation: typeof reputation === "string" ? reputation : "Unknown",
       holders: to_number_fun(holders),
@@ -187,7 +202,7 @@ async function fetch_and_merge_fun(
       HUGGIES_NEAR_ID,
       near_info_fun({
         price_usd: wnear?.price_usd ?? 0,
-        icon: wrap_durable?.icon ?? null,
+        icon: token_icon_url_fun(wrap_durable?.icon_hash ?? null),
       }),
     );
   }
@@ -197,7 +212,10 @@ async function fetch_and_merge_fun(
   for (const [id, base] of durable) {
     if (out.has(id)) continue;
     out.set(id, {
-      ...base,
+      id,
+      symbol: base.symbol,
+      decimals: base.decimals,
+      icon: token_icon_url_fun(base.icon_hash),
       price_usd: 0,
       reputation: "Unknown",
       holders: 0,
