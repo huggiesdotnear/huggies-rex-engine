@@ -73,6 +73,17 @@ function rows_to_records_fun(
 // `sort` is the sort the visible list is using. it lets the api serve
 // the icons as a sorted page with no ids in the url at all, which is
 // far cheaper than carrying a list of ids.
+//
+// --- WHY --- the sorted page is only used when it can actually answer
+// for the tokens we want. it holds 300 tokens taken from the TOP of
+// the sort, so it is the right set only for a descending list. an
+// ascending list starts at the bottom of the sort, and a search is a
+// handful of arbitrary tokens — for both, the page covers none of
+// them, so asking for it fetched ~800KB of icons for nothing.
+//
+// so the page is fetched only for a descending list that is a page's
+// worth of tokens. otherwise the ids are asked for directly, which is
+// one small request for one small set.
 export async function fetch_token_icons_fun(
   ids: ReadonlyArray<string>,
   sort?: { by: string; desc: boolean },
@@ -93,12 +104,29 @@ export async function fetch_token_icons_fun(
   }
   if (missing.length === 0) return out;
 
-  // 1. the sorted page — no ids in the url at all.
-  // `covered` tracks every id the page answered for, NOT only the ones
+  // `covered` tracks every id the api answered for, NOT only the ones
   // with an icon: a token with no icon is still answered, and asking
   // for it again by id would be a wasted request every single time.
   const covered = new Set<string>();
-  if (sort !== undefined) {
+
+  // 1. the sorted page — no ids in the url at all.
+  //
+  // --- WHY --- the page is the set we want ONLY when the sort is
+  // descending AND the set is exactly one page. descending means the
+  // page starts at the top of the sort, which is the first page the
+  // reader was shown. ascending means the page starts at the BOTTOM
+  // of the sort — a completely different set of tokens — so asking for
+  // it answered for none of them and cost a request and ~800KB for
+  // nothing.
+  //
+  // --- WHY --- the count has to match too. the list page carries the
+  // marked tokens on top, so it asks for 306 icons while the page
+  // holds 300; the extra 6 are asked for by id below.
+  const page_matches =
+    sort !== undefined &&
+    sort.desc === true &&
+    wanted.length >= HUGGIES_ICON_BATCH_SIZE;
+  if (page_matches && sort !== undefined) {
     const response = await api_intear_tokens_get({
       fields: HUGGIES_ICON_FIELDS,
       sort: { by: sort.by as "volume_usd_24h", desc: sort.desc },

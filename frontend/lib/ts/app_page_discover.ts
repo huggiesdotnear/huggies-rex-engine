@@ -35,6 +35,7 @@ import { HUGGIES_DISCOVER_TOKEN_PAGE } from "./app_page_discover_token_page";
 import { fetch_token_icons_fun } from "./app_page_discover_token_icons";
 import { search_tokens_fun } from "./app_page_discover_token_search";
 import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
+import { token_row_by_name_fun } from "./token_row_by_name";
 import { token_sort_field_fun } from "./app_page_discover_token_sort";
 import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort";
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
@@ -67,6 +68,14 @@ export interface HUGGIES_APP_PAGE_DISCOVER_DATA {
 }
 // ========================================
 // ========================================
+// --- HELPERS ----------------------------
+// parse a numeric API value without rendering NaN or Infinity.
+function to_finite_number_fun(value: unknown): number {
+  const parsed = typeof value === "number" ? value : Number(String(value));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+// ========================================
+// ========================================
 // --- FAVOURITES ------------------------
 // fetch the marked tokens by id, so the `default` view can put them on
 // top of the page.
@@ -83,24 +92,50 @@ async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
   const ids = HUGGIES_PINNED_TOKENS.map((entry) => entry.id);
   if (ids.length === 0) return [];
   const response = await api_intear_tokens_get({
-    fields: ["name", "symbol", "decimals", "price_usd", "reputation"],
+    fields: [
+      "name",
+      "symbol",
+      "decimals",
+      "price_usd",
+      "reputation",
+      "holders",
+      "volume_usd_24h",
+      "market_cap_usd",
+    ],
     ids,
   });
   // the rows come back keyed by id; the order the api returned them in
   // is not the order we want, so the caller pins them by their own
   // weight. a token the api does not know is simply absent.
-  return response.rows.map((row) => ({
-    id: String(row[0]),
-    name: typeof row[1] === "string" && row[1].length > 0 ? row[1] : String(row[0]),
-    symbol: typeof row[2] === "string" && row[2].length > 0 ? row[2] : String(row[0]),
-    decimals: typeof row[3] === "number" ? row[3] : 0,
-    icon: null,
-    price_usd: Number(row[4] ?? 0),
-    reputation: "Unknown",
-    holders: 0,
-    volume_usd_24h: 0,
-    market_cap_usd: 0,
-  }));
+  //
+  // --- WHY --- the same field set as the list page, so a marked token
+  // carries its real volume, market cap and holders. asking for fewer
+  // fields left those at zero, and a row reading "$0 MCAP" is a lie
+  // the reader cannot see is a lie.
+  //
+  // --- WHY --- the row is read by column NAME, not by index: the api
+  // always returns `account_id` as the first column, even when it was
+  // not requested, so a fixed index read is shifted by one.
+  const columns = response.columns;
+  return response.rows.map((row) => {
+    const cell = token_row_by_name_fun(columns, row);
+    const id = typeof cell.account_id === "string" ? cell.account_id : "";
+    const name = cell.name;
+    const symbol = cell.symbol;
+    const reputation = cell.reputation;
+    return {
+      id,
+      name: typeof name === "string" && name.length > 0 ? name : id,
+      symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
+      decimals: to_finite_number_fun(cell.decimals),
+      icon: null,
+      price_usd: to_finite_number_fun(cell.price_usd),
+      reputation: typeof reputation === "string" ? reputation : "Unknown",
+      holders: to_finite_number_fun(cell.holders),
+      volume_usd_24h: to_finite_number_fun(cell.volume_usd_24h),
+      market_cap_usd: to_finite_number_fun(cell.market_cap_usd),
+    };
+  });
 }
 // ========================================
 // ========================================

@@ -100,9 +100,16 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   // a real search index behind it; filtering a loaded list in
   // javascript only sees the tokens we happened to load, so a token
   // outside that page was unfindable however the reader typed.
+  //
+  // --- WHY --- clearing the box goes back to the list. the search
+  // results and the list rows are held side by side, so the list is
+  // still there to show the moment the reader stops typing.
   use_effect(() => {
     const needle = query.trim();
-    if (needle.length === 0) return;
+    if (needle.length === 0) {
+      void HUGGIES_APP_PAGE_DISCOVER_STORE.clear_search();
+      return;
+    }
     const timer = window.setTimeout(() => {
       void HUGGIES_APP_PAGE_DISCOVER_STORE.search(needle);
     }, HUGGIES_SEARCH_DEBOUNCE_MS);
@@ -113,6 +120,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
 
   const page_data = HUGGIES_APP_PAGE_DISCOVER_STORE.get_data();
   const loading = HUGGIES_APP_PAGE_DISCOVER_STORE.is_loading();
+  const searching_now = HUGGIES_APP_PAGE_DISCOVER_STORE.is_searching();
   const searching = query.trim().length > 0;
 
   // the rows on screen: the search results when the reader is
@@ -178,7 +186,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
         <p class="huggies-token-error">{message}</p>
       ))}
       <div class="huggies-token-results-scroll" ref={scroll_ref}>
-        {tokens.length === 0 && !loading ? (
+        {tokens.length === 0 && !loading && !searching_now ? (
           <p>NO TOKENS FOUND</p>
         ) : (
           <div class="huggies-token-results">
@@ -190,7 +198,12 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
             )}
           </div>
         )}
-        {loading && <p class="huggies-token-loading">LOADING TOKENS...</p>}
+        {searching_now && (
+          <p class="huggies-token-loading">SEARCHING...</p>
+        )}
+        {loading && !searching_now && (
+          <p class="huggies-token-loading">LOADING TOKENS...</p>
+        )}
         {!searching && has_more && !loading && (
           <p class="huggies-token-loading">SCROLL FOR MORE...</p>
         )}

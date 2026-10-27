@@ -21,8 +21,20 @@ let data: HUGGIES_APP_PAGE_DISCOVER_DATA | null = null;
 // the sort the current load was for, so a new sort starts a new load
 // and clears the old rows.
 let loaded_sort: HUGGIES_TOKEN_SORT | null = null;
-// true while a load is running.
-let loading = false;
+// the direction the current load was for. the sort and the direction
+// are one view: a load for one direction must not overwrite the rows
+// of the other.
+let loaded_desc = true;
+// true while a LIST load is running.
+let loading_list = false;
+// true while a SEARCH is running.
+//
+// --- WHY --- the list and the search have their own flags. they can
+// be in flight at the same time — the reader types while the first
+// page is still loading — and one shared flag made the search wait
+// for the list, or the list wait for the search, which showed as a
+// page that never finished loading.
+let loading_search = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
@@ -57,14 +69,25 @@ function subscribe_fun(listener: () => void): () => void {
 // the load runs once per sort. a second call for the same sort while
 // a load is running is ignored, so the page cannot fetch twice because
 // two components asked for it.
+//
+// --- WHY --- the previous rows are NOT cleared here. the api takes a
+// moment to answer, and wiping the list on every sort change made the
+// page flash "LOADING TOKENS..." and show nothing, which reads as
+// broken. the old rows stay on screen under the loading note until
+// the new ones arrive.
+//
+// --- WHY --- the sort AND the direction are both remembered. they are
+// one view, and a load for one direction must not overwrite the rows
+// of the other: the reader can flip the direction twice while a
+// request is still in flight, and the last answer has to win.
 async function load_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
 ): Promise<void> {
-  if (loading && loaded_sort === sort) return;
-  loading = true;
+  if (loading_list && loaded_sort === sort && loaded_desc === desc) return;
+  loading_list = true;
   loaded_sort = sort;
-  data = null;
+  loaded_desc = desc;
   notify_fun();
   try {
     const tokens = await HUGGIES_APP_PAGE_DISCOVER.load_tokens_page(
@@ -73,7 +96,7 @@ async function load_fun(
       0,
     );
     // a load for an older sort must not overwrite a newer one.
-    if (loaded_sort !== sort) return;
+    if (loaded_sort !== sort || loaded_desc !== desc) return;
     // the icons for the rows on screen. the cache is read first, so
     // on a warm cache this costs no network at all.
     const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
@@ -81,10 +104,14 @@ async function load_fun(
       sort,
       desc,
     );
-    if (loaded_sort !== sort) return;
+    if (loaded_sort !== sort || loaded_desc !== desc) return;
+    // the search results are DROPPED here. the reader changed the sort
+    // while a search was on screen, and the search rows belong to the
+    // old view — showing them under a new sort is showing one list
+    // under another's label.
     data = { tokens, search: null, icons, errors: [] };
   } catch (err) {
-    if (loaded_sort !== sort) return;
+    if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
       tokens: { rows: [], has_more: false, fetched: 0 },
       search: null,
@@ -92,8 +119,8 @@ async function load_fun(
       errors: [err instanceof Error ? err.message : String(err)],
     };
   } finally {
-    if (loaded_sort === sort) {
-      loading = false;
+    if (loaded_sort === sort && loaded_desc === desc) {
+      loading_list = false;
       notify_fun();
     }
   }
@@ -108,8 +135,12 @@ async function load_more_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
 ): Promise<void> {
-  if (loading || data === null) return;
-  loading = true;
+  if (loading_list || data === null) return;
+  // the next page belongs to the view on screen. if the reader changed
+  // the sort or the direction since, this page is for a view that is
+  // no longer there.
+  if (loaded_sort !== sort || loaded_desc !== desc) return;
+  loading_list = true;
   notify_fun();
   try {
     // the offset is the api's own count, not the length of the rows on
@@ -122,11 +153,15 @@ async function load_more_fun(
       desc,
       offset,
     );
+    // a sort change while this page was in flight means these rows
+    // belong to a view that is no longer on screen.
+    if (loaded_sort !== sort || loaded_desc !== desc) return;
     const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
       next.rows,
       sort,
       desc,
     );
+    if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
       ...data,
       tokens: {
@@ -137,6 +172,7 @@ async function load_more_fun(
       icons: { ...data.icons, ...icons },
     };
   } catch (err) {
+    if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
       ...data,
       errors: [
@@ -145,18 +181,22 @@ async function load_more_fun(
       ],
     };
   } finally {
-    loading = false;
+    loading_list = false;
     notify_fun();
   }
 }
 // ========================================
 // run a search and hold its results.
 //
-// a search REPLACES the list rows: when the reader types, the list is
-// no longer a list, it is the answer to their question.
+// the search results live in their own field, beside the list rows.
+// the component shows whichever one applies.
 async function search_fun(query: string): Promise<void> {
-  if (loading) return;
-  loading = true;
+  // --- WHY --- a search is NOT dropped when a load is running. the
+  // reader can type while the first page is still in flight, and
+  // dropping the search meant the page sat on "SEARCHING..." forever
+  // with no results and no error. the search runs alongside the load
+  // instead, and whichever lands last is the one on screen.
+  loading_search = true;
   notify_fun();
   try {
     const rows = await HUGGIES_APP_PAGE_DISCOVER.search(query);
@@ -165,11 +205,19 @@ async function search_fun(query: string): Promise<void> {
       "volume_usd_24h",
       true,
     );
+    // the list rows are KEPT. the search results live in their own
+    // field, and the component shows whichever one applies. clearing
+    // the list meant that clearing the search box left an empty page
+    // until the list was fetched again.
     data = {
-      tokens: { rows: [], has_more: false, fetched: 0 },
+      ...(data ?? {
+        tokens: { rows: [], has_more: false, fetched: 0 },
+        search: null,
+        icons: {},
+        errors: [],
+      }),
       search: rows,
-      icons,
-      errors: [],
+      icons: { ...(data?.icons ?? {}), ...icons },
     };
   } catch (err) {
     data = {
@@ -181,13 +229,25 @@ async function search_fun(query: string): Promise<void> {
       }),
       search: [],
       errors: [
+        ...(data?.errors ?? []),
         err instanceof Error ? err.message : String(err),
       ],
     };
   } finally {
-    loading = false;
+    loading_search = false;
     notify_fun();
   }
+}
+// ========================================
+// clear the search results, so the list rows show again.
+//
+// --- WHY --- the search results and the list rows are held side by
+// side, so clearing the search is just dropping the results. the list
+// itself was never touched, so it comes back instantly.
+function clear_search_fun(): void {
+  if (data === null || data.search === null) return;
+  data = { ...data, search: null };
+  notify_fun();
 }
 // ========================================
 // ========================================
@@ -197,9 +257,14 @@ function get_data_fun(): HUGGIES_APP_PAGE_DISCOVER_DATA | null {
   return data;
 }
 // ========================================
-// true while a load is running.
+// true while a LIST load is running.
 function is_loading_fun(): boolean {
-  return loading;
+  return loading_list;
+}
+// ========================================
+// true while a SEARCH is running.
+function is_searching_fun(): boolean {
+  return loading_search;
 }
 // ========================================
 // ========================================
@@ -208,9 +273,11 @@ export const HUGGIES_APP_PAGE_DISCOVER_STORE = {
   load: load_fun,
   load_more: load_more_fun,
   search: search_fun,
+  clear_search: clear_search_fun,
   subscribe: subscribe_fun,
   get_data: get_data_fun,
   is_loading: is_loading_fun,
+  is_searching: is_searching_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near
