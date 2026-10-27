@@ -27,13 +27,8 @@ makes nothing.
 
 ## THE COMPONENTS
 
-| component                                               | source                                 |
-| ------------------------------------------------------- | -------------------------------------- |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | none — it writes the url               |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | request 1                              |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | request 2                              |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | none — the link is a constant          |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS`   | none — the contract list is a constant |
+see [`components.csv`](./components.csv) — one row per component, with the
+source it reads from.
 
 the components read the loaded data from
 [`frontend/lib/ts/contract_page_pumpopoly_store.ts`](../../frontend/lib/ts/contract_page_pumpopoly_store.ts)

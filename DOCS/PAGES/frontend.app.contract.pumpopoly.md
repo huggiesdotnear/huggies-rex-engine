@@ -1,12 +1,5 @@
 # frontend/app/contract/pumpopoly.html
 
-PUMPOPOLY
-
-<!--
-this file contains the source of truth for what is on the page.
-do not add classes here as they are something not written in stone.
--->
-
 ```html
 <main>
   <!--==========================================-->
@@ -47,13 +40,8 @@ final — a sign-in never replaces the player the link points at.
 
 ## the components
 
-| component                                               | what it shows                         |
-| ------------------------------------------------------- | ------------------------------------- |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | the id jump box                       |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | the balance and the six world cards   |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | the nft count and the token id table  |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | the "new players start here" link     |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS`   | the links to the other contract pages |
+see [`components.csv`](./components.csv) — one row per component, with the
+source it reads from.
 
 ## when a source fails
 

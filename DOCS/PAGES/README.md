@@ -15,8 +15,20 @@ can be read straight against the html.
 
 a page with no layout yet says `page spec coming soon`.
 
+## the components
+
+the components a page mounts are listed in
+[`components.csv`](./components.csv), not in the page spec. one row per
+component, with the source it reads from.
+
+the csv is the single place to look for "what is on this page" — the
+page spec holds the layout and the behaviour, the csv holds the
+components and where their data comes from.
+
 ## Pages
 
+- [`components.csv`](./components.csv) - the components each page mounts,
+  and the source each one reads from
 - [`frontend.index.md`](./frontend.index.md) - `frontend/index.html`
 - [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - FEED
 - [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html`

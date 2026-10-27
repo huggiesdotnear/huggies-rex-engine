@@ -43,12 +43,8 @@ one call for every token on the page, every load.
 
 ## THE FOUR TABLES
 
-| table           | component                                          | source    |
-| --------------- | -------------------------------------------------- | --------- |
-| direct + native | `HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE`   | request 1 |
-| rhea amm        | `HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE` | request 2 |
-| rhea dcl v2     | `HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE` | request 3 |
-| intear dex      | `HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE`   | request 4 |
+see [`components.csv`](./components.csv) — one row per component, with the
+source it reads from.
 
 the components read the loaded data from
 [`frontend/lib/ts/app_page_account_store.ts`](../../frontend/lib/ts/app_page_account_store.ts)
