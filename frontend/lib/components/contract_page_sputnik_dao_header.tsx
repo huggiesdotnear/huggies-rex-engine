@@ -10,17 +10,6 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
 // ========================================
 // ========================================
-// --- HELPERS ----------------------------
-// format a yoctoNEAR amount as NEAR.
-function format_near_fun(yocto: string): string {
-  if (yocto.length === 0) return "—";
-  const value = Number(yocto);
-  if (!Number.isFinite(value)) return "—";
-  return `${(value / 10 ** 24).toLocaleString(undefined, {
-    maximumFractionDigits: 4,
-  })} NEAR`;
-}
-// ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
   const [, set_revision] = use_state(0);
@@ -60,12 +49,6 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
         <article class="huggies-dao-stat">
           <span class="huggies-dao-stat-value">{dao.proposals.length}</span>
           <span class="huggies-dao-stat-label">PROPOSALS</span>
-        </article>
-        <article class="huggies-dao-stat">
-          <span class="huggies-dao-stat-value">
-            {format_near_fun(dao.available_amount)}
-          </span>
-          <span class="huggies-dao-stat-label">AVAILABLE</span>
         </article>
       </section>
     </>

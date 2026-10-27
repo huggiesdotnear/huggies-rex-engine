@@ -22,22 +22,22 @@ import { current_app_depth_fun } from "../ts/app_depth";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// a short summary of what a set of permissions allows.
+// the actions a set of permissions allows.
 //
 // --- WHY --- the raw permissions are a wall of text: `call:VoteRemove`,
 // `transfer:VoteRemove`, `policy_update_parameters:*` and a dozen
 // more. the part before the colon is what is acted on — the action —
-// and the part after is the scope. so the summary is the set of
-// actions, and the scope is left in the cell's title so it is one
-// hover away.
-function permission_summary_fun(permissions: ReadonlyArray<string>): string {
+// and the part after is the scope. so the cell lists the actions, one
+// per line, and the full list with every scope is in the cell's
+// title.
+function permission_actions_fun(permissions: ReadonlyArray<string>): string[] {
   const actions = new Set<string>();
   for (const permission of permissions) {
     const colon = permission.indexOf(":");
     const action = colon === -1 ? permission : permission.slice(0, colon);
     actions.add(action);
   }
-  return [...actions].join(", ");
+  return [...actions];
 }
 // ========================================
 // --- COMPONENT --------------------------
@@ -101,7 +101,11 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
                 >
                   {member.permissions.length === 0
                     ? "—"
-                    : permission_summary_fun(member.permissions)}
+                    : permission_actions_fun(member.permissions).map(
+                        (action) => (
+                          <span class="huggies-dao-permission">{action}</span>
+                        ),
+                      )}
                 </td>
               </tr>
             ))}

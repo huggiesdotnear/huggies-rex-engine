@@ -37,12 +37,16 @@ function status_class_fun(status: string): string {
 }
 // ========================================
 // the human date of a nanosecond timestamp.
+//
+// --- WHY --- the date is day and month and year, with no weekday and
+// no time: the date column is narrow, and "Mar 14, 2026" is as much
+// of a proposal's date as anyone reads.
 function format_time_fun(nanoseconds: string): string {
   if (nanoseconds.length === 0) return "—";
   const value = Number(nanoseconds);
   if (!Number.isFinite(value) || value <= 0) return "—";
   return new Date(value / 1e6).toLocaleDateString(undefined, {
-    year: "numeric",
+    year: "2-digit",
     month: "short",
     day: "numeric",
   });

@@ -10,26 +10,33 @@
   margin-top: 20px;
 }
 /*==================================*/
-/* --- the members table --- */
+/* --- the members table ---
+   the table is laid out with auto widths, not fixed ones: the roles
+   and the permissions both need room, and a fixed width clips them
+   instead of wrapping. the account column is the only one with a
+   set width, because the ids are the thing being scanned. */
 .huggies-dao-members-scroll {
-  max-height: 420px;
+  max-height: 460px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 .huggies-dao-members-table {
   width: 100%;
-  table-layout: fixed;
+  table-layout: auto;
   border-collapse: collapse;
   font-size: 12px;
 }
 .huggies-dao-members-table th,
 .huggies-dao-members-table td {
   text-align: left;
-  padding: 6px 4px;
+  padding: 8px 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* --- WHY --- the roles and the permissions wrap onto as many lines
+     as they need. clipping them hid the roles an account is in, and
+     the roles are the point of the column. */
+  overflow: visible;
+  white-space: normal;
+  vertical-align: top;
 }
 .huggies-dao-members-table th {
   font-family: Arial, Helvetica, sans-serif;
@@ -39,33 +46,30 @@
   opacity: 0.7;
 }
 .huggies-dao-member-rank {
-  width: 34px;
+  width: 26px;
   text-align: right;
   opacity: 0.6;
 }
 .huggies-dao-member-account {
-  width: 30%;
+  width: 28%;
 }
 .huggies-dao-members-table td.huggies-dao-member-account a {
   display: block;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
   overflow-wrap: anywhere;
   word-break: break-all;
   line-height: 1.3;
   font-family: monospace;
   font-size: 10px;
 }
-/* the roles an account is in, as chips. */
+/* the roles an account is in, as chips. they stack: one per line, so
+   every role is visible and none is clipped. */
 .huggies-dao-member-roles {
-  width: 25%;
-  white-space: normal;
+  width: 22%;
 }
 .huggies-dao-role-chip {
-  display: inline-block;
-  margin: 1px 3px 1px 0;
-  padding: 1px 7px;
+  display: block;
+  margin: 0 0 3px;
+  padding: 2px 7px;
   border-radius: 999px;
   background: rgba(0, 198, 215, 0.24);
   font-family: Arial, Helvetica, sans-serif;
@@ -73,14 +77,25 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   white-space: nowrap;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-/* what the roles grant. */
+/* what the roles grant.
+   --- WHY --- the actions are a wrapped inline list, not one per line.
+   one per line made a seventeen-line row, and a row is a member of a
+   dao, not a page of policy. the full list with every scope is in the
+   cell's title, one hover away. */
 .huggies-dao-member-permissions {
-  width: 35%;
   font-size: 10px;
+  line-height: 1.6;
   opacity: 0.75;
-  white-space: normal;
   overflow-wrap: anywhere;
+}
+.huggies-dao-permission {
+  display: inline-block;
+  margin: 0 6px 0 0;
 }
 /*==================================*/
 /* --- the roles that are open to everyone ---
