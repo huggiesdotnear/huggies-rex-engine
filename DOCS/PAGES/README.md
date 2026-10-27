@@ -6,7 +6,7 @@ the file name is the page path, dots instead of slashes:
 `frontend/app/account.html` -> [`frontend.app.account.md`](./frontend.app.account.md)
 
 a page outside `app/` has no `app.` in its name:
-`frontend/index.html` -> [`frontend.splash.md`](./frontend.splash.md)
+`frontend/index.html` -> [`frontend.index.md`](./frontend.index.md)
 
 every spec starts with the page path as its h1, then the layout: the
 page heading, then the components, top to bottom, in the order they
@@ -17,7 +17,7 @@ a page with no layout yet says `page spec coming soon`.
 
 ## Pages
 
-- [`frontend.splash.md`](./frontend.splash.md) - `frontend/index.html`
+- [`frontend.index.md`](./frontend.index.md) - `frontend/index.html`
 - [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - FEED
 - [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html`
 - [`frontend.app.discover.md`](./frontend.app.discover.md) - `frontend/app/discover.html`
