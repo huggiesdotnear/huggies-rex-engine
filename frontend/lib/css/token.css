@@ -217,3 +217,13 @@
   margin-top: 8px;
 }
 /*==================================*/
+
+/*==================================*/
+/* --- DEPRECATED ---
+   this file is on its way out.
+
+   the token page's rules move to ../pages/tokens_token.css
+   when the token page is migrated.
+
+   do not add new rules to this file. */
+/*==================================*/

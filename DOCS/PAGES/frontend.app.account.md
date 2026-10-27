@@ -23,6 +23,16 @@ do not add classes here as they are something not written in stone.
 <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
 ```
 
-=====================
+## the css
+
+the page links two stylesheets: the app-wide base
+(`frontend/lib/css/import.css`) and its own
+(`frontend/lib/css/pages/account.css`).
+
+the page's own file holds only what is the account page's. the
+balance tables' look lives in `frontend/lib/css/shared/balance_table.css`
+and `.../shared/balance_sort.css`, which the contract pages share.
+
+====================
 <br/>
 copyright 2026 by sleet.near

@@ -1,0 +1,14 @@
+/*==================================*/
+/* the landing page (frontend/index.html).
+
+   it is the one page with a footer, so the footer style lives here. */
+/*==================================*/
+footer {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  text-align: center;
+  padding: 20px 0;
+}
+/*==================================*/

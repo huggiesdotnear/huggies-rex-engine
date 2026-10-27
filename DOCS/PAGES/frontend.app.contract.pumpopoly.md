@@ -90,6 +90,19 @@ precision as one.
 
 see [`frontend.app.contract.pumpopoly.requests.md`](./frontend.app.contract.pumpopoly.requests.md).
 
+## the css
+
+the page links two stylesheets: the app-wide base
+(`frontend/lib/css/import.css`) and its own
+(`frontend/lib/css/pages/pumpopoly.css`).
+
+the page's own file holds only what is the pumpopoly page's. the stat
+tile's box lives in `frontend/lib/css/shared/stat_tile.css` and the
+sort control in `.../shared/sort_control.css`.
+
+the six stat cards and the nft count are one component
+(`frontend/lib/components/stat_tile.tsx`), not six ad-hoc blocks.
+
 ====================
 <br/>
 copyright 2026 by sleet.near

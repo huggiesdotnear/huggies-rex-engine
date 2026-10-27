@@ -24,6 +24,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
 import { huggies_error_card_fun } from "./error_card";
+import { huggies_stat_tile_fun } from "./stat_tile";
 // ========================================
 // ========================================
 // --- SORT ------------------------------
@@ -127,13 +128,12 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
       })}
       <h2>nft.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-cards">
-        <article class="huggies-pumpopoly-card">
-          <span class="huggies-pumpopoly-label">NFTS HELD</span>
-          <strong class="huggies-pumpopoly-value">
-            {page_data?.nft.count ?? 0}
-          </strong>
-          <span class="huggies-pumpopoly-sub">PUMPOPOLY NFTS</span>
-        </article>
+        {huggies_stat_tile_fun({
+          label: "NFTS HELD",
+          value: String(page_data?.nft.count ?? 0),
+          sub: "PUMPOPOLY NFTS",
+          class_prefix: "huggies-pumpopoly",
+        })}
       </div>
       {token_ids.length === 0 ? (
         <p>NO NFTS</p>

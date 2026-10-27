@@ -8,8 +8,19 @@ main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* --- WHY --- stretch, not center. the page content sits directly
+     inside main — there is no wrapper div — so every child is a flex
+     item here and `align-items:center` would shrink each one to its
+     content width. stretch makes them fill the column, and
+     `min-width:0` lets a long id or a wide grid shrink instead of
+     pushing the column open. */
+  align-items: stretch;
   justify-content: flex-start;
+  /* --- WHY --- left, not center. body centers text, but a page reads
+     better flush left. the pages that still wrap their content set
+     this on the wrapper instead; the pages that dropped the wrapper
+     need it here. */
+  text-align: left;
   width: 500px;
   max-width: 90vw;
   box-sizing: border-box;
@@ -20,10 +31,9 @@ main {
   /*border: 1px solid purple;*/
 }
 /*==================================*/
-/* shared page-content wrapper.
-   every page body sits inside this so nested content can never
-   break out of the main column: width:100% + min-width:0 keeps
-   grids and long ids from stretching the flex item. */
+/* the page-content wrapper.
+   most pages still wrap their content in this div; the account and
+   pumpopoly pages do not, because main does the same job now. */
 .huggies-page {
   width: 100%;
   max-width: 100%;

@@ -53,6 +53,15 @@ RUN bun install
 # the asset naming templates embed `[hash]` so two pages sharing the
 # same CSS path don't collide on disk.
 #
+# --- WHY: `[dir]` in the chunk and asset naming ---
+# without it, every page's css and js lands flat in static/. the root
+# index.html and app/index.html then both produce a file called
+# `index-<hash>.css` — and when their content happens to be identical
+# (which it is for pages that share the same css), the hash matches
+# too and bun refuses to build: "Multiple files share the same output
+# path". keeping the directory puts each page's assets beside it, so
+# two pages can never collide no matter what their content is.
+#
 # `find` instead of a `./**/*.html` glob: globstar is not enabled in
 # the default sh that runs this, so the glob would silently match
 # nothing and we'd ship an empty static folder. `find` also picks up
@@ -69,8 +78,8 @@ WORKDIR /src/frontend
 RUN mkdir -p ../static \
     && bun build \
         --entry-naming='[dir]/[name].[ext]' \
-        --chunk-naming='[name]-[hash].[ext]' \
-        --asset-naming='[name]-[hash].[ext]' \
+        --chunk-naming='[dir]/[name]-[hash].[ext]' \
+        --asset-naming='[dir]/[name]-[hash].[ext]' \
         --outdir=../static \
         --minify \
         $(find . -type f -name '*.html')

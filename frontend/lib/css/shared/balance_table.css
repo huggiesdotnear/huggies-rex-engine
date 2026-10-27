@@ -1,0 +1,161 @@
+/*==================================*/
+/* the balance table and the balance panel.
+   both show the same row — icon, ticker, contract id, then the amount
+   and its usd value — so they share one look and one set of rules.
+
+   the table is the account page's: one column, every field stacked in
+   its cell, so it never needs horizontal scrolling.
+
+   the panel is the same look under a different wrapper, so the
+   contract pages and the dao page show balances exactly like the
+   account page does.
+
+   --- WHY --- one rule set for both, written with a selector list
+   rather than pasted twice. the rules used to be copied in three
+   times, and the last copy silently won every conflict. */
+/*==================================*/
+/* the table block itself. */
+.huggies-balance-table {
+  text-align: left;
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+/* the panel is the same content without the table's own spacing. */
+.huggies-balance-panel {
+  margin-top: 20px;
+}
+/*==================================*/
+/* the scroll box: caps the height and scrolls the rest. */
+.huggies-balance-table .huggies-scroll,
+.huggies-balance-panel .huggies-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+/*==================================*/
+/* --- the table --- */
+.huggies-balance-table table,
+.huggies-balance-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  /* one column: every field stacks inside its cell, so the table
+     never needs horizontal scrolling. */
+  table-layout: fixed;
+}
+.huggies-balance-table td,
+.huggies-balance-panel td {
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  vertical-align: top;
+  width: 100%;
+}
+/*==================================*/
+/* --- one row, stacked ---
+   row one: icon, ticker, contract id. row two: the balance and the
+   usd value. */
+.huggies-balance-table .huggies-row-head,
+.huggies-balance-panel .huggies-row-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.huggies-balance-table .huggies-token-icon,
+.huggies-balance-panel .huggies-token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+.huggies-balance-table .huggies-token-icon--empty,
+.huggies-balance-panel .huggies-token-icon--empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.huggies-balance-table .huggies-ticker,
+.huggies-balance-panel .huggies-ticker {
+  font-weight: bold;
+  flex: none;
+  white-space: nowrap;
+}
+/* the contract id sits on row one, clipped so a 64-char id cannot push
+   the row past the page. the title holds the complete value. */
+.huggies-balance-table .huggies-contract,
+.huggies-balance-panel .huggies-contract {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+/* the balance and the usd value are row two. they keep their digits
+   aligned and never wrap. */
+.huggies-balance-table .huggies-amounts,
+.huggies-balance-panel .huggies-amounts {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 2px;
+  padding-left: 26px;
+}
+.huggies-balance-table .huggies-amount,
+.huggies-balance-panel .huggies-amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.huggies-balance-table .huggies-usd,
+.huggies-balance-panel .huggies-usd {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+/*==================================*/
+/* --- pinned NEAR row --- */
+.huggies-balance-table tr.is-pinned td {
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+.huggies-balance-table tr.is-pinned .huggies-ticker {
+  color: var(--color-middle);
+}
+/*==================================*/
+/* --- the total --- */
+.huggies-balance-table tfoot th,
+.huggies-balance-panel tfoot th {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.huggies-balance-table tfoot th {
+  opacity: 1;
+}
+.huggies-balance-table .huggies-total-usd,
+.huggies-balance-panel .huggies-total-usd {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+/*==================================*/
+/* --- a note under the table --- */
+.huggies-balance-table p,
+.huggies-balance-panel p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
+}
+/*==================================*/

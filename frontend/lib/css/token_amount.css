@@ -55,3 +55,13 @@
   opacity: 0.7;
 }
 /* =================================== */
+
+/*==================================*/
+/* --- DEPRECATED ---
+   this file is on its way out.
+
+   this file moves to ../shared/ when the pages that use it are
+   migrated.
+
+   do not add new rules to this file. */
+/*==================================*/
