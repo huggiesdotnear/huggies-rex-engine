@@ -11,12 +11,9 @@ a page outside `app/` has no `app.` in its name:
 ## what is where
 
 a page is described by three files:
-
-| file | what it holds |
-| ---- | ------------- |
-| `frontend.app.account.md` | a one-line description and the html codeblock |
-| [`components.csv`](./components.csv) | the components each page mounts, and the source each reads from |
-| [`requests.csv`](./requests.csv) | the requests each page makes |
+- `frontend.app.account.md` | a one-line description and the html codeblock
+- [`components.csv`](./components.csv) | the components each page mounts, and the source each reads from
+- [`requests.csv`](./requests.csv) | the requests each page makes |
 
 the split is by granularity. the md file is the page. the csvs are every
 page at once, so a question like "which components read request 2?" has
