@@ -3,6 +3,7 @@
 <!--
 this file contains the source of truth for what is on the page.
 do not add classes here as they are something not written in stone.
+do not add this comment to other files.
 -->
 
 ```html
@@ -22,16 +23,6 @@ do not add classes here as they are something not written in stone.
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
 <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
 ```
-
-## the css
-
-the page links two stylesheets: the app-wide base
-(`frontend/lib/css/import.css`) and its own
-(`frontend/lib/css/import-account.css`).
-
-the import file pulls in `frontend/lib/css/pages/account.css` — the
-page's own rules — plus the shared balance table and sort rules, which
-the contract pages share too.
 
 ====================
 <br/>
