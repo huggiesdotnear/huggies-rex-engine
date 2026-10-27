@@ -17,6 +17,7 @@ import {
 } from "./contract_page_pumpopoly_parse";
 import type {
   HUGGIES_PUMPOPOLY_DATA,
+  HUGGIES_PUMPOPOLY_ERRORS,
   HUGGIES_PUMPOPOLY_PLAYER,
 } from "./contract_page_pumpopoly_parse";
 // ========================================
@@ -38,7 +39,7 @@ import type {
 export async function load_pumpopoly_page_fun(
   account_id: string | null,
 ): Promise<HUGGIES_PUMPOPOLY_DATA> {
-  const errors: string[] = [];
+  const errors: HUGGIES_PUMPOPOLY_ERRORS = { player: null, nfts: null };
   const near = near_kit_client();
   let player: HUGGIES_PUMPOPOLY_PLAYER | null = null;
   let nft_token_ids: string[] = [];
@@ -54,9 +55,7 @@ export async function load_pumpopoly_page_fun(
         ),
       );
     } catch (err) {
-      errors.push(
-        `player: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      errors.player = err instanceof Error ? err.message : String(err);
     }
     try {
       const raw = await near_kit_contract_view_fun_json<
@@ -70,7 +69,7 @@ export async function load_pumpopoly_page_fun(
         .map((token) => token.token_id)
         .filter((token_id): token_id is string => typeof token_id === "string");
     } catch (err) {
-      errors.push(`nfts: ${err instanceof Error ? err.message : String(err)}`);
+      errors.nfts = err instanceof Error ? err.message : String(err);
     }
   }
   const land_count = player?.land_count ?? 0;

@@ -19,6 +19,7 @@ import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
+import { huggies_error_card_fun } from "./error_card";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -48,6 +49,11 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS_FUN() {
 
   return (
     <>
+      {huggies_error_card_fun({
+        error: page_data?.errors.player ?? null,
+        label: "PLAYER DATA",
+        class_prefix: "huggies-pumpopoly",
+      })}
       <h2>world.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-balance">
         <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>

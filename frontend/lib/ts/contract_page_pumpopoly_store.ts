@@ -79,7 +79,10 @@ async function contract_page_pumpopoly_store_load_fun(
       player: null,
       nft: { count: 0, token_ids: [] },
       credit_score: 0,
-      errors: [err instanceof Error ? err.message : String(err)],
+      errors: {
+        player: err instanceof Error ? err.message : String(err),
+        nfts: null,
+      },
     };
   } finally {
     if (loaded_account_id === account_id) {

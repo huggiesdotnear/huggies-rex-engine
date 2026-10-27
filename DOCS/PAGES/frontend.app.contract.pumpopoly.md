@@ -20,7 +20,7 @@ do not add classes here as they are something not written in stone.
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PAGE"></div>
+  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS"></div>
   <!--==========================================-->
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
@@ -43,13 +43,31 @@ the shared module every page reads it through.
 
 ## the components
 
-| component                                               | what it shows                                                 |
-| ------------------------------------------------------- | ------------------------------------------------------------- |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | the id jump box                                               |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | the balance and the six world cards                           |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | the nft count and the token ids                               |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | the "new players start here" link                             |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PAGE`             | the data-limitations box and the links to the other contracts |
+| component                                               | what it shows                         |
+| ------------------------------------------------------- | ------------------------------------- |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | the id jump box                       |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | the balance and the six world cards   |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | the nft count and the token ids       |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | the "new players start here" link     |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS`   | the links to the other contract pages |
+
+## when a source fails
+
+each source is caught on its own, so one contract being down leaves the
+other one intact.
+
+the component that shows a source's data owns that source's failure.
+it renders an error card where the data would have been, so a reader is
+never left looking at zeros and wondering whether the player has no
+land or the contract could not be reached:
+
+- the player call failed — the card says `COULD NOT LOAD / PLAYER DATA`
+  above the world section.
+- the nft call failed — the card says `COULD NOT LOAD / NFTS` above the
+  nft section.
+
+the errors are keyed by source in the loaded data, so a component can
+tell which source a message belongs to.
 
 ## the requests
 

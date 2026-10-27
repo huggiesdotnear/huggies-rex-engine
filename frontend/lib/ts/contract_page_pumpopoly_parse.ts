@@ -39,7 +39,22 @@ export interface HUGGIES_PUMPOPOLY_DATA {
   player: HUGGIES_PUMPOPOLY_PLAYER | null;
   nft: HUGGIES_PUMPOPOLY_NFT_DATA;
   credit_score: number;
-  errors: string[];
+  errors: HUGGIES_PUMPOPOLY_ERRORS;
+}
+// ========================================
+// the errors, one per source.
+//
+// --- WHY --- keyed by source rather than one flat list: each part of
+// the page depends on exactly one source, and a component that shows a
+// source's data says so right there when that source failed. a flat
+// list of strings could not be told apart that way — the reader
+// would see zeros and not know whether the player has no land or the
+// contract could not be reached.
+export interface HUGGIES_PUMPOPOLY_ERRORS {
+  // the world contract call failed.
+  player: string | null;
+  // the nft contract call failed.
+  nfts: string | null;
 }
 // ========================================
 // ========================================

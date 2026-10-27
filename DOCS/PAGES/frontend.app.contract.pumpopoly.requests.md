@@ -27,13 +27,13 @@ makes nothing.
 
 ## THE COMPONENTS
 
-| component                                               | source                        |
-| ------------------------------------------------------- | ----------------------------- |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | none — it writes the url      |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | request 1                     |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | request 2                     |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | none — the link is a constant |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PAGE`             | reads request errors          |
+| component                                               | source                                 |
+| ------------------------------------------------------- | -------------------------------------- |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | none — it writes the url               |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | request 1                              |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | request 2                              |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | none — the link is a constant          |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS`   | none — the contract list is a constant |
 
 the components read the loaded data from
 [`frontend/lib/ts/contract_page_pumpopoly_store.ts`](../../frontend/lib/ts/contract_page_pumpopoly_store.ts)
@@ -42,8 +42,11 @@ and fetch nothing themselves.
 ## FAILING SOURCES
 
 each source is caught on its own. a contract that is down leaves the
-other one intact, and the message lands in `data.errors`, which the
-page chrome shows under "DATA LIMITATIONS".
+other one intact.
+
+the errors are keyed by source — `errors.player` and `errors.nfts` —
+so the component that shows a source's data can tell which source a
+message belongs to, and shows it where that data would have been.
 
 ====================
 <br/>

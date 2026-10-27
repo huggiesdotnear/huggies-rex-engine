@@ -18,6 +18,7 @@ import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
+import { huggies_error_card_fun } from "./error_card";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -47,6 +48,11 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
 
   return (
     <>
+      {huggies_error_card_fun({
+        error: page_data?.errors.nfts ?? null,
+        label: "NFTS",
+        class_prefix: "huggies-pumpopoly",
+      })}
       <h2>nft.pumpopoly.near</h2>
       <div class="huggies-pumpopoly-cards">
         <article class="huggies-pumpopoly-card">

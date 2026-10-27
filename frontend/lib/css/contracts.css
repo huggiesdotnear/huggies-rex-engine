@@ -403,6 +403,44 @@
   overflow-wrap: anywhere;
   word-break: break-all;
 }
+/* --- the error card --- */
+/* one card for the whole page, listing whatever could not be loaded. it
+   sits at the top of the page, above the data, because a card of zeros
+   with the reason at the bottom is easy to miss. */
+.huggies-pumpopoly-error-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  /* --- WHY --- the same card shape as the other cards on the page, with
+     a red border and tint so it reads as a problem rather than as
+     data. the balance block uses the same idea with the cyan tint. --- */
+  border: 1px solid rgba(255, 90, 90, 0.5);
+  border-radius: 12px;
+  background: rgba(255, 90, 90, 0.12);
+}
+.huggies-pumpopoly-error-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.huggies-pumpopoly-error-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.huggies-pumpopoly-error-title {
+  font-size: 13px;
+}
+.huggies-pumpopoly-error-text {
+  font-size: 11px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+}
 .huggies-pumpopoly-invite {
   /* --- WHY --- the invite is a full-width button, not a text link.
      it is the one thing on the page a NEW visitor wants, so it has to

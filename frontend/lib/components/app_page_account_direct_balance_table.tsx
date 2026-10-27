@@ -123,21 +123,25 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
 
   // the native NEAR holding is pulled out of the sortable list and
   // pinned above it; everything else competes on usd or ticker.
-  const all_entries: Array<HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY> = (page_data?.direct ?? []).map(
-    (balance) => ({
-      id: balance.id,
-      raw: balance.raw,
-      usd_value: balance.usd_value,
-      info: balance.info,
-    }),
-  );
+  const all_entries: Array<HUGGIES_APP_PAGE_ACCOUNT_BALANCE_ENTRY> = (
+    page_data?.direct ?? []
+  ).map((balance) => ({
+    id: balance.id,
+    raw: balance.raw,
+    usd_value: balance.usd_value,
+    info: balance.info,
+  }));
   const near_entry = all_entries.find((entry) => entry.id === HUGGIES_NEAR_ID);
   const rest = all_entries.filter((entry) => entry.id !== HUGGIES_NEAR_ID);
   // the balance filter hides dust and spam. it runs here so the hidden
   // count is known for the note under the table.
   const kept = HUGGIES_APP_PAGE_ACCOUNT_BALANCE_FILTER.filter(rest);
   const hidden_count = rest.length - kept.length;
-  const sorted = HUGGIES_APP_PAGE_ACCOUNT_BALANCE_SORT.sort(kept, sort_by, sort_desc);
+  const sorted = HUGGIES_APP_PAGE_ACCOUNT_BALANCE_SORT.sort(
+    kept,
+    sort_by,
+    sort_desc,
+  );
   // the total covers the pinned row too, so it is not counted twice.
   const total_usd = all_entries.reduce(
     (sum, entry) => sum + entry.usd_value,
@@ -178,7 +182,8 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
               near_entry === undefined && (
                 <tr>
                   <td>
-                    NO BALANCES OVER {HUGGIES_APP_PAGE_ACCOUNT_BALANCE_FILTER.min_usd} USD
+                    NO BALANCES OVER{" "}
+                    {HUGGIES_APP_PAGE_ACCOUNT_BALANCE_FILTER.min_usd} USD
                   </td>
                 </tr>
               )}
