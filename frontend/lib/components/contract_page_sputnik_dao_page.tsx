@@ -14,6 +14,7 @@ import { useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_AUTH } from "../ts/auth_status";
 import { HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE } from "../ts/contract_page_sputnik_dao";
+import { HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES } from "../ts/contract_page_sputnik_dao_balances";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
 // ========================================
 // ========================================
@@ -27,20 +28,20 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
   // first one; a reader who is signed in and has none is asked for an
   // id; a reader who is not signed in is asked for an id too.
   //
-  // --- WHY --- the contract reads run together, so the page is as
-  // slow as its slowest one rather than the sum of the five.
+  // --- WHY --- the dao and its balances are asked for together, so
+  // the page is as slow as its slowest one rather than the sum of the
+  // two.
   use_effect(() => {
     let cancelled = false;
     HUGGIES_AUTH.init();
 
-    const url_dao_id = new URLSearchParams(window.location.search).get(
-      "dao_id",
-    );
+    const url_dao_id = new URLSearchParams(window.location.search).get("id");
     const account_id = HUGGIES_AUTH.get_account_id();
 
     const load_fun = async () => {
       HUGGIES_DAO_PAGE_STATE.set({
         dao: null,
+        balances: [],
         treasuries: [],
         account_id,
         loading: true,
@@ -61,6 +62,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
           if (cancelled) return;
           HUGGIES_DAO_PAGE_STATE.set({
             dao: null,
+            balances: [],
             treasuries: [],
             account_id,
             loading: true,
@@ -74,6 +76,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
 
       HUGGIES_DAO_PAGE_STATE.set({
         dao: null,
+        balances: [],
         treasuries,
         account_id,
         loading: true,
@@ -93,7 +96,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
           // --- WHY --- the chosen dao goes into the url so the reader
           // can share the page and so a reload keeps the same dao.
           const url = new URL(window.location.href);
-          url.searchParams.set("dao_id", dao_id);
+          url.searchParams.set("id", dao_id);
           window.history.replaceState({}, "", url.toString());
         }
       }
@@ -102,6 +105,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
         // nothing to show: the reader has to pick one.
         HUGGIES_DAO_PAGE_STATE.set({
           dao: null,
+          balances: [],
           treasuries,
           account_id,
           loading: false,
@@ -110,21 +114,26 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE_FUN() {
         return;
       }
 
-      // the dao itself.
+      // the dao and its balances.
       try {
-        const dao = await HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.load_dao(dao_id);
+        const [dao, balances] = await Promise.all([
+          HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.load_dao(dao_id),
+          HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES.load(dao_id),
+        ]);
         if (cancelled) return;
         HUGGIES_DAO_PAGE_STATE.set({
           dao,
+          balances: balances.rows,
           treasuries,
           account_id,
           loading: false,
-          errors: dao.errors,
+          errors: [...dao.errors, ...balances.errors],
         });
       } catch (err: unknown) {
         if (cancelled) return;
         HUGGIES_DAO_PAGE_STATE.set({
           dao: null,
+          balances: [],
           treasuries,
           account_id,
           loading: false,

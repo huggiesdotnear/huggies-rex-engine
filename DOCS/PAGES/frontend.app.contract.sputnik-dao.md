@@ -1,17 +1,19 @@
-# frontend/app/contract/sputnik-dao.html ?dao_id={dao_account_id}
+# frontend/app/contract/sputnik-dao.html ?id={dao_account_id}
 
-the page shows one Sputnik DAO: its name and purpose, its policy roles and the accounts in each, and its proposals, taken from the `?dao_id=` url parameter.
+the page shows one Sputnik DAO: its name and purpose, its members and the roles they are in, its proposals, and its token balances, taken from the `?id=` url parameter.
 
 ```html
 <main>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR"></div>
-  <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER"></div>
+  <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR"></div>
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES"></div>
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS"></div>
+  <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES"></div>
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE"></div>
   <!--==========================================-->

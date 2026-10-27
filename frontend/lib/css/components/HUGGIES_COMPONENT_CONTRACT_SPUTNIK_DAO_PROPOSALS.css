@@ -1,7 +1,7 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS
-   the DAO's proposals: one row per proposal, with the id, the kind,
-   the status, the proposer and the votes.
+   the DAO's proposals: one row per proposal, with the kind, what it
+   does, the status, the proposer, the votes and the date.
 
    the section heading is styled by base/main.css — the h2 rule is
    app-wide, not the page's own. */
@@ -37,20 +37,27 @@
   opacity: 0.7;
 }
 .huggies-dao-proposal-id {
-  width: 34px;
+  width: 30px;
   text-align: right;
   opacity: 0.6;
   font-variant-numeric: tabular-nums;
 }
 .huggies-dao-proposal-kind {
-  width: 22%;
+  width: 18%;
   font-weight: 700;
 }
+/* what the proposal does — the kind's real content. */
+.huggies-dao-proposal-what {
+  width: 28%;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 .huggies-dao-proposal-status-col {
-  width: 18%;
+  width: 16%;
 }
 .huggies-dao-proposal-proposer {
-  width: 30%;
+  width: 22%;
 }
 .huggies-dao-proposals-table td.huggies-dao-proposal-proposer a {
   display: block;
@@ -64,16 +71,42 @@
   font-size: 10px;
 }
 .huggies-dao-proposal-votes {
-  width: 10%;
+  width: 8%;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 .huggies-dao-proposal-date {
   width: 16%;
   text-align: right;
+}
+/* --- the expand toggle ---
+   it sits in the date cell, so the date and the caret are one
+   clickable thing. */
+.huggies-dao-proposal-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
   opacity: 0.8;
 }
+.huggies-dao-proposal-toggle:hover {
+  opacity: 1;
+}
+.huggies-dao-proposal-caret {
+  font-size: 8px;
+  opacity: 0.7;
+}
+/*==================================*/
 /* --- the status chip ---
    each status gets its own colour, so a reader can see which
    proposals are live and which are done without reading the words. */
@@ -100,31 +133,25 @@
   background: rgba(218, 41, 28, 0.4);
 }
 /*==================================*/
-/* --- the descriptions ---
-   the proposal's own words, under the table. the table is a summary
-   and the description is the detail, so they are not in the same
-   row. */
-.huggies-dao-proposal-descriptions {
-  list-style: none;
-  margin: 10px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* --- the expanded row ---
+   the detail sits under its proposal, in its own row. */
+.huggies-dao-proposal-detail-row td {
+  white-space: normal;
+  padding: 8px 4px 10px;
+  background: rgba(0, 0, 0, 0.18);
 }
-.huggies-dao-proposal-descriptions li {
+.huggies-dao-proposal-note {
+  margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   line-height: 1.45;
-  opacity: 0.85;
   overflow-wrap: anywhere;
-  padding: 8px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.12);
 }
-.huggies-dao-proposal-descriptions strong {
+.huggies-dao-proposal-vote-list {
+  margin: 4px 0 0;
   font-family: monospace;
+  font-size: 10px;
   opacity: 0.7;
+  overflow-wrap: anywhere;
 }
 /*==================================*/

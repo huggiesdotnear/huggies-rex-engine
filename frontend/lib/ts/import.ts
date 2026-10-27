@@ -28,6 +28,7 @@ import "../components/contract_page_sputnik_dao_selector";
 import "../components/contract_page_sputnik_dao_header";
 import "../components/contract_page_sputnik_dao_roles";
 import "../components/contract_page_sputnik_dao_proposals";
+import "../components/contract_page_sputnik_dao_balances";
 import "../components/contract_page_pumpopoly_account_selector";
 import "../components/contract_page_pumpopoly_player_stats";
 import "../components/contract_page_pumpopoly_nft_list";

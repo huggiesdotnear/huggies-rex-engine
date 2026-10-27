@@ -37,12 +37,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
   if (dao === null) return null;
 
   // the number of accounts in every role, counted once.
-  const member_total = dao.roles.reduce(
-    (sum, role) => sum + role.members.length,
-    0,
-  );
-  const unique_members = new Set(dao.roles.flatMap((role) => role.members))
-    .size;
+  const member_total = dao.members.length;
 
   return (
     <>
@@ -59,7 +54,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
           <span class="huggies-dao-stat-label">ROLES</span>
         </article>
         <article class="huggies-dao-stat">
-          <span class="huggies-dao-stat-value">{unique_members}</span>
+          <span class="huggies-dao-stat-value">{member_total}</span>
           <span class="huggies-dao-stat-label">MEMBERS</span>
         </article>
         <article class="huggies-dao-stat">
@@ -73,9 +68,6 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
           <span class="huggies-dao-stat-label">AVAILABLE</span>
         </article>
       </section>
-      {member_total === 0 && dao.roles.length > 0 && (
-        <p class="huggies-dao-empty">NO MEMBERS IN ANY ROLE</p>
-      )}
     </>
   );
 }

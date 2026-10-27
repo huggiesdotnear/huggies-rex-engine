@@ -42,7 +42,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
   }, []);
 
   const state = HUGGIES_DAO_PAGE_STATE.get();
-  const dao_id = new URLSearchParams(window.location.search).get("dao_id");
+  const dao_id = new URLSearchParams(window.location.search).get("id");
 
   // --- WHY --- the dropdown only shows when there is a real choice to
   // make. one dao and the box is enough; none and there is nothing to
@@ -51,7 +51,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
 
   const open_dao_fun = (next_id: string) => {
     const url = new URL(window.location.href);
-    url.searchParams.set("dao_id", next_id);
+    url.searchParams.set("id", next_id);
     window.location.href = url.toString();
   };
 
@@ -62,7 +62,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
         label: "DAO ACCOUNT ID",
         placeholder: "dao.sputnik-dao.near",
         button_text: "OPEN DAO",
-        param_name: "dao_id",
+        param_name: "id",
         class_prefix: "huggies-dao",
       })}
       {has_choice && (

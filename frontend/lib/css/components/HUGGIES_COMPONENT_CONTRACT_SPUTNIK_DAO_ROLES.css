@@ -1,58 +1,13 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES
-   the DAO's policy roles: one tab per role, and the accounts in it.
+   the DAO's members: one table, one row per account, with the roles
+   that account is in and the permissions those roles grant.
 
    the section heading is styled by base/main.css — the h2 rule is
    app-wide, not the page's own. */
 /*==================================*/
 .huggies-dao-roles-section {
   margin-top: 20px;
-}
-/*==================================*/
-/* --- the role tabs ---
-   one pill per role, with the member count beside the name, so the
-   reader can see what is in each role before picking one. */
-.huggies-dao-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.huggies-dao-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: auto;
-  max-width: none;
-  margin: 0;
-  padding: 6px 10px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: inherit;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  cursor: pointer;
-  opacity: 0.7;
-}
-.huggies-dao-tab:hover {
-  background: rgba(255, 255, 255, 0.15);
-  opacity: 1;
-}
-.huggies-dao-tab.is-active {
-  opacity: 1;
-  background: var(--color-middle);
-  border-color: var(--color-middle);
-  color: var(--color-fontend);
-}
-/* the member count, in a small circle. */
-.huggies-dao-tab-count {
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.75;
 }
 /*==================================*/
 /* --- the members table --- */
@@ -89,7 +44,7 @@
   opacity: 0.6;
 }
 .huggies-dao-member-account {
-  width: 40%;
+  width: 30%;
 }
 .huggies-dao-members-table td.huggies-dao-member-account a {
   display: block;
@@ -102,10 +57,41 @@
   font-family: monospace;
   font-size: 10px;
 }
+/* the roles an account is in, as chips. */
+.huggies-dao-member-roles {
+  width: 25%;
+  white-space: normal;
+}
+.huggies-dao-role-chip {
+  display: inline-block;
+  margin: 1px 3px 1px 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(0, 198, 215, 0.24);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* what the roles grant. */
 .huggies-dao-member-permissions {
-  width: 45%;
+  width: 35%;
   font-size: 10px;
   opacity: 0.75;
   white-space: normal;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* --- the roles that are open to everyone ---
+   they name no accounts, so there is no row for them. the note says
+   they exist and what they can do. */
+.huggies-dao-open-roles {
+  margin: 10px 0 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
 }
 /*==================================*/

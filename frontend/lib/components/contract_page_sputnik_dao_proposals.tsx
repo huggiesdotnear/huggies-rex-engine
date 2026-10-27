@@ -1,6 +1,11 @@
 // ========================================
-// the DAO's proposals: one row per proposal, with the id, the kind,
-// the status, the proposer and the votes.
+// the DAO's proposals: one row per proposal — id, kind, what it does,
+// status, proposer, votes, date.
+//
+// the row shows the kind's real content, because that is the
+// proposal: a Transfer says how much of which token went to whom, and
+// a row reading only "Transfer" says nothing. the proposer's own note
+// is the description, and it sits in the expanded part of the row.
 //
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
@@ -46,6 +51,8 @@ function format_time_fun(nanoseconds: string): string {
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
   const [, set_revision] = use_state(0);
+  // the proposals the reader has opened.
+  const [open_ids, set_open_ids] = use_state<number[]>([]);
 
   use_effect(() => {
     const unsubscribe = HUGGIES_DAO_PAGE_STATE.subscribe(() => {
@@ -69,6 +76,14 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
     );
   }
 
+  const toggle_fun = (id: number) => {
+    set_open_ids((current) =>
+      current.includes(id)
+        ? current.filter((open) => open !== id)
+        : [...current, id],
+    );
+  };
+
   return (
     <section class="huggies-dao-proposals-section">
       <h2>PROPOSALS ({dao.proposals.length})</h2>
@@ -78,6 +93,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
             <tr>
               <th class="huggies-dao-proposal-id">#</th>
               <th class="huggies-dao-proposal-kind">KIND</th>
+              <th class="huggies-dao-proposal-what">WHAT</th>
               <th class="huggies-dao-proposal-status-col">STATUS</th>
               <th class="huggies-dao-proposal-proposer">PROPOSER</th>
               <th class="huggies-dao-proposal-votes">VOTES</th>
@@ -85,51 +101,83 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
             </tr>
           </thead>
           <tbody>
-            {dao.proposals.map((proposal) => (
-              <tr
-                key={proposal.id}
-                class={`huggies-dao-proposal-row ${status_class_fun(proposal.status)}`}
-              >
-                <td class="huggies-dao-proposal-id">{proposal.id}</td>
-                <td class="huggies-dao-proposal-kind">{proposal.kind}</td>
-                <td class="huggies-dao-proposal-status-col">
-                  <span class="huggies-dao-proposal-status">
-                    {proposal.status}
-                  </span>
-                </td>
-                <td class="huggies-dao-proposal-proposer">
-                  {proposal.proposer.length === 0 ? (
-                    "—"
-                  ) : (
-                    <a
-                      href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(proposal.proposer)}`}
+            {dao.proposals.map((proposal) => {
+              const is_open = open_ids.includes(proposal.id);
+              return (
+                <>
+                  <tr
+                    key={proposal.id}
+                    class={`huggies-dao-proposal-row ${status_class_fun(proposal.status)}`}
+                  >
+                    <td class="huggies-dao-proposal-id">{proposal.id}</td>
+                    <td class="huggies-dao-proposal-kind">{proposal.kind}</td>
+                    <td class="huggies-dao-proposal-what">
+                      {proposal.kind_summary}
+                    </td>
+                    <td class="huggies-dao-proposal-status-col">
+                      <span class="huggies-dao-proposal-status">
+                        {proposal.status}
+                      </span>
+                    </td>
+                    <td class="huggies-dao-proposal-proposer">
+                      {proposal.proposer.length === 0 ? (
+                        "—"
+                      ) : (
+                        <a
+                          href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(proposal.proposer)}`}
+                        >
+                          {proposal.proposer}
+                        </a>
+                      )}
+                    </td>
+                    <td class="huggies-dao-proposal-votes">
+                      {proposal.votes_count}
+                    </td>
+                    <td class="huggies-dao-proposal-date">
+                      <button
+                        type="button"
+                        class="huggies-dao-proposal-toggle"
+                        onClick={() => toggle_fun(proposal.id)}
+                        aria-expanded={is_open}
+                      >
+                        {format_time_fun(proposal.submission_time)}
+                        <span class="huggies-dao-proposal-caret">
+                          {is_open ? "▲" : "▼"}
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                  {is_open && (
+                    <tr
+                      key={`${proposal.id}-detail`}
+                      class="huggies-dao-proposal-detail-row"
                     >
-                      {proposal.proposer}
-                    </a>
+                      <td colSpan={7}>
+                        {proposal.description.length > 0 && (
+                          <p class="huggies-dao-proposal-note">
+                            {proposal.description}
+                          </p>
+                        )}
+                        {proposal.votes.length > 0 && (
+                          <p class="huggies-dao-proposal-vote-list">
+                            {proposal.votes
+                              .map((vote) => `${vote.account_id} ${vote.vote}`)
+                              .join(" · ")}
+                          </p>
+                        )}
+                        {proposal.description.length === 0 &&
+                          proposal.votes.length === 0 && (
+                            <p class="huggies-dao-proposal-note">NO DETAIL</p>
+                          )}
+                      </td>
+                    </tr>
                   )}
-                </td>
-                <td class="huggies-dao-proposal-votes">
-                  {proposal.votes_count}
-                </td>
-                <td class="huggies-dao-proposal-date">
-                  {format_time_fun(proposal.submission_time)}
-                </td>
-              </tr>
-            ))}
+                </>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      {dao.proposals.some((proposal) => proposal.description.length > 0) && (
-        <ul class="huggies-dao-proposal-descriptions">
-          {dao.proposals
-            .filter((proposal) => proposal.description.length > 0)
-            .map((proposal) => (
-              <li key={proposal.id}>
-                <strong>#{proposal.id}</strong> {proposal.description}
-              </li>
-            ))}
-        </ul>
-      )}
     </section>
   );
 }

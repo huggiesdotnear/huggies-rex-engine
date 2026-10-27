@@ -60,7 +60,12 @@ huggies dao — the same fields trezu returns in the treasury config.
 ]}
 ```
 
-`kind` is an enum: `Group` (a list of accounts) or `Everyone`.
+`kind` is an enum with two shapes:
+
+- `{ "Group": ["a.near", "b.near"] }` — the accounts in the role
+- `"Everyone"` — a bare string, meaning any account can act in the
+  role. it has NO member list, so there is no way to count its
+  members and no way to list them.
 
 `get_proposals` -> proposals:
 
@@ -89,6 +94,30 @@ huggies dao — the same fields trezu returns in the treasury config.
 
 `vote_counts` maps a role name to `[yes, no, spam]`.
 
+### the amount in a Transfer
+
+the `amount` is in the token's own smallest unit, and the contract does
+NOT say how many decimals that is. NEAR is 24 decimals and most other
+tokens are 18, so guessing reads a $SHIT amount as twenty million
+times too small. the decimals come from the token registry —
+`HUGGIES_TOKEN_INFO.get([token_id])` — and the registry has no `near`
+entry, so NEAR is the 24-decimal constant.
+
+an empty `token_id` means NEAR.
+
+## the members
+
+there is NO contract method that lists every member of a dao. the
+policy only holds role -> member lists, and the roles that are open to
+everyone name no accounts at all. so the page's member list is the
+union of the roles' member lists, and an account in three roles is ONE
+member, not three.
+
+--- WHY --- summing the roles' member counts is wrong. on the huggies
+dao the roles hold 2 accounts each and the same 2 accounts are in all
+three, so the sum reads 6 for a dao with 2 people. the page counts
+the accounts, not the role slots.
+
 ## the gotchas
 
 1. **the account must be a real dao.** the factory account answers
@@ -109,6 +138,11 @@ huggies dao — the same fields trezu returns in the treasury config.
 
 5. **`get_last_bounty_id` / `get_bounties`** exist but were empty on
    every dao checked.
+
+6. **a proposal is not a transaction.** it is a record in the
+   contract's storage. `get_actions_log` gives the trail of
+   `AddProposal` / `VoteApprove` actions with their block heights,
+   but the contract does not store the transaction hashes.
 
 ## the archive rpc
 

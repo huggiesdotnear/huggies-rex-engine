@@ -1,5 +1,11 @@
 // ========================================
-// the dao the page is showing, read from the `?dao_id=` url parameter.
+// the dao the page is showing, read from the `?id=` url parameter.
+//
+// --- WHY --- `?id=` and not `?dao_id=`: the dao page is a contract
+// page, and a contract page shows one account. the account page shows
+// an account with `?id=` and the dao page shows a dao with `?id=`, so
+// the two pages read the url the same way and the jump box on each
+// writes the same parameter.
 //
 // this is page state, not identity: the page shows one dao for
 // anyone, signed in or not. the signed-in account only supplies the
@@ -12,11 +18,6 @@
 // --- STATE ------------------------------
 // the dao the page is about. null until one is resolved.
 let dao_id: string | null = null;
-// true when the URL carried a `?dao_id=` of its own.
-//
-// --- WHY --- this is separate from "do we have a dao". a url id is
-// final: a sign-in must never replace the dao the link points at.
-let has_url_id = false;
 // plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
@@ -43,9 +44,8 @@ function subscribe_fun(listener: () => void): () => void {
   };
 }
 // ========================================
-// trim the raw `?dao_id=` value, treating blank as absent so a
-// trailing `?dao_id=` link resolves to nothing rather than an empty
-// heading.
+// trim the raw `?id=` value, treating blank as absent so a trailing
+// `?id=` link resolves to nothing rather than an empty heading.
 function normalize_dao_id_fun(raw: string | null): string | null {
   if (raw === null) return null;
   const trimmed = raw.trim();
@@ -53,13 +53,13 @@ function normalize_dao_id_fun(raw: string | null): string | null {
 }
 // ========================================
 // --- READ ------------------------------
-// the `?dao_id=` off the current url, or null when there is none.
+// the `?id=` off the current url, or null when there is none.
 function read_url_dao_id_fun(): string | null {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return null;
   }
   const params = new URLSearchParams(window.location.search);
-  return normalize_dao_id_fun(params.get("dao_id"));
+  return normalize_dao_id_fun(params.get("id"));
 }
 // ========================================
 // --- WRITE -----------------------------
@@ -78,10 +78,6 @@ export const HUGGIES_CONTRACT_SPUTNIK_DAO_ID = {
   subscribe: subscribe_fun,
   get: read_url_dao_id_fun,
   set: set_dao_id_fun,
-  has_url_id: () => has_url_id,
-  mark_url_id: () => {
-    has_url_id = true;
-  },
 };
 // ========================================
 // copyright 2026 by sleet.near

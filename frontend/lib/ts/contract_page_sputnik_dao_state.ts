@@ -12,12 +12,15 @@
 // subscriber cannot break.
 // ========================================
 import type { HUGGIES_DAO_INFO } from "./contract_page_sputnik_dao";
+import type { HUGGIES_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
 import type { HUGGIES_TREASURY } from "../../../middleman/huggies";
 // ========================================
 // --- TYPES ------------------------------
 export interface HUGGIES_DAO_PAGE_STATE {
   // the dao being shown, or null while it loads.
   dao: HUGGIES_DAO_INFO | null;
+  // the dao's own token holdings.
+  balances: ReadonlyArray<HUGGIES_DAO_BALANCE>;
   // the daos the signed-in account is a member of.
   treasuries: HUGGIES_TREASURY[];
   // the account whose daos are listed. null when nobody is signed in.
@@ -33,6 +36,7 @@ export interface HUGGIES_DAO_PAGE_STATE {
 // first load answers.
 let state: HUGGIES_DAO_PAGE_STATE = {
   dao: null,
+  balances: [],
   treasuries: [],
   account_id: null,
   loading: false,
