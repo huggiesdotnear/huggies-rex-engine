@@ -1,0 +1,45 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_DISCOVER
+   the contract cards on the discover page: one card per supported
+   contract, each carrying its title and its contract id.
+
+   --- WHY --- stacked, full width. the cards are links to a contract
+   page and each carries a title plus its contract id; side by side the
+   ids were squeezed into a 150px column and clipped, and the row of
+   cards read as a grid of tiles rather than a list of links. one per
+   row, each the full width of the page column, keeps every id
+   readable. */
+/*==================================*/
+.huggies-contract-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.huggies-contract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.huggies-contract-card:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.huggies-contract-card code {
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/*==================================*/

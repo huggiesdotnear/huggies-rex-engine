@@ -1,5 +1,6 @@
 /*==================================*/
-/* the balance table and the balance panel.
+/* HUGGIES_COMPONENT_BALANCE_TABLE
+   the balance table and the balance panel.
    both show the same row — icon, ticker, contract id, then the amount
    and its usd value — so they share one look and one set of rules.
 
@@ -151,11 +152,51 @@
   font-variant-numeric: tabular-nums;
 }
 /*==================================*/
+/* --- the section heading above a titled table block --- */
+.huggies-balance-table .huggies-section-title {
+  text-align: left;
+  font-size: 18px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+/*==================================*/
 /* --- a note under the table --- */
 .huggies-balance-table p,
 .huggies-balance-panel p {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   opacity: 0.8;
+}
+/*==================================*/
+/* --- the sort control on the account page's balance table ---
+   --- WHY --- this is separate from the shared `.huggies-sort-control`
+   in the discover component. that one is a row of small toggle pills
+   for the token list; this one is the account table's own pair of
+   sort keys. they are different controls that happen to both sort
+   something. */
+.huggies-balance-table .huggies-sort {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.huggies-balance-table .huggies-sort button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: inherit;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.huggies-balance-table .huggies-sort button.is-active {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 /*==================================*/

@@ -1,4 +1,5 @@
 /*==================================*/
-/* the game page's css. */
-@import url(./legacy/game.css);
+/* the game page's css: the components it mounts. */
+@import url(./components/HUGGIES_COMPONENT_EMOJI_MATCH_GAME.css);
+@import url(./components/HUGGIES_COMPONENT_GAME_LINK.css);
 /*==================================*/

@@ -1,5 +1,6 @@
 /*==================================*/
-/* the stat tile: a label, a value, and an optional sub-label.
+/* HUGGIES_COMPONENT_STAT_TILE
+   the stat tile: a label, a value, and an optional sub-label.
 
    one tile shape, used by the pumpopoly page's six stat cards and its
    nft count. the tile is shared; the page's own parts of it (the

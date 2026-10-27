@@ -1,0 +1,27 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_GAME_LINK
+   the hidden game link, under the auth button. it is meant to be
+   found, so it is quiet: small, low contrast, and only a little
+   brighter on hover. */
+/*==================================*/
+#HUGGIES_COMPONENT_GAME_LINK {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 2px;
+  text-align: center;
+}
+.huggies-game-link {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-decoration: none !important;
+  color: inherit;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+.huggies-game-link:hover,
+.huggies-game-link:focus-visible {
+  opacity: 0.9;
+}
+/*==================================*/

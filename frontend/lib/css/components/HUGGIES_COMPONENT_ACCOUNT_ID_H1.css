@@ -1,0 +1,24 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_ACCOUNT_ID_H1
+   the account id the page is about. it renders nothing when there is
+   no ?id= on the url. */
+/*==================================*/
+#HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
+  /* body centers text; the heading reads better flush left. */
+  text-align: left;
+  /* full width of main()'s box, so the border spans the content
+     rather than only the text. */
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  /* a long account id wraps instead of stretching the page. */
+  font-family: monospace;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+}
+/*==================================*/

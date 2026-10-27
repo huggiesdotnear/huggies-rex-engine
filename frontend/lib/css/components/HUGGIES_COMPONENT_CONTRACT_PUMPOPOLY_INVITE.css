@@ -1,0 +1,45 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE
+   the "new players start here" link.
+
+   --- WHY --- the invite is a full-width button, not a text link.
+   it is the one thing on the page a NEW visitor wants, so it has to
+   read as a button. the `main a` rule in links.css sets
+   `color:inherit`, which would make this label white on a white
+   fill, so the color is restated with a selector that beats it.
+   `display:block` + `width:100%` makes the anchor fill the page
+   column, and `box-sizing` keeps the padding inside that width. */
+.huggies-pumpopoly-invite {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border: 2px solid var(--color-middle);
+  border-radius: 12px;
+  background: var(--color-backend-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+main a.huggies-pumpopoly-invite,
+.huggies-page a.huggies-pumpopoly-invite {
+  color: var(--color-backend);
+}
+main a.huggies-pumpopoly-invite:hover,
+.huggies-page a.huggies-pumpopoly-invite:hover,
+main a.huggies-pumpopoly-invite:focus-visible,
+.huggies-page a.huggies-pumpopoly-invite:focus-visible {
+  background: var(--color-middle);
+  color: var(--color-fontend);
+  border-color: var(--color-middle-dark);
+}
+/*==================================*/

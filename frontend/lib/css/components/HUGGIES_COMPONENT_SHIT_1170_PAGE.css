@@ -1,8 +1,11 @@
 /*==================================*/
-/* $SHIT token page: holder tabs, the share of the supply each group */
-/* holds, the holder rows, and the metadata block at the bottom.       */
-/* the page column itself is the standard `main` / `.huggies-page` —   */
-/* this file only styles what is inside it.                            */
+/* HUGGIES_COMPONENT_SHIT_1170_PAGE
+   the $SHIT token page: holder tabs, the share of the supply each
+   group holds, the holder rows, and the metadata block at the
+   bottom.
+
+   the page column itself is the standard `main` — this file only
+   styles what is inside it. */
 /*==================================*/
 .huggies-shit {
   text-align: left;
@@ -318,14 +321,4 @@
   padding-bottom: 6px;
   margin-bottom: 10px;
 }
-/*==================================*/
-
-/*==================================*/
-/* --- DEPRECATED ---
-   this file is on its way out.
-
-   the $SHIT page's rules move to ../pages/tokens_shit_1170.css
-   when that page is migrated.
-
-   do not add new rules to this file. */
 /*==================================*/

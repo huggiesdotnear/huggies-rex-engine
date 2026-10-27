@@ -1,0 +1,12 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE
+   the direct and native token balances on the account page.
+
+   the table's own look is shared
+   (HUGGIES_COMPONENT_BALANCE_TABLE.css). this file holds the
+   account page's own parts of it. */
+/*==================================*/
+/* the note under the table: how many holdings were hidden. it
+   inherits from the generic `.huggies-balance-table p` rule, so it
+   needs nothing of its own. */
+/*==================================*/

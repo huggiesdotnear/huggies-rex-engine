@@ -1,0 +1,61 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS
+   the player's balance and the six world cards.
+
+   the tile's own shape is shared
+   (HUGGIES_COMPONENT_STAT_TILE.css). this file holds the page's
+   parts of it. */
+/*==================================*/
+.huggies-pumpopoly-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.huggies-pumpopoly-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.huggies-pumpopoly-value {
+  font-size: 26px;
+  line-height: 1.1;
+}
+.huggies-pumpopoly-sub {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.65;
+}
+.huggies-pumpopoly-text {
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the in-game balance leads the world section, full width above the
+   cards. it is the number a player came for, so it gets its own row
+   instead of one cell in a grid of six. */
+.huggies-pumpopoly-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(0, 198, 215, 0.5);
+  border-radius: 12px;
+  background: rgba(0, 198, 215, 0.16);
+}
+.huggies-pumpopoly-balance-value {
+  font-size: 30px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.huggies-pumpopoly-raw {
+  font-size: 10px;
+  opacity: 0.5;
+  overflow-wrap: anywhere;
+}
+/*==================================*/

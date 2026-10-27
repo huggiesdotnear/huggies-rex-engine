@@ -13,5 +13,9 @@
 /*@import url(./base/footer.css);*/
 @import url(./base/main.css);
 @import url(./base/nav.css);
-@import url(./base/auth.css);
+/*==================================*/
+/* the components every page carries. */
+@import url(./components/HUGGIES_COMPONENT_AUTH_BUTTON.css);
+@import url(./components/HUGGIES_COMPONENT_GAME_LINK.css);
+@import url(./components/HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK.css);
 /*==================================*/

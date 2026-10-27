@@ -1,0 +1,161 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE
+   the DAO page: the header, the stats, the policy roles and the
+   proposals.
+
+   the id jump box is shared
+   (HUGGIES_COMPONENT_ID_JUMP_BOX.css). */
+/*==================================*/
+/* --- the header ---
+   the dao header matches the account page's heading: the name on one
+   line, the account id under it, and a rule between them and the
+   page's content. */
+.huggies-dao-header {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+.huggies-dao-header h1 {
+  margin: 0 0 0.2rem;
+  font-size: 24px;
+}
+.huggies-dao-header code {
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+}
+/*==================================*/
+/* --- the stats --- */
+.huggies-dao-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.huggies-dao-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.huggies-dao-stat-value {
+  font-size: 26px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-dao-stat-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/
+/* --- the policy roles --- */
+.huggies-dao-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.huggies-dao-role {
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  min-width: 0;
+}
+.huggies-dao-role h3 {
+  margin: 0 0 0.5rem;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.huggies-dao-empty {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.6;
+}
+.huggies-dao-members {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.huggies-dao-members li {
+  min-width: 0;
+}
+.huggies-dao-members a {
+  display: block;
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* --- the proposals --- */
+.huggies-dao-proposals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.huggies-dao-proposal {
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  min-width: 0;
+}
+.huggies-dao-proposal header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+.huggies-dao-proposal-id {
+  font-weight: 700;
+}
+.huggies-dao-proposal-status {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+}
+.huggies-dao-proposal p {
+  margin: 0 0 0.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.huggies-dao-proposal footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.65;
+  flex-wrap: wrap;
+}
+.huggies-dao-proposal footer a {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/

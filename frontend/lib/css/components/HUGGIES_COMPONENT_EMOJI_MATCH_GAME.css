@@ -1,5 +1,6 @@
 /*==================================*/
-/* the emoji memory game, in the huggies style.
+/* HUGGIES_COMPONENT_EMOJI_MATCH_GAME
+   the emoji memory game, in the huggies style.
    the board keeps the emojifi shape — a four-by-four grid of square
    cards — but every colour comes from the app's own palette, so the
    game reads as part of the site rather than a pasted-in page. */
@@ -152,14 +153,4 @@
     gap: 0.3rem;
   }
 }
-/*==================================*/
-
-/*==================================*/
-/* --- DEPRECATED ---
-   this file is on its way out.
-
-   the game page's rules move to ../pages/game.css when the game
-   page is migrated.
-
-   do not add new rules to this file. */
 /*==================================*/

@@ -1,0 +1,123 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_TOKEN_DETAIL
+   the token's card: the icon, the symbol, the name, the id, the
+   metadata grid, the description and the socials. */
+/*==================================*/
+/* --- header --- */
+.huggies-token-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.huggies-token-detail-header h1,
+.huggies-token-detail-header p {
+  margin: 0;
+}
+.huggies-token-detail-header p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.75;
+}
+.huggies-token-detail-header code {
+  display: block;
+  font-size: 10px;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+.huggies-token-detail-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+/* --- metadata grid --- */
+.huggies-token-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.huggies-token-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  min-width: 0;
+}
+.huggies-token-meta-row span {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+.huggies-token-meta-row strong {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+/* --- about card --- */
+.huggies-token-description-card {
+  margin: 1rem 0;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.huggies-token-description-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: 16px;
+}
+.huggies-token-description-card p {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+/* --- socials --- */
+.huggies-token-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+/* --- WHY --- the social links are buttons that share the row's full
+   width between them: one link fills it on its own, two split it in
+   half, three split it three ways. `flex:1` with a `min-width:0` lets
+   them shrink rather than force the row wider than the page. */
+.huggies-token-social-link {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.huggies-token-social-link:hover,
+.huggies-token-social-link:focus-visible {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+/*==================================*/

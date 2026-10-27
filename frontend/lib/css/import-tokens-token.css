@@ -1,4 +1,10 @@
 /*==================================*/
-/* the token page's css. */
-@import url(./pages/token.css);
+/* the token page's css: the components it mounts. */
+@import url(./components/HUGGIES_COMPONENT_TOKEN_PAGE.css);
+@import url(./components/HUGGIES_COMPONENT_TOKEN_SELECTOR.css);
+@import url(./components/HUGGIES_COMPONENT_TOKEN_STATUS.css);
+@import url(./components/HUGGIES_COMPONENT_TOKEN_DETAIL.css);
+@import url(./components/HUGGIES_COMPONENT_TOKEN_HOLDERS.css);
+@import url(./components/HUGGIES_COMPONENT_TOKEN_HOLDER_ROW.css);
+@import url(./components/HUGGIES_COMPONENT_ID_JUMP_BOX.css);
 /*==================================*/

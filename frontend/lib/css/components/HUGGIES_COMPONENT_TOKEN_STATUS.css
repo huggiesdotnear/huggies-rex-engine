@@ -1,0 +1,15 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_TOKEN_STATUS
+   the token page's status line: what the page says while the load is
+   running, when it failed, and when the url carried no token id.
+
+   it renders nothing at all once the token's card is up. */
+/*==================================*/
+#HUGGIES_COMPONENT_TOKEN_STATUS {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+  margin: 0 0 12px;
+}
+/*==================================*/
