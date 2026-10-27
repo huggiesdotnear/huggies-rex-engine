@@ -1,11 +1,7 @@
 # frontend/index.html
 
-SPLASH
-
-<!--
-this file contains the source of truth for what is on the page.
-do not add classes here as they are something not written in stone.
--->
+the page shows the app's name and one random slogan, then sends the
+browser to `frontend/app/index.html` — the FEED — after a 1.5s delay.
 
 ```html
 <main>
@@ -16,17 +12,6 @@ do not add classes here as they are something not written in stone.
   <!--==========================================-->
 </main>
 ```
-
-the page shows the app's name and one random slogan, then sends the
-browser to `frontend/app/index.html` — the FEED — after a 1.5s delay.
-
-## the components
-
-| component                           | what it shows                            |
-| ----------------------------------- | ---------------------------------------- |
-| `HUGGIES_COMPONENT_RANDOM_SLOGAN_P` | one random slogan from `HUGGIES_SLOGANS` |
-
-the redirect is in `frontend/lib/ts/index.ts`, not in a component.
 
 ====================
 <br/>
