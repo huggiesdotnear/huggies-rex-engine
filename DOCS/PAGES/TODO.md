@@ -15,8 +15,12 @@ a page is done when:
 
 ## the pages
 
-- [ ] `frontend/app/index.html` — FEED
+<!---
+not in scope
+[ ] `frontend/app/index.html` — FEED
 - [ ] `frontend/app/skill.html` — SKILL
+-->
+remov items as you complete
 - [ ] `frontend/app/game.html` — GAME
 - [ ] `frontend/app/tokens/token.html` — TOKEN ?id=
 - [ ] `frontend/app/tokens/shit-1170.html` — $SHIT
