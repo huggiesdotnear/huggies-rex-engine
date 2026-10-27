@@ -27,11 +27,11 @@ do not add classes here as they are something not written in stone.
 
 the page links two stylesheets: the app-wide base
 (`frontend/lib/css/import.css`) and its own
-(`frontend/lib/css/pages/account.css`).
+(`frontend/lib/css/import-account.css`).
 
-the page's own file holds only what is the account page's. the
-balance tables' look lives in `frontend/lib/css/shared/balance_table.css`
-and `.../shared/balance_sort.css`, which the contract pages share.
+the import file pulls in `frontend/lib/css/pages/account.css` — the
+page's own rules — plus the shared balance table and sort rules, which
+the contract pages share too.
 
 ====================
 <br/>

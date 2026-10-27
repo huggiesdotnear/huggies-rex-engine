@@ -1,4 +1,4 @@
 /*==================================*/
-/* the discover page (app/discover.html). */
-@import url(../discover.css);
+/* the discover page's css. */
+@import url(./legacy/discover.css);
 /*==================================*/

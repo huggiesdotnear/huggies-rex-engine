@@ -4,14 +4,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap");
 /*==================================*/
 /* css  */
-/* the app-wide styles every page needs. */
-@import url(./colors.css);
-@import url(./font.css);
-@import url(./body.css);
-@import url(./links.css);
-@import url(./button.css);
-/*@import url(./footer.css);*/
-@import url(./main.css);
-@import url(./nav.css);
-@import url(./auth.css);
+/* the app-wide base. every page links this file. */
+@import url(./base/colors.css);
+@import url(./base/font.css);
+@import url(./base/body.css);
+@import url(./base/links.css);
+@import url(./base/button.css);
+/*@import url(./base/footer.css);*/
+@import url(./base/main.css);
+@import url(./base/nav.css);
+@import url(./base/auth.css);
 /*==================================*/

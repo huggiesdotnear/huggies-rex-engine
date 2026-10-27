@@ -1,4 +1,4 @@
 /*==================================*/
-/* the game page (app/game.html). */
-@import url(../game.css);
+/* the game page's css. */
+@import url(./legacy/game.css);
 /*==================================*/

@@ -2,10 +2,8 @@
 /* the account page: the account id heading and the balance tables.
 
    the tables' own look lives in ../shared/balance_table.css, which the
-   contract pages share. */
-/*==================================*/
-@import url(../shared/balance_table.css);
-@import url(../shared/balance_sort.css);
+   contract pages share. this file holds only what is the account page's
+   own. */
 /*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
   /* body centers text; the heading reads better flush left. */

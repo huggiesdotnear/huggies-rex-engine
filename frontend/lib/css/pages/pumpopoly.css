@@ -2,10 +2,8 @@
 /* the pumpopoly page: the player selector, the stats, the nft table,
    the invite link and the error card.
 
-   the stat tile's own look lives in ../shared/stat_tile.css. */
-/*==================================*/
-@import url(../shared/stat_tile.css);
-@import url(../shared/sort_control.css);
+   the stat tile's own look lives in ../shared/stat_tile.css. this file
+   holds only what is the pumpopoly page's own. */
 /*==================================*/
 /* --- the account selector --- */
 .huggies-pumpopoly-selector {

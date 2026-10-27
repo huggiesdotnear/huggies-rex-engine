@@ -1,0 +1,6 @@
+/*==================================*/
+/* the account page's css. */
+@import url(./pages/account.css);
+@import url(./shared/balance_table.css);
+@import url(./shared/balance_sort.css);
+/*==================================*/

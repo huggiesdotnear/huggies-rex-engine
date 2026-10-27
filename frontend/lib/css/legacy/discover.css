@@ -1,7 +1,7 @@
 /*==================================*/
 /* discover page: searchable token results and contract cards */
 /*==================================*/
-@import url(./shared/sort_control.css);
+@import url(../shared/sort_control.css);
 /*==================================*/
 .huggies-discover-section {
   width: 100%;
@@ -212,7 +212,7 @@
    this file is on its way out.
 
    the shared sort control moved to
-   ./shared/sort_control.css.
+   ../shared/sort_control.css.
 
    the rest of this file still styles the discover page. it moves to
    ../pages/discover.css when the discover page is migrated.

@@ -5,15 +5,17 @@ some files/folders
 - `frontend/` frontend
   - `frontend/lib/css/` - stylesheets
     - `frontend/lib/css/import.css` - the app-wide base. every page
-      links this. it holds the colours, fonts, body, links, buttons,
-      main column, nav and auth button.
-    - `frontend/lib/css/pages/` - one file per page. a page links its
-      own file after the base.
-    - `frontend/lib/css/shared/` - one file per shared component. a
-      rule lives with the page that owns the component, so two files
-      never style the same classes.
-    - the older top-level css files are deprecated and move into
-      `pages/` as their pages are migrated.
+      links this. it pulls in the files in `base/`.
+    - `frontend/lib/css/import-<page>.css` - one per page, holding only
+      import statements. a page links this after the base. a page with
+      nothing of its own gets no such file.
+    - `frontend/lib/css/base/` - the app-wide rules: colours, fonts,
+      body, links, buttons, the main column, the nav and the auth
+      button.
+    - `frontend/lib/css/pages/` - the rules a page owns.
+    - `frontend/lib/css/shared/` - the rules a shared component owns.
+    - `frontend/lib/css/legacy/` - deprecated files, waiting for their
+      page to migrate into `pages/`.
 - `src/` backend
 - `DOCKER/` - docker setup: multi-stage `Dockerfile`, `docker-compose.yml`.
   see [`DOCKER/README.md`](../DOCKER/README.md). the frontend bundle is baked
