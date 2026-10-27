@@ -1,7 +1,7 @@
 // ========================================
 // the account id box on the Pumpopoly page.
 //
-// the box itself is shared — frontend/lib/components/account_id_selector.tsx
+// the box itself is shared — frontend/lib/components/id_jump_box.tsx
 // — because the token page and the DAO page have the same box with
 // different wording. this component supplies the Pumpopoly wording.
 //
@@ -13,7 +13,7 @@ import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
-import { huggies_account_id_selector_fun } from "./account_id_selector";
+import { huggies_id_jump_box_fun } from "./id_jump_box";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -34,8 +34,8 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN() {
 
   return (
     <>
-      {huggies_account_id_selector_fun({
-        account_id,
+      {huggies_id_jump_box_fun({
+        id: account_id,
         label: "ACCOUNT ID",
         placeholder: "account.near",
         button_text: "INSPECT PLAYER ACCOUNT",
@@ -45,7 +45,6 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN() {
     </>
   );
 }
-// ========================================
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.

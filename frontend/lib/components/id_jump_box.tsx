@@ -13,15 +13,22 @@
 // the css is driven by a class_prefix prop: the component writes
 // `<prefix>-selector`, `<prefix>-input` and `<prefix>-open`, and the
 // page's css file carries those rules.
+//
+// --- WHY --- named `id_jump_box` and not `account_id_selector`: the
+// thing it opens is an id of some kind. an account id on the pumpopoly
+// page, a token id on the token page, a dao id on the DAO page. a
+// token id is an account id on NEAR, but calling it an account id on
+// a token page reads wrong, so the name says "id" and leaves the kind
+// to the page that uses it.
 // ========================================
 import { useState as use_state } from "preact/hooks";
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_ACCOUNT_ID_SELECTOR_PROPS {
+export interface HUGGIES_ID_JUMP_BOX_PROPS {
   // the id the page is currently showing. it seeds the input, so the
   // field starts out holding the id that is on screen.
-  account_id: string | null;
+  id: string | null;
   // the label above the field, e.g. "ACCOUNT ID".
   label: string;
   // the placeholder inside the field, e.g. "account.near".
@@ -37,10 +44,10 @@ export interface HUGGIES_ACCOUNT_ID_SELECTOR_PROPS {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_account_id_selector_fun(
-  props: HUGGIES_ACCOUNT_ID_SELECTOR_PROPS,
+export function huggies_id_jump_box_fun(
+  props: HUGGIES_ID_JUMP_BOX_PROPS,
 ): preact.JSX.Element {
-  const [input_id, set_input_id] = use_state<string>(props.account_id ?? "");
+  const [input_id, set_input_id] = use_state<string>(props.id ?? "");
 
   // --- WHY --- the input is seeded from props on mount only. a later
   // change of the page's id must not overwrite what the user is

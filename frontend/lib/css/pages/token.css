@@ -1,15 +1,12 @@
 /*==================================*/
-/* token detail page: metadata and indexed holders */
+/* the token page's css.
+
+   the page shows one token: its card, its metadata and the indexed
+   holders of it. every rule here belongs to that page. */
 /*==================================*/
-.huggies-token-detail {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  min-width: 0;
-  text-align: left;
-}
 /* --- the token id jump box --- */
-.huggies-token-search-card {
+/* the box is the shared id jump box, styled with this page's prefix. */
+.huggies-token-selector {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -19,19 +16,19 @@
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.12);
 }
-.huggies-token-search-card label {
+.huggies-token-input {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   min-width: 0;
 }
-.huggies-token-search-card span {
+.huggies-token-input span {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   letter-spacing: 0.06em;
   opacity: 0.75;
 }
-.huggies-token-search-card input {
+.huggies-token-input input {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
@@ -44,15 +41,15 @@
   font-family: monospace;
   font-size: 13px;
 }
-.huggies-token-search-card button {
+.huggies-token-open {
   /* --- WHY --- the global button rule sets a fixed width:500px so
-  buttons line up with the page column, but this card is narrower than
-  that, so the button hung out past the card's own edge. `width:100%`
-  resolves against the card's CONTENT box — the same box the input
-  above it fills — so the button lines up with the input and stops
-  exactly at the card's padding. `align-self:stretch` is what makes it
-  fill that box in a column flexbox; without it a 100% width would
-  still be pinned to its own left edge. */
+     buttons line up with the page column, but this card is narrower than
+     that, so the button hung out past the card's own edge. `width:100%`
+     resolves against the card's CONTENT box — the same box the input
+     above it fills — so the button lines up with the input and stops
+     exactly at the card's padding. `align-self:stretch` is what makes it
+     fill that box in a column flexbox; without it a 100% width would
+     still be pinned to its own left edge. */
   width: 100%;
   align-self: stretch;
   box-sizing: border-box;
@@ -64,7 +61,7 @@
   font-weight: 700;
   cursor: pointer;
 }
-.huggies-token-search-card button:hover {
+.huggies-token-open:hover {
   background: #e9e9e9;
 }
 /* --- header --- */
@@ -217,13 +214,53 @@
   margin-top: 8px;
 }
 /*==================================*/
-
+/* --- the holders table columns ---
+   the holders table has four columns, so it cannot use the account
+   table's single stacked column. the account cell stays wide and the
+   two amount columns share what is left. */
 /*==================================*/
-/* --- DEPRECATED ---
-   this file is on its way out.
-
-   the token page's rules move to ../pages/tokens_token.css
-   when the token page is migrated.
-
-   do not add new rules to this file. */
+.huggies-token-holders th.huggies-holder-rank,
+.huggies-token-holders td.huggies-holder-rank {
+  width: 34px;
+  text-align: right;
+  opacity: 0.6;
+}
+.huggies-token-holders th.huggies-holder-account,
+.huggies-token-holders td.huggies-holder-account {
+  width: 40%;
+}
+/* a long account id wraps inside its cell instead of stretching the
+   table, so the columns keep their widths. */
+.huggies-token-holders td.huggies-holder-account a {
+  display: block;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+  font-family: monospace;
+  font-size: 10px;
+}
+.huggies-token-holders th.huggies-holder-amount,
+.huggies-token-holders td.huggies-holder-amount {
+  width: 30%;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-token-holders th.huggies-holder-usd,
+.huggies-token-holders td.huggies-holder-usd {
+  width: 30%;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+/* the holder column headers stay in the small uppercase label style
+   the rest of the token page uses. */
+.huggies-token-holders th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
 /*==================================*/

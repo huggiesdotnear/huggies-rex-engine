@@ -11,7 +11,7 @@ frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE,reque
 frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE,request 4,the intear dex internal balances,
 frontend/app/account.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
 frontend/app/account.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR,none — it writes the url,the id jump box,shared box (account_id_selector.tsx) with the pumpopoly wording
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR,none — it writes the url,the id jump box,shared box (id_jump_box.tsx) with the pumpopoly wording
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS,request 1,the balance and the six world cards,renders nothing when there is no account id; shows an error card where the data would be when the player call fails
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST,request 2,the nft count and the token id table,"one column of token ids, capped at 420px and scrolled; sorts by token id as a string, ascending or descending; shows an error card where the data would be when the nft call fails"
 frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE,none — the link is a constant,the "new players start here" link,built from a constant invite code
@@ -22,3 +22,11 @@ frontend/app/discover.html,HUGGIES_COMPONENT_TOKEN_DISCOVER,requests 1-4,the sea
 frontend/app/discover.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
 frontend/app/discover.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,
 frontend/app/discover.html,HUGGIES_COMPONENT_GAME_LINK,none — the link is a constant,the link to the game page,
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_TOKEN_SELECTOR,none — it reads and writes the url,the token id jump box,shared box (id_jump_box.tsx) with the token wording; it writes the id to ?id= and the page reloads
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_TOKEN_PAGE,requests 1-2,the page's load,"the one loader; it fetches the metadata and the first holder page in parallel and writes them to the page's store; it renders nothing"
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_TOKEN_STATUS,requests 1-2,the status line,"says TOKEN ID MISSING when the url has no id, the error when the load failed, and LOADING TOKEN... while it runs; it renders nothing once the token's card is up"
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_TOKEN_DETAIL,request 1,the token's card,"the icon, the symbol, the name, the id, the metadata grid, the description and the socials; the metadata grid shows PRICE, REPUTATION, HOLDERS, LIQUIDITY, MARKET CAP and DECIMALS"
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_TOKEN_HOLDERS,request 2,the indexed holders table,"the rank, the account, the balance and the usd value; capped at 420px and scrolled; the usd value is priced from the metadata request; a LOAD MORE button asks the api for the next cursor page"
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,
+frontend/app/tokens/token.html,HUGGIES_COMPONENT_SHIT_LINK,none — the link is a constant,the easter-egg link to the $SHIT page,"it renders only when the url's token id is the $SHIT token"
