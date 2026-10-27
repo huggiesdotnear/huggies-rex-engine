@@ -397,6 +397,47 @@
      between itself and the heading above it. */
   margin-top: 0.5rem;
 }
+/* --- the nft sort control --- */
+/* the nft list sorts by one thing, so its control is a single full-width
+   button rather than a row of sort keys. it spans the page column like
+   the other buttons on the page.
+   --- WHY --- the shared `.huggies-sort-control` is an inline-flex that
+   shrinks to its content, and `.huggies-sort-button` sets `width:auto`
+   so a row of them can sit side by side. this is one button on its own
+   row, so it is put back to full width here. the scoped class keeps the
+   token page's sort control content-sized.
+   --- WHY --- the fill is restated too. the shared sort button is a
+   small teal pill for a row of little toggles; stretched across the
+   page that same pill is a thin bar of 11px text. this one is a real
+   page-sized button instead, matching the other buttons here: light
+   fill, teal border, larger text. */
+.huggies-pumpopoly-nft-sort {
+  display: flex;
+  width: 100%;
+  max-width: 90vw;
+  margin-top: 0.5rem;
+}
+.huggies-pumpopoly-nft-sort .huggies-sort-button {
+  width: 100%;
+  max-width: none;
+  flex: 1;
+  padding: 0.7rem 1.1rem;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: #2d2d2d;
+  background: #ffffff;
+  border: 0;
+  border-radius: 8px;
+}
+.huggies-pumpopoly-nft-sort .huggies-sort-button:hover {
+  background: #e9e9e9;
+  color: #2d2d2d;
+}
+.huggies-pumpopoly-nft-sort .huggies-sort-button.is-active,
+.huggies-pumpopoly-nft-sort .huggies-sort-button.is-active:hover {
+  background: #ffffff;
+  color: #2d2d2d;
+}
 .huggies-pumpopoly-nft-table {
   width: 100%;
   table-layout: fixed;

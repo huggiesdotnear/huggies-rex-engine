@@ -67,7 +67,7 @@ function nft_sort_control_fun(props: {
 }): preact.JSX.Element {
   const Icon = props.direction === "desc" ? ArrowDown : ArrowUp;
   return (
-    <div class="huggies-sort-control">
+    <div class="huggies-sort-control huggies-pumpopoly-nft-sort">
       <button
         type="button"
         class="huggies-sort-button is-active"
