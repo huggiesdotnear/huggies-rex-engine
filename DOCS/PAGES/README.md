@@ -44,6 +44,7 @@ everything for that page. no component fetches anything.
 
 ## Pages
 
+- [`TODO.md`](./TODO.md) - the pages that still need their spec written
 - [`components.csv`](./components.csv) - the components each page mounts,
   and the source each one reads from
 - [`requests.csv`](./requests.csv) - the requests each page makes
