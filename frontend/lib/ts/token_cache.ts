@@ -5,9 +5,21 @@
 // volatile data (price_usd, reputation) is deliberately NOT cached —
 // it moves constantly and is refetched on each load. see
 // lib/ts/token_info.ts for the read-through path that combines the two.
+//
+// the indexeddb mechanics live in lib/ts/indexed_db_store.ts — this
+// file only says WHICH store this cache is and what a row looks like.
+import { HUGGIES_INDEXED_DB_STORE } from "./indexed_db_store";
+// ========================================
 const HUGGIES_TOKEN_DB_NAME = "huggies_tokens";
 const HUGGIES_TOKEN_DB_VERSION = 1;
 const HUGGIES_TOKEN_STORE = "tokens";
+// ========================================
+// the cache's identity, handed to the shared store module.
+const HUGGIES_TOKEN_STORE_CONFIG = {
+  db_name: HUGGIES_TOKEN_DB_NAME,
+  db_version: HUGGIES_TOKEN_DB_VERSION,
+  store_name: HUGGIES_TOKEN_STORE,
+};
 // ========================================
 // ========================================
 // --- SHAPE ------------------------------
@@ -21,37 +33,6 @@ export interface HUGGIES_CACHED_TOKEN {
 }
 // ========================================
 // ========================================
-// --- CONNECTION ------------------------
-// open (and upgrade) the database once per page, cached on the
-// promise so concurrent callers share one connection.
-// --- WHY --- idb-style `onupgradeneeded` fires only on first open or
-// a version bump, so the store is created exactly once; caching the
-// promise avoids a second open request on a rapid second call.
-let db_promise: Promise<IDBDatabase> | null = null;
-// ========================================
-// open the database, creating the tokens store on first use.
-function open_db_fun(): Promise<IDBDatabase> {
-  if (db_promise !== null) return db_promise;
-  db_promise = new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open(
-      HUGGIES_TOKEN_DB_NAME,
-      HUGGIES_TOKEN_DB_VERSION,
-    );
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      // only create when missing, so a future version bump that adds
-      // stores does not throw on the ones already here.
-      if (!db.objectStoreNames.contains(HUGGIES_TOKEN_STORE)) {
-        db.createObjectStore(HUGGIES_TOKEN_STORE, { keyPath: "id" });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-  return db_promise;
-}
-// ========================================
-// ========================================
 // --- READ ------------------------------
 // look up one cached token; resolves null when absent or on any db
 // failure, so a cache problem degrades to a refetch instead of an
@@ -59,58 +40,21 @@ function open_db_fun(): Promise<IDBDatabase> {
 async function get_cached_token_fun(
   id: string,
 ): Promise<HUGGIES_CACHED_TOKEN | null> {
-  try {
-    const db = await open_db_fun();
-    return await new Promise<HUGGIES_CACHED_TOKEN | null>((resolve) => {
-      const request = db
-        .transaction(HUGGIES_TOKEN_STORE, "readonly")
-        .objectStore(HUGGIES_TOKEN_STORE)
-        .get(id);
-      request.onsuccess = () =>
-        resolve((request.result as HUGGIES_CACHED_TOKEN) ?? null);
-      request.onerror = () => resolve(null);
-    });
-  } catch (err) {
-    console.warn("[token_cache] read failed, falling back to fetch", err);
-    return null;
-  }
+  const found = await HUGGIES_INDEXED_DB_STORE.get_many<
+    HUGGIES_CACHED_TOKEN
+  >(HUGGIES_TOKEN_STORE_CONFIG, [id]);
+  return found.get(id) ?? null;
 }
 // ========================================
 // look up many ids at once. missing ids are simply absent from the
 // returned map, which is the caller's signal to fetch them.
-// --- WHY --- resolves on the readwrite transaction's `oncomplete`, not a
-// timeout and not each request: `readonly` transactions do not fire
-// `oncomplete` reliably across browsers, so the transaction is opened
-// readwrite purely to get that one completion signal. a timeout-based
-// resolve can fire before the queued gets have settled and silently
-// drop rows.
 async function get_cached_tokens_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, HUGGIES_CACHED_TOKEN>> {
-  const found = new Map<string, HUGGIES_CACHED_TOKEN>();
-  if (ids.length === 0) return found;
-  try {
-    const db = await open_db_fun();
-    await new Promise<void>((resolve) => {
-      const tx = db.transaction(HUGGIES_TOKEN_STORE, "readwrite");
-      const store = tx.objectStore(HUGGIES_TOKEN_STORE);
-      for (const id of ids) {
-        const request = store.get(id);
-        request.onsuccess = () => {
-          const row = request.result as HUGGIES_CACHED_TOKEN | undefined;
-          if (row !== undefined) found.set(id, row);
-        };
-        // individual misses are expected (that is the point) — only a
-        // hard failure ends the wait, via the completion signal.
-      }
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
-      tx.onabort = () => resolve();
-    });
-  } catch (err) {
-    console.warn("[token_cache] batch read failed, falling back to fetch", err);
-  }
-  return found;
+  return HUGGIES_INDEXED_DB_STORE.get_many<HUGGIES_CACHED_TOKEN>(
+    HUGGIES_TOKEN_STORE_CONFIG,
+    ids,
+  );
 }
 // ========================================
 // ========================================
@@ -120,20 +64,10 @@ async function get_cached_tokens_fun(
 async function put_cached_tokens_fun(
   tokens: ReadonlyArray<HUGGIES_CACHED_TOKEN>,
 ): Promise<void> {
-  if (tokens.length === 0) return;
-  try {
-    const db = await open_db_fun();
-    await new Promise<void>((resolve) => {
-      const tx = db.transaction(HUGGIES_TOKEN_STORE, "readwrite");
-      const store = tx.objectStore(HUGGIES_TOKEN_STORE);
-      for (const token of tokens) store.put(token);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
-      tx.onabort = () => resolve();
-    });
-  } catch (err) {
-    console.warn("[token_cache] write failed", err);
-  }
+  await HUGGIES_INDEXED_DB_STORE.put_many(
+    HUGGIES_TOKEN_STORE_CONFIG,
+    tokens,
+  );
 }
 // ========================================
 // ========================================

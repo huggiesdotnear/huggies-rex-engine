@@ -95,14 +95,43 @@
   margin: 0 0 8px;
 }
 /* --- token rows --- */
-.huggies-token-results {
-  display: flex;
-  flex-direction: column;
+/* --- WHY --- the scroll box is a WRAPPER around the results, not the
+   results themselves. the wrapper is what the page listens to for
+   the scroll event that asks for the next page, so it has to be the
+   element that actually scrolls — the rows inside it grow as the
+   pages are appended. --- */
+.huggies-token-results-scroll {
   max-height: 460px;
   overflow-y: auto;
   width: 100%;
   min-width: 0;
+}
+.huggies-token-results {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
   gap: 6px;
+}
+/* --- the loading / scroll-for-more notes --- */
+/* --- WHY --- these sit INSIDE the scroll box, below the rows, so they
+   are the last thing in the list and the reader sees them when they
+   reach the end. --- */
+.huggies-token-loading {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  text-align: center;
+  margin: 8px 0 0;
+}
+/* --- a failed request --- */
+.huggies-token-error {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #ff8a80;
+  margin: 0 0 8px;
 }
 .huggies-token-result {
   display: grid;

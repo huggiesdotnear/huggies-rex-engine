@@ -1,44 +1,48 @@
 // ========================================
 // searchable token list for the discover page.
-// ========================================
+//
+// this component does NOT fetch. the discover page has one loader
+// (lib/ts/app_page_discover.ts) and this component reads its result
+// from the page store (lib/ts/app_page_discover_store.ts). read that
+// file to see what the discover page requests.
+//
+// the list is paged: the api sorts and paginates on its own, so the
+// page asks for one page of rows at a time and asks for the next one
+// when the reader scrolls to the bottom. mounts into
+// <div id="HUGGIES_COMPONENT_TOKEN_DISCOVER">.
 import { render } from "preact";
 import {
   useEffect as use_effect,
   useMemo as use_memo,
+  useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import {
-  fetch_all_tokens_fun,
-  search_tokens_fun,
-  type HUGGIES_TOKEN_SEARCH_RESULT,
-} from "../ts/app_page_discover_token_search";
 import { token_detail_href_fun } from "../ts/token_link";
 import { order_discover_tokens_fun } from "../ts/app_page_discover_token_order";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-  token_sort_field_fun,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "../ts/app_page_discover_token_sort";
-import {
-  get_cached_token_set_fun,
-  put_cached_token_set_fun,
-} from "../ts/app_page_discover_token_list_cache";
-import { fetch_token_icons_fun } from "../ts/app_page_discover_token_icon_fetch";
+import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/app_page_discover_store";
 import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
 import { huggies_sort_control_fun } from "./sort_control";
+import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_result";
 // ========================================
+// ========================================
+// --- CONFIG -----------------------------
 // how long to wait after a keystroke before asking the api. long
 // enough that typing a word is one request, not one per letter.
 const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
-// how many token rows are on screen at once. the list scrolls, so this
-// is how many icons get fetched for it. it is well above one batch:
-// the api's url limit decides how many ids fit in a single request
-// (see token_icon_fetch.ts), so the visible list spans a few batches.
-const HUGGIES_VISIBLE_ROWS = 300;
+// how close to the bottom of the list the reader has to scroll before
+// the next page is asked for. a little early, so the next page is
+// usually already there by the time they reach the end.
+const HUGGIES_LOAD_MORE_THRESHOLD_PX = 600;
 // ========================================
+// ========================================
+// --- ROW -------------------------------
 // render one token result as a link to its detail page.
 function token_result_row_fun(
   token: HUGGIES_TOKEN_SEARCH_RESULT,
@@ -67,11 +71,10 @@ function token_result_row_fun(
   );
 }
 // ========================================
-// searchable token list component.
-export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
-  const [all_tokens, set_all_tokens] = use_state<
-    HUGGIES_TOKEN_SEARCH_RESULT[] | null
-  >(null);
+// ========================================
+// --- COMPONENT --------------------------
+function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
+  const [, set_revision] = use_state(0);
   const [query, set_query] = use_state("");
   const [sort, set_sort] = use_state<HUGGIES_TOKEN_SORT>(
     HUGGIES_DEFAULT_TOKEN_SORT,
@@ -79,132 +82,74 @@ export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   const [direction, set_direction] = use_state<HUGGIES_TOKEN_SORT_DIRECTION>(
     HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   );
-  const [error, set_error] = use_state<string | null>(null);
+  // the scroll container, so the reader's position at the bottom can
+  // be detected.
+  const scroll_ref = use_ref<HTMLDivElement | null>(null);
 
-  // --- WHY --- the whole indexed token set is fetched once and cached
-  // in indexeddb, rather than one page per sort. sorting happens in
-  // javascript, so a cached copy per sort field would store the same
-  // 7.4k rows several times over for nothing, and a truncated top-N
-  // list could never show the smallest token in an ascending sort.
+  // the page store owns the load. this component starts it once and
+  // re-renders when it lands.
   use_effect(() => {
-    let cancelled = false;
-    set_error(null);
-    void get_cached_token_set_fun()
-      .then((cached) => {
-        if (cached !== null) {
-          if (!cancelled) set_all_tokens(cached);
-          return cached;
-        }
-        return fetch_all_tokens_fun().then((rows) => {
-          if (cancelled) return rows;
-          set_all_tokens(rows);
-          void put_cached_token_set_fun(rows);
-          return rows;
-        });
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        set_error(err instanceof Error ? err.message : String(err));
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    const unsubscribe = HUGGIES_APP_PAGE_DISCOVER_STORE.subscribe(() => {
+      set_revision((revision) => revision + 1);
+    });
+    void HUGGIES_APP_PAGE_DISCOVER_STORE.load(sort, direction === "desc");
+    return unsubscribe;
+  }, [sort, direction]);
 
-  // --- WHY --- a search asks the api, not the downloaded list. the api
-  // has a real search index behind it; filtering a downloaded list in
-  // javascript only sees the tokens we happened to download, so a
-  // token outside that set was unfindable however the reader typed.
-  const [search_rows, set_search_rows] = use_state<
-    HUGGIES_TOKEN_SEARCH_RESULT[] | null
-  >(null);
-  const [searching, set_searching] = use_state(false);
+  // --- WHY --- a search asks the api, not the loaded page. the api has
+  // a real search index behind it; filtering a loaded list in
+  // javascript only sees the tokens we happened to load, so a token
+  // outside that page was unfindable however the reader typed.
   use_effect(() => {
     const needle = query.trim();
-    if (needle.length === 0) {
-      set_search_rows(null);
-      set_searching(false);
-      return;
-    }
-    let cancelled = false;
-    set_searching(true);
+    if (needle.length === 0) return;
     const timer = window.setTimeout(() => {
-      void search_tokens_fun(needle)
-        .then((rows) => {
-          if (cancelled) return;
-          set_search_rows(rows);
-          set_searching(false);
-        })
-        .catch((err: unknown) => {
-          if (cancelled) return;
-          set_searching(false);
-          console.warn("[token_discover] search failed", err);
-        });
+      void HUGGIES_APP_PAGE_DISCOVER_STORE.search(needle);
     }, HUGGIES_SEARCH_DEBOUNCE_MS);
     return () => {
-      cancelled = true;
       window.clearTimeout(timer);
     };
   }, [query]);
 
-  // --- WHY --- useMemo, not a plain const. the sorted list is the
-  // dependency of the icon effect below, and a plain const builds a
-  // NEW array on every render — so the effect re-fired on every
-  // render and fetched icons in the background forever. useMemo keeps
-  // the same array identity while the inputs are unchanged, so the
-  // effect only runs when the list actually changes.
+  const page_data = HUGGIES_APP_PAGE_DISCOVER_STORE.get_data();
+  const loading = HUGGIES_APP_PAGE_DISCOVER_STORE.is_loading();
+  const searching = query.trim().length > 0;
+
+  // the rows on screen: the search results when the reader is
+  // searching, the list pages otherwise.
   const tokens = use_memo(() => {
-    if (search_rows !== null) return search_rows;
-    if (all_tokens === null) return null;
-    return order_discover_tokens_fun(all_tokens, sort, direction);
-  }, [search_rows, all_tokens, sort, direction]);
+    if (searching) return page_data?.search ?? [];
+    const rows = page_data?.tokens.rows ?? [];
+    return order_discover_tokens_fun(rows, sort);
+  }, [searching, page_data, sort, direction]);
 
-  // --- WHY --- icons are fetched only for the rows on screen, and
-  // cached in the durable per-token store. asking for the icon field
-  // on every indexed token costs ~21MB, because each icon is a full
-  // base64 data uri.
-  const visible_ids = use_memo(() => {
-    if (tokens === null) return [];
-    return tokens.slice(0, HUGGIES_VISIBLE_ROWS).map((token) => token.id);
-  }, [tokens]);
-  // the page of tokens the api should return the icons for. the api
-  // can serve a sorted page with no ids in the url at all, which is
-  // far cheaper than carrying a list of ids.
-  const icon_sort = use_memo(() => {
-    if (search_rows !== null) return undefined;
-    return {
-      by: token_sort_field_fun(sort),
-      desc: direction === "desc",
-    };
-  }, [search_rows, sort, direction]);
-  const [icons, set_icons] = use_state<Record<string, string>>({});
+  // the icons for the rows on screen, filled in from the store.
+  const icons = page_data?.icons ?? {};
+
+  // --- WHY --- the next page is asked for when the reader nears the
+  // bottom of the list, not when they reach it exactly: the request
+  // takes a moment, and asking early means the rows are usually
+  // already there by the time they scroll to them.
+  const has_more = page_data?.tokens.has_more ?? false;
   use_effect(() => {
-    if (visible_ids.length === 0) return;
-    let cancelled = false;
-    void fetch_token_icons_fun(visible_ids, icon_sort)
-      .then((found) => {
-        if (cancelled) return;
-        const next: Record<string, string> = {};
-        for (const [id, icon] of found) next[id] = icon;
-        set_icons(next);
-      })
-      .catch((err: unknown) => {
-        console.warn("[token_discover] icon fetch failed", err);
-      });
-    return () => {
-      cancelled = true;
+    if (searching || !has_more || loading) return;
+    const element = scroll_ref.current;
+    if (element === null) return;
+    const on_scroll_fun = (): void => {
+      const distance =
+        element.scrollHeight - element.scrollTop - element.clientHeight;
+      if (distance > HUGGIES_LOAD_MORE_THRESHOLD_PX) return;
+      void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(sort, direction === "desc");
     };
-  }, [visible_ids, icon_sort]);
+    element.addEventListener("scroll", on_scroll_fun);
+    return () => {
+      element.removeEventListener("scroll", on_scroll_fun);
+    };
+  }, [searching, has_more, loading, sort, direction]);
 
-  const rows =
-    tokens === null
-      ? null
-      : tokens.map((token) => ({
-          ...token,
-          icon: icons[token.id] ?? token.icon,
-        }));
   // the marked tokens are styled wherever the sort puts them.
   const marked_ids = pinned_token_ids_fun();
+  const errors = page_data?.errors ?? [];
 
   return (
     <section class="huggies-token-discover">
@@ -229,22 +174,31 @@ export function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
           })}
         </div>
       </div>
-      {error !== null && <p>{error}</p>}
-      {searching && <p class="huggies-token-searching">SEARCHING...</p>}
-      {rows === null ? (
-        <p>LOADING TOKENS...</p>
-      ) : rows.length === 0 ? (
-        <p>NO TOKENS FOUND</p>
-      ) : (
-        <div class="huggies-token-results">
-          {rows.map((token) =>
-            token_result_row_fun(token, marked_ids.has(token.id)),
-          )}
-        </div>
-      )}
+      {errors.map((message) => (
+        <p class="huggies-token-error">{message}</p>
+      ))}
+      <div class="huggies-token-results-scroll" ref={scroll_ref}>
+        {tokens.length === 0 && !loading ? (
+          <p>NO TOKENS FOUND</p>
+        ) : (
+          <div class="huggies-token-results">
+            {tokens.map((token) =>
+              token_result_row_fun(
+                { ...token, icon: icons[token.id] ?? token.icon },
+                marked_ids.has(token.id),
+              ),
+            )}
+          </div>
+        )}
+        {loading && <p class="huggies-token-loading">LOADING TOKENS...</p>}
+        {!searching && has_more && !loading && (
+          <p class="huggies-token-loading">SCROLL FOR MORE...</p>
+        )}
+      </div>
     </section>
   );
 }
+// ========================================
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
