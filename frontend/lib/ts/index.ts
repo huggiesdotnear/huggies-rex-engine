@@ -1,6 +1,6 @@
 // ========================================
-// root landing-page script: after a 1.5s splash delay, sends the
-// browser into app/index.html. SSR guard skips the timer outside
+// root splash-page script: after a 1.5s delay, sends the browser
+// into app/index.html (the FEED). SSR guard skips the timer outside
 // the browser so this module stays importable from tests/scripts.
 // ========================================
 
