@@ -31,6 +31,18 @@ main {
   /*border: 1px solid purple;*/
 }
 /*==================================*/
+/* the section heading inside the page column.
+   --- WHY --- it lives here and not on a page's own wrapper: main is
+   the column, so a heading in it is a section of the page. the rule
+   under the heading separates it from what follows. */
+main h2 {
+  text-align: left;
+  font-size: 18px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin: 20px 0 10px;
+}
+/*==================================*/
 /* the page-content wrapper.
    most pages still wrap their content in this div; the account and
    pumpopoly pages do not, because main does the same job now. */

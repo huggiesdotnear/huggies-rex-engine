@@ -1,7 +1,11 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_LAYOUT
-   the chrome every smart-contract page shares: the page wrapper, the
-   section headings, the metadata list and the data-limitations box. */
+   the chrome every smart-contract page shares: the page wrapper and
+   the data-limitations box.
+
+   --- WHY --- the h2 rule is NOT here. it is in base/main.css, on
+   `main h2`, because main is the page column and a heading in it is
+   a section of the page — not something the contract layout owns. */
 /*==================================*/
 .huggies-contract-page {
   width: 100%;
@@ -9,13 +13,6 @@
   box-sizing: border-box;
   text-align: left;
   min-width: 0;
-}
-.huggies-contract-page h2 {
-  text-align: left;
-  font-size: 18px;
-  border-bottom: 1px solid #474747;
-  padding-bottom: 6px;
-  margin: 20px 0 10px;
 }
 /* --- metadata list --- */
 .huggies-contract-meta {

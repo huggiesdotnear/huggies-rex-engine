@@ -1,7 +1,10 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS
    the DAO's proposals: one row per proposal, with the id, the kind,
-   the status, the proposer and the votes. */
+   the status, the proposer and the votes.
+
+   the section heading is styled by base/main.css — the h2 rule is
+   app-wide, not the page's own. */
 /*==================================*/
 .huggies-dao-proposals-section {
   margin-top: 20px;

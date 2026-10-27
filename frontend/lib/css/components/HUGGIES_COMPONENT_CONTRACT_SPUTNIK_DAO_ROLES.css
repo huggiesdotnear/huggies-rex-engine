@@ -1,17 +1,12 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES
-   the DAO's policy roles: one tab per role, and the accounts in it. */
+   the DAO's policy roles: one tab per role, and the accounts in it.
+
+   the section heading is styled by base/main.css — the h2 rule is
+   app-wide, not the page's own. */
 /*==================================*/
 .huggies-dao-roles-section {
   margin-top: 20px;
-}
-.huggies-dao-roles-section h2,
-.huggies-dao-proposals-section h2 {
-  text-align: left;
-  font-size: 18px;
-  border-bottom: 1px solid #474747;
-  padding-bottom: 6px;
-  margin: 20px 0 10px;
 }
 /*==================================*/
 /* --- the role tabs ---
