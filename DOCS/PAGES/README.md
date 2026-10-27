@@ -8,27 +8,48 @@ the file name is the page path, dots instead of slashes:
 a page outside `app/` has no `app.` in its name:
 `frontend/index.html` -> [`frontend.index.md`](./frontend.index.md)
 
-every spec starts with the page path as its h1, then the layout: the
-page heading, then the components, top to bottom, in the order they
-appear on screen. a component is written as its mount id, so the spec
-can be read straight against the html.
+## what is where
 
-a page with no layout yet says `page spec coming soon`.
+a page is described by three files:
+
+| file | what it holds |
+| ---- | ------------- |
+| `frontend.app.account.md` | a one-line description and the html codeblock |
+| [`components.csv`](./components.csv) | the components each page mounts, and the source each reads from |
+| [`requests.csv`](./requests.csv) | the requests each page makes |
+
+the split is by granularity. the md file is the page. the csvs are every
+page at once, so a question like "which components read request 2?" has
+one answer, in one place.
+
+a page's md file holds a one-line description and the html codeblock,
+nothing else. the description says what the page is for; the codeblock
+is the layout.
 
 ## the components
 
 the components a page mounts are listed in
 [`components.csv`](./components.csv), not in the page spec. one row per
-component, with the source it reads from.
+component, with the source it reads from and a note for the detail that
+does not fit the other columns.
 
 the csv is the single place to look for "what is on this page" — the
-page spec holds the layout and the behaviour, the csv holds the
-components and where their data comes from.
+page spec holds the layout, and the csv holds the components and where
+their data comes from.
+
+## the requests
+
+the requests a page makes are listed in [`requests.csv`](./requests.csv),
+not in the page spec. one row per request, with the call it makes.
+
+a page's requests come from one loader — one file that fetches
+everything for that page. no component fetches anything.
 
 ## Pages
 
 - [`components.csv`](./components.csv) - the components each page mounts,
   and the source each one reads from
+- [`requests.csv`](./requests.csv) - the requests each page makes
 - [`frontend.index.md`](./frontend.index.md) - `frontend/index.html`
 - [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - FEED
 - [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html`
@@ -36,7 +57,6 @@ components and where their data comes from.
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
 - [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id=
-  - [`frontend.app.account.requests.md`](./frontend.app.account.requests.md) - what the account page fetches
 - [`frontend.app.tokens.token.md`](./frontend.app.tokens.token.md) - `frontend/app/tokens/token.html` - ?id=
 - [`frontend.app.tokens.shit-1170.md`](./frontend.app.tokens.shit-1170.md) - `frontend/app/tokens/shit-1170.html`
 - [`frontend.app.contract.rhea-amm.md`](./frontend.app.contract.rhea-amm.md) - `frontend/app/contract/rhea-amm.html`
@@ -44,7 +64,6 @@ components and where their data comes from.
 - [`frontend.app.contract.intear-dex.md`](./frontend.app.contract.intear-dex.md) - `frontend/app/contract/intear-dex.html`
 - [`frontend.app.contract.sputnik-dao.md`](./frontend.app.contract.sputnik-dao.md) - `frontend/app/contract/sputnik-dao.html`
 - [`frontend.app.contract.pumpopoly.md`](./frontend.app.contract.pumpopoly.md) - `frontend/app/contract/pumpopoly.html` - ?id=
-  - [`frontend.app.contract.pumpopoly.requests.md`](./frontend.app.contract.pumpopoly.requests.md) - what the pumpopoly page fetches
 
 ## The nav
 

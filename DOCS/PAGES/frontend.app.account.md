@@ -1,9 +1,12 @@
 # frontend/app/account.html ?id={account_id}
 
+the page shows the balances of one account, taken from the `?id=` url parameter.
+
 <!--
 this file contains the source of truth for what is on the page.
 do not add classes here as they are something not written in stone.
 do not add this comment to other files.
+a page's md file should only contain the html codeblock, nothing else.
 -->
 
 ```html

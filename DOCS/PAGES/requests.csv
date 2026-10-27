@@ -1,0 +1,9 @@
+page,request,what,how,notes
+frontend/app/account.html,1,direct + native balances,"GET /balances?account=<id>&sources=direct,native",one of four sources — four different contracts so four requests; they run in parallel so the page is as slow as its slowest source
+frontend/app/account.html,2,rhea amm balances,near view v2.ref-finance.near.get_deposits,one of four sources — four different contracts so four requests; they run in parallel so the page is as slow as its slowest source
+frontend/app/account.html,3,rhea dcl v2 balances,near view dclv2.ref-labs.near.list_user_assets,one of four sources — four different contracts so four requests; they run in parallel so the page is as slow as its slowest source
+frontend/app/account.html,4,intear dex balances,near view dex.intear.near.registered_assets_of,one of four sources — four different contracts so four requests; they run in parallel so the page is as slow as its slowest source
+frontend/app/account.html,5,token metadata (durable),"GET /tokens?fields=symbol,decimals,icon&ids=<new>",one call for the whole page not one per table; the durable fields never change so they are cached in IndexedDB forever and skipped for tokens the app has already seen
+frontend/app/account.html,6,token metadata (volatile),"GET /tokens?fields=price_usd,reputation,holders&ids=<all>",one call for the whole page not one per table; never cached — prices and reputation move within minutes so it fires every load
+frontend/app/contract/pumpopoly.html,1,the player,near view world.pumpopoly.near.view_player,one of two sources — two different contracts so two requests; they run in parallel so the page is as slow as its slowest source
+frontend/app/contract/pumpopoly.html,2,the player's nfts,near view nft.pumpopoly.near.nft_tokens_for_owner,one of two sources — two different contracts so two requests; they run in parallel so the page is as slow as its slowest source

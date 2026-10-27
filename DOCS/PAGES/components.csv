@@ -1,18 +1,18 @@
-page,component,source,what it shows
-frontend/index.html,HUGGIES_COMPONENT_RANDOM_SLOGAN_P,none — the slogan is a constant,one random slogan from HUGGIES_SLOGANS
-frontend/app/index.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL"
-frontend/app/index.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu
-frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_ID_H1,none — it reads the url,the account id the page is about
-frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE,request 1,the direct and native token balances
-frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE,request 2,the rhea amm (ref finance v2) balances
-frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE,request 3,the rhea dcl v2 internal balances
-frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE,request 4,the intear dex internal balances
-frontend/app/account.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL"
-frontend/app/account.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR,none — it writes the url,the id jump box
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS,request 1,the balance and the six world cards
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST,request 2,the nft count and the token id table
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE,none — the link is a constant,the "new players start here" link
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS,none — the contract list is a constant,the links to the other contract pages
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL"
-frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu
+page,component,source,what it shows,notes
+frontend/index.html,HUGGIES_COMPONENT_RANDOM_SLOGAN_P,none — the slogan is a constant,one random slogan from HUGGIES_SLOGANS,chosen at random; the page then redirects to the feed after 1.5s
+frontend/app/index.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",hrefs are resolved at render time so a nav on a nested page still points back at the bare filenames under /app/
+frontend/app/index.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,shows LOGIN when signed out and the shortened account id when signed in
+frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_ID_H1,none — it reads the url,the account id the page is about,renders nothing when there is no ?id= on the url
+frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE,request 1,the direct and native token balances,one row per token with the fields stacked in one column so the table never scrolls sideways
+frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE,request 2,the rhea amm (ref finance v2) balances,
+frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE,request 3,the rhea dcl v2 internal balances,
+frontend/app/account.html,HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE,request 4,the intear dex internal balances,
+frontend/app/account.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
+frontend/app/account.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR,none — it writes the url,the id jump box,shared box (account_id_selector.tsx) with the pumpopoly wording
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS,request 1,the balance and the six world cards,renders nothing when there is no account id; shows an error card where the data would be when the player call fails
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST,request 2,the nft count and the token id table,"one column of token ids, capped at 420px and scrolled; sorts by token id as a string, ascending or descending; shows an error card where the data would be when the nft call fails"
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE,none — the link is a constant,the "new players start here" link,built from a constant invite code
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS,none — the contract list is a constant,the links to the other contract pages,
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_NAV,none — the nav is a constant,"the top nav: FEED, DISCOVER, PROFILE, SKILL",
+frontend/app/contract/pumpopoly.html,HUGGIES_COMPONENT_AUTH_BUTTON,none — the auth state is local,the sign-in button and the account menu,
