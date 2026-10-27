@@ -38,7 +38,7 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN() {
         account_id,
         label: "ACCOUNT ID",
         placeholder: "account.near",
-        button_text: "OPEN ACCOUNT",
+        button_text: "INSPECT PLAYER ACCOUNT",
         param_name: "id",
         class_prefix: "huggies-pumpopoly",
       })}

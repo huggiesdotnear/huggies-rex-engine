@@ -26,7 +26,7 @@ export interface HUGGIES_ACCOUNT_ID_SELECTOR_PROPS {
   label: string;
   // the placeholder inside the field, e.g. "account.near".
   placeholder: string;
-  // the button text, e.g. "OPEN ACCOUNT".
+  // the button text, e.g. "OPEN TOKEN" or "INSPECT PLAYER ACCOUNT".
   button_text: string;
   // the url parameter the id is written to. "id" for most pages,
   // "dao_id" for the DAO page.
