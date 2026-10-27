@@ -1,89 +1,40 @@
 // ========================================
 // data loader for the Pumpopoly contract page.
+//
+// this is the page's ONLY loader. every fetch the Pumpopoly page makes
+// happens in this file, and no component fetches anything — the
+// components read the loaded data from
+// lib/ts/contract_page_pumpopoly_store.ts. read this file and you know
+// the page's requests.
+//
+// the shapes are parsed in lib/ts/contract_page_pumpopoly_parse.ts.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
 import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
+import {
+  parse_pumpopoly_player_fun,
+  pumpopoly_credit_score_fun,
+} from "./contract_page_pumpopoly_parse";
+import type {
+  HUGGIES_PUMPOPOLY_DATA,
+  HUGGIES_PUMPOPOLY_PLAYER,
+} from "./contract_page_pumpopoly_parse";
 // ========================================
-// --- WHY --- the Pumpopoly token has 24 decimals, so one unit is
-// 1e24. dividing by 1e18 showed a balance a million times too big.
 // ========================================
-const HUGGIES_PUMPOPOLY_UNIT = 1_000_000_000_000_000_000_000_000n;
-const HUGGIES_PUMPOPOLY_DECIMALS = 24;
+// --- REQUESTS --------------------------
+// the world contract: one player view.
+// the nft contract: the player's token ids.
+//
+// they are two contracts, so they are two requests — they cannot be
+// merged. they run in parallel, so the page is as slow as its slowest
+// source, not the sum of both.
+//
+// a failing source is caught on its own and leaves the other one
+// intact; the message lands in data.errors.
 // ========================================
-export interface HUGGIES_PUMPOPOLY_PLAYER {
-  land_count: number;
-  location: number;
-  balance: string;
-  balance_human: string;
-  account_id: string;
-  invites: number;
-  invitees: number;
-  invited_by: string;
-  last_move: string;
-}
-export interface HUGGIES_PUMPOPOLY_NFT_DATA {
-  count: number;
-  token_ids: string[];
-}
-export interface HUGGIES_PUMPOPOLY_DATA {
-  player: HUGGIES_PUMPOPOLY_PLAYER | null;
-  nft: HUGGIES_PUMPOPOLY_NFT_DATA;
-  credit_score: number;
-  errors: string[];
-}
 // ========================================
-// parse a non-negative integer defensively.
-function parse_count_fun(value: unknown): number {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return Math.max(0, Math.trunc(value));
-  }
-  if (typeof value === "string" && /^\d+$/.test(value)) {
-    const parsed = Number(value);
-    return Number.isSafeInteger(parsed) ? parsed : 0;
-  }
-  return 0;
-}
-// ========================================
-// format a Pumpopoly base-unit balance as a human-readable amount.
-export function format_pumpopoly_balance_fun(raw: string): string {
-  try {
-    const amount = BigInt(raw);
-    const negative = amount < 0n;
-    const magnitude = negative ? -amount : amount;
-    const whole = magnitude / HUGGIES_PUMPOPOLY_UNIT;
-    const fraction = (magnitude % HUGGIES_PUMPOPOLY_UNIT)
-      .toString()
-      .padStart(HUGGIES_PUMPOPOLY_DECIMALS, "0")
-      .replace(/0+$/, "");
-    const sign = negative ? "-" : "";
-    return fraction.length === 0
-      ? `${sign}${whole.toLocaleString()}`
-      : `${sign}${whole.toLocaleString()}.${fraction}`;
-  } catch {
-    return "0";
-  }
-}
-// ========================================
-// parse a Pumpopoly player view defensively.
-function parse_player_fun(value: unknown): HUGGIES_PUMPOPOLY_PLAYER | null {
-  if (typeof value !== "object" || value === null) return null;
-  const player = value as Partial<HUGGIES_PUMPOPOLY_PLAYER>;
-  if (typeof player.account_id !== "string") return null;
-  const balance = typeof player.balance === "string" ? player.balance : "0";
-  return {
-    land_count: parse_count_fun(player.land_count),
-    location: parse_count_fun(player.location),
-    balance,
-    balance_human: format_pumpopoly_balance_fun(balance),
-    account_id: player.account_id,
-    invites: parse_count_fun(player.invites),
-    invitees: parse_count_fun(player.invitees),
-    invited_by: typeof player.invited_by === "string" ? player.invited_by : "",
-    last_move: typeof player.last_move === "string" ? player.last_move : "",
-  };
-}
-// ========================================
-// load Pumpopoly player information and NFT holdings.
+// --- LOAD ------------------------------
+// load Pumpopoly player information and NFT holdings for one account.
 export async function load_pumpopoly_page_fun(
   account_id: string | null,
 ): Promise<HUGGIES_PUMPOPOLY_DATA> {
@@ -94,7 +45,7 @@ export async function load_pumpopoly_page_fun(
 
   if (account_id !== null) {
     try {
-      player = parse_player_fun(
+      player = parse_pumpopoly_player_fun(
         await near_kit_contract_view_fun_json<unknown>(
           near,
           "world.pumpopoly.near",
@@ -130,7 +81,7 @@ export async function load_pumpopoly_page_fun(
       count: nft_token_ids.length,
       token_ids: nft_token_ids,
     },
-    credit_score: land_count * 10 + invites * 30,
+    credit_score: pumpopoly_credit_score_fun(land_count, invites),
     errors,
   };
 }

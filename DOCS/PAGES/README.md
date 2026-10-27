@@ -28,7 +28,8 @@ a page with no layout yet says `page spec coming soon`.
 - [`frontend.app.contract.rhea-dcl-v2.md`](./frontend.app.contract.rhea-dcl-v2.md) - `frontend/app/contract/rhea-dcl-v2.html`
 - [`frontend.app.contract.intear-dex.md`](./frontend.app.contract.intear-dex.md) - `frontend/app/contract/intear-dex.html`
 - [`frontend.app.contract.sputnik-dao.md`](./frontend.app.contract.sputnik-dao.md) - `frontend/app/contract/sputnik-dao.html`
-- [`frontend.app.contract.pumpopoly.md`](./frontend.app.contract.pumpopoly.md) - `frontend/app/contract/pumpopoly.html`
+- [`frontend.app.contract.pumpopoly.md`](./frontend.app.contract.pumpopoly.md) - `frontend/app/contract/pumpopoly.html` - ?id=
+  - [`frontend.app.contract.pumpopoly.requests.md`](./frontend.app.contract.pumpopoly.requests.md) - what the pumpopoly page fetches
 
 ## The nav
 
