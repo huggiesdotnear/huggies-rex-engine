@@ -385,20 +385,46 @@
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
-.huggies-pumpopoly-nfts {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+/* --- the nft table --- */
+/* one column of token ids, capped in height and scrolled, so a player
+   with hundreds of nfts does not push the rest of the page off screen.
+   the same cap the account page's balance table uses. */
+.huggies-pumpopoly-nft-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* the sort control sits above the table, so it needs a little space
+     between itself and the heading above it. */
+  margin-top: 0.5rem;
 }
-.huggies-pumpopoly-nfts li {
-  padding: 0.5rem 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
+.huggies-pumpopoly-nft-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
 }
-.huggies-pumpopoly-nfts code {
+.huggies-pumpopoly-nft-table th {
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 6px 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  /* --- WHY --- a sticky header needs an opaque background, or the rows
+     scrolling under it show through. this is the page background
+     (body.css), so the header sits on the same colour as everything
+     else and nothing shows through. --- */
+  background: var(--color-backend);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+.huggies-pumpopoly-nft-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.huggies-pumpopoly-nft-table code {
   font-size: 11px;
   overflow-wrap: anywhere;
   word-break: break-all;

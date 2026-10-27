@@ -9,16 +9,83 @@
 // renders nothing when there is no account id — the page falls back to
 // the signed-in account, and a signed-out visitor sees no nfts at all.
 //
+// the list is one column of token ids in a table, capped in height and
+// scrolled, so a player with hundreds of nfts does not push the rest of
+// the page off screen.
+//
 // mounts into
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST">.
 // ========================================
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
+import { ArrowDown, ArrowUp } from "lucide-preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
 import { huggies_error_card_fun } from "./error_card";
+// ========================================
+// ========================================
+// --- SORT ------------------------------
+// the sort direction of the nft list.
+type HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION = "asc" | "desc";
+// ========================================
+// the default direction: smallest id first, so the list reads the way
+// an id list normally does.
+const HUGGIES_DEFAULT_NFT_SORT_DIRECTION: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION =
+  "asc";
+// ========================================
+// sort the token ids by their id.
+//
+// --- WHY --- the ids are compared as plain strings and not as numbers.
+// a nft token id is a number, but it is carried as a string and can be
+// long enough to lose precision as a number. comparing them as strings
+// keeps the order stable and never rounds one away.
+function sort_nft_token_ids_fun(
+  token_ids: ReadonlyArray<string>,
+  direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION,
+): string[] {
+  const sorted = [...token_ids].sort((a, b) => {
+    if (a === b) return 0;
+    return a < b ? -1 : 1;
+  });
+  return direction === "desc" ? sorted.reverse() : sorted;
+}
+// ========================================
+// ========================================
+// --- SORT CONTROL ----------------------
+// the direction toggle. the nft list has one thing to sort by — the
+// token id — so it needs only a direction, not a row of sort keys.
+//
+// --- WHY --- this is its own control and not the shared
+// sort_control.tsx. that one is welded to the token list's sort keys
+// (volume, market cap) and its types, and the nft list sorts plain
+// strings by id, which is a different thing.
+function nft_sort_control_fun(props: {
+  direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION;
+  on_direction: (direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION) => void;
+}): preact.JSX.Element {
+  const Icon = props.direction === "desc" ? ArrowDown : ArrowUp;
+  return (
+    <div class="huggies-sort-control">
+      <button
+        type="button"
+        class="huggies-sort-button is-active"
+        aria-pressed="true"
+        onClick={() =>
+          props.on_direction(props.direction === "desc" ? "asc" : "desc")
+        }
+        aria-label={
+          props.direction === "desc" ? "sort ascending" : "sort descending"
+        }
+        title={props.direction === "desc" ? "descending" : "ascending"}
+      >
+        <Icon size={13} />
+        {props.direction === "desc" ? "DESC" : "ASC"}
+      </button>
+    </div>
+  );
+}
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -26,6 +93,10 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
   // --- WHY --- a revision counter forces a re-render when the store
   // lands; preact doesn't re-render from external state changes alone.
   const [, set_revision] = use_state(0);
+  const [direction, set_direction] =
+    use_state<HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION>(
+      HUGGIES_DEFAULT_NFT_SORT_DIRECTION,
+    );
 
   const account_id = HUGGIES_PAGE_ACCOUNT_ID.get_account_id();
 
@@ -45,6 +116,7 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
 
   const page_data = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_data();
   const token_ids = page_data?.nft.token_ids ?? [];
+  const sorted = sort_nft_token_ids_fun(token_ids, direction);
 
   return (
     <>
@@ -66,13 +138,30 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
       {token_ids.length === 0 ? (
         <p>NO NFTS</p>
       ) : (
-        <ul class="huggies-pumpopoly-nfts">
-          {token_ids.map((token_id) => (
-            <li>
-              <code>{token_id}</code>
-            </li>
-          ))}
-        </ul>
+        <>
+          {nft_sort_control_fun({
+            direction,
+            on_direction: (next) => set_direction(next),
+          })}
+          <div class="huggies-pumpopoly-nft-scroll">
+            <table class="huggies-pumpopoly-nft-table">
+              <thead>
+                <tr>
+                  <th scope="col">TOKEN ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((token_id) => (
+                  <tr>
+                    <td>
+                      <code>{token_id}</code>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </>
   );

@@ -47,7 +47,7 @@ the shared module every page reads it through.
 | ------------------------------------------------------- | ------------------------------------- |
 | `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR` | the id jump box                       |
 | `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS`     | the balance and the six world cards   |
-| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | the nft count and the token ids       |
+| `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST`         | the nft count and the token id table  |
 | `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE`           | the "new players start here" link     |
 | `HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_CONTRACT_LINKS`   | the links to the other contract pages |
 
@@ -68,6 +68,23 @@ land or the contract could not be reached:
 
 the errors are keyed by source in the loaded data, so a component can
 tell which source a message belongs to.
+
+## the nft table
+
+the nft list is a one-column table of token ids, capped at 420px and
+scrolled, so a player with hundreds of nfts does not push the rest of
+the page off screen. the same cap the account page's balance table
+uses.
+
+it sorts by token id, ascending or descending, from the direction
+toggle above the table. it has its own control rather than the shared
+`sort_control.tsx`, because that one is welded to the token list's sort
+keys and sorts records by a numeric field, which is a different thing
+from ordering a list of ids.
+
+the ids are compared as strings, not numbers: a nft token id is a
+number, but it is carried as a string and can be long enough to lose
+precision as one.
 
 ## the requests
 
