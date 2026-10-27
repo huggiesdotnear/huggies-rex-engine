@@ -37,7 +37,7 @@ import "../components/tokens_page_token_holders";
 import "../components/tokens_page_token_status";
 import "../components/emoji_match_game";
 import "../components/game_link";
-import "../components/shit_link";
+import "../components/tokens_page_shit_1170_page_link";
 import "../components/sort_control";
 import "../components/shit_1170_page";
 // ========================================
