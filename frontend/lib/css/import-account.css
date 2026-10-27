@@ -1,9 +1,5 @@
 /*==================================*/
 /* the account page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_ID_H1.css);
-@import url(./components/HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE.css);
-@import url(./components/HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE.css);
-@import url(./components/HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE.css);
-@import url(./components/HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE.css);
 @import url(./components/HUGGIES_COMPONENT_BALANCE_TABLE.css);
 /*==================================*/

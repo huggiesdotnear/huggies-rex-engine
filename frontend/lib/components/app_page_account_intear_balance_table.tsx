@@ -5,13 +5,15 @@
 // (lib/ts/app_page_account.ts) and this component reads its result from the
 // page store (lib/ts/app_page_account_store.ts). read that file to see what
 // the account page requests.
+//
+// the table is the shared one (lib/components/balance_table.tsx).
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "../ts/app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
-import { huggies_balance_row_fun } from "./balance_row";
+import { huggies_balance_table_fun } from "./balance_table";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -40,25 +42,16 @@ function HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE_FUN() {
 
   return (
     <>
-      <h2 class="huggies-section-title">INTEAR DEX INTERNAL BALANCE</h2>
-      <div class="huggies-scroll">
-        <table data-huggies-intear-balance-account={account_id}>
-          <tbody>
-            {rows.map((row) =>
-              huggies_balance_row_fun({
-                id: row.id,
-                raw: row.raw,
-                info: row.info,
-                usd_value: row.usd_value,
-              }),
-            )}
-          </tbody>
-        </table>
-      </div>
+      {huggies_balance_table_fun({
+        rows,
+        title: "INTEAR DEX INTERNAL BALANCE",
+        loading: false,
+        empty_text: "NO BALANCES",
+        account_id,
+      })}
     </>
   );
 }
-// ========================================
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.

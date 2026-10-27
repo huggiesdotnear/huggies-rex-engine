@@ -1,15 +1,10 @@
 // ========================================
-// the chrome every smart-contract page shares: the page wrapper,
-// the signed-in account's balance panel and the data-limitations box.
-// ========================================
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
-import { HUGGIES_AUTH } from "../ts/auth_status";
-import { huggies_balance_panel_fun } from "./balance_panel";
+// the chrome every smart-contract page shares: the page wrapper and
+// the data-limitations box.
 // ========================================
 export interface HUGGIES_CONTRACT_LAYOUT_PROPS {
   title: string;
   children: preact.ComponentChildren;
-  show_balance?: boolean;
   errors?: ReadonlyArray<string>;
 }
 // ========================================
@@ -17,30 +12,11 @@ export interface HUGGIES_CONTRACT_LAYOUT_PROPS {
 export function huggies_contract_layout_fun(
   props: HUGGIES_CONTRACT_LAYOUT_PROPS,
 ): preact.JSX.Element {
-  const [account_id, set_account_id] = use_state<string | null>(null);
-
-  use_effect(() => {
-    HUGGIES_AUTH.init();
-    const unsubscribe = HUGGIES_AUTH.subscribe(() => {
-      set_account_id(HUGGIES_AUTH.get_account_id());
-    });
-    set_account_id(HUGGIES_AUTH.get_account_id());
-    return unsubscribe;
-  }, []);
-
   const errors = props.errors ?? [];
 
   return (
     <div class="huggies-contract-page huggies-page">
       {props.children}
-      {props.show_balance !== false && account_id !== null && (
-        <div class="huggies-balance-table">
-          {huggies_balance_panel_fun({
-            account_id,
-            title: "YOUR BALANCE",
-          })}
-        </div>
-      )}
       {errors.length > 0 && (
         <details class="huggies-contract-errors">
           <summary>DATA LIMITATIONS</summary>
