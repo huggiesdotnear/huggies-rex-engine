@@ -1,15 +1,18 @@
 /*==================================*/
 /* the single 500px column every page renders into.
-   flex-start (not center) so a long page starts at the top
-   instead of being vertically centered around the viewport.
+
+   the column is centred in the viewport: body centres main
+   horizontally, and main centres its own content vertically.
+
+   `main > *` below keeps every page block the full width of the
+   column — see the note on that rule for why it is needed.
+
    the fixed bottom nav is cleared by body's 100px padding-bottom,
    which sits below this 100vh box. */
 main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /*align-items: stretch;*/
-  /*justify-content: flex-start;*/
   justify-content: center;
   align-items: center;
   text-align: left;
@@ -21,5 +24,23 @@ main {
   margin-bottom: 20px;
   /*----------------------*/
   /*border: 1px solid purple;*/
+}
+/*==================================*/
+/* every child of the column fills it.
+
+   --- WHY --- `align-items: center` on main centres each child on the
+   cross axis, which means the child is only as wide as its own
+   content. the page's grids, tables and cards all size themselves
+   with `width: 100%`, so they need a full-width box to measure
+   against — without this they collapse to their content and the page
+   ends up a ragged stack of narrow boxes in the middle of the
+   column.
+
+   --- WHY --- `min-width: 0` lets a long id or a wide grid shrink
+   instead of pushing the column open. */
+main > * {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 /*==================================*/

@@ -10,6 +10,17 @@
   gap: 12px;
   margin-bottom: 14px;
 }
+/* --- WHY --- the text column takes the rest of the row. the header
+   is a flex row, so the column that holds the symbol, the name and
+   the id is a flex item and shrinks to its own content — the symbol
+   heading then measured 162px instead of the column's width, and the
+   rule under it stopped short of the card's edge. `flex: 1` gives it
+   the rest of the row, and `min-width: 0` lets a long id wrap
+   inside it instead of pushing the row open. */
+.huggies-token-detail-header > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .huggies-token-detail-header h1,
 .huggies-token-detail-header p {
   margin: 0;

@@ -11,3 +11,4 @@ node_modules
 # they are run with `bun run <file>.test.tsx` and are never deployed.
 **/*.test.ts
 **/*.test.tsx
+/.openchamber
