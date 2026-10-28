@@ -3,24 +3,9 @@
    the searchable token list on the discover page: the search box, the
    sort row, the results and the notes.
 
-   the page's sections — CONTRACTS and TOKENS — are the wrapper the
-   discover html puts around each block. */
-/*==================================*/
-.huggies-discover-section {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  min-width: 0;
-  text-align: left;
-  margin-bottom: 28px;
-}
-.huggies-discover-section h2 {
-  text-align: left;
-  font-size: 18px;
-  border-bottom: 1px solid #474747;
-  padding-bottom: 6px;
-  margin-bottom: 10px;
-}
+   the page's sections — CONTRACTS and TOKENS — are plain <section>
+   elements in the page column. their spacing and their heading are
+   styled by base/main.css. */
 /*==================================*/
 /* --- controls: search stacked above the sort buttons --- */
 /* --- WHY --- the search box sits on its own row above the sort

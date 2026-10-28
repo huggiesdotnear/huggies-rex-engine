@@ -5,7 +5,7 @@ the page shows one token: its card, its metadata, and the indexed holders of it,
 ```html
 <main>
   <!--==========================================-->
-  <article class="huggies-token-detail">
+  <article>
     <!--==========================================-->
     <div id="HUGGIES_COMPONENT_TOKEN_STATUS"></div>
     <!--==========================================-->

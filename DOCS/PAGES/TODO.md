@@ -9,8 +9,8 @@ a page is done when:
 - the md file holds the description and the html codeblock (no placeholder)
 - `components.csv` has a row for every component the page mounts
 - `requests.csv` has a row for every request the page makes
-- the html matches the spec (drop the `.huggies-page` wrapper — `main`
-  does that job now)
+- the html matches the spec (no wrapper div, no classes — `main` is the
+  column and the page content sits directly inside it)
 - not duple wraping things in a div
 - and and cleaning and removing legacy css. when all the pages done the css should be gone.
 

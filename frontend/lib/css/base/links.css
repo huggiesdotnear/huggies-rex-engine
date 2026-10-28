@@ -1,6 +1,6 @@
 /*==================================*/
 /* link styling.
-   scoped to main / .huggies-page so the fixed bottom nav keeps its
+   scoped to main so the fixed bottom nav keeps its
    own look (nav links are NOT underlined). links inherit the page
    text color instead of the browser default blue/purple, which is
    unreadable on the red background.
@@ -11,26 +11,22 @@
    where the link is the content itself, through .huggies-link-underline
    or by hovering a card link. */
 /*==================================*/
-main a,
-.huggies-page a {
+main a {
   color: inherit;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
 /* the opt-in underline, for links that are the content. */
-main a.huggies-link-underline,
-.huggies-page a.huggies-link-underline {
+main a.huggies-link-underline {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-main a.huggies-link-underline:hover,
-.huggies-page a.huggies-link-underline:hover {
+main a.huggies-link-underline:hover {
   text-decoration-thickness: 2px;
 }
 /* a code chip inside a link keeps its own small size, so the link
    text does not jump when the code rule shrinks it. */
-main a code,
-.huggies-page a code {
+main a code {
   font-size: 0.85em;
   color: inherit;
 }

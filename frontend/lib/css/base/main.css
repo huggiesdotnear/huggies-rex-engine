@@ -43,14 +43,11 @@ main h2 {
   margin: 20px 0 10px;
 }
 /*==================================*/
-/* the page-content wrapper.
-   most pages still wrap their content in this div; the account and
-   pumpopoly pages do not, because main does the same job now. */
-.huggies-page {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  text-align: left;
-  min-width: 0;
+/* a section inside the page column.
+   --- WHY --- a section is a block of the page, so the gap under it
+   belongs to the column and not to the page that happens to use one.
+   it keeps two sections from running into each other. */
+main section {
+  margin-bottom: 28px;
 }
 /*==================================*/

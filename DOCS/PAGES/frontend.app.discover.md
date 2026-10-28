@@ -7,12 +7,12 @@ the page lists the supported contracts and a searchable, sortable list of tokens
   <!--==========================================-->
   <h1>DISCOVER</h1>
   <!--==========================================-->
-  <section class="huggies-discover-section">
+  <section>
     <h2>CONTRACTS</h2>
     <div id="HUGGIES_COMPONENT_CONTRACT_DISCOVER"></div>
   </section>
   <!--==========================================-->
-  <section class="huggies-discover-section">
+  <section>
     <h2>TOKENS</h2>
     <div id="HUGGIES_COMPONENT_TOKEN_DISCOVER"></div>
   </section>

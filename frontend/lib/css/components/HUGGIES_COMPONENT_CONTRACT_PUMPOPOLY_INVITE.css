@@ -30,14 +30,11 @@
     color 0.2s ease,
     border-color 0.2s ease;
 }
-main a.huggies-pumpopoly-invite,
-.huggies-page a.huggies-pumpopoly-invite {
+main a.huggies-pumpopoly-invite {
   color: var(--color-backend);
 }
 main a.huggies-pumpopoly-invite:hover,
-.huggies-page a.huggies-pumpopoly-invite:hover,
-main a.huggies-pumpopoly-invite:focus-visible,
-.huggies-page a.huggies-pumpopoly-invite:focus-visible {
+main a.huggies-pumpopoly-invite:focus-visible {
   background: var(--color-middle);
   color: var(--color-fontend);
   border-color: var(--color-middle-dark);
