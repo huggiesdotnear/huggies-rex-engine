@@ -21,7 +21,6 @@ not in scope
 - [ ] `frontend/app/skill.html` — SKILL
 -->
 remov items as you complete
-- [ ] `frontend/app/game.html` — GAME
 - [ ] `frontend/app/contract/rhea-amm.html` — RHEA AMM
 - [ ] `frontend/app/contract/rhea-dcl-v2.html` — RHEA DCL V2
 - [ ] `frontend/app/contract/intear-dex.html` — INTEAR DEX

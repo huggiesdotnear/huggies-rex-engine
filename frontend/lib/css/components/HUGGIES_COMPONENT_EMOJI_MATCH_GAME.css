@@ -119,35 +119,6 @@
 .huggies-emoji-game-new-game {
   margin-top: 1rem;
 }
-/* --- the token list --- */
-.huggies-emoji-game-footer {
-  margin-top: 1.5rem;
-  text-align: left;
-}
-.huggies-emoji-game-footer h2 {
-  font-size: 16px;
-  border-bottom: 1px solid #474747;
-  padding-bottom: 6px;
-}
-.huggies-emoji-game-footer ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.huggies-emoji-game-footer li {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
-.huggies-emoji-game-footer p {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  opacity: 0.6;
-}
 @media (max-width: 420px) {
   .huggies-emoji-game-grid {
     gap: 0.3rem;

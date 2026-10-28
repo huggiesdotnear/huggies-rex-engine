@@ -1,0 +1,91 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_GAME_MEME_TOKENS
+   the meme tokens the game is played with, as rounded cards.
+
+   --- WHY --- cards, and not a plain list of links. each token carries
+   an emoji, a label AND its token id, and a bare link can only show
+   one line of it — so the id either wrapped badly or was dropped. a
+   rounded card holds the emoji, the label and the id together, with
+   the live token icon in the corner when the api has one.
+
+   --- WHY --- the grid, and not one card per row. the ids are long and
+   the labels are short, so a card that sized itself to its content
+   would be ragged. the cards are equal width in a grid and the id
+   truncates inside its own card. */
+/*==================================*/
+.huggies-meme-tokens {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+.huggies-meme-tokens h2 {
+  font-size: 16px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+.huggies-meme-tokens-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.5rem;
+}
+.huggies-meme-tokens-item {
+  min-width: 0;
+}
+.huggies-meme-tokens-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+.huggies-meme-tokens-card:hover,
+.huggies-meme-tokens-card:focus-visible {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.22);
+}
+.huggies-meme-tokens-emoji {
+  flex: 0 0 auto;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.huggies-meme-tokens-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.huggies-meme-tokens-label {
+  font-size: 14px;
+  line-height: 1.2;
+}
+.huggies-meme-tokens-id {
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the live token icon sits in the corner of the card. */
+.huggies-meme-tokens-icon {
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #ffffff;
+}
+/*==================================*/

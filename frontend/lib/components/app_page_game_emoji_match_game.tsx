@@ -1,5 +1,11 @@
 // ========================================
 // eight-pair emoji memory match game component.
+//
+// the board and the score. the meme tokens it plays with live in
+// lib/ts/app_page_game_emoji_tokens.ts, and the icons it draws on the
+// cards come from the page's store.
+//
+// this component does not fetch. it reads the store and renders.
 // ========================================
 import { render } from "preact";
 import {
@@ -8,8 +14,8 @@ import {
   useState as use_state,
 } from "preact/hooks";
 import { HUGGIES_EMOJI_TOKENS } from "../ts/app_page_game_emoji_tokens";
-import { token_detail_href_fun } from "../ts/token_link";
-import { HUGGIES_TOKEN_INFO } from "../ts/token_info";
+import { HUGGIES_APP_PAGE_GAME_STORE } from "../ts/app_page_game_store";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 // ========================================
 interface HUGGIES_EMOJI_CARD {
@@ -40,39 +46,20 @@ function new_emoji_cards_fun(): HUGGIES_EMOJI_CARD[] {
 // ========================================
 // emoji memory match game component.
 export function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
+  // the page's icons, by token id. the store owns the load, so this
+  // component only reads.
+  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_GAME_STORE);
   const [cards, set_cards] =
     use_state<HUGGIES_EMOJI_CARD[]>(new_emoji_cards_fun);
   const [first_id, set_first_id] = use_state<number | null>(null);
   const [board_locked, set_board_locked] = use_state(false);
   const [matched_pairs, set_matched_pairs] = use_state(0);
   const [moves, set_moves] = use_state(0);
-  const [icons, set_icons] = use_state<Record<string, string>>({});
   // the pending unflip timer, held in a ref so a re-render can never
   // cancel it the way an effect cleanup does.
   const unflip_timer_ref = use_ref<number | null>(null);
 
-  const token_ids = HUGGIES_EMOJI_TOKENS.map((token) => token.token_id).filter(
-    (token_id): token_id is string => token_id !== null,
-  );
-
-  use_effect(() => {
-    let cancelled = false;
-    void HUGGIES_TOKEN_INFO.get(token_ids)
-      .then((info_map) => {
-        if (cancelled) return;
-        const next_icons: Record<string, string> = {};
-        for (const [token_id, info] of info_map) {
-          if (info.icon !== null) next_icons[token_id] = info.icon;
-        }
-        set_icons(next_icons);
-      })
-      .catch(() => {
-        // The emoji remains the fallback when live token icons are unavailable.
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const icons = page_data?.icons ?? {};
 
   // clear the pending unflip when the component goes away.
   use_effect(() => {
@@ -155,7 +142,7 @@ export function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
   const has_won = matched_pairs === HUGGIES_EMOJI_TOKENS.length;
 
   return (
-    <article class="huggies-emoji-game">
+    <section class="huggies-emoji-game">
       <header class="huggies-emoji-game-header">
         <h1>EMOJI MEMORY MATCH</h1>
         <p>Match all eight meme pairs.</p>
@@ -208,30 +195,7 @@ export function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
       >
         NEW GAME
       </button>
-      <footer class="huggies-emoji-game-footer">
-        <h2>MEME TOKENS</h2>
-        <ul>
-          {HUGGIES_EMOJI_TOKENS.map((token) => (
-            <li key={token.emoji}>
-              {token.token_id !== null ? (
-                <a href={token_detail_href_fun(token.token_id)}>
-                  {token.emoji} {token.label} ({token.token_id})
-                </a>
-              ) : (
-                <a
-                  href="https://meme.cooking/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {token.emoji} {token.label} (meme.cooking)
-                </a>
-              )}
-            </li>
-          ))}
-        </ul>
-        <p>this is not financial advice</p>
-      </footer>
-    </article>
+    </section>
   );
 }
 // ========================================
