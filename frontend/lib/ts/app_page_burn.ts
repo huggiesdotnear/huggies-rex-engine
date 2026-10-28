@@ -27,14 +27,21 @@
 import { api_intear_balances_get } from "../../../middleman";
 import { api_intear_tokens_get } from "../../../middleman";
 import { HUGGIES_BURN_ADDRESSES } from "./app_page_burn_addresses";
-import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
+import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
+import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // the balance sources the page reads. "direct" is what the account
-// holds itself, "native" is the chain's own NEAR balance, which intear
-// reports as its own source. both come from the SAME /balances call.
-const HUGGIES_BURN_BALANCE_SOURCES = ["direct", "native"] as const;
+// holds itself.
+//
+// --- WHY --- "direct" and NOT "native": the native source is the
+// chain's own NEAR balance, and a burn address is locked and empty of
+// everything but a little gas. the gas left on it is not burned
+// supply, it is the dust the account needs to exist — and on
+// burn.sleet.near it reads as 0.00. so the page asks for the tokens
+// that were actually sent to be burned, and not the gas.
+const HUGGIES_BURN_BALANCE_SOURCES = ["direct"] as const;
 // the token fields the burn cards show.
 //
 // `icon_hash` and not `icon`: the icon field is a full inline svg data
@@ -50,18 +57,6 @@ const HUGGIES_BURN_TOKEN_FIELDS = [
   "icon_hash",
   "total_supply",
 ] as const;
-// --- WHY --- intear has NO `near` entry in /tokens — it comes back in
-// the response's `missing` list — so the chain's own token has to be
-// described here or the native balance cannot be rendered at all. 24
-// decimals is the NEAR protocol constant, not a fetched value.
-//
-// the 1:1 wrapper stands in for NEAR's icon and supply: wNEAR tracks
-// NEAR one for one, so its supply is the same number and its icon IS
-// the NEAR logo (the green "N"), not a lookalike.
-const HUGGIES_NEAR_ID = "near";
-const HUGGIES_NEAR_SYMBOL = "NEAR";
-const HUGGIES_NEAR_DECIMALS = 24;
-const HUGGIES_WRAP_ID = "wrap.near";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -124,22 +119,6 @@ function add_decimal_strings_fun(a: string, b: string): string {
     return a;
   }
 }
-// the share of the supply a raw amount is, as a percentage.
-// --- WHY --- the math runs on BigInt: the percent of a large supply
-// is a number with more significant digits than a double can hold
-// exactly, and the answer is then rounded for display.
-function percent_of_supply_fun(raw: string, supply: string): number {
-  try {
-    const raw_big = BigInt(raw);
-    const supply_big = BigInt(supply);
-    if (supply_big === 0n) return 0;
-    // scale to 6 decimal places of a percent, then divide to a number.
-    const scaled = (raw_big * 1000000n) / supply_big;
-    return Number(scaled) / 10000;
-  } catch {
-    return 0;
-  }
-}
 // ========================================
 // --- BALANCES --------------------------
 // the raw balances of one burn account, by token id.
@@ -181,16 +160,9 @@ async function fetch_burn_metadata_fun(
 ): Promise<Map<string, HUGGIES_BURN_META>> {
   const out = new Map<string, HUGGIES_BURN_META>();
   if (ids.length === 0) return out;
-  // --- WHY --- wNEAR is asked for alongside the wanted ids when the
-  // native NEAR holding is among them: the registry has no `near` row,
-  // so wNEAR is what the NEAR card borrows its icon and its supply
-  // from. asking for it costs nothing extra — it rides along in the
-  // same call.
-  const wants_near = ids.includes(HUGGIES_NEAR_ID);
-  const asked = wants_near ? [...new Set([...ids, HUGGIES_WRAP_ID])] : ids;
   const response = await api_intear_tokens_get({
     fields: HUGGIES_BURN_TOKEN_FIELDS,
-    ids: [...asked],
+    ids: [...ids],
   });
   // --- WHY --- the row is read by column NAME, not by index: the api
   // always returns `account_id` as the first column, even when it was
@@ -212,18 +184,6 @@ async function fetch_burn_metadata_fun(
       decimals: to_finite_number_fun(decimals),
       icon_hash: icon_hash_of_fun(hash),
       total_supply_raw: to_decimal_string_fun(supply, "0"),
-    });
-  }
-  // the registry has no `near` row, so the chain's own token is
-  // described here. its icon and its supply come from wNEAR, which
-  // tracks NEAR one for one.
-  if (wants_near && !out.has(HUGGIES_NEAR_ID)) {
-    const wrap = out.get(HUGGIES_WRAP_ID);
-    out.set(HUGGIES_NEAR_ID, {
-      symbol: HUGGIES_NEAR_SYMBOL,
-      decimals: HUGGIES_NEAR_DECIMALS,
-      icon_hash: wrap?.icon_hash ?? null,
-      total_supply_raw: wrap?.total_supply_raw ?? "0",
     });
   }
   return out;
@@ -301,10 +261,10 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
       id,
       symbol: meta.symbol,
       decimals: meta.decimals,
-      icon: token_icon_url_fun(meta.icon_hash),
+      icon: token_icon_for_fun(id, meta.icon_hash),
       raw,
       total_supply_raw: meta.total_supply_raw,
-      percent: percent_of_supply_fun(raw, meta.total_supply_raw),
+      percent: HUGGIES_SUPPLY_PERCENT.percent(raw, meta.total_supply_raw),
     });
   }
 

@@ -148,8 +148,14 @@ interface HUGGIES_DAO_TOKEN_SCALES {
 // ========================================
 // NEAR is the chain's own token and has no registry entry, so it is
 // described here. 24 decimals is the NEAR protocol constant.
-const HUGGIES_DAO_NEAR_DECIMALS = 24;
-const HUGGIES_DAO_NEAR_SYMBOL = "NEAR";
+//
+// the id, the symbol and the decimals live in lib/ts/token_near.ts,
+// next to the other facts about the chain's own token.
+import {
+  HUGGIES_NEAR_DECIMALS as HUGGIES_DAO_NEAR_DECIMALS,
+  HUGGIES_NEAR_ID,
+  HUGGIES_NEAR_SYMBOL as HUGGIES_DAO_NEAR_SYMBOL,
+} from "./token_near";
 // ========================================
 // format a raw token amount as a short human figure.
 function format_amount_fun(raw: string, decimals: number): string {
@@ -288,11 +294,15 @@ function kind_summary_fun(
       // --- WHY --- an empty token id means NEAR. the contract uses ""
       // for the chain's own token.
       const token =
-        typeof token_id === "string" && token_id.length > 0 ? token_id : "near";
+        typeof token_id === "string" && token_id.length > 0
+          ? token_id
+          : HUGGIES_NEAR_ID;
       const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
       const symbol =
         scales.symbols.get(token) ??
-        (token === "near" ? HUGGIES_DAO_NEAR_SYMBOL : token.split(".")[0]);
+        (token === HUGGIES_NEAR_ID
+          ? HUGGIES_DAO_NEAR_SYMBOL
+          : token.split(".")[0]);
       const amount_text =
         typeof amount === "string" ? format_amount_fun(amount, decimals) : "—";
       const receiver =
@@ -532,7 +542,9 @@ async function load_token_scales_fun(
     const token_id = (transfer as { token_id?: unknown }).token_id;
     // --- WHY --- an empty token id means NEAR, the chain's own token.
     const token =
-      typeof token_id === "string" && token_id.length > 0 ? token_id : "near";
+      typeof token_id === "string" && token_id.length > 0
+        ? token_id
+        : HUGGIES_NEAR_ID;
     token_ids.add(token);
   }
   if (token_ids.size === 0) return { decimals, symbols };

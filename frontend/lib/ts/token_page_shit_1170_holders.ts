@@ -8,6 +8,7 @@ import {
   shit_holder_type_fun,
   type HUGGIES_SHIT_HOLDER_ROW_TYPE,
 } from "./token_page_shit_1170_known_holders";
+import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";
 // ========================================
 // the type of a holder row, after known-holder classification.
 export type HUGGIES_SHIT_HOLDER_TYPE = HUGGIES_SHIT_HOLDER_ROW_TYPE;
@@ -74,9 +75,7 @@ function format_usd_fun(value: number): string {
 // format the share of the total supply: two decimals above 0.01%,
 // three above 0.001%, and "<0.001%" for the dust below that.
 function format_percent_fun(percent: number): string {
-  if (percent >= 0.01) return `${percent.toFixed(2)}%`;
-  if (percent >= 0.001) return `${percent.toFixed(3)}%`;
-  return "<0.001%";
+  return HUGGIES_SUPPLY_PERCENT.format(percent);
 }
 // ========================================
 // the share of the total supply a raw balance holds, in percent.
@@ -84,19 +83,7 @@ function balance_percent_fun(
   balance: string,
   total_supply_raw: bigint,
 ): number {
-  // --- WHY --- the raw balance and the raw supply are both 18-decimal
-  // integers, so the ratio is computed on BigInt and only then scaled
-  // to a percent. doing it in floating point loses the sub-0.001%
-  // rows this page still has to rank.
-  let raw = 0n;
-  try {
-    raw = BigInt(balance);
-  } catch {
-    raw = 0n;
-  }
-  if (total_supply_raw <= 0n) return 0;
-  const scaled = (raw * 10_000n) / total_supply_raw;
-  return Number(scaled) / 100;
+  return HUGGIES_SUPPLY_PERCENT.percent(balance, total_supply_raw.toString());
 }
 // ========================================
 // --- PUBLIC -----------------------------

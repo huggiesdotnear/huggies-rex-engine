@@ -24,12 +24,15 @@ import { HUGGIES_BALANCE_SORT } from "../ts/balance_sort";
 import { huggies_balance_row_fun } from "./balance_row";
 import type { HUGGIES_BALANCE_ENTRY } from "../ts/balance_filter";
 import type { HUGGIES_BALANCE_SORT_BY } from "../ts/balance_sort";
+import { HUGGIES_NEAR_ID } from "../ts/token_near";
 // ========================================
 // --- CONFIG -----------------------------
 // the native NEAR row is pinned above the sorted list: it is the gas
 // balance an account cannot function without, so it is not competing
 // for rank with the rest.
-const HUGGIES_NEAR_ID = "near";
+//
+// the id itself lives in lib/ts/token_near.ts, next to the other
+// facts about the chain's own token.
 // the default order: biggest position first, which is what a reader
 // opening an account wants to see.
 const HUGGIES_DEFAULT_SORT_BY: HUGGIES_BALANCE_SORT_BY = "usd";

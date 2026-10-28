@@ -20,20 +20,8 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_BURN_STORE } from "../ts/app_page_burn_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
+import { HUGGIES_SUPPLY_PERCENT } from "../ts/token_supply_percent";
 import { token_detail_href_fun } from "../ts/token_link";
-// ========================================
-// ========================================
-// --- HELPERS ----------------------------
-// the share of the supply, as it is written on the card.
-//
-// --- WHY --- a percentage with more than two decimals is noise: a
-// token that is 0.0001% of its supply burned is a rounding error, and
-// four decimals of it makes the card harder to read for nothing.
-function format_percent_fun(percent: number): string {
-  if (!Number.isFinite(percent) || percent <= 0) return "0%";
-  if (percent < 0.01) return "<0.01%";
-  return `${percent.toFixed(2)}%`;
-}
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -89,7 +77,7 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
                   OF TOTAL SUPPLY
                 </span>
                 <span class="huggies-burn-token-detail-value">
-                  {format_percent_fun(token.percent)}
+                  {HUGGIES_SUPPLY_PERCENT.format(token.percent)}
                 </span>
               </div>
             </div>

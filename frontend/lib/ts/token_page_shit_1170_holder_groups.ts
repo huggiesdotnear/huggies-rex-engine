@@ -8,6 +8,7 @@
 // ========================================
 import type { HUGGIES_SHIT_HOLDER } from "./token_page_shit_1170_holders";
 import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./token_page_shit_1170_known_holders";
+import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";
 // ========================================
 // the share of the total supply one group of holders holds.
 export interface HUGGIES_SHIT_HOLDER_GROUP {
@@ -32,20 +33,7 @@ const HUGGIES_SHIT_HOLDER_GROUP_ORDER: ReadonlyArray<HUGGIES_SHIT_HOLDER_ROW_TYP
 // do: two decimals above 0.01%, three above 0.001%, and "<0.001%"
 // below that.
 function format_group_percent_fun(percent: number): string {
-  if (percent >= 0.01) return `${percent.toFixed(2)}%`;
-  if (percent >= 0.001) return `${percent.toFixed(3)}%`;
-  return "<0.001%";
-}
-// ========================================
-// the share of the total supply a raw balance holds, in percent.
-function raw_percent_fun(raw: bigint, total_supply_raw: bigint): number {
-  // --- WHY --- the raw balance and the raw supply are both 18-decimal
-  // integers, so the ratio is computed on BigInt and only then scaled
-  // to a percent. doing it in floating point loses the sub-0.001%
-  // groups this page still has to show.
-  if (total_supply_raw <= 0n) return 0;
-  const scaled = (raw * 10_000n) / total_supply_raw;
-  return Number(scaled) / 100;
+  return HUGGIES_SUPPLY_PERCENT.format(percent);
 }
 // ========================================
 // --- PUBLIC -----------------------------
@@ -71,7 +59,10 @@ export function shit_holder_groups_fun(
     (type) => (counts.get(type) ?? 0) > 0,
   ).map((type) => {
     const raw_total = raw_totals.get(type) ?? 0n;
-    const percent = raw_percent_fun(raw_total, total_supply_raw);
+    const percent = HUGGIES_SUPPLY_PERCENT.percent(
+      raw_total.toString(),
+      total_supply_raw.toString(),
+    );
     return {
       type,
       count: counts.get(type) ?? 0,

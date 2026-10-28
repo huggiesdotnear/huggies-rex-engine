@@ -31,7 +31,7 @@ import { api_intear_tokens_get } from "../../../middleman";
 import { api_intear_tokens_post } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
-import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
+import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -82,7 +82,7 @@ function rows_to_records_fun(
       icon_hash: icon_hash_of_fun(hash),
     };
     records.push(record);
-    const url = token_icon_url_fun(record.icon_hash);
+    const url = token_icon_for_fun(record.id, record.icon_hash);
     if (url !== null) icons.set(record.id, url);
   }
   return { records, icons };
@@ -126,7 +126,7 @@ export async function fetch_token_icons_fun(
     // old cache records stored the inline icon under `icon`; the hash
     // migration left those records without `icon_hash`. read the old
     // field too so an existing browser cache keeps working.
-    const url = token_icon_url_fun(hit.icon_hash);
+    const url = token_icon_for_fun(id, hit.icon_hash);
     if (url !== null) {
       out.set(id, url);
     } else if (typeof hit.icon === "string" && hit.icon.length > 0) {

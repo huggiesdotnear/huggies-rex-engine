@@ -7,7 +7,13 @@
 import { api_intear_tokens_get } from "../../../middleman";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
-import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
+import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
+import {
+  HUGGIES_NEAR_DECIMALS,
+  HUGGIES_NEAR_ID,
+  HUGGIES_NEAR_SYMBOL,
+  HUGGIES_WRAP_ID,
+} from "./token_near";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -24,15 +30,6 @@ const HUGGIES_VOLATILE_FIELDS = ["price_usd", "reputation", "holders"] as const;
 // icon itself is served from a content-addressed url the browser
 // caches for a year. see lib/ts/token_icon_url.ts.
 const HUGGIES_DURABLE_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
-// --- WHY --- intear has NO `near` entry in /tokens (it comes back in
-// the response's `missing` list), so the chain's own token has to be
-// described here or the native balance cannot be rendered at all. 24
-// decimals is the NEAR protocol constant, not a fetched value.
-const HUGGIES_NEAR_ID = "near";
-const HUGGIES_NEAR_SYMBOL = "NEAR";
-const HUGGIES_NEAR_DECIMALS = 24;
-// the 1:1 wrapper whose price and icon stand in for NEAR's.
-const HUGGIES_WRAP_ID = "wrap.near";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -186,7 +183,7 @@ async function fetch_and_merge_fun(
       id,
       symbol: base?.symbol ?? id,
       decimals: base?.decimals ?? 0,
-      icon: token_icon_url_fun(base?.icon_hash ?? null),
+      icon: token_icon_for_fun(id, base?.icon_hash ?? null),
       price_usd: to_number_fun(price_usd),
       reputation: typeof reputation === "string" ? reputation : "Unknown",
       holders: to_number_fun(holders),
@@ -202,7 +199,10 @@ async function fetch_and_merge_fun(
       HUGGIES_NEAR_ID,
       near_info_fun({
         price_usd: wnear?.price_usd ?? 0,
-        icon: token_icon_url_fun(wrap_durable?.icon_hash ?? null),
+        icon: token_icon_for_fun(
+          HUGGIES_WRAP_ID,
+          wrap_durable?.icon_hash ?? null,
+        ),
       }),
     );
   }
@@ -215,7 +215,7 @@ async function fetch_and_merge_fun(
       id,
       symbol: base.symbol,
       decimals: base.decimals,
-      icon: token_icon_url_fun(base.icon_hash),
+      icon: token_icon_for_fun(id, base.icon_hash),
       price_usd: 0,
       reputation: "Unknown",
       holders: 0,

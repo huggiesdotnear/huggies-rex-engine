@@ -29,7 +29,7 @@ import {
   api_intear_tokens_get,
 } from "../../../middleman";
 import { token_row_by_name_fun } from "./token_row_by_name";
-import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
+import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,
@@ -91,7 +91,7 @@ async function fetch_token_detail_fun(
     name: typeof name === "string" && name.length > 0 ? name : token_id,
     symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : token_id,
     decimals: to_finite_number_fun(cell.decimals),
-    icon: token_icon_url_fun(icon_hash_of_fun(icon_hash)),
+    icon: token_icon_for_fun(token_id, icon_hash_of_fun(icon_hash)),
     price_usd: to_finite_number_fun(cell.price_usd),
     reputation:
       typeof cell.reputation === "string" ? cell.reputation : "Unknown",

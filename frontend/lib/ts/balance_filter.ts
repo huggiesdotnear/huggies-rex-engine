@@ -20,7 +20,10 @@ const HUGGIES_SPAM_REPUTATION = "Spam";
 // the chain's own token. never hidden: it is the balance an account is
 // most likely to care about, and its usd price is derived rather than
 // reported, so the floor below could hide a real holding.
-const HUGGIES_NEAR_ID = "near";
+//
+// the id itself lives in lib/ts/token_near.ts, next to the other
+// facts about the chain's own token.
+import { HUGGIES_NEAR_ID } from "./token_near";
 // ========================================
 // --- TYPES ------------------------------
 // one row ready to render: the raw balance plus the info needed to
