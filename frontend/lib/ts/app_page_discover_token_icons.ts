@@ -123,8 +123,15 @@ export async function fetch_token_icons_fun(
   // request on every single load forever.
   const missing = wanted.filter((id) => !cached.has(id));
   for (const [id, hit] of cached) {
+    // old cache records stored the inline icon under `icon`; the hash
+    // migration left those records without `icon_hash`. read the old
+    // field too so an existing browser cache keeps working.
     const url = token_icon_url_fun(hit.icon_hash);
-    if (url !== null) out.set(id, url);
+    if (url !== null) {
+      out.set(id, url);
+    } else if (typeof hit.icon === "string" && hit.icon.length > 0) {
+      out.set(id, hit.icon);
+    }
   }
   if (missing.length === 0) return out;
 

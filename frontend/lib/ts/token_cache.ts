@@ -40,6 +40,9 @@ export interface HUGGIES_CACHED_TOKEN {
   symbol: string;
   decimals: number;
   icon_hash: string | null;
+  // the pre-hash cache stored the inline icon under this field. it is
+  // read for old browser records and is absent from new ones.
+  icon?: string | null;
 }
 // ========================================
 // ========================================

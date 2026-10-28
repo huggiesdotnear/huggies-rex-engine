@@ -32,9 +32,16 @@ const HUGGIES_INTEAR_BASE_URL = "https://api.intea.rs";
 // a token with no icon has no hash: the api answers with `null` for
 // both. that is a real answer, not a miss, so the caller must not ask
 // again for it.
-export function token_icon_url_fun(icon_hash: string | null): string | null {
-  if (icon_hash === null || icon_hash.length === 0) return null;
-  return `${HUGGIES_INTEAR_BASE_URL}/icon/${encodeURIComponent(icon_hash)}.webp`;
+export function token_icon_url_fun(
+  icon_hash: string | null | undefined,
+): string | null {
+  // the cache may still hold the old inline icon from before the hash
+  // migration. old records have `icon`, not `icon_hash`, so they must
+  // keep working instead of crashing on an undefined hash.
+  if (typeof icon_hash === "string" && icon_hash.length > 0) {
+    return `${HUGGIES_INTEAR_BASE_URL}/icon/${encodeURIComponent(icon_hash)}.webp`;
+  }
+  return null;
 }
 
 // ========================================
