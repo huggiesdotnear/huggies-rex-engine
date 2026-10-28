@@ -21,6 +21,7 @@ LOCATION: src
 ## FRONTEND - ts, preact, html, css
 
 LOCATION: frontend
+<br/>
 for pages see [DOCS/PAGES/README.md](./PAGES/README.md)
 
 **FRONTEND RULES**
