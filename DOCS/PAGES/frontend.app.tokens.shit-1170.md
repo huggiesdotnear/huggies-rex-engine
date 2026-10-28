@@ -2,13 +2,6 @@
 
 the page shows the $SHIT token: its holders, the share of the supply each group of holders holds, and the token's own metadata.
 
-<!--
-this file contains the source of truth for what is on the page.
-do not add classes here as they are something not written in stone.
-do not add this comment to other files.
-a page's md file should only contain the html codeblock, nothing else.
--->
-
 ```html
 <main>
   <div id="HUGGIES_COMPONENT_SHIT_1170_STATUS"></div>
