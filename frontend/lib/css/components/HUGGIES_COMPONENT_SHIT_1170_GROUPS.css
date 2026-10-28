@@ -1,0 +1,128 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_SHIT_1170_GROUPS
+   the share of the supply each group of holders holds.
+
+   the rows are the old SHIT info page's flat white buttons — a white
+   fill, an 8px radius and no shadow, the same as its `.filter-btn`.
+   the coloured stripe down the left edge is its `.holder-item` stripe.
+   the row of the ACTIVE tab is the active one.                       */
+/*==================================*/
+.huggies-shit-groups {
+  margin-bottom: 14px;
+}
+.huggies-shit-groups h2 {
+  text-align: left;
+  font-size: 15px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+.huggies-shit-groups-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* three across, so six groups sit in two even rows */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.huggies-shit-group {
+  /* --- WHY --- the name sits on its own line above the numbers. three
+  across on a 500px column leaves each card about 145px, which is not
+  enough for the icon, the name, the count and the percentage on one
+  line — the names came out as "VA…" and "BU…". stacked, the name has
+  the whole width of the card. */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 2px solid #dddddd;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  /* --- WHY --- an explicit list, not `transition: all`. `all` also
+  transitions `background-color`, and the active fill then animates in
+  over 200ms — which reads as the fill not landing at all on a slow
+  frame. the fill is a state, not an effect: it should be there the
+  moment the tab changes. only the border animates. */
+  transition: border-color 0.2s ease;
+}
+/* the coloured stripe down the left of a group row */
+.huggies-shit-group.is-dev {
+  border-left-color: #4caf50;
+}
+.huggies-shit-group.is-dex {
+  border-left-color: #2196f3;
+}
+.huggies-shit-group.is-nft {
+  border-left-color: #ff9800;
+}
+.huggies-shit-group.is-vault {
+  border-left-color: var(--color-middle);
+}
+.huggies-shit-group.is-burn {
+  border-left-color: #da291c;
+}
+.huggies-shit-group.is-regular {
+  border-left-color: #999999;
+}
+/* --- WHY --- the group of the ACTIVE tab is the one that is picked
+   out. the tabs and the group list show the same thing from two
+   sides, so the reader can see at a glance which filter the list
+   under them is filtered by. it is the old page's `.filter-btn.active`
+   look — the border and the fill both turn. --- */
+.huggies-shit-group.is-active {
+  border-color: var(--color-middle);
+  background-color: var(--color-middle);
+}
+.huggies-shit-group.is-active .huggies-shit-group-name,
+.huggies-shit-group.is-active .huggies-shit-group-count,
+.huggies-shit-group.is-active .huggies-shit-group-percent {
+  color: #06181a;
+}
+.huggies-shit-group-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.huggies-shit-group-icon {
+  font-size: 14px;
+  line-height: 1;
+  flex: none;
+}
+.huggies-shit-group-name {
+  color: #2d2d2d;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-shit-group-right {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+.huggies-shit-group-count {
+  color: #666666;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.huggies-shit-group-percent {
+  /* --- WHY --- the share is the number the reader came for, so it is
+  the one thing in the row that never shrinks. */
+  text-align: right;
+  color: #4caf50;
+  font-size: 14px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/*==================================*/

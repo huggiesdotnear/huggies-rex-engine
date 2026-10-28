@@ -45,4 +45,10 @@ import "../components/game_link";
 import "../components/tokens_page_shit_1170_page_link";
 import "../components/sort_control";
 import "../components/shit_1170_page";
+import "../components/shit_1170_status";
+import "../components/shit_1170_header";
+import "../components/shit_1170_groups";
+import "../components/shit_1170_filters";
+import "../components/shit_1170_holders";
+import "../components/shit_1170_metadata";
 // ========================================

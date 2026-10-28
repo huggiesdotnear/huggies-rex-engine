@@ -1,0 +1,39 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_TOKEN_META
+   the metadata grid — the rows of LABEL and VALUE that a token's page
+   shows.
+
+   it is shared: the token page and the $SHIT page both show one, so
+   the grid's rules live here and both pages import this file. a rule
+   lives with the component that owns it, so two files never style the
+   same classes. */
+/*==================================*/
+.huggies-token-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.huggies-token-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  min-width: 0;
+}
+.huggies-token-meta-row span {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+.huggies-token-meta-row strong {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+/*==================================*/

@@ -1,0 +1,59 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_SHIT_1170_FILTERS
+   the holder-type filter tabs.
+
+   one emoji per holder type, in the old page's `.filter-btn` look:
+   a white fill, a 2px border and an 8px radius. the old page's
+   `.filter-buttons` had its `display:flex` commented out, so its
+   buttons flowed as inline blocks and wrapped into a centred grid —
+   that is the layout here too, but on a fixed grid so every tab is
+   the same width and the row spans the whole column.              */
+/*==================================*/
+.huggies-shit-tabs {
+  display: grid;
+  /* seven tabs, one row, each an equal share of the column */
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.huggies-shit-tab {
+  /* --- WHY --- the global button rule pins every button to the page
+  column width. these tabs are grid cells, so the width is reset here
+  and the grid hands out the columns instead. */
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #dddddd;
+  border-radius: 8px;
+  /* --- WHY --- `background-color`, not the `background` shorthand. the
+  global button rule sets `background-color`, and a shorthand in one
+  rule does not reliably beat a longhand in another — the shorthand
+  resets every background longhand it does not name, but the longhand
+  in the other rule still wins on specificity and order. naming the
+  longhand directly is what makes the active fill land. */
+  background-color: #ffffff;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+  padding: 8px 0;
+  cursor: pointer;
+  /* --- WHY --- an explicit list, not `transition: all`. `all` also
+  transitions `background-color`, and the active fill then animates in
+  over 200ms — which reads as the fill not landing at all on a slow
+  frame. the fill is a state, not an effect: it should be there the
+  moment the tab changes. only the border animates. */
+  transition: border-color 0.2s ease;
+}
+.huggies-shit-tab:hover {
+  border-color: var(--color-backend);
+  background-color: #f5f5f5;
+}
+.huggies-shit-tab.is-active {
+  background-color: var(--color-middle);
+  border-color: var(--color-middle);
+  color: #06181a;
+}
+/*==================================*/
