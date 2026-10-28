@@ -5,17 +5,13 @@ the page shows one token: its card, its metadata, and the indexed holders of it,
 ```html
 <main>
   <!--==========================================-->
-  <article>
-    <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_TOKEN_STATUS"></div>
-    <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_TOKEN_DETAIL"></div>
-    <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_TOKEN_SELECTOR"></div>
-    <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_TOKEN_HOLDERS"></div>
-    <!--==========================================-->
-  </article>
+  <div id="HUGGIES_COMPONENT_TOKEN_STATUS"></div>
+  <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_TOKEN_DETAIL"></div>
+  <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_TOKEN_SELECTOR"></div>
+  <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_TOKEN_HOLDERS"></div>
   <!--==========================================-->
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
