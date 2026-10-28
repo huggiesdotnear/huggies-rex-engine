@@ -16,7 +16,7 @@ import { HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES } from "./contract_page_sputnik_d
 import { HUGGIES_AUTH } from "./auth_status";
 import type { HUGGIES_DAO_INFO } from "./contract_page_sputnik_dao";
 import type { HUGGIES_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
-import type { HUGGIES_TREASURY } from "../../../middleman/huggies";
+import type { TREZU_TREASURY } from "../../../middleman/huggies";
 // ========================================
 // --- TYPES ------------------------------
 export interface HUGGIES_DAO_PAGE_STATE {
@@ -25,7 +25,7 @@ export interface HUGGIES_DAO_PAGE_STATE {
   // the dao's own token holdings.
   balances: ReadonlyArray<HUGGIES_DAO_BALANCE>;
   // the daos the signed-in account is a member of.
-  treasuries: HUGGIES_TREASURY[];
+  treasuries: TREZU_TREASURY[];
   // the account whose daos are listed. null when nobody is signed in.
   account_id: string | null;
   // true while the page is loading.

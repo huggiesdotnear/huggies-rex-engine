@@ -1,4 +1,4 @@
-// HUGGIES_TREZU_TREASURIES_ROUTE
+// TREZU_TREASURIES_ROUTE
 // GET /api/trezu/user/treasuries?accountId=<near-account-id>[&includeHidden=true]
 //
 // proxies the trezu api treasuries list for one account. no upstream
@@ -23,22 +23,18 @@ use axum::{
 use serde_json::Value;
 
 use crate::backend::logic::{
-    huggies_trezu_account_id_fun::huggies_trezu_account_id_fun,
-    huggies_trezu_base_url_fun::huggies_trezu_base_url_fun,
-    huggies_trezu_client_fun::huggies_trezu_client_fun,
-    huggies_trezu_error_fun::huggies_trezu_error_fun,
-    huggies_trezu_include_hidden_fun::huggies_trezu_include_hidden_fun,
-    huggies_trezu_treasuries_path_fun::huggies_trezu_treasuries_path_fun,
+    trezu_account_id_fun::trezu_account_id_fun, trezu_base_url_fun::trezu_base_url_fun,
+    trezu_client_fun::trezu_client_fun, trezu_error_fun::trezu_error_fun,
+    trezu_include_hidden_fun::trezu_include_hidden_fun,
+    trezu_treasuries_path_fun::trezu_treasuries_path_fun,
 };
-use crate::backend::types::huggies_trezu_treasuries_query::huggies_trezu_treasuries_query;
+use crate::backend::types::trezu_treasuries_query::trezu_treasuries_query;
 // ====================================
-pub async fn huggies_trezu_treasuries_route(
-    Query(query): Query<huggies_trezu_treasuries_query>,
-) -> Response {
-    let account_id = match huggies_trezu_account_id_fun(query.account_id.as_deref()) {
+pub async fn trezu_treasuries_route(Query(query): Query<trezu_treasuries_query>) -> Response {
+    let account_id = match trezu_account_id_fun(query.account_id.as_deref()) {
         Some(id) => id,
         None => {
-            return huggies_trezu_error_fun(
+            return trezu_error_fun(
                 StatusCode::BAD_REQUEST,
                 "invalid_account_id",
                 "accountId is required and must not be blank",
@@ -47,21 +43,21 @@ pub async fn huggies_trezu_treasuries_route(
         }
     };
 
-    let include_hidden = huggies_trezu_include_hidden_fun(query.include_hidden.as_deref());
+    let include_hidden = trezu_include_hidden_fun(query.include_hidden.as_deref());
 
     let url = format!(
         "{}{}?accountId={}&includeHidden={}",
-        huggies_trezu_base_url_fun(),
-        huggies_trezu_treasuries_path_fun(),
+        trezu_base_url_fun(),
+        trezu_treasuries_path_fun(),
         urlencode_component_fun(&account_id),
         include_hidden,
     );
 
-    let client = huggies_trezu_client_fun();
+    let client = trezu_client_fun();
     let response = match client.get(&url).send().await {
         Ok(res) => res,
         Err(err) => {
-            return huggies_trezu_error_fun(
+            return trezu_error_fun(
                 StatusCode::BAD_GATEWAY,
                 "trezu_unreachable",
                 &format!("trezu request failed: {err}"),
@@ -74,7 +70,7 @@ pub async fn huggies_trezu_treasuries_route(
     let body = match response.text().await {
         Ok(text) => text,
         Err(err) => {
-            return huggies_trezu_error_fun(
+            return trezu_error_fun(
                 StatusCode::BAD_GATEWAY,
                 "trezu_unreachable",
                 &format!("trezu response body could not be read: {err}"),
@@ -84,7 +80,7 @@ pub async fn huggies_trezu_treasuries_route(
     };
 
     if !status.is_success() {
-        return huggies_trezu_error_fun(
+        return trezu_error_fun(
             StatusCode::BAD_GATEWAY,
             "trezu_error",
             &format!("trezu responded with status {status}"),
@@ -95,7 +91,7 @@ pub async fn huggies_trezu_treasuries_route(
     let parsed: Value = match serde_json::from_str(&body) {
         Ok(value) => value,
         Err(err) => {
-            return huggies_trezu_error_fun(
+            return trezu_error_fun(
                 StatusCode::BAD_GATEWAY,
                 "trezu_invalid_json",
                 &format!("trezu response was not valid json: {err}"),
@@ -105,7 +101,7 @@ pub async fn huggies_trezu_treasuries_route(
     };
 
     if !parsed.is_array() {
-        return huggies_trezu_error_fun(
+        return trezu_error_fun(
             StatusCode::BAD_GATEWAY,
             "trezu_invalid_json",
             "trezu response was not a json array",

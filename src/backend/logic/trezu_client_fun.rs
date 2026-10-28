@@ -1,4 +1,4 @@
-// HUGGIES_TREZU_CLIENT_FUN
+// TREZU_CLIENT_FUN
 // build the reqwest client used to call the trezu api.
 //
 // the timeout is short (3s) on purpose: this client sits in front of
@@ -7,7 +7,7 @@
 // ====================================
 use std::time::Duration;
 // ====================================
-pub fn huggies_trezu_client_fun() -> reqwest::Client {
+pub fn trezu_client_fun() -> reqwest::Client {
     reqwest::Client::builder()
         .timeout(Duration::from_secs(3))
         .build()

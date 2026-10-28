@@ -30,7 +30,7 @@ the error codes are `invalid_account_id`, `trezu_unreachable`,
 ## CLIENT
 
 the typed client lives in `middleman/huggies/`:
-`api_huggies_treasuries_get({ accountId, includeHidden })`.
+`api_trezu_treasuries_get({ accountId, includeHidden })`.
 
 it is same-origin: the browser calls our backend, our backend calls
 trezu. no upstream auth is needed, trezu's treasuries endpoint is

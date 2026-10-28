@@ -1,5 +1,5 @@
 // ========================================
-// HUGGIES_TREASURY_CONFIG
+// TREZU_TREASURY_CONFIG
 // the config trezu attaches to a treasury. `metadata` can be null
 // entirely, the rest of the fields can be missing, and
 // `isConfidential` is always present.
@@ -9,10 +9,10 @@
 // arrive in the browser.
 // ========================================
 
-import type { HUGGIES_TREASURY_METADATA } from "./huggies_treasury_metadata";
+import type { TREZU_TREASURY_METADATA } from "./trezu_treasury_metadata";
 
-export interface HUGGIES_TREASURY_CONFIG {
-  metadata: HUGGIES_TREASURY_METADATA | null;
+export interface TREZU_TREASURY_CONFIG {
+  metadata: TREZU_TREASURY_METADATA | null;
   name?: string;
   purpose?: string;
   isConfidential: boolean;

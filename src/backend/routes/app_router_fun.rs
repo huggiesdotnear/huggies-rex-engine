@@ -19,8 +19,8 @@ use axum::{
 };
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
-use super::huggies_trezu_treasuries_route::huggies_trezu_treasuries_route;
 use super::ping_route::ping_route;
+use super::trezu_treasuries_route::trezu_treasuries_route;
 // ====================================
 // CORS preflight middleware — intercepts every OPTIONS request
 // before any handler runs and returns 204 with CORS headers.
@@ -88,10 +88,7 @@ pub fn app_router_fun() -> Router {
     // --------------------------------------------------------
     let api_router = Router::new()
         .route("/api/huggies/ping", get(ping_route))
-        .route(
-            "/api/trezu/user/treasuries",
-            get(huggies_trezu_treasuries_route),
-        );
+        .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
     // static fallback lives in its own inner router so the
     // fresh_static_middleware_fun (Cache-Control: no-cache,

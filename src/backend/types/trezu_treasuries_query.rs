@@ -1,4 +1,4 @@
-// HUGGIES_TREZU_TREASURIES_QUERY
+// TREZU_TREASURIES_QUERY
 // the query params our /api/trezu/user/treasuries route accepts. the
 // upstream trezu api takes the same two names, so the proxy can
 // forward them without renaming.
@@ -10,7 +10,7 @@
 use serde::Deserialize;
 // ====================================
 #[derive(Debug, Clone, Deserialize)]
-pub struct huggies_trezu_treasuries_query {
+pub struct trezu_treasuries_query {
     #[serde(rename = "accountId")]
     pub account_id: Option<String>,
     #[serde(rename = "includeHidden")]

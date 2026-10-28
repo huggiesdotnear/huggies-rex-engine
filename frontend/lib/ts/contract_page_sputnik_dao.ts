@@ -30,7 +30,7 @@ import { near_kit_client } from "@near-kit-tool-box/web";
 import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
 import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
-import type { HUGGIES_TREASURY } from "../../../middleman/huggies";
+import type { TREZU_TREASURY } from "../../../middleman/huggies";
 // ========================================
 // --- TYPES ------------------------------
 // how a role is open. `Group` names the accounts in it; `Everyone`
@@ -162,7 +162,7 @@ function format_amount_fun(raw: string, decimals: number): string {
 }
 // ========================================
 // the display name of a treasury, or its id when trezu has no name.
-function treasury_name_fun(treasury: HUGGIES_TREASURY): string {
+function treasury_name_fun(treasury: TREZU_TREASURY): string {
   const name = treasury.config?.name;
   return typeof name === "string" && name.length > 0 ? name : treasury.daoId;
 }
@@ -175,8 +175,8 @@ function treasury_name_fun(treasury: HUGGIES_TREASURY): string {
 // treasury is one the account chose to hide, so it stays out of the
 // list too.
 function member_treasuries_fun(
-  treasuries: ReadonlyArray<HUGGIES_TREASURY>,
-): HUGGIES_TREASURY[] {
+  treasuries: ReadonlyArray<TREZU_TREASURY>,
+): TREZU_TREASURY[] {
   return treasuries.filter(
     (treasury) =>
       treasury.isMember === true &&
@@ -558,9 +558,7 @@ async function load_token_scales_fun(
 // the page's load surface. one call per thing the page loads.
 export const HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE = {
   load_dao: load_dao_fun,
-  list_dao_treasuries: async (
-    account_id: string,
-  ): Promise<HUGGIES_TREASURY[]> =>
+  list_dao_treasuries: async (account_id: string): Promise<TREZU_TREASURY[]> =>
     member_treasuries_fun(await list_trezu_treasuries_fun(account_id)),
 };
 // ========================================

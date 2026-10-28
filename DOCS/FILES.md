@@ -25,7 +25,8 @@ some files/folders
     directly from the browser. does NOT go through our backend, so
     the backend is never rate limited by intear.
   - `middleman/huggies/` - typed client for our own backend routes.
-    empty until those routes are added.
+    holds the trezu proxy client, named after the api it fronts
+    (`api_trezu_*`), not after us.
 - `bin/` - ts files that i can run with bun. see [`bin/README.md`](../bin/README.md)
   for the cli usage.
 

@@ -1,5 +1,5 @@
 // ========================================
-// HUGGIES_TREASURY
+// TREZU_TREASURY
 // one treasury (sputnik dao) as trezu returns it for an account.
 // `daoId` is the dao account, `config` carries the display info and
 // can be null, the four flags describe how the account relates to the
@@ -10,11 +10,11 @@
 // arrive in the browser.
 // ========================================
 
-import type { HUGGIES_TREASURY_CONFIG } from "./huggies_treasury_config";
+import type { TREZU_TREASURY_CONFIG } from "./trezu_treasury_config";
 
-export interface HUGGIES_TREASURY {
+export interface TREZU_TREASURY {
   daoId: string;
-  config: HUGGIES_TREASURY_CONFIG | null;
+  config: TREZU_TREASURY_CONFIG | null;
   isMember: boolean;
   isSaved: boolean;
   isHidden: boolean;
