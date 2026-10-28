@@ -25,9 +25,9 @@ for pages see [DOCS/PAGES/README.md](./PAGES/README.md)
 
 **FRONTEND RULES**
 - css lives in `frontend/lib/css`, the base folder there is for elements. the components one is for components css named by mount id or components/shared to match the tsx file names.
-- tsx files live in `frontend/lib/components`, named `<page>_<section>.tsx` after the page's html path and the part it renders.
-- reusable tsx lives in `components/shared/`, is named after what it draws, takes props, and does not self-mount or fetch.
-- ts lives in `frontend/lib/ts`, and important file here is the `mount_ids.ts`
+- tsx files live in `frontend/lib/components`, named `<page>_<section>.tsx` after the page and the part of it they render. each one self-mounts: it renders itself into the element whose id is its mount id, and does nothing on a page that has no such element.
+- reusable tsx lives in `components/shared/`, is named after what it draws, takes props, and does not self-mount.
+- ts lives in `frontend/lib/ts`, and important file here is the `mount_ids.ts` and the `import.ts`
 - other then the index.html all html pages live in `frontend/app`
 
 
