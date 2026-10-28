@@ -24,23 +24,25 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
   return (
     <>
       <header>
-        <h1>{dao.name}</h1>
-        <code>{dao.id}</code>
+        <h1>
+          {dao.name} <code>{dao.id}</code>
+          {dao.purpose.length > 0 && <p>{dao.purpose}</p>}
+        </h1>
+        {/*========================================*/}
       </header>
-      {dao.purpose.length > 0 && <p class="purpose">{dao.purpose}</p>}
-      <section class="stats">
-        <article class="stat">
-          <span class="stat-value">{dao.roles.length}</span>
-          <span class="stat-label">ROLES</span>
-        </article>
-        <article class="stat">
-          <span class="stat-value">{member_total}</span>
-          <span class="stat-label">MEMBERS</span>
-        </article>
-        <article class="stat">
-          <span class="stat-value">{dao.proposals.length}</span>
-          <span class="stat-label">PROPOSALS</span>
-        </article>
+      <section>
+        <div>
+          <strong>{dao.roles.length}</strong>
+          <span>ROLES</span>
+        </div>
+        <div>
+          <strong>{member_total}</strong>
+          <span>MEMBERS</span>
+        </div>
+        <div>
+          <strong>{dao.proposals.length}</strong>
+          <span>PROPOSALS</span>
+        </div>
       </section>
     </>
   );
