@@ -9,11 +9,6 @@
 //   session_token -> X-Session-Token: <token>
 //
 // any other header the caller supplies is passed through verbatim.
-//
-// --- WHY --- there is no encryption password here. the session is
-// opened by sending a signed message to the server and getting a
-// session token back, so the token is the only secret a caller ever
-// holds — there is no key to encrypt with, and no password to send.
 // ========================================
 
 export interface REQUEST_OPTIONS {
