@@ -26,38 +26,10 @@ main {
   /*border: 1px solid purple;*/
 }
 /*==================================*/
-/* every child of the column fills it.
-
-   --- WHY --- `align-items: center` on main centres each child on the
-   cross axis, which means the child is only as wide as its own
-   content. the page's grids, tables and cards all size themselves
-   with `width: 100%`, so they need a full-width box to measure
-   against — without this they collapse to their content and the page
-   ends up a ragged stack of narrow boxes in the middle of the
-   column.
-
-   --- WHY --- `min-width: 0` lets a long id or a wide grid shrink
-   instead of pushing the column open. */
+/* every child of the column fills it. */
 main > * {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-}
-/*==================================*/
-/* the tagline under a page's h1.
-
-   a page's own markup (the one line under the heading) is not a
-   component, so it has no mount id and no css file of its own. this
-   rule styles it for every page that has one. it is a `main > p` so it
-   only reaches a paragraph that is a DIRECT child of the page column
-   — a paragraph inside a component is styled by that component and
-   never gets here. */
-main > p {
-  font-family: "Lilita One", sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.16em;
-  margin: 0 0 0.5rem;
-  text-align: left;
-  opacity: 0.85;
 }
 /*==================================*/
