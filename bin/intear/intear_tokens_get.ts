@@ -80,10 +80,11 @@ const limit_raw = flags.get("--limit");
 // cast. asking the API for a field that does not exist would only
 // surface as a 400 from the server.
 const schema_fields = await api_intear_token_fields();
+// --- WHY --- `account_id` is not in the selectable field list on any
+// endpoint: it is always the row's leading column, returned whether
+// or not it is asked for. defaulting to it here would 400.
 const requested =
-  fields_raw !== undefined
-    ? fields_raw.split(",")
-    : ["account_id", "symbol", "price_usd"];
+  fields_raw !== undefined ? fields_raw.split(",") : ["symbol", "price_usd"];
 for (const field of requested) {
   if (!schema_fields.includes(field)) {
     console.error(
