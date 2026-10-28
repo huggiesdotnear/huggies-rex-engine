@@ -1,6 +1,5 @@
 /*==================================*/
 /* the token page's css: the components it mounts. */
-@import url(./components/HUGGIES_COMPONENT_TOKEN_PAGE.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_SELECTOR.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_STATUS.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_DETAIL.css);

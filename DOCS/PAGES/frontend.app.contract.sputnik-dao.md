@@ -15,7 +15,6 @@ the page shows one Sputnik DAO: its name and purpose, its members and the roles 
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE"></div>
   <!--==========================================-->
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>

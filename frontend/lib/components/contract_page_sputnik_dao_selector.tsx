@@ -13,10 +13,10 @@
 // mounts into <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR">.
 // ========================================
 import { render } from "preact";
-import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_AUTH } from "../ts/auth_status";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_id_jump_box_fun } from "./id_jump_box";
 // ========================================
 // ========================================
@@ -32,16 +32,9 @@ function treasury_name_fun(treasury: {
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
-  const [, set_revision] = use_state(0);
+  const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
 
-  use_effect(() => {
-    const unsubscribe = HUGGIES_DAO_PAGE_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_DAO_PAGE_STATE.get();
+  const state = page_state;
   const dao_id = new URLSearchParams(window.location.search).get("id");
 
   // --- WHY --- the dropdown only shows when there is a real choice to

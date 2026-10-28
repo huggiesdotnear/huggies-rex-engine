@@ -11,6 +11,9 @@
 // state, a subscribe/unsubscribe pair, and a notify that a throwing
 // subscriber cannot break.
 // ========================================
+import { HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE } from "./contract_page_sputnik_dao";
+import { HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES } from "./contract_page_sputnik_dao_balances";
+import { HUGGIES_AUTH } from "./auth_status";
 import type { HUGGIES_DAO_INFO } from "./contract_page_sputnik_dao";
 import type { HUGGIES_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
 import type { HUGGIES_TREASURY } from "../../../middleman/huggies";
@@ -82,11 +85,126 @@ function subscribe_fun(listener: () => void): () => void {
   };
 }
 // ========================================
+// --- LOAD -------------------------------
+// load the dao the page is about.
+//
+// --- WHY --- the daos the reader can pick from are asked for first,
+// because they decide which dao the page shows when the url carries
+// none. a reader who is signed in and has daos is sent to their first
+// one; a reader who is signed in and has none is asked for an id; a
+// reader who is not signed in is asked for an id too.
+//
+// --- WHY --- the dao and its balances are asked for together, so the
+// page is as slow as its slowest one rather than the sum of the two.
+async function dao_page_state_load_fun(): Promise<void> {
+  HUGGIES_AUTH.init();
+
+  const url_dao_id = new URLSearchParams(window.location.search).get("id");
+  const account_id = HUGGIES_AUTH.get_account_id();
+
+  HUGGIES_DAO_PAGE_STATE.set({
+    dao: null,
+    balances: [],
+    treasuries: [],
+    account_id,
+    loading: true,
+    errors: [],
+  });
+
+  // the daos the reader is a member of.
+  let treasuries: Awaited<
+    ReturnType<typeof HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.list_dao_treasuries>
+  > = [];
+  if (account_id !== null) {
+    try {
+      treasuries =
+        await HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.list_dao_treasuries(account_id);
+    } catch (err: unknown) {
+      HUGGIES_DAO_PAGE_STATE.set({
+        dao: null,
+        balances: [],
+        treasuries: [],
+        account_id,
+        loading: true,
+        errors: [
+          `treasuries: ${err instanceof Error ? err.message : String(err)}`,
+        ],
+      });
+    }
+  }
+
+  HUGGIES_DAO_PAGE_STATE.set({
+    dao: null,
+    balances: [],
+    treasuries,
+    account_id,
+    loading: true,
+    errors: [],
+  });
+
+  // which dao to show.
+  //
+  // --- WHY --- the url wins. a link to a dao must show that dao,
+  // not the reader's first one. only when the url carries none
+  // does the reader's own list decide.
+  let dao_id = url_dao_id;
+  if (dao_id === null || dao_id.trim().length === 0) {
+    const first = treasuries[0];
+    if (first !== undefined) {
+      dao_id = first.daoId;
+      // --- WHY --- the chosen dao goes into the url so the reader
+      // can share the page and so a reload keeps the same dao.
+      const url = new URL(window.location.href);
+      url.searchParams.set("id", dao_id);
+      window.history.replaceState({}, "", url.toString());
+    }
+  }
+
+  if (dao_id === null || dao_id.trim().length === 0) {
+    // nothing to show: the reader has to pick one.
+    HUGGIES_DAO_PAGE_STATE.set({
+      dao: null,
+      balances: [],
+      treasuries,
+      account_id,
+      loading: false,
+      errors: [],
+    });
+    return;
+  }
+
+  // the dao and its balances.
+  try {
+    const [dao, balances] = await Promise.all([
+      HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.load_dao(dao_id),
+      HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES.load(dao_id),
+    ]);
+    HUGGIES_DAO_PAGE_STATE.set({
+      dao,
+      balances: balances.rows,
+      treasuries,
+      account_id,
+      loading: false,
+      errors: [...dao.errors, ...balances.errors],
+    });
+  } catch (err: unknown) {
+    HUGGIES_DAO_PAGE_STATE.set({
+      dao: null,
+      balances: [],
+      treasuries,
+      account_id,
+      loading: false,
+      errors: [err instanceof Error ? err.message : String(err)],
+    });
+  }
+}
+// ========================================
 // public surface, in one place so components have a single import.
 export const HUGGIES_DAO_PAGE_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,
+  load: dao_page_state_load_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

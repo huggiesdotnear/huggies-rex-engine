@@ -1,6 +1,5 @@
 /*==================================*/
 /* the sputnik-dao contract page's css: the components it mounts. */
-@import url(./components/HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PAGE.css);
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR.css);
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER.css);
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES.css);

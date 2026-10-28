@@ -9,28 +9,19 @@
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR">.
 // ========================================
 import { render } from "preact";
-// aliased on import so call sites follow this repo's snake_case rule.
-import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
+import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_id_jump_box_fun } from "./id_jump_box";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN() {
-  // --- WHY --- a revision counter forces a re-render when the page's
-  // id changes; preact doesn't re-render from external state changes
-  // alone.
-  const [, set_revision] = use_state(0);
-
-  use_effect(() => {
-    const unsubscribe = HUGGIES_PAGE_ACCOUNT_ID.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const account_id = HUGGIES_PAGE_ACCOUNT_ID.get_account_id();
+  // --- WHY --- the id comes from the store: the store watches the id
+  // and re-loads when it changes, so the components read one place for
+  // both the id and the data, and they follow it.
+  use_page_store_fun(HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE);
+  const account_id = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
 
   return (
     <>
@@ -53,7 +44,6 @@ const SELF_MOUNT_ID =
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    HUGGIES_PAGE_ACCOUNT_ID.init();
     render(<HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN />, el);
   }
 }

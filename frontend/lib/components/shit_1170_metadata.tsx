@@ -6,9 +6,9 @@
 // it reads the loaded summary and the loaded price from the page's
 // store. it fetches nothing.
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { shit_total_supply_formatted_fun } from "../ts/tokens_page_shit_1170_holders";
 import type { HUGGIES_SHIT_SUMMARY } from "../ts/tokens_page_shit_1170_summary";
 import type { HUGGIES_SHIT_PRICE } from "../ts/tokens_page_shit_1170_price";
@@ -35,16 +35,7 @@ function shit_meta_row_fun(label: string, value: string): preact.JSX.Element {
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_METADATA_FUN() {
-  const [, set_revision] = use_state(0);
-
-  use_effect(() => {
-    const unsubscribe = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get();
+  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
   const summary = state.summary;
   const price = state.price;
   // no summary yet — there is nothing to show.

@@ -13,36 +13,23 @@
 // column so the table never needs horizontal scrolling. mounts into
 // <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE">.
 import { render } from "preact";
-// aliased on import so call sites follow this repo's snake_case rule.
-import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "../ts/app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_balance_table_fun } from "./balance_table";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
   // ========================================
-  const [, set_revision] = use_state(0);
-
-  const account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
-
-  // the page store owns the load. this component starts it once and
-  // re-renders when it lands.
-  use_effect(() => {
-    if (account_id === null) return;
-    const unsubscribe = HUGGIES_APP_PAGE_ACCOUNT_STORE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    void HUGGIES_APP_PAGE_ACCOUNT_STORE.load(account_id);
-    return unsubscribe;
-  }, [account_id]);
+  // --- WHY --- the id comes from the store: the store watches the id
+  // and re-loads when it changes, so the components read one place
+  // for both the id and the data, and they follow it.
+  const account_id = HUGGIES_APP_PAGE_ACCOUNT_STORE.get_account_id();
+  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_STORE);
 
   // no `?id=` on this url — render nothing.
   if (account_id === null) return <></>;
-
-  const page_data = HUGGIES_APP_PAGE_ACCOUNT_STORE.get_data();
 
   return (
     <>
@@ -64,7 +51,6 @@ const SELF_MOUNT_ID =
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    HUGGIES_APP_PAGE_ACCOUNT_ID.init();
     render(<HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN />, el);
   }
 }

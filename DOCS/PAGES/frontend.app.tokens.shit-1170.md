@@ -17,7 +17,6 @@ a page's md file should only contain the html codeblock, nothing else.
   <div id="HUGGIES_COMPONENT_SHIT_1170_FILTERS"></div>
   <div id="HUGGIES_COMPONENT_SHIT_1170_HOLDERS"></div>
   <div id="HUGGIES_COMPONENT_SHIT_1170_METADATA"></div>
-  <div id="HUGGIES_COMPONENT_SHIT_1170_PAGE"></div>
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
 <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>

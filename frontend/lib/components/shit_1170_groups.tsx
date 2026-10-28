@@ -8,10 +8,10 @@
 // `.filter-btn` look, with a coloured stripe down the left edge for
 // the type. the card of the ACTIVE tab is the filled-in one.
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
 import { HUGGIES_TOKENS_PAGE_SHIT_1170 } from "../ts/tokens_page_shit_1170";
+import { use_page_store_fun } from "../ts/use_page_store";
 import {
   shit_holder_groups_fun,
   type HUGGIES_SHIT_HOLDER_GROUP,
@@ -54,16 +54,7 @@ function render_group_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_GROUPS_FUN() {
-  const [, set_revision] = use_state(0);
-
-  use_effect(() => {
-    const unsubscribe = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get();
+  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
   // the groups are the loaded holders added up per type. before the
   // first page of holders lands there is nothing to add up.
   if (state.holders.length === 0) return null;

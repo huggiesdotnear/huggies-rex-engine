@@ -5,10 +5,10 @@
 // it reads the loaded token from the page's store. it fetches nothing.
 // ========================================
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKENS_PAGE_TOKEN_STATE } from "../ts/tokens_page_token_state";
 import { format_price_usd_fun } from "../ts/tokens_page_token_price_format";
+import { use_page_store_fun } from "../ts/use_page_store";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -27,16 +27,7 @@ function token_metadata_row_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
-  const [, set_revision] = use_state(0);
-
-  use_effect(() => {
-    const unsubscribe = HUGGIES_TOKENS_PAGE_TOKEN_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_TOKENS_PAGE_TOKEN_STATE.get();
+  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_TOKEN_STATE);
   const detail = state.detail;
   if (detail === null) return null;
 

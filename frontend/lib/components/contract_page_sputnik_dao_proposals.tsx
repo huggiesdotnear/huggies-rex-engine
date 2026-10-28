@@ -10,9 +10,10 @@
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
+import { useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { current_app_depth_fun } from "../ts/app_depth";
 // ========================================
 // ========================================
@@ -54,18 +55,10 @@ function format_time_fun(nanoseconds: string): string {
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
-  const [, set_revision] = use_state(0);
   // the proposals the reader has opened.
   const [open_ids, set_open_ids] = use_state<number[]>([]);
 
-  use_effect(() => {
-    const unsubscribe = HUGGIES_DAO_PAGE_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_DAO_PAGE_STATE.get();
+  const state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
   const dao = state.dao;
   if (dao === null) return null;
 

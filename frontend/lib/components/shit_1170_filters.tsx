@@ -8,25 +8,17 @@
 // the tooltip on each tab is what the legend used to say — hovering the
 // emoji explains what that group of holders is.
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
 import { HUGGIES_SHIT_FILTERS } from "../ts/tokens_page_shit_1170_filters";
+import { use_page_store_fun } from "../ts/use_page_store";
 import type { HUGGIES_SHIT_ACTIVE_FILTER } from "../ts/tokens_page_shit_1170_state";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_FILTERS_FUN() {
-  const [, set_revision] = use_state(0);
-
-  use_effect(() => {
-    const unsubscribe = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const active_filter = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get().active_filter;
+  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
+  const active_filter = state.active_filter;
 
   return (
     <div class="huggies-shit-tabs" role="tablist" aria-label="holder types">

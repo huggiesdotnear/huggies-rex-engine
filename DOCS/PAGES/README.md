@@ -11,6 +11,7 @@ a page outside `app/` has no `app.` in its name:
 ## what is where
 
 a page is described by three files:
+
 - `frontend.app.account.md` | a one-line description and the html codeblock
 - [`components.csv`](./components.csv) | the components each page mounts, and the source each reads from
 - [`requests.csv`](./requests.csv) | the requests each page makes |
@@ -45,6 +46,7 @@ everything for that page. no component fetches anything.
 ## Pages
 
 - [`TODO.md`](./TODO.md) - the pages that still need their spec written
+- [`PATTERN.md`](./PATTERN.md) - how every page with data is built
 - [`components.csv`](./components.csv) - the components each page mounts,
   and the source each one reads from
 - [`requests.csv`](./requests.csv) - the requests each page makes

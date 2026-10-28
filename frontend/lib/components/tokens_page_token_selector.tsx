@@ -10,7 +10,7 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_TOKEN_ID } from "../ts/tokens_page_token_id";
+import { HUGGIES_TOKENS_PAGE_TOKEN_STATE } from "../ts/tokens_page_token_state";
 import { huggies_id_jump_box_fun } from "./id_jump_box";
 // ========================================
 // ========================================
@@ -19,7 +19,7 @@ function HUGGIES_COMPONENT_TOKEN_SELECTOR_FUN() {
   // --- WHY --- the id is read once, with no subscription. the jump box
   // writes a new id to the url and the browser navigates, so the page
   // is a fresh document with a fresh id — there is nothing to watch.
-  const token_id = HUGGIES_TOKENS_PAGE_TOKEN_ID.get();
+  const token_id = HUGGIES_TOKENS_PAGE_TOKEN_STATE.get_token_id();
 
   return (
     <>

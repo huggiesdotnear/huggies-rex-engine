@@ -27,6 +27,7 @@ import {
   type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "../ts/app_page_discover_token_sort";
 import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/app_page_discover_store";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
 import { huggies_sort_control_fun } from "./sort_control";
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_result";
@@ -74,7 +75,6 @@ function token_result_row_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
-  const [, set_revision] = use_state(0);
   const [query, set_query] = use_state("");
   const [sort, set_sort] = use_state<HUGGIES_TOKEN_SORT>(
     HUGGIES_DEFAULT_TOKEN_SORT,
@@ -86,14 +86,15 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   // be detected.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
 
-  // the page store owns the load. this component starts it once and
-  // re-renders when it lands.
+  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_DISCOVER_STORE);
+
+  // --- WHY --- the page's start script loads the list with the default
+  // sort. this effect is for the reader's OWN choices: when they pick
+  // a different sort, the list is loaded again with it. the store
+  // ignores a load for a sort that is already loaded, so the two do
+  // not fight.
   use_effect(() => {
-    const unsubscribe = HUGGIES_APP_PAGE_DISCOVER_STORE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
     void HUGGIES_APP_PAGE_DISCOVER_STORE.load(sort, direction === "desc");
-    return unsubscribe;
   }, [sort, direction]);
 
   // --- WHY --- a search asks the api, not the loaded page. the api has
@@ -118,7 +119,6 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
     };
   }, [query]);
 
-  const page_data = HUGGIES_APP_PAGE_DISCOVER_STORE.get_data();
   const loading = HUGGIES_APP_PAGE_DISCOVER_STORE.is_loading();
   const searching_now = HUGGIES_APP_PAGE_DISCOVER_STORE.is_searching();
   const searching = query.trim().length > 0;
@@ -147,7 +147,10 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
       const distance =
         element.scrollHeight - element.scrollTop - element.clientHeight;
       if (distance > HUGGIES_LOAD_MORE_THRESHOLD_PX) return;
-      void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(sort, direction === "desc");
+      void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(
+        sort,
+        direction === "desc",
+      );
     };
     element.addEventListener("scroll", on_scroll_fun);
     return () => {
@@ -198,9 +201,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
             )}
           </div>
         )}
-        {searching_now && (
-          <p class="huggies-token-loading">SEARCHING...</p>
-        )}
+        {searching_now && <p class="huggies-token-loading">SEARCHING...</p>}
         {loading && !searching_now && (
           <p class="huggies-token-loading">LOADING TOKENS...</p>
         )}

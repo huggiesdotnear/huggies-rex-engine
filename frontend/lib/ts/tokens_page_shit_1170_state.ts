@@ -10,6 +10,7 @@
 // the store has the same shape as lib/ts/tokens_page_token_state.ts:
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
+import { HUGGIES_TOKENS_PAGE_SHIT_1170 } from "./tokens_page_shit_1170";
 import type { HUGGIES_SHIT_SUMMARY } from "./tokens_page_shit_1170_summary";
 import type { HUGGIES_SHIT_PRICE } from "./tokens_page_shit_1170_price";
 import type { HUGGIES_SHIT_HOLDER } from "./tokens_page_shit_1170_holders";
@@ -58,6 +59,8 @@ let state: HUGGIES_SHIT_1170_STATE = {
 };
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
+// true while the page's load is running.
+let loading = false;
 // ========================================
 // --- HELPERS ----------------------------
 // broadcast a change to every subscriber; one throwing (or
@@ -123,6 +126,60 @@ function set_active_filter_fun(filter: HUGGIES_SHIT_ACTIVE_FILTER): void {
   set_state_fun({ ...state, active_filter: filter });
 }
 // ========================================
+// --- LOAD -------------------------------
+// load the page's data.
+//
+// the load runs once. a second call while a load is running is
+// ignored, so the page cannot fetch twice because two components asked
+// for it.
+//
+// --- WHY --- the three steps run in order, not together: the summary
+// carries the decimals and the total supply, and the holder rows need
+// both. the holder rows also need the price, because a row priced with
+// a price of zero reads as "$0.00" — a lie rather than a missing
+// number.
+async function tokens_page_shit_1170_state_load_fun(): Promise<void> {
+  if (loading) return;
+  loading = true;
+  reset_fun();
+  notify_fun();
+  try {
+    const summary = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_summary();
+    const price = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_price();
+    const price_usd =
+      price.price_usd > 0 ? price.price_usd : (summary?.price_usd ?? 0);
+    const total_supply_raw = HUGGIES_TOKENS_PAGE_SHIT_1170.bigint_or_zero(
+      summary?.total_supply_raw ?? "0",
+    );
+    const page = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_holders(
+      null,
+      price_usd,
+      summary?.decimals ?? 18,
+      total_supply_raw,
+    );
+    set_state_fun({
+      ...state,
+      summary,
+      price,
+      holders: page.rows,
+      holder_total: page.total,
+      next_cursor: page.next_cursor,
+      loading_more: false,
+      loading: false,
+      error: null,
+    });
+  } catch (err) {
+    set_state_fun({
+      ...state,
+      loading: false,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  } finally {
+    loading = false;
+    notify_fun();
+  }
+}
+// ========================================
 // --- PUBLIC ---------------------------
 export const HUGGIES_TOKENS_PAGE_SHIT_1170_STATE = {
   get: get_state_fun,
@@ -130,6 +187,7 @@ export const HUGGIES_TOKENS_PAGE_SHIT_1170_STATE = {
   subscribe: subscribe_fun,
   reset: reset_fun,
   set_active_filter: set_active_filter_fun,
+  load: tokens_page_shit_1170_state_load_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

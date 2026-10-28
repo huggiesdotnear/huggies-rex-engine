@@ -10,6 +10,8 @@
 // state, a subscribe/unsubscribe pair, and a notify that a throwing
 // subscriber cannot break.
 // ========================================
+import { HUGGIES_TOKENS_PAGE_TOKEN } from "./tokens_page_token";
+import { HUGGIES_TOKENS_PAGE_TOKEN_ID } from "./tokens_page_token_id";
 import type { HUGGIES_TOKEN_PAGE_STATE } from "./tokens_page_token_detail";
 // ========================================
 // --- STATE ------------------------------
@@ -23,6 +25,17 @@ let state: HUGGIES_TOKEN_PAGE_STATE = {
   loading_more: false,
   error: null,
 };
+// the token id the page is about.
+//
+// --- WHY --- it lives here as well as in the id module: the components
+// need it to build their links and to know whether there is a token at
+// all, and the store is what they already read.
+let token_id: string | null = null;
+// the token id the current load was for, so a second load for the same
+// id does not start over.
+let loaded_token_id: string | null = null;
+// true while a load is running.
+let loading = false;
 // plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
@@ -82,12 +95,84 @@ function reset_fun(): void {
   });
 }
 // ========================================
+// --- LOAD -------------------------------
+// load the page's data for one token.
+//
+// the load runs once per token id. a second call for the same id while
+// a load is running is ignored, so the page cannot fetch twice because
+// two components asked for it.
+//
+// --- WHY --- the metadata and the holders are asked for together: the
+// holders table prices each balance with the token's price and scales
+// it by the token's decimals, and both come from the metadata
+// response. but the holders request does not need them — it returns
+// raw balances — so there is nothing to wait for.
+async function tokens_page_token_state_load_fun(): Promise<void> {
+  const next_token_id = HUGGIES_TOKENS_PAGE_TOKEN_ID.get();
+  // --- WHY --- the id is stored even when there is none: the
+  // components read it to know there is nothing to show, and they read
+  // it through the store so they follow it when it changes.
+  if (token_id !== next_token_id) {
+    token_id = next_token_id;
+    notify_fun();
+  }
+  if (next_token_id === null) return;
+  const load_token_id = next_token_id;
+  if (loading && loaded_token_id === load_token_id) return;
+  loading = true;
+  loaded_token_id = load_token_id;
+  reset_fun();
+  notify_fun();
+  try {
+    const [detail, holder_page] = await Promise.all([
+      HUGGIES_TOKENS_PAGE_TOKEN.load_detail(load_token_id),
+      HUGGIES_TOKENS_PAGE_TOKEN.load_holders(load_token_id, null),
+    ]);
+    // a load for an older token id must not overwrite a newer one.
+    if (loaded_token_id !== load_token_id) return;
+    set_state_fun({
+      detail,
+      holders: holder_page.rows,
+      holder_total: holder_page.total,
+      next_cursor: holder_page.next_cursor,
+      loading_more: false,
+      error: null,
+    });
+  } catch (err) {
+    if (loaded_token_id !== load_token_id) return;
+    set_state_fun({
+      detail: null,
+      holders: [],
+      holder_total: 0,
+      next_cursor: null,
+      loading_more: false,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  } finally {
+    if (loaded_token_id === load_token_id) {
+      loading = false;
+      notify_fun();
+    }
+  }
+}
+// ========================================
+// the token id the page is about, or null when there is none.
+//
+// --- WHY --- it is read through the store so the components have one
+// place to read from: the id and the data always change together, and
+// the store is what tells the components to re-render.
+function get_token_id_fun(): string | null {
+  return token_id;
+}
+// ========================================
 // public surface, in one place so components have a single import.
 export const HUGGIES_TOKENS_PAGE_TOKEN_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,
   reset: reset_fun,
+  load: tokens_page_token_state_load_fun,
+  get_token_id: get_token_id_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

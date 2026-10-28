@@ -5,23 +5,16 @@
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
+import { use_page_store_fun } from "../ts/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
-  const [, set_revision] = use_state(0);
+  const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
 
-  use_effect(() => {
-    const unsubscribe = HUGGIES_DAO_PAGE_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_DAO_PAGE_STATE.get();
+  const state = page_state;
   const dao = state.dao;
   if (dao === null) return null;
 

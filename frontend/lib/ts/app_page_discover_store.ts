@@ -253,7 +253,7 @@ function clear_search_fun(): void {
 // ========================================
 // --- READ ------------------------------
 // the loaded data, or null while it is still loading.
-function get_data_fun(): HUGGIES_APP_PAGE_DISCOVER_DATA | null {
+function get_fun(): HUGGIES_APP_PAGE_DISCOVER_DATA | null {
   return data;
 }
 // ========================================
@@ -275,7 +275,7 @@ export const HUGGIES_APP_PAGE_DISCOVER_STORE = {
   search: search_fun,
   clear_search: clear_search_fun,
   subscribe: subscribe_fun,
-  get_data: get_data_fun,
+  get: get_fun,
   is_loading: is_loading_fun,
   is_searching: is_searching_fun,
 };

@@ -17,12 +17,11 @@
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST">.
 // ========================================
 import { render } from "preact";
-// aliased on import so call sites follow this repo's snake_case rule.
-import { useState as use_state, useEffect as use_effect } from "preact/hooks";
+import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_PAGE_ACCOUNT_ID } from "../ts/page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
+import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_error_card_fun } from "./error_card";
 import { huggies_stat_tile_fun } from "./stat_tile";
 // ========================================
@@ -99,34 +98,15 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
       HUGGIES_DEFAULT_NFT_SORT_DIRECTION,
     );
 
-  const account_id = HUGGIES_PAGE_ACCOUNT_ID.get_account_id();
-
-  // --- WHY --- the page's id can change under us: the page opened
-  // signed out, so it had no player, and a later sign-in fills it in.
-  // without this subscription the component would keep the old id and
-  // never ask for the new player's nfts.
-  use_effect(() => {
-    const unsubscribe = HUGGIES_PAGE_ACCOUNT_ID.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  // the store owns the load. this component starts it once and
-  // re-renders when it lands.
-  use_effect(() => {
-    if (account_id === null) return;
-    const unsubscribe = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    void HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.load(account_id);
-    return unsubscribe;
-  }, [account_id]);
+  const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE);
+  // --- WHY --- the id comes from the store: the store watches the id
+  // and re-loads when it changes, so the components read one place for
+  // both the id and the data, and they follow it.
+  const account_id = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
 
   // no account id and nobody signed in — there is no player to show.
   if (account_id === null) return <></>;
 
-  const page_data = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_data();
   const token_ids = page_data?.nft.token_ids ?? [];
   const sorted = sort_nft_token_ids_fun(token_ids, direction);
 
@@ -186,7 +166,6 @@ const SELF_MOUNT_ID =
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    HUGGIES_PAGE_ACCOUNT_ID.init();
     render(<HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN />, el);
   }
 }

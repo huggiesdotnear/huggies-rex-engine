@@ -15,8 +15,6 @@ the page shows one token: its card, its metadata, and the indexed holders of it,
     <!--==========================================-->
     <div id="HUGGIES_COMPONENT_TOKEN_HOLDERS"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_TOKEN_PAGE"></div>
-    <!--==========================================-->
   </article>
   <!--==========================================-->
 </main>

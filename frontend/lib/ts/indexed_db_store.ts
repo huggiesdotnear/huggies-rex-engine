@@ -104,7 +104,10 @@ async function get_many_fun<row>(
       tx.onabort = () => resolve();
     });
   } catch (err) {
-    console.warn("[indexed_db_store] batch read failed, falling back to fetch", err);
+    console.warn(
+      "[indexed_db_store] batch read failed, falling back to fetch",
+      err,
+    );
   }
   return found;
 }

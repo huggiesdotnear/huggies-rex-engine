@@ -2,25 +2,17 @@
 // the $SHIT page's status line: what the page says while the load is
 // running and when it failed.
 //
-// it reads the page's store. it fetches nothing.
+// it reads the page's store through the shared hook. it fetches
+// nothing — the page's start script runs the load.
 import { render } from "preact";
-import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
+import { use_page_store_fun } from "../ts/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_STATUS_FUN() {
-  const [, set_revision] = use_state(0);
-
-  use_effect(() => {
-    const unsubscribe = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.subscribe(() => {
-      set_revision((revision) => revision + 1);
-    });
-    return unsubscribe;
-  }, []);
-
-  const state = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get();
+  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
 
   // --- WHY --- the status only shows while there is nothing else to
   // show. once the holders have loaded, the table takes over and the
