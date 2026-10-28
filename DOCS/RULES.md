@@ -4,7 +4,6 @@
 
 - 🧬 one function per a file, clean clear sanke_case nameing for functions. and file name should match function name.
 - 🧬 `========================================` comments at the top of the file between import statemnets, and at the bottom of the file. and in vaires places in the html files. never remove these comments.
-- 🧬 never touch the repo main README.
 - 🧬 please no camel case only snake_case or SCREAMING_SNAKE.
 - 🧬 frontend/lib/ts/import.ts is for components only, no other ts file should be impoted here and no other ts file should import components ts files
 - frontend/lib/ts/ holds plain ts only. a file that renders jsx is a component and lives in frontend/lib/components/ (`balance_row.tsx`, `token_holder_row.tsx`), never in frontend/lib/ts/.
@@ -16,6 +15,12 @@
 - every page has ONE loader: a `<prefix>_<pagename>.ts` that does all of that page's fetching. the components read the loaded data and fetch nothing themselves, so the page's request list is knowable by reading one file. see [PAGES/PATTERN.md](./PAGES/PATTERN.md) for the whole shape — the store, the start script and the one hook.
 - 🧬 i am sure i mentioned this somewhere but we have clean clear spearteion of logic, the middleman should never import form the frontend logic or have any forntend specify logic. when i am working on the frontend and i ask to add features we may need to add backend or middleman logic. if i ask to remove something form a page only stuff in the fornted should be touchd remove the css and logic for that feature. do not touch the middleman or backend logic for that unless i say or ask first.
 - 🧬 never put a table in a mardown file. perfer to create .csv files instead.
+- if you run "bunx prettier . --write" dont undo the prettier chages, can commit with your work, even if files that you where not working on got touched
+- 🧬 dont not touch files with a do not touch comment in them.
+  - do not touch the AGENTS.md file unless asked
+  - never touch the repo main README
+
+
 
 =====================
 <br/>
