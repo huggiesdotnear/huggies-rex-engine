@@ -5,17 +5,17 @@
 // one-line summary.
 //
 // argv:
-//   bun bin/intear_balances_get.ts <account_id> [sources]
+//   bun bin/intear/intear_balances_get.ts <account_id> [sources]
 //       [--tokens a,b] [--token-fields f1,f2]
 //
 // examples:
-//   bun bin/intear_balances_get.ts sleet.near
-//   bun bin/intear_balances_get.ts sleet.near direct,native,rhea
-//   bun bin/intear_balances_get.ts sleet.near direct --tokens wrap.near --token-fields symbol,balance
+//   bun bin/intear/intear_balances_get.ts sleet.near
+//   bun bin/intear/intear_balances_get.ts sleet.near direct,native,rhea
+//   bun bin/intear/intear_balances_get.ts sleet.near direct --tokens wrap.near --token-fields symbol,balance
 // ========================================
 
-import { api_intear_balances_get } from "../middleman/intear";
-import { split_argv } from "./fun/split_argv";
+import { api_intear_balances_get } from "../../middleman/intear";
+import { split_argv } from "../fun/split_argv";
 
 // --- argv ----------------------------------------------------------
 const { positional, flags } = split_argv(process.argv.slice(2));
@@ -23,7 +23,7 @@ const { positional, flags } = split_argv(process.argv.slice(2));
 const account_id = positional[0];
 if (account_id === undefined) {
   console.error(
-    "usage: bun bin/intear_balances_get.ts <account_id> [sources] " +
+    "usage: bun bin/intear/intear_balances_get.ts <account_id> [sources] " +
       "[--tokens a,b] [--token-fields f1,f2]",
   );
   process.exit(1);

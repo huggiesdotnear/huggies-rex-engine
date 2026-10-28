@@ -3,18 +3,23 @@
 // bin primitive that separates positional args from flags in one
 // pass, so every bin parses argv the same way.
 //
-// a flag listed in BOOLEAN_FLAGS (e.g. --desc) stands alone with no
-// value; every other --flag takes the next token as its value.
+// a flag listed in the bin's own boolean_flags takes no value; every
+// other --flag takes the next token as its value.
 //
 // booleans are tracked by index rather than stored in the map, so a
-// bin reads `has_flag(argv, "--desc")` instead of guessing whether
-// the map holds "true" or an empty string.
+// bin reads `seen.has("--desc")` instead of guessing whether the map
+// holds "true" or an empty string.
+//
+// --- WHY --- the boolean flags are per-bin, not one global set. the
+// intear bins use --desc, the huggies bins use --include-hidden, and
+// a shared set would make one bin's flag swallow the next positional
+// in another bin's argv. the caller passes the ones it owns.
 // ========================================
 
-// --- WHY --- these flags take no value. treating them as
-// value-taking would swallow the next positional as their value, so
-// they must be listed here rather than handled by convention.
-export const BOOLEAN_FLAGS = new Set(["--desc"]);
+export interface SPLIT_ARGV_OPTIONS {
+  // the flags that stand alone with no value.
+  boolean_flags?: Iterable<string>;
+}
 
 export interface SPLIT_ARGV_RESULT {
   positional: string[];
@@ -23,7 +28,11 @@ export interface SPLIT_ARGV_RESULT {
   seen: Set<string>;
 }
 
-export function split_argv(argv: string[]): SPLIT_ARGV_RESULT {
+export function split_argv(
+  argv: string[],
+  options: SPLIT_ARGV_OPTIONS = {},
+): SPLIT_ARGV_RESULT {
+  const boolean_flags = new Set(options.boolean_flags ?? []);
   const positional: string[] = [];
   const flags = new Map<string, string>();
   const seen = new Set<string>();
@@ -35,7 +44,7 @@ export function split_argv(argv: string[]): SPLIT_ARGV_RESULT {
       continue;
     }
     seen.add(token);
-    if (BOOLEAN_FLAGS.has(token)) continue;
+    if (boolean_flags.has(token)) continue;
 
     const value = argv[i + 1];
     // --- WHY --- a trailing flag with no value is a typo far more

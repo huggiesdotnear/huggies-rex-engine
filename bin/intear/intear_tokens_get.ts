@@ -5,14 +5,14 @@
 // one-line summary.
 //
 // argv:
-//   bun bin/intear_tokens_get.ts [token_ids] [--fields a,b] [--limit n]
+//   bun bin/intear/intear_tokens_get.ts [token_ids] [--fields a,b] [--limit n]
 //       [--sort field] [--desc] [--where key=value] [--account account.near]
 //
 // examples:
-//   bun bin/intear_tokens_get.ts wrap.near
-//   bun bin/intear_tokens_get.ts wrap.near --fields symbol,price_usd,volume_usd_24h
-//   bun bin/intear_tokens_get.ts --fields symbol,volume_usd_24h --limit 20 --sort volume_usd_24h --desc
-//   bun bin/intear_tokens_get.ts --where min_reputation=NotFake --limit 20
+//   bun bin/intear/intear_tokens_get.ts wrap.near
+//   bun bin/intear/intear_tokens_get.ts wrap.near --fields symbol,price_usd,volume_usd_24h
+//   bun bin/intear/intear_tokens_get.ts --fields symbol,volume_usd_24h --limit 20 --sort volume_usd_24h --desc
+//   bun bin/intear/intear_tokens_get.ts --where min_reputation=NotFake --limit 20
 // ========================================
 
 import type {
@@ -22,12 +22,18 @@ import type {
 import {
   api_intear_token_fields,
   api_intear_tokens_get,
-} from "../middleman/intear";
-import { split_argv } from "./fun/split_argv";
+} from "../../middleman/intear";
+import { split_argv } from "../fun/split_argv";
+
+// --- FLAGS ---------------------------------------------------------
+// the flags of this bin that take no value.
+const BOOLEAN_FLAGS = ["--desc"];
 
 // --- argv ----------------------------------------------------------
 // argv[0] is bun, argv[1] is this script, so real args start at 2.
-const { positional, flags, seen } = split_argv(process.argv.slice(2));
+const { positional, flags, seen } = split_argv(process.argv.slice(2), {
+  boolean_flags: BOOLEAN_FLAGS,
+});
 
 // --- WHY --- nothing here is required: omitting the token ids and
 // every filter is a valid "give me the top tokens by volume" call, so
@@ -36,7 +42,7 @@ const { positional, flags, seen } = split_argv(process.argv.slice(2));
 // mistaken invocation than a deliberate "call with defaults".
 if (process.argv.length <= 2) {
   console.error(
-    "usage: bun bin/intear_tokens_get.ts [token_ids] [--fields a,b] [--limit n] " +
+    "usage: bun bin/intear/intear_tokens_get.ts [token_ids] [--fields a,b] [--limit n] " +
       "[--sort field] [--desc] [--where key=value] [--account account.near]",
   );
   process.exit(1);

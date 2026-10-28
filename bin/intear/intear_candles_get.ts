@@ -5,14 +5,14 @@
 // one-line summary.
 //
 // argv:
-//   bun bin/intear_candles_get.ts <token_ids> [resolution]
+//   bun bin/intear/intear_candles_get.ts <token_ids> [resolution]
 //       [--count-back n] [--to-millis n] [--quote usd|near] [--series list]
 //
 // examples:
-//   bun bin/intear_candles_get.ts wrap.near
-//   bun bin/intear_candles_get.ts wrap.near,usdt.tether-token.near 1h
-//   bun bin/intear_candles_get.ts wrap.near 1d --count-back 30
-//   bun bin/intear_candles_get.ts wrap.near 1h --quote near --series open,high,low,close
+//   bun bin/intear/intear_candles_get.ts wrap.near
+//   bun bin/intear/intear_candles_get.ts wrap.near,usdt.tether-token.near 1h
+//   bun bin/intear/intear_candles_get.ts wrap.near 1d --count-back 30
+//   bun bin/intear/intear_candles_get.ts wrap.near 1h --quote near --series open,high,low,close
 // ========================================
 
 import type {
@@ -20,8 +20,8 @@ import type {
   candle_resolution,
   candle_series,
 } from "@sleet-js/intear-api-tool-box";
-import { api_intear_candles_get } from "../middleman/intear";
-import { split_argv } from "./fun/split_argv";
+import { api_intear_candles_get } from "../../middleman/intear";
+import { split_argv } from "../fun/split_argv";
 
 // --- argv ----------------------------------------------------------
 const { positional, flags } = split_argv(process.argv.slice(2));
@@ -29,7 +29,7 @@ const { positional, flags } = split_argv(process.argv.slice(2));
 const token_ids_raw = positional[0];
 if (token_ids_raw === undefined) {
   console.error(
-    "usage: bun bin/intear_candles_get.ts <token_ids> [resolution] " +
+    "usage: bun bin/intear/intear_candles_get.ts <token_ids> [resolution] " +
       "[--count-back n] [--to-millis n] [--quote usd|near] [--series list]",
   );
   process.exit(1);
