@@ -15,7 +15,7 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: left;
+  text-align: center;
   width: 500px;
   max-width: 90vw;
   box-sizing: border-box;
