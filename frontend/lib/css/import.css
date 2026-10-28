@@ -5,6 +5,9 @@
 /*==================================*/
 /* css  */
 /* the app-wide base. every page links this file. */
+/*base css is only for elmensts, colors and fonts.*/
+/*if we notice that a compoenst are styleing
+the same elemenet the same way maybe create a .css file for that element */
 @import url(./base/colors.css);
 @import url(./base/font.css);
 @import url(./base/body.css);

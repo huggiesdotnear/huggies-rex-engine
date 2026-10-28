@@ -1,37 +1,8 @@
 /*==================================*/
-/* the `code` element, app-wide.
-   a `code` chip in this app is always a raw id — a token id, an
-   account id, a contract id — so it is always long and always
-   monospace.
-
-   --- WHY --- the chip is the SAME COLOR as the text around it. an
-   earlier version dimmed it with `opacity`, but opacity makes the
-   chip a transparent overlay of whatever sits behind it, so on the
-   red background it came out a muddy pink instead of a clean white.
-   the font is what tells the chip apart from the text — not a
-   different color, and not a faded one.
-
-   --- WHY --- these live here and not in each component. the same
-   two facts (monospace, breakable) were written out in eight
-   places, so a chip in a new component would have been written a
-   ninth time. a component that wants a different size, or a
-   different way to handle a long id, overrides these in its own css
-   — the mount id makes that override win.
-
-   --- HOW TO OVERRIDE --- a component writes
-   `#HUGGIES_COMPONENT_<name> code { font-size: 10px; }` and it wins,
-   because the id selector has more weight than the bare `code`
-   element selector here. */
-/*==================================*/
 code {
   font-family: monospace;
   /*----------------------*/
-  /* the color is the text color. nothing here, so a chip never
-     changes the color of the text it sits in. */
   color: inherit;
-  /*----------------------*/
-  /* a chip is small, so the text around it stays the loud part. */
-  font-size: 11px;
   /*----------------------*/
   /* ids have no spaces and no breaks of their own, so the chip
      breaks them wherever it runs out of room. */
