@@ -25,6 +25,17 @@ bun bin/intear/intear_tokens_get.ts --fields symbol,volume_usd_24h \
   --where min_reputation=NotFake
 ```
 
+## intear_tokens_post
+
+POST /tokens — the same endpoint as `intear_tokens_get`, with the params
+in a JSON body. this is the one to use when a list of token ids does
+not fit in a url: the body limit is 64KB, against ~8KB for the url.
+
+```sh
+bun bin/intear/intear_tokens_post.ts wrap.near
+bun bin/intear/intear_tokens_post.ts --fields symbol,icon --limit 20 --sort volume_usd_24h --desc
+```
+
 ## intear_tokens_search
 
 GET /tokens/search — fuzzy search by name/symbol. needs no `--sort`.
