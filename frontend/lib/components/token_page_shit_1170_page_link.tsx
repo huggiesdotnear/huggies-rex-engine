@@ -8,12 +8,15 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token_page_shit_1170_token";
+import { HUGGIES_URL_ID } from "../ts/url_id";
 // ========================================
 // the token id on the page, or null when there is none.
+//
+// --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
+// and the blank-means-absent rule live there, so this link and the
+// token page cannot drift apart on which token the page is showing.
 function token_id_from_url_fun(): string | null {
-  if (typeof window === "undefined") return null;
-  const id = new URLSearchParams(window.location.search).get("id");
-  return id !== null && id.length > 0 ? id : null;
+  return HUGGIES_URL_ID.read();
 }
 // ========================================
 // the easter-egg link to the $SHIT holders page.

@@ -14,7 +14,10 @@
 // --- WHY --- it lives in lib/ts and not in a page's own file: it is
 // shared by pages on more than one level of the app, so it keeps a
 // plain name rather than a page prefix.
-import { HUGGIES_PAGE_ACCOUNT_ID } from "./page_account_id";
+//
+// --- WHY --- it imports nothing: the rule is the whole of it, so it
+// must not drag a page's own module in with it.
+const URL_ID_PARAM = "id";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -40,7 +43,7 @@ function read_url_id_fun(): string | null {
     return null;
   }
   const params = new URLSearchParams(window.location.search);
-  return normalize_id_fun(params.get("id"));
+  return normalize_id_fun(params.get(URL_ID_PARAM));
 }
 // ========================================
 // public surface, in one place so callers have a single import.

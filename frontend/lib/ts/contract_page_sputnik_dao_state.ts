@@ -14,6 +14,7 @@
 import { HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE } from "./contract_page_sputnik_dao";
 import { HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES } from "./contract_page_sputnik_dao_balances";
 import { HUGGIES_AUTH } from "./auth_status";
+import { HUGGIES_URL_ID } from "./url_id";
 import type { HUGGIES_DAO_INFO } from "./contract_page_sputnik_dao";
 import type { HUGGIES_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
 import type { TREZU_TREASURY } from "../../../middleman/huggies";
@@ -99,7 +100,11 @@ function subscribe_fun(listener: () => void): () => void {
 async function dao_page_state_load_fun(): Promise<void> {
   HUGGIES_AUTH.init();
 
-  const url_dao_id = new URLSearchParams(window.location.search).get("id");
+  // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
+  // and the blank-means-absent rule live there, so this loader and the
+  // selector box cannot drift apart on which dao is shown. a padded id
+  // used to reach load_dao untrimmed and match nothing.
+  const url_dao_id = HUGGIES_URL_ID.read();
   const account_id = HUGGIES_AUTH.get_account_id();
 
   HUGGIES_DAO_PAGE_STATE.set({
@@ -148,7 +153,9 @@ async function dao_page_state_load_fun(): Promise<void> {
   // not the reader's first one. only when the url carries none
   // does the reader's own list decide.
   let dao_id = url_dao_id;
-  if (dao_id === null || dao_id.trim().length === 0) {
+  // --- WHY --- the null check is enough: url_id.ts already treats a
+  // blank id as absent, so there is no second blank check to make.
+  if (dao_id === null) {
     const first = treasuries[0];
     if (first !== undefined) {
       dao_id = first.daoId;
@@ -160,7 +167,7 @@ async function dao_page_state_load_fun(): Promise<void> {
     }
   }
 
-  if (dao_id === null || dao_id.trim().length === 0) {
+  if (dao_id === null) {
     // nothing to show: the reader has to pick one.
     HUGGIES_DAO_PAGE_STATE.set({
       dao: null,

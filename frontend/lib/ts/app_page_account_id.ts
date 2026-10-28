@@ -5,6 +5,8 @@
 // identity. components on that page read it through here instead
 // of each parsing the url itself.
 // ========================================
+import { HUGGIES_URL_ID } from "./url_id";
+// ========================================
 // ========================================
 // --- STATE ------------------------------
 // null until init() reads the url, and stays null on a page with no
@@ -38,26 +40,21 @@ function subscribe_fun(listener: () => void): () => void {
   };
 }
 // ========================================
-// trim the raw `?id=` value, treating blank as absent so a trailing
-// `?id=` link renders nothing instead of an empty heading.
-function normalize_account_id_fun(raw: string | null): string | null {
-  if (raw === null) return null;
-  const trimmed = raw.trim();
-  return trimmed.length === 0 ? null : trimmed;
-}
-// ========================================
 // ========================================
 // --- INIT -------------------------------
 // read `?id=` out of the current url once and keep it. safe to call
 // more than once; the url is only read when nothing is set yet, so a
 // re-render or a second import cannot blank an id we already have.
+//
+// --- WHY --- the reading is the shared lib/ts/url_id.ts: the trim and
+// the blank-means-absent rule live there, so this page and the token
+// page cannot drift apart on how the id is found.
 function init_fun(): void {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return;
   }
   if (account_id !== null) return;
-  const params = new URLSearchParams(window.location.search);
-  account_id = normalize_account_id_fun(params.get("id"));
+  account_id = HUGGIES_URL_ID.read();
   notify_fun();
 }
 // ========================================

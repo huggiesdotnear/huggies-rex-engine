@@ -1,8 +1,11 @@
 // ========================================
 // the token id on the page, read from the `?id=` url parameter.
 //
-// one place reads the url, so two components cannot drift apart on how
-// the id is found. the id is null when the url carries none.
+// the reading itself is the shared lib/ts/url_id.ts, so the token page
+// and the account page cannot drift apart on how the id is found. the
+// id is null when the url carries none.
+// ========================================
+import { HUGGIES_URL_ID } from "./url_id";
 // ========================================
 // --- READ ------------------------------
 // the `?id=` off the current url, or null when there is none.
@@ -11,11 +14,7 @@
 // at nothing, and rendering the empty token would be worse than
 // saying the id is missing.
 function token_id_from_url_fun(): string | null {
-  if (typeof window === "undefined") return null;
-  const id = new URLSearchParams(window.location.search).get("id");
-  if (id === null) return null;
-  const trimmed = id.trim();
-  return trimmed.length === 0 ? null : trimmed;
+  return HUGGIES_URL_ID.read();
 }
 // ========================================
 // public surface, in one place so components have a single import.

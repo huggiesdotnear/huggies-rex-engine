@@ -5,6 +5,7 @@
 // components — the host page loads import.ts for that.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
+import { HUGGIES_URL_ID } from "./url_id";
 // ========================================
 // ========================================
 // ========================================
@@ -47,14 +48,12 @@ function build_account_href_fun(account_id: string): string {
 // the page's own `?id=`, or null when absent/blank. read here rather
 // than through HUGGIES_APP_PAGE_ACCOUNT_ID because that module's state is
 // populated by components which run AFTER this routing decision.
+//
+// --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
+// and the blank-means-absent rule live there, so the routing decision
+// and the page's own id cannot drift apart.
 function read_url_account_id_fun(): string | null {
-  if (typeof window === "undefined" || typeof window.location === "undefined") {
-    return null;
-  }
-  const raw = new URLSearchParams(window.location.search).get("id");
-  if (raw === null) return null;
-  const trimmed = raw.trim();
-  return trimmed.length === 0 ? null : trimmed;
+  return HUGGIES_URL_ID.read();
 }
 // ========================================
 // ========================================

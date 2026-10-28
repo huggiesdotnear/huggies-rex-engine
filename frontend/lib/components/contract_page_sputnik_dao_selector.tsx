@@ -18,6 +18,7 @@ import { HUGGIES_AUTH } from "../ts/auth_status";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_id_jump_box_fun } from "./id_jump_box";
+import { HUGGIES_URL_ID } from "../ts/url_id";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -35,7 +36,10 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
   const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
 
   const state = page_state;
-  const dao_id = new URLSearchParams(window.location.search).get("id");
+  // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
+  // and the blank-means-absent rule live there, so this box and the
+  // page's own loader cannot drift apart on which dao is shown.
+  const dao_id = HUGGIES_URL_ID.read();
 
   // --- WHY --- the dropdown only shows when there is a real choice to
   // make. one dao and the box is enough; none and there is nothing to

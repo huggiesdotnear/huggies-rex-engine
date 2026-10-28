@@ -15,6 +15,7 @@
 // pair, and a notify that a throwing subscriber cannot break.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
+import { HUGGIES_URL_ID } from "./url_id";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
@@ -60,21 +61,13 @@ function subscribe_fun(listener: () => void): () => void {
   };
 }
 // ========================================
-// trim the raw `?id=` value, treating blank as absent so a trailing
-// `?id=` link resolves to nothing rather than an empty heading.
-function normalize_account_id_fun(raw: string | null): string | null {
-  if (raw === null) return null;
-  const trimmed = raw.trim();
-  return trimmed.length === 0 ? null : trimmed;
-}
-// ========================================
 // the `?id=` off the current url, or null when there is none.
+//
+// --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
+// and the blank-means-absent rule live there, so this page and the
+// account page cannot drift apart on how the id is found.
 function read_url_account_id_fun(): string | null {
-  if (typeof window === "undefined" || typeof window.location === "undefined") {
-    return null;
-  }
-  const params = new URLSearchParams(window.location.search);
-  return normalize_account_id_fun(params.get("id"));
+  return HUGGIES_URL_ID.read();
 }
 // ========================================
 // --- INIT -------------------------------
