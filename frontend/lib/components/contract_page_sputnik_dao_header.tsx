@@ -23,25 +23,23 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
 
   return (
     <>
-      <header class="huggies-dao-header">
+      <header>
         <h1>{dao.name}</h1>
         <code>{dao.id}</code>
       </header>
-      {dao.purpose.length > 0 && (
-        <p class="huggies-dao-purpose">{dao.purpose}</p>
-      )}
-      <section class="huggies-dao-stats">
-        <article class="huggies-dao-stat">
-          <span class="huggies-dao-stat-value">{dao.roles.length}</span>
-          <span class="huggies-dao-stat-label">ROLES</span>
+      {dao.purpose.length > 0 && <p class="purpose">{dao.purpose}</p>}
+      <section class="stats">
+        <article class="stat">
+          <span class="stat-value">{dao.roles.length}</span>
+          <span class="stat-label">ROLES</span>
         </article>
-        <article class="huggies-dao-stat">
-          <span class="huggies-dao-stat-value">{member_total}</span>
-          <span class="huggies-dao-stat-label">MEMBERS</span>
+        <article class="stat">
+          <span class="stat-value">{member_total}</span>
+          <span class="stat-label">MEMBERS</span>
         </article>
-        <article class="huggies-dao-stat">
-          <span class="huggies-dao-stat-value">{dao.proposals.length}</span>
-          <span class="huggies-dao-stat-label">PROPOSALS</span>
+        <article class="stat">
+          <span class="stat-value">{dao.proposals.length}</span>
+          <span class="stat-label">PROPOSALS</span>
         </article>
       </section>
     </>

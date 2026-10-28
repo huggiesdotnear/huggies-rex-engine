@@ -22,7 +22,7 @@ export interface HUGGIES_STAT_TILE_PROPS {
   // the small label under the value, e.g. "IN-GAME PLOTS". null when
   // the tile has no sub-label.
   sub?: string | null;
-  // the css class prefix for the page, e.g. "huggies-pumpopoly".
+  // the css class prefix for the page, e.g. "pumpopoly".
   class_prefix: string;
   // true when the value is text rather than a number. a text value
   // renders smaller, because a name like "sputnik-dao.near" at number
@@ -37,7 +37,7 @@ export function huggies_stat_tile_fun(
 ): preact.JSX.Element {
   return (
     <>
-      <article class="huggies-stat-tile">
+      <article class="stat-tile">
         <span class={`${props.class_prefix}-label`}>{props.label}</span>
         <strong
           class={

@@ -1,4 +1,5 @@
 /*==================================*/
-/* the rhea-amm contract page's css: the components it mounts. */
-@import url(./components/HUGGIES_COMPONENT_CONTRACT_COMING_SOON.css);
+/* the rhea-amm contract page's css: the components it mounts. each one
+   brings the shared css it needs with its own @imports. */
+@import url(./components/HUGGIES_COMPONENT_CONTRACT_PAGE_RHEA_AMM_PAGE.css);
 /*==================================*/

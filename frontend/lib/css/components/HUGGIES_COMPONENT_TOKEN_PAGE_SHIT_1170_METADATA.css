@@ -3,19 +3,21 @@
    the token metadata block at the bottom of the $SHIT page.
 
    the metadata grid itself is the shared one the token page uses, so
-   its rows are styled by HUGGIES_COMPONENT_TOKEN_META_GRID.css. */
+   its rows are styled by shared/token_meta_grid.css. */
+@import url(./shared/token_meta_grid.css);
+
 /*==================================*/
-.huggies-shit-metadata {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA .metadata {
   margin-top: 24px;
 }
-.huggies-shit-metadata h2 {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA .metadata h2 {
   text-align: left;
   font-size: 15px;
   border-bottom: 1px solid #474747;
   padding-bottom: 6px;
   margin-bottom: 10px;
 }
-.huggies-shit-price-error {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA .price-error {
   margin: 10px 0 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;

@@ -2,20 +2,15 @@
 /* HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES
    the burned tokens, as cards.
 
-   --- WHY --- a grid and not one card per row: there is one card per
-   burned token and there can be many of them. a grid of equal cards
-   reads as a collection, where a stack of full-width rows reads as a
-   list. the card is sized by the page column, so it stays inside the
-   500px the app renders into.
-
-   --- WHY --- the two figures inside a card are stacked and not side
-   by side: "BURNED 12.5M SHIT" and "OF TOTAL SUPPLY 4.21%" are both
-   long, and side by side they would wrap in a narrow card. */
+   a grid and not one card per row: there is one card per burned token
+   and there can be many of them. the two figures inside a card are
+   stacked and not side by side: both are long, and side by side they
+   would wrap in a narrow card. */
 /*==================================*/
-.huggies-burn-balances {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES {
   text-align: left;
 }
-.huggies-burn-note {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .note {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -23,12 +18,12 @@
   text-align: left;
   margin: 0.5rem 0;
 }
-.huggies-burn-tokens-list {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 0.5rem;
 }
-.huggies-burn-token-card {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-list > a {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -45,18 +40,18 @@
     border-color 0.2s ease,
     background-color 0.2s ease;
 }
-.huggies-burn-token-card:hover,
-.huggies-burn-token-card:focus-visible {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-list > a:hover,
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-list > a:focus-visible {
   border-color: rgba(255, 255, 255, 0.45);
   background: rgba(0, 0, 0, 0.22);
 }
-.huggies-burn-token-header {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-header {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   min-width: 0;
 }
-.huggies-burn-token-icon-wrap {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .icon-wrap {
   flex: 0 0 auto;
   width: 2rem;
   height: 2rem;
@@ -67,42 +62,42 @@
   justify-content: center;
   overflow: hidden;
 }
-.huggies-burn-token-icon {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .icon {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-.huggies-burn-token-icon-placeholder {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .icon-placeholder {
   font-family: "Lilita One", sans-serif;
   font-size: 16px;
   color: #474747;
   line-height: 1;
 }
-.huggies-burn-token-info {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-info {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
   min-width: 0;
   flex: 1 1 auto;
 }
-.huggies-burn-token-label {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-label {
   font-family: "Lilita One", sans-serif;
   font-size: 15px;
   line-height: 1.2;
 }
-.huggies-burn-token-id {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-id {
   font-size: 10px;
   opacity: 0.55;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.huggies-burn-token-details {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-details {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
-.huggies-burn-token-detail {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-detail {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
@@ -111,19 +106,19 @@
   background: rgba(0, 0, 0, 0.22);
   min-width: 0;
 }
-.huggies-burn-token-detail-label {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .detail-label {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 9px;
   letter-spacing: 0.1em;
   opacity: 0.6;
 }
-.huggies-burn-token-detail-value {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .detail-value {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.huggies-burn-errors {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .errors {
   margin-top: 0.5rem;
 }
 /*==================================*/

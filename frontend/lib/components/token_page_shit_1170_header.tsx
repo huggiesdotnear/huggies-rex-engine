@@ -12,7 +12,7 @@ import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token_page_shit_1170_token";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER_FUN() {
   return (
-    <header class="huggies-shit-header">
+    <header>
       <h1>{HUGGIES_SHIT_TOKEN_ID}</h1>
     </header>
   );

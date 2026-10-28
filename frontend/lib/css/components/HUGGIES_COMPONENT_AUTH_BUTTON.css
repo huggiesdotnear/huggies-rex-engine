@@ -68,7 +68,7 @@
 /*----------------------*/
 /* the ✕ that forgets one account. square, so it lines up with  */
 /* the row's height instead of stretching to the column width.   */
-[data-huggies-auth-account] > button.huggies-auth-account-remove {
+[data-huggies-auth-account] > button.account-remove {
   flex: 0 0 auto;
   width: 38px;
   padding: 8px 0;
@@ -79,7 +79,7 @@
 /* the account the app is currently acting as. */
 /* the filled dot plus a bolder label, so it reads as "current"   */
 /* even without relying on the dot's color alone.                  */
-[data-huggies-auth-account] > button.huggies-auth-account-active {
+[data-huggies-auth-account] > button.account.is-active {
   font-weight: 700;
   background-color: var(--color-middle);
   color: var(--color-fontend);

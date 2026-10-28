@@ -1,0 +1,8 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_PAGE_INTEAR_DEX_PAGE
+   this component's own rules. the shared components it renders
+   bring their own css in with the @imports below.
+*/
+/*==================================*/
+@import url(./shared/contract_coming_soon.css);
+/*==================================*/

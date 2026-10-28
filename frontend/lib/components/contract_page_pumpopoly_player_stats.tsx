@@ -17,8 +17,8 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_error_card_fun } from "./error_card";
-import { huggies_stat_tile_fun } from "./stat_tile";
+import { huggies_error_card_fun } from "./shared/error_card";
+import { huggies_stat_tile_fun } from "./shared/stat_tile";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -39,56 +39,52 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS_FUN() {
       {huggies_error_card_fun({
         error: page_data?.errors.player ?? null,
         label: "PLAYER DATA",
-        class_prefix: "huggies-pumpopoly",
+        class_prefix: "pumpopoly",
       })}
       <h2>world.pumpopoly.near</h2>
-      <div class="huggies-pumpopoly-balance">
-        <span class="huggies-pumpopoly-label">IN-GAME BALANCE</span>
-        <strong class="huggies-pumpopoly-balance-value">
-          {player?.balance_human ?? "0"}
-        </strong>
-        <span class="huggies-pumpopoly-sub">PUMPOPOLY TOKENS</span>
-        {player !== null && (
-          <code class="huggies-pumpopoly-raw">{player.balance}</code>
-        )}
+      <div class="balance">
+        <span class="label">IN-GAME BALANCE</span>
+        <strong class="balance-value">{player?.balance_human ?? "0"}</strong>
+        <span class="sub">PUMPOPOLY TOKENS</span>
+        {player !== null && <code class="raw">{player.balance}</code>}
       </div>
-      <div class="huggies-pumpopoly-cards">
+      <div class="cards">
         {huggies_stat_tile_fun({
           label: "LAND",
           value: String(player?.land_count ?? 0),
           sub: "IN-GAME PLOTS",
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
         })}
         {huggies_stat_tile_fun({
           label: "BOARD POSITION",
           value: String(player?.location ?? 0),
           sub: "SQUARE",
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
         })}
         {huggies_stat_tile_fun({
           label: "CREDIT SCORE",
           value: String(page_data?.credit_score ?? 0),
           sub: "LAND + INVITES",
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
         })}
         {huggies_stat_tile_fun({
           label: "INVITES",
           value: String(player?.invites ?? 0),
           sub: `${player?.invitees ?? 0} INVITEES`,
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
         })}
         {huggies_stat_tile_fun({
           label: "INVITED BY",
           value: player?.invited_by || "NONE",
           sub: null,
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
           is_text: true,
         })}
         {huggies_stat_tile_fun({
           label: "LAST MOVE",
           value: player?.last_move || "UNKNOWN",
           sub: null,
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
           is_text: true,
         })}
       </div>

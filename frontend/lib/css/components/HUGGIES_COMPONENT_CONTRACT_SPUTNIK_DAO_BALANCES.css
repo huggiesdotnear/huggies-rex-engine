@@ -1,0 +1,8 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES
+   this component's own rules. the shared components it renders
+   bring their own css in with the @imports below.
+*/
+/*==================================*/
+@import url(./shared/balance_table.css);
+/*==================================*/

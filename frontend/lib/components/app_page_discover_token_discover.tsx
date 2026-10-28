@@ -29,7 +29,7 @@ import {
 import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/app_page_discover_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
-import { huggies_sort_control_fun } from "./sort_control";
+import { huggies_sort_control_fun } from "./shared/sort_control";
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_result";
 // ========================================
 // ========================================
@@ -49,22 +49,22 @@ function token_result_row_fun(
   token: HUGGIES_TOKEN_SEARCH_RESULT,
   marked: boolean,
 ): preact.JSX.Element {
-  const row_class = marked
-    ? "huggies-token-result is-marked"
-    : "huggies-token-result";
   return (
-    <a class={row_class} href={token_detail_href_fun(token.id)}>
+    <a
+      class={marked ? "result is-marked" : "result"}
+      href={token_detail_href_fun(token.id)}
+    >
       {token.icon !== null ? (
-        <img class="huggies-token-result-icon" src={token.icon} alt="" />
+        <img class="result-icon" src={token.icon} alt="" />
       ) : (
-        <span class="huggies-token-result-icon is-empty" />
+        <span class="result-icon is-empty" />
       )}
-      <span class="huggies-token-result-copy">
+      <span class="result-copy">
         <strong>{token.symbol}</strong>
         <span>{token.name}</span>
         <code>{token.id}</code>
       </span>
-      <span class="huggies-token-result-values">
+      <span class="result-values">
         <span>${token.volume_usd_24h.toLocaleString()} VOL</span>
         <span>${token.market_cap_usd.toLocaleString()} MCAP</span>
       </span>
@@ -163,9 +163,9 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   const errors = page_data?.errors ?? [];
 
   return (
-    <section class="huggies-token-discover">
-      <div class="huggies-token-discover-controls">
-        <div class="huggies-token-search">
+    <section>
+      <div class="controls">
+        <div class="search">
           <input
             type="search"
             value={query}
@@ -175,7 +175,7 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
             }}
           />
         </div>
-        <div class="huggies-token-discover-sort">
+        <div class="sort">
           {huggies_sort_control_fun({
             sort,
             direction,
@@ -185,13 +185,13 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
         </div>
       </div>
       {errors.map((message) => (
-        <p class="huggies-token-error">{message}</p>
+        <p class="error">{message}</p>
       ))}
-      <div class="huggies-token-results-scroll" ref={scroll_ref}>
+      <div class="results-scroll" ref={scroll_ref}>
         {tokens.length === 0 && !loading && !searching_now ? (
           <p>NO TOKENS FOUND</p>
         ) : (
-          <div class="huggies-token-results">
+          <div class="results">
             {tokens.map((token) =>
               token_result_row_fun(
                 { ...token, icon: icons[token.id] ?? token.icon },
@@ -200,12 +200,10 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
             )}
           </div>
         )}
-        {searching_now && <p class="huggies-token-loading">SEARCHING...</p>}
-        {loading && !searching_now && (
-          <p class="huggies-token-loading">LOADING TOKENS...</p>
-        )}
+        {searching_now && <p class="loading">SEARCHING...</p>}
+        {loading && !searching_now && <p class="loading">LOADING TOKENS...</p>}
         {!searching && has_more && !loading && (
-          <p class="huggies-token-loading">SCROLL FOR MORE...</p>
+          <p class="loading">SCROLL FOR MORE...</p>
         )}
       </div>
     </section>

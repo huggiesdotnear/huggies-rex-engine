@@ -10,7 +10,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { shit_total_supply_formatted_fun } from "../ts/token_page_shit_1170_holders";
-import { huggies_token_meta_grid_fun } from "./token_meta_grid";
+import { huggies_token_meta_grid_fun } from "./shared/token_meta_grid";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -34,7 +34,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
   const price_usd = summary.price_usd;
 
   return (
-    <section class="huggies-shit-metadata">
+    <section class="metadata">
       <h2>TOKEN METADATA</h2>
       {huggies_token_meta_grid_fun([
         { label: "PRICE", value: format_price_usd_fun(price_usd) },
@@ -59,7 +59,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
         },
       ])}
       {price_usd <= 0 && (
-        <p class="huggies-shit-price-error">
+        <p class="price-error">
           PRICE UNAVAILABLE: the api reported no price for this token
         </p>
       )}

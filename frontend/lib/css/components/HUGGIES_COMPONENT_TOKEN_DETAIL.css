@@ -2,64 +2,60 @@
 /* HUGGIES_COMPONENT_TOKEN_DETAIL
    the token's card: the icon, the symbol, the name, the id, the
    metadata grid, the description and the socials. */
+@import url(./shared/token_meta_grid.css);
+
 /*==================================*/
-/* --- header --- */
-.huggies-token-detail-header {
+#HUGGIES_COMPONENT_TOKEN_DETAIL header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
 }
-/* --- WHY --- the text column takes the rest of the row. the header
-   is a flex row, so the column that holds the symbol, the name and
-   the id is a flex item and shrinks to its own content — the symbol
-   heading then measured 162px instead of the column's width, and the
-   rule under it stopped short of the card's edge. `flex: 1` gives it
-   the rest of the row, and `min-width: 0` lets a long id wrap
-   inside it instead of pushing the row open. */
-.huggies-token-detail-header > div {
+/* the text column takes the rest of the row. the header is a flex row,
+   so the column that holds the symbol, the name and the id is a flex
+   item and shrinks to its own content. `flex: 1` gives it the rest of
+   the row, and `min-width: 0` lets a long id wrap inside it instead
+   of pushing the row open. */
+#HUGGIES_COMPONENT_TOKEN_DETAIL header > div {
   flex: 1 1 auto;
   min-width: 0;
 }
-.huggies-token-detail-header h1,
-.huggies-token-detail-header p {
+#HUGGIES_COMPONENT_TOKEN_DETAIL header h1,
+#HUGGIES_COMPONENT_TOKEN_DETAIL header p {
   margin: 0;
 }
-.huggies-token-detail-header p {
+#HUGGIES_COMPONENT_TOKEN_DETAIL header p {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   opacity: 0.75;
 }
-.huggies-token-detail-header code {
+#HUGGIES_COMPONENT_TOKEN_DETAIL header code {
   display: block;
   font-size: 10px;
   opacity: 0.55;
   overflow-wrap: anywhere;
   word-break: break-all;
 }
-.huggies-token-detail-icon {
+#HUGGIES_COMPONENT_TOKEN_DETAIL .icon {
   width: 52px;
   height: 52px;
   border-radius: 50%;
   object-fit: cover;
   flex: none;
 }
-/* --- metadata grid ---
-   the grid itself is shared with the $SHIT page, so its rules live in
-   HUGGIES_COMPONENT_TOKEN_META_GRID.css. --- */
 /* --- about card --- */
-.huggies-token-description-card {
+#HUGGIES_COMPONENT_TOKEN_DETAIL .description-card {
   margin: 1rem 0;
   padding: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.12);
 }
-.huggies-token-description-card h2 {
+#HUGGIES_COMPONENT_TOKEN_DETAIL .description-card h2 {
   margin: 0 0 0.45rem;
   font-size: 16px;
 }
-.huggies-token-description-card p {
+#HUGGIES_COMPONENT_TOKEN_DETAIL .description-card p {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
@@ -67,17 +63,17 @@
   overflow-wrap: anywhere;
 }
 /* --- socials --- */
-.huggies-token-socials {
+#HUGGIES_COMPONENT_TOKEN_DETAIL .socials {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 12px 0;
 }
-/* --- WHY --- the social links are buttons that share the row's full
-   width between them: one link fills it on its own, two split it in
-   half, three split it three ways. `flex:1` with a `min-width:0` lets
-   them shrink rather than force the row wider than the page. */
-.huggies-token-social-link {
+/* the social links are buttons that share the row's full width between
+   them: one link fills it on its own, two split it in half, three
+   split it three ways. `flex:1` with a `min-width:0` lets them shrink
+   rather than force the row wider than the page. */
+#HUGGIES_COMPONENT_TOKEN_DETAIL .social-link {
   flex: 1 1 0;
   min-width: 0;
   display: inline-flex;
@@ -100,8 +96,8 @@
     background 0.2s ease,
     border-color 0.2s ease;
 }
-.huggies-token-social-link:hover,
-.huggies-token-social-link:focus-visible {
+#HUGGIES_COMPONENT_TOKEN_DETAIL .social-link:hover,
+#HUGGIES_COMPONENT_TOKEN_DETAIL .social-link:focus-visible {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.7);
 }

@@ -4,10 +4,12 @@
    token ids.
 
    one column of token ids, capped in height and scrolled, so a player
-   with hundreds of nfts does not push the rest of the page off screen.
-   the same cap the account page's balance table uses. */
+   with hundreds of nfts does not push the rest of the page off screen. */
+@import url(./shared/error_card.css);
+@import url(./shared/stat_tile.css);
+
 /*==================================*/
-.huggies-pumpopoly-nft-scroll {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-scroll {
   max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -15,13 +17,13 @@
      between itself and the heading above it. */
   margin-top: 0.5rem;
 }
-.huggies-pumpopoly-nft-table {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 12px;
 }
-.huggies-pumpopoly-nft-table th {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table th {
   position: sticky;
   top: 0;
   text-align: left;
@@ -30,45 +32,39 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   opacity: 0.7;
-  /* --- WHY --- a sticky header needs an opaque background, or the rows
-     scrolling under it show through. this is the page background
-     (body.css), so the header sits on the same colour as everything
-     else and nothing shows through. --- */
+  /* a sticky header needs an opaque background, or the rows scrolling
+     under it show through. this is the page background. */
   background: var(--color-backend);
   border-bottom: 1px solid rgba(255, 255, 255, 0.28);
 }
-.huggies-pumpopoly-nft-table td {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table td {
   text-align: left;
   padding: 6px 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
-.huggies-pumpopoly-nft-table code {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table code {
   font-size: 11px;
   overflow-wrap: anywhere;
   word-break: break-all;
 }
 /*==================================*/
 /* --- the nft sort control ---
-   the nft list sorts by one thing, so its control is a single full-width
-   button rather than a row of sort keys. it spans the page column like
-   the other buttons on the page.
-   --- WHY --- the shared `.huggies-sort-control` is an inline-flex that
-   shrinks to its content, and `.huggies-sort-button` sets `width:auto`
-   so a row of them can sit side by side. this is one button on its own
-   row, so it is put back to full width here. the scoped class keeps the
-   token page's sort control content-sized.
-   --- WHY --- the fill is restated too. the shared sort button is a
-   small teal pill for a row of little toggles; stretched across the
-   page that same pill is a thin bar of 11px text. this one is a real
-   page-sized button instead, matching the other buttons here: light
-   fill, teal border, larger text. */
-.huggies-pumpopoly-nft-sort {
+   the nft list sorts by one thing, so its control is a single
+   full-width button rather than a row of sort keys.
+
+   the shared sort control is an inline-flex that shrinks to its
+   content, and its sort button sets `width:auto` so a row of them can
+   sit side by side. this is one button on its own row, so it is put
+   back to full width here. the fill is restated too: the shared sort
+   button is a small teal pill for a row of little toggles; stretched
+   across the page that same pill is a thin bar of 11px text. */
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .sort-control {
   display: flex;
   width: 100%;
   max-width: 90vw;
   margin-top: 0.5rem;
 }
-.huggies-pumpopoly-nft-sort .huggies-sort-button {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .sort-control .sort-button {
   width: 100%;
   max-width: none;
   flex: 1;
@@ -80,12 +76,18 @@
   border: 0;
   border-radius: 8px;
 }
-.huggies-pumpopoly-nft-sort .huggies-sort-button:hover {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+  .sort-control
+  .sort-button:hover {
   background: #e9e9e9;
   color: #2d2d2d;
 }
-.huggies-pumpopoly-nft-sort .huggies-sort-button.is-active,
-.huggies-pumpopoly-nft-sort .huggies-sort-button.is-active:hover {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+  .sort-control
+  .sort-button.is-active,
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+  .sort-control
+  .sort-button.is-active:hover {
   background: #ffffff;
   color: #2d2d2d;
 }

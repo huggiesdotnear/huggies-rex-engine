@@ -1,0 +1,141 @@
+/*==================================*/
+/* balance_table
+   the balance table, shared by every page that shows token balances:
+   the account page's four tables and the dao page's one.
+
+   one column, every field stacked in its cell, so the table never needs
+   horizontal scrolling. */
+/*==================================*/
+@import url(./balance_row.css);
+/*==================================*/
+/* the table block itself. */
+.balance-table {
+  text-align: left;
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+/*==================================*/
+/* the scroll box: caps the height and scrolls the rest. */
+.balance-table .scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+/*==================================*/
+/* --- the table --- */
+.balance-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  /* one column: every field stacks inside its cell, so the table
+     never needs horizontal scrolling. */
+  table-layout: fixed;
+}
+.balance-table td {
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  vertical-align: top;
+  width: 100%;
+}
+/*==================================*/
+/* --- the total --- */
+.balance-table tfoot th {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 8px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  opacity: 1;
+}
+.balance-table .total-usd {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+/*==================================*/
+/* --- the section heading above a titled table block --- */
+.balance-table .section-title {
+  text-align: left;
+  font-size: 18px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+/*==================================*/
+/* --- a note under the table --- */
+.balance-table p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  opacity: 0.8;
+}
+/*==================================*/
+/* --- the sort control and the dust toggle --- */
+.balance-table .sort {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.balance-table .sort button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: inherit;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.balance-table .sort button.is-active {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+/*==================================*/
+/* --- the dust toggle, below the table --- */
+.balance-table .dust {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+}
+.balance-table .dust-note {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  opacity: 0.7;
+  margin: 0;
+}
+.balance-table .dust-button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: inherit;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.balance-table .dust-button:hover,
+.balance-table .dust-button:focus-visible {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+/*==================================*/

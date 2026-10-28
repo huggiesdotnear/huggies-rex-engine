@@ -6,30 +6,27 @@
    the section heading is styled by base/main.css — the h2 rule is
    app-wide, not the page's own. */
 /*==================================*/
-.huggies-dao-proposals-section {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS > section {
   margin-top: 20px;
 }
-.huggies-dao-proposals-scroll {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .proposals-scroll {
   max-height: 460px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 /* --- the proposals table ---
-   the layout is auto, not fixed: the kind and the "what it does" are
-   both words of different lengths, and a fixed width clipped them
-   ("ChangeC…", "20,135,408.9836 S…").
-   --- WHY --- the columns that hold a word get a share of the width
-   and the ones that hold a number get what they need. without a
+   the layout is fixed: the columns that hold a word get a share of the
+   width and the ones that hold a number get what they need. without a
    share the auto layout starved the date column and the date broke
    over three lines. */
-.huggies-dao-proposals-table {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS table {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 12px;
 }
-.huggies-dao-proposals-table th,
-.huggies-dao-proposals-table td {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS th,
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS td {
   text-align: left;
   padding: 8px 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -37,58 +34,55 @@
   white-space: normal;
   vertical-align: top;
 }
-.huggies-dao-proposals-table th {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS th {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.7;
 }
-.huggies-dao-proposal-id {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-id {
   width: 22px;
   text-align: right;
   opacity: 0.6;
   font-variant-numeric: tabular-nums;
 }
-.huggies-dao-proposal-kind {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-kind {
   width: 22%;
   font-weight: 700;
 }
-/* what the proposal does — the kind's real content.
-   --- WHY --- this column is the one the reader came for, so it gets
-   the room. a Transfer reads "20,135,408.98 SHIT → sleet.near" and
-   it needs the width to say so on one line. */
-.huggies-dao-proposal-what {
+/* what the proposal does — the kind's real content. this column is the
+   one the reader came for, so it gets the room. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-what {
   width: 27%;
   font-size: 11px;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
-.huggies-dao-proposal-status-col {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-status {
   width: 16%;
   white-space: nowrap;
 }
-/* the proposer.
-   --- WHY --- the column has a width. without one the auto layout
-   squeezed it until the account id broke onto one letter per line. */
-.huggies-dao-proposal-proposer {
+/* the proposer. the column has a width, or the auto layout squeezes it
+   until the account id breaks onto one letter per line. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-proposer {
   width: 19%;
   font-family: monospace;
   font-size: 10px;
   overflow-wrap: anywhere;
 }
-.huggies-dao-proposals-table td.huggies-dao-proposal-proposer a {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS td.col-proposer a {
   display: block;
   overflow-wrap: anywhere;
   word-break: break-all;
   line-height: 1.3;
 }
-.huggies-dao-proposal-votes {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-votes {
   width: 42px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.huggies-dao-proposal-date {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .col-date {
   width: 84px;
   text-align: right;
   white-space: nowrap;
@@ -96,7 +90,7 @@
 /* --- the expand toggle ---
    it sits in the date cell, so the date and the caret are one
    clickable thing. */
-.huggies-dao-proposal-toggle {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .toggle {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
@@ -113,10 +107,10 @@
   cursor: pointer;
   opacity: 0.8;
 }
-.huggies-dao-proposal-toggle:hover {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .toggle:hover {
   opacity: 1;
 }
-.huggies-dao-proposal-caret {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .caret {
   font-size: 8px;
   opacity: 0.7;
 }
@@ -124,7 +118,7 @@
 /* --- the status chip ---
    each status gets its own colour, so a reader can see which
    proposals are live and which are done without reading the words. */
-.huggies-dao-proposal-status {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .status {
   display: inline-block;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
@@ -134,33 +128,33 @@
   background: rgba(255, 255, 255, 0.18);
   white-space: nowrap;
 }
-.huggies-dao-proposal-row.is-in-progress .huggies-dao-proposal-status {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .row.is-in-progress .status {
   background: rgba(0, 198, 215, 0.28);
 }
-.huggies-dao-proposal-row.is-approved .huggies-dao-proposal-status {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .row.is-approved .status {
   background: rgba(142, 240, 160, 0.28);
 }
-.huggies-dao-proposal-row.is-rejected .huggies-dao-proposal-status {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .row.is-rejected .status {
   background: rgba(255, 152, 0, 0.28);
 }
-.huggies-dao-proposal-row.is-expired .huggies-dao-proposal-status {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .row.is-expired .status {
   background: rgba(218, 41, 28, 0.4);
 }
 /*==================================*/
 /* --- the expanded row ---
    the detail sits under its proposal, in its own row. */
-.huggies-dao-proposal-detail-row td {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-row td {
   padding: 8px 6px 10px;
   background: rgba(0, 0, 0, 0.18);
 }
-.huggies-dao-proposal-note {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .note {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
-.huggies-dao-proposal-vote-list {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .vote-list {
   margin: 4px 0 0;
   font-family: monospace;
   font-size: 10px;

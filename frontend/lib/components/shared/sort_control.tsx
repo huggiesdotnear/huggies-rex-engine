@@ -6,7 +6,7 @@ import {
   HUGGIES_TOKEN_SORTS,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
-} from "../ts/app_page_discover_token_sort";
+} from "../../ts/app_page_discover_token_sort";
 // ========================================
 // render the sort options as a row of buttons, plus a direction toggle.
 export function huggies_sort_control_fun(props: {
@@ -18,14 +18,12 @@ export function huggies_sort_control_fun(props: {
 }): preact.JSX.Element {
   const Icon = props.direction === "desc" ? ArrowDown : ArrowUp;
   return (
-    <div class={`huggies-sort-control ${props.class ?? ""}`.trim()}>
+    <div class={`sort-control ${props.class ?? ""}`.trim()}>
       {HUGGIES_TOKEN_SORTS.map((option) => (
         <button
           type="button"
           class={
-            option.key === props.sort
-              ? "huggies-sort-button is-active"
-              : "huggies-sort-button"
+            option.key === props.sort ? "sort-button is-active" : "sort-button"
           }
           aria-pressed={option.key === props.sort}
           onClick={() => props.on_sort(option.key)}
@@ -35,7 +33,7 @@ export function huggies_sort_control_fun(props: {
       ))}
       <button
         type="button"
-        class="huggies-sort-button huggies-sort-direction"
+        class="sort-button sort-direction"
         onClick={() =>
           props.on_direction(props.direction === "desc" ? "asc" : "desc")
         }

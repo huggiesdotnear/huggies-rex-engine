@@ -143,11 +143,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
             <div key={id} data-huggies-auth-account={id}>
               <button
                 type="button"
-                class={
-                  id === account_id
-                    ? "huggies-auth-account-active"
-                    : "huggies-auth-account"
-                }
+                class={id === account_id ? "account is-active" : "account"}
                 onClick={() => on_pick_account_fun(id)}
                 disabled={busy}
                 title={
@@ -161,13 +157,13 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
               </button>
               <button
                 type="button"
-                class="huggies-auth-account-remove"
+                class="account-remove"
                 onClick={() => on_remove_account_fun(id)}
                 disabled={busy}
                 title={`remove ${id}`}
               >
                 ✕
-              </button>
+              </button>{" "}
             </div>
           ))}
           <button

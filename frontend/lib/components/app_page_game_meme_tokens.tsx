@@ -21,16 +21,15 @@ function HUGGIES_COMPONENT_GAME_MEME_TOKENS_FUN() {
   const icons = page_data?.icons ?? {};
 
   return (
-    <section class="huggies-meme-tokens">
+    <section>
       <h2>MEME TOKENS</h2>
-      <ul class="huggies-meme-tokens-list">
+      <ul>
         {HUGGIES_EMOJI_TOKENS.map((token) => {
           const icon =
             token.token_id === null ? null : (icons[token.token_id] ?? null);
           return (
-            <li class="huggies-meme-tokens-item">
+            <li>
               <a
-                class="huggies-meme-tokens-card"
                 href={
                   token.token_id !== null
                     ? token_detail_href_fun(token.token_id)
@@ -40,18 +39,12 @@ function HUGGIES_COMPONENT_GAME_MEME_TOKENS_FUN() {
                   ? { target: "_blank", rel: "noreferrer" }
                   : {})}
               >
-                <span class="huggies-meme-tokens-emoji">{token.emoji}</span>
-                <span class="huggies-meme-tokens-body">
-                  <strong class="huggies-meme-tokens-label">
-                    {token.label}
-                  </strong>
-                  <code class="huggies-meme-tokens-id">
-                    {token.token_id ?? "meme.cooking"}
-                  </code>
+                <span class="emoji">{token.emoji}</span>
+                <span class="body">
+                  <strong class="label">{token.label}</strong>
+                  <code class="id">{token.token_id ?? "meme.cooking"}</code>
                 </span>
-                {icon !== null && (
-                  <img class="huggies-meme-tokens-icon" src={icon} alt="" />
-                )}
+                {icon !== null && <img class="icon" src={icon} alt="" />}
               </a>
             </li>
           );

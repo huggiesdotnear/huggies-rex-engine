@@ -12,7 +12,7 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_id_jump_box_fun } from "./id_jump_box";
+import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -31,7 +31,7 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN() {
         placeholder: "account.near",
         button_text: "INSPECT PLAYER ACCOUNT",
         param_name: "id",
-        class_prefix: "huggies-pumpopoly",
+        class_prefix: "pumpopoly",
       })}
     </>
   );

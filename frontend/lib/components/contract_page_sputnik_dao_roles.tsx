@@ -52,52 +52,50 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
 
   if (dao.members.length === 0) {
     return (
-      <section class="huggies-dao-roles-section">
+      <section>
         <h2>MEMBERS</h2>
-        <p class="huggies-dao-empty">NO MEMBERS NAMED IN THE POLICY</p>
+        <p class="empty">NO MEMBERS NAMED IN THE POLICY</p>
       </section>
     );
   }
 
   return (
-    <section class="huggies-dao-roles-section">
+    <section>
       <h2>MEMBERS ({dao.members.length})</h2>
-      <div class="huggies-dao-members-scroll">
-        <table class="huggies-dao-members-table">
+      <div class="members-scroll">
+        <table>
           <thead>
             <tr>
-              <th class="huggies-dao-member-rank">#</th>
-              <th class="huggies-dao-member-account">ACCOUNT</th>
-              <th class="huggies-dao-member-roles">ROLES</th>
-              <th class="huggies-dao-member-permissions">PERMISSIONS</th>
+              <th class="col-rank">#</th>
+              <th class="col-account">ACCOUNT</th>
+              <th class="col-roles">ROLES</th>
+              <th class="col-permissions">PERMISSIONS</th>
             </tr>
           </thead>
           <tbody>
             {dao.members.map((member, index) => (
               <tr key={member.account_id}>
-                <td class="huggies-dao-member-rank">{index + 1}</td>
-                <td class="huggies-dao-member-account">
+                <td class="col-rank">{index + 1}</td>
+                <td class="col-account">
                   <a
                     href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(member.account_id)}`}
                   >
                     {member.account_id}
                   </a>
                 </td>
-                <td class="huggies-dao-member-roles">
+                <td class="col-roles">
                   {member.roles.map((role) => (
-                    <span class="huggies-dao-role-chip">{role}</span>
+                    <span class="role-chip">{role}</span>
                   ))}
                 </td>
                 <td
-                  class="huggies-dao-member-permissions"
+                  class="col-permissions"
                   title={member.permissions.join(", ")}
                 >
                   {member.permissions.length === 0
                     ? "—"
                     : permission_actions_fun(member.permissions).map(
-                        (action) => (
-                          <span class="huggies-dao-permission">{action}</span>
-                        ),
+                        (action) => <span class="permission">{action}</span>,
                       )}
                 </td>
               </tr>
@@ -106,7 +104,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
         </table>
       </div>
       {dao.open_roles.length > 0 && (
-        <p class="huggies-dao-open-roles">
+        <p class="open-roles">
           ALSO OPEN TO EVERYONE:{" "}
           {dao.open_roles.map((role) => role.name).join(", ")} — any account can
           act in {dao.open_roles.length === 1 ? "that role" : "those roles"}.

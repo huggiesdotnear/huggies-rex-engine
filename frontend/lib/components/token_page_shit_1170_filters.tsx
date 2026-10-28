@@ -21,16 +21,12 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
   const active_filter = state.active_filter;
 
   return (
-    <div class="huggies-shit-tabs" role="tablist" aria-label="holder types">
+    <div class="tabs" role="tablist" aria-label="holder types">
       {HUGGIES_SHIT_FILTERS.map((filter) => (
         <button
           type="button"
           role="tab"
-          class={
-            filter.key === active_filter
-              ? "huggies-shit-tab is-active"
-              : "huggies-shit-tab"
-          }
+          class={`tab${filter.key === active_filter ? " is-active" : ""}`}
           aria-selected={filter.key === active_filter}
           aria-label={filter.label}
           title={`${filter.label} — ${filter.description}`}

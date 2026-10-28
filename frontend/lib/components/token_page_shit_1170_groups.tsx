@@ -29,24 +29,14 @@ function render_group_fun(
   is_active: boolean,
 ): preact.JSX.Element {
   return (
-    <li
-      class={`huggies-shit-group is-${group.type}${is_active ? " is-active" : ""}`}
-    >
-      <span class="huggies-shit-group-left">
-        <span class="huggies-shit-group-icon">
-          {shit_holder_icon_fun(group.type)}
-        </span>
-        <span class="huggies-shit-group-name">
-          {shit_holder_type_label_fun(group.type)}
-        </span>
+    <li class={`group is-${group.type}${is_active ? " is-active" : ""}`}>
+      <span class="group-left">
+        <span class="group-icon">{shit_holder_icon_fun(group.type)}</span>
+        <span class="group-name">{shit_holder_type_label_fun(group.type)}</span>
       </span>
-      <span class="huggies-shit-group-right">
-        <span class="huggies-shit-group-count">
-          {group.count.toLocaleString()}
-        </span>
-        <span class="huggies-shit-group-percent">
-          {group.percent_formatted}
-        </span>
+      <span class="group-right">
+        <span class="group-count">{group.count.toLocaleString()}</span>
+        <span class="group-percent">{group.percent_formatted}</span>
       </span>
     </li>
   );
@@ -67,9 +57,9 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS_FUN() {
   );
 
   return (
-    <section class="huggies-shit-groups">
+    <section class="groups">
       <h2>HOLDERS BY GROUP</h2>
-      <ul class="huggies-shit-groups-list">
+      <ul class="groups-list">
         {groups.map((group) =>
           render_group_fun(group, group.type === state.active_filter),
         )}

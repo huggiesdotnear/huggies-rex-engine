@@ -14,10 +14,10 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_APP_PAGE_BURN_INFO_FUN() {
   return (
-    <section class="huggies-burn-info">
+    <section>
       <h2>ABOUT BURNING ON NEAR</h2>
-      <div class="huggies-burn-info-list">
-        <div class="huggies-burn-info-card">
+      <div>
+        <div>
           <h3>WHAT IS BURNING?</h3>
           <p>
             Burning refers to the process of permanently removing tokens or
@@ -26,7 +26,7 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_INFO_FUN() {
             access keys from an account, effectively locking it forever.
           </p>
         </div>
-        <div class="huggies-burn-info-card">
+        <div>
           <h3>BURN ADDRESSES</h3>
           <p>
             A burn address is an account with no access keys, making it

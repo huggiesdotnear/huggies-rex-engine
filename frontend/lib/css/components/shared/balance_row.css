@@ -1,0 +1,70 @@
+/*==================================*/
+/* balance_row
+   one row of the balance table: the icon, the ticker and the contract
+   id on one line, the human balance and the usd value on the next. */
+/*==================================*/
+/* --- one row, stacked --- */
+.balance-table .row-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.balance-table .token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+.balance-table .token-icon.is-empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.balance-table .ticker {
+  font-weight: bold;
+  flex: none;
+  white-space: nowrap;
+}
+/* the contract id sits on row one, clipped so a 64-char id cannot push
+   the row past the page. the title holds the complete value. */
+.balance-table .contract {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+/* the balance and the usd value are row two. they keep their digits
+   aligned and never wrap. */
+.balance-table .amounts {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 2px;
+  padding-left: 26px;
+}
+.balance-table .amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.balance-table .usd {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+/*==================================*/
+/* --- pinned NEAR row --- */
+.balance-table tr.is-pinned td {
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+.balance-table tr.is-pinned .ticker {
+  color: var(--color-middle);
+}
+/*==================================*/

@@ -1,5 +1,5 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_TOKEN_HOLDER_ROW
+/* token_holder_row
    one row of the holders table: the rank, the account, the balance
    and the usd value.
 
@@ -7,19 +7,19 @@
    single stacked column. the account cell stays wide and the two
    amount columns share what is left. */
 /*==================================*/
-.huggies-token-holders th.huggies-holder-rank,
-.huggies-token-holders td.huggies-holder-rank {
+.token-holders th.holder-rank,
+.token-holders td.holder-rank {
   width: 34px;
   text-align: right;
   opacity: 0.6;
 }
-.huggies-token-holders th.huggies-holder-account,
-.huggies-token-holders td.huggies-holder-account {
+.token-holders th.holder-account,
+.token-holders td.holder-account {
   width: 40%;
 }
 /* a long account id wraps inside its cell instead of stretching the
    table, so the columns keep their widths. */
-.huggies-token-holders td.huggies-holder-account a {
+.token-holders td.holder-account a {
   display: block;
   white-space: normal;
   overflow: visible;
@@ -30,13 +30,13 @@
   font-family: monospace;
   font-size: 10px;
 }
-.huggies-token-holders th.huggies-holder-amount,
-.huggies-token-holders td.huggies-holder-amount {
+.token-holders th.holder-amount,
+.token-holders td.holder-amount {
   width: 30%;
   font-variant-numeric: tabular-nums;
 }
-.huggies-token-holders th.huggies-holder-usd,
-.huggies-token-holders td.huggies-holder-usd {
+.token-holders th.holder-usd,
+.token-holders td.holder-usd {
   width: 30%;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -44,7 +44,7 @@
 }
 /* the holder column headers stay in the small uppercase label style
    the rest of the token page uses. */
-.huggies-token-holders th {
+.token-holders th {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   text-transform: uppercase;

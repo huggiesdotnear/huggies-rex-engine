@@ -9,7 +9,7 @@
 // one row of the grid: the label above the value.
 function token_meta_row_fun(label: string, value: string): preact.JSX.Element {
   return (
-    <div class="huggies-token-meta-row">
+    <div class="meta-row">
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
@@ -21,7 +21,7 @@ export function huggies_token_meta_grid_fun(
   rows: ReadonlyArray<{ label: string; value: string }>,
 ): preact.JSX.Element {
   return (
-    <div class="huggies-token-meta">
+    <div class="token-meta">
       {rows.map((row) => token_meta_row_fun(row.label, row.value))}
     </div>
   );

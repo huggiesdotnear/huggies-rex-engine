@@ -6,7 +6,7 @@
    the section heading is styled by base/main.css — the h2 rule is
    app-wide, not the page's own. */
 /*==================================*/
-.huggies-dao-roles-section {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES > section {
   margin-top: 20px;
 }
 /*==================================*/
@@ -15,45 +15,44 @@
    and the permissions both need room, and a fixed width clips them
    instead of wrapping. the account column is the only one with a
    set width, because the ids are the thing being scanned. */
-.huggies-dao-members-scroll {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .members-scroll {
   max-height: 460px;
   overflow-y: auto;
   overflow-x: hidden;
 }
-.huggies-dao-members-table {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES table {
   width: 100%;
   table-layout: auto;
   border-collapse: collapse;
   font-size: 12px;
 }
-.huggies-dao-members-table th,
-.huggies-dao-members-table td {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES th,
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES td {
   text-align: left;
   padding: 8px 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  /* --- WHY --- the roles and the permissions wrap onto as many lines
-     as they need. clipping them hid the roles an account is in, and
-     the roles are the point of the column. */
+  /* the roles and the permissions wrap onto as many lines as they
+     need. clipping them hid the roles an account is in. */
   overflow: visible;
   white-space: normal;
   vertical-align: top;
 }
-.huggies-dao-members-table th {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES th {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.7;
 }
-.huggies-dao-member-rank {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-rank {
   width: 26px;
   text-align: right;
   opacity: 0.6;
 }
-.huggies-dao-member-account {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-account {
   width: 28%;
 }
-.huggies-dao-members-table td.huggies-dao-member-account a {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES td.col-account a {
   display: block;
   overflow-wrap: anywhere;
   word-break: break-all;
@@ -63,10 +62,10 @@
 }
 /* the roles an account is in, as chips. they stack: one per line, so
    every role is visible and none is clipped. */
-.huggies-dao-member-roles {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-roles {
   width: 22%;
 }
-.huggies-dao-role-chip {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .role-chip {
   display: block;
   margin: 0 0 3px;
   padding: 2px 7px;
@@ -82,18 +81,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* what the roles grant.
-   --- WHY --- the actions are a wrapped inline list, not one per line.
-   one per line made a seventeen-line row, and a row is a member of a
-   dao, not a page of policy. the full list with every scope is in the
-   cell's title, one hover away. */
-.huggies-dao-member-permissions {
+/* what the roles grant: a wrapped inline list, not one per line. the
+   full list with every scope is in the cell's title. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-permissions {
   font-size: 10px;
   line-height: 1.6;
   opacity: 0.75;
   overflow-wrap: anywhere;
 }
-.huggies-dao-permission {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .permission {
   display: inline-block;
   margin: 0 6px 0 0;
 }
@@ -101,7 +97,7 @@
 /* --- the roles that are open to everyone ---
    they name no accounts, so there is no row for them. the note says
    they exist and what they can do. */
-.huggies-dao-open-roles {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles {
   margin: 10px 0 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;

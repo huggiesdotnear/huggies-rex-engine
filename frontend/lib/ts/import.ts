@@ -45,12 +45,12 @@ import "../components/app_page_burn_addresses";
 import "../components/app_page_burn_balances";
 import "../components/app_page_burn_info";
 import "../components/token_page_shit_1170_page_link";
-import "../components/sort_control";
+import "../components/shared/sort_control";
 import "../components/token_page_shit_1170_status";
 import "../components/token_page_shit_1170_header";
 import "../components/token_page_shit_1170_groups";
 import "../components/token_page_shit_1170_filters";
 import "../components/token_page_shit_1170_holders";
 import "../components/token_page_shit_1170_metadata";
-import "../components/token_meta_grid";
+import "../components/shared/token_meta_grid";
 // ========================================

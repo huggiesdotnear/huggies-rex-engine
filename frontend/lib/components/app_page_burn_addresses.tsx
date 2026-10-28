@@ -27,18 +27,15 @@ function account_href_fun(account_id: string): string {
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES_FUN() {
   return (
-    <section class="huggies-burn-addresses">
+    <section>
       <h2>COMMUNITY BURN ADDRESSES</h2>
-      <div class="huggies-burn-addresses-list">
+      <div>
         {HUGGIES_BURN_ADDRESSES.map((account_id) => (
-          <a
-            class="huggies-burn-address-card"
-            href={account_href_fun(account_id)}
-          >
-            <span class="huggies-burn-address-emoji">🔥</span>
-            <span class="huggies-burn-address-body">
-              <strong class="huggies-burn-address-label">BURN ADDRESS</strong>
-              <code class="huggies-burn-address-id">{account_id}</code>
+          <a href={account_href_fun(account_id)}>
+            <span class="emoji">🔥</span>
+            <span>
+              <strong>BURN ADDRESS</strong>
+              <code>{account_id}</code>
             </span>
           </a>
         ))}

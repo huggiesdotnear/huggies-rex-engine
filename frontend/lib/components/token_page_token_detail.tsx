@@ -9,7 +9,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { format_price_usd_fun } from "../ts/token_page_token_price_format";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_token_meta_grid_fun } from "./token_meta_grid";
+import { huggies_token_meta_grid_fun } from "./shared/token_meta_grid";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -20,10 +20,8 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
 
   return (
     <>
-      <header class="huggies-token-detail-header">
-        {detail.icon !== null && (
-          <img class="huggies-token-detail-icon" src={detail.icon} alt="" />
-        )}
+      <header>
+        {detail.icon !== null && <img class="icon" src={detail.icon} alt="" />}
         <div>
           <h1>{detail.symbol}</h1>
           <p>{detail.name}</p>
@@ -45,17 +43,17 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
         { label: "DECIMALS", value: String(detail.decimals) },
       ])}
       {detail.description !== null && (
-        <section class="huggies-token-description-card">
+        <section class="description-card">
           <h2>DESCRIPTION:</h2>
-          <p class="huggies-token-description">{detail.description}</p>
+          <p class="description">{detail.description}</p>
         </section>
       )}
       {Object.keys(detail.socials).length > 0 && (
-        <section class="huggies-token-socials">
+        <section class="socials">
           {Object.entries(detail.socials).map(([name, url]) => (
             <a
               key={name}
-              class="huggies-token-social-link"
+              class="social-link"
               href={url}
               target="_blank"
               rel="noreferrer"

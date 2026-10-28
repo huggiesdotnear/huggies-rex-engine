@@ -19,8 +19,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_STATUS_FUN() {
   // status line would be a second, contradicting answer.
   if (state.holders.length > 0) return null;
 
-  if (state.error !== null)
-    return <p class="huggies-shit-error">{state.error}</p>;
+  if (state.error !== null) return <p class="error">{state.error}</p>;
   return <p>LOADING SHIT...</p>;
 }
 // ========================================

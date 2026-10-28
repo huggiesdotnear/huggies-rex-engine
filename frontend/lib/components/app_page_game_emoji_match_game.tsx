@@ -142,57 +142,51 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
   const has_won = matched_pairs === HUGGIES_EMOJI_TOKENS.length;
 
   return (
-    <section class="huggies-emoji-game">
-      <header class="huggies-emoji-game-header">
+    <section>
+      <header>
         <h1>EMOJI MEMORY MATCH</h1>
         <p>Match all eight meme pairs.</p>
       </header>
-      <div class="huggies-emoji-game-stats">
-        <div class="huggies-emoji-game-stat">
+      <div class="stats">
+        <div class="stat">
           <strong>
             {matched_pairs}/{HUGGIES_EMOJI_TOKENS.length}
           </strong>
           <span>PAIRS MATCHED</span>
         </div>
-        <div class="huggies-emoji-game-stat">
+        <div class="stat">
           <strong>{moves}</strong>
           <span>MOVES</span>
         </div>
       </div>
-      <div class="huggies-emoji-game-grid" role="grid" aria-label="Memory game">
+      <div class="grid" role="grid" aria-label="Memory game">
         {cards.map((card) => {
           const icon =
             card.token_id === null ? null : (icons[card.token_id] ?? null);
           return (
             <button
               type="button"
-              class={`huggies-emoji-game-card${card.revealed ? " revealed" : ""}${card.matched ? " matched" : ""}`}
+              class={`card${card.revealed ? " is-revealed" : ""}${card.matched ? " is-matched" : ""}`}
               disabled={card.matched}
               aria-label={
                 card.revealed ? `Revealed ${card.emoji}` : "Hidden memory card"
               }
               onClick={() => reveal_card_fun(card.id)}
             >
-              <span class="huggies-emoji-game-card-face">
-                {card.revealed ? card.emoji : "?"}
-              </span>
+              <span class="card-face">{card.revealed ? card.emoji : "?"}</span>
               {card.revealed && icon !== null && (
-                <img class="huggies-emoji-game-card-icon" src={icon} alt="" />
+                <img class="card-icon" src={icon} alt="" />
               )}
             </button>
           );
         })}
       </div>
       {has_won && (
-        <p class="huggies-emoji-game-win" role="status">
+        <p class="win" role="status">
           🎉 You matched them all! You win! 🎉
         </p>
       )}
-      <button
-        type="button"
-        class="huggies-emoji-game-new-game"
-        onClick={new_game_fun}
-      >
+      <button type="button" class="new-game" onClick={new_game_fun}>
         NEW GAME
       </button>
     </section>

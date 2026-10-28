@@ -18,13 +18,13 @@
 //   - the dust toggle.
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
-import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
-import { HUGGIES_BALANCE_FILTER } from "../ts/balance_filter";
-import { HUGGIES_BALANCE_SORT } from "../ts/balance_sort";
+import { HUGGIES_AMOUNT_FORMAT } from "../../ts/token_amount_format";
+import { HUGGIES_BALANCE_FILTER } from "../../ts/balance_filter";
+import { HUGGIES_BALANCE_SORT } from "../../ts/balance_sort";
 import { huggies_balance_row_fun } from "./balance_row";
-import type { HUGGIES_BALANCE_ENTRY } from "../ts/balance_filter";
-import type { HUGGIES_BALANCE_SORT_BY } from "../ts/balance_sort";
-import { HUGGIES_NEAR_ID } from "../ts/token_near";
+import type { HUGGIES_BALANCE_ENTRY } from "../../ts/balance_filter";
+import type { HUGGIES_BALANCE_SORT_BY } from "../../ts/balance_sort";
+import { HUGGIES_NEAR_ID } from "../../ts/token_near";
 // ========================================
 // --- CONFIG -----------------------------
 // the native NEAR row is pinned above the sorted list: it is the gas
@@ -65,7 +65,7 @@ function sort_toggle_fun(
 ): preact.JSX.Element {
   const Icon = sort_desc ? ArrowDown : ArrowUp;
   return (
-    <div class="huggies-sort" role="group" aria-label="sort balances">
+    <div class="sort" role="group" aria-label="sort balances">
       <button
         type="button"
         class={sort_by === "usd" ? "is-active" : ""}
@@ -84,7 +84,7 @@ function sort_toggle_fun(
       </button>
       <button
         type="button"
-        class="huggies-sort-dir"
+        class="dir"
         onClick={() => on_sort(sort_by)}
         aria-label={sort_desc ? "sort ascending" : "sort descending"}
         title={sort_desc ? "descending" : "ascending"}
@@ -116,21 +116,21 @@ function dust_toggle_fun(
 ): preact.JSX.Element {
   if (show_dust) {
     return (
-      <div class="huggies-dust" role="group" aria-label="dust holdings">
-        <button type="button" class="huggies-dust-button" onClick={on_toggle}>
+      <div class="dust" role="group" aria-label="dust holdings">
+        <button type="button" class="dust-button" onClick={on_toggle}>
           HIDE DUST
         </button>
       </div>
     );
   }
   return (
-    <div class="huggies-dust" role="group" aria-label="dust holdings">
+    <div class="dust" role="group" aria-label="dust holdings">
       {hidden_count > 0 && (
-        <span class="huggies-dust-note">
+        <span class="dust-note">
           {hidden_count} low-value holding{hidden_count === 1 ? "" : "s"} hidden
         </span>
       )}
-      <button type="button" class="huggies-dust-button" onClick={on_toggle}>
+      <button type="button" class="dust-button" onClick={on_toggle}>
         SHOW DUST
       </button>
     </div>
@@ -176,14 +176,14 @@ export function huggies_balance_table_fun(
 
   return (
     <>
-      {props.title !== null && props.title !== undefined && (
-        <h2 class="huggies-section-title">{props.title}</h2>
-      )}
-      <div class="huggies-balance-table">
+      <div class="balance-table">
+        {props.title !== null && props.title !== undefined && (
+          <h2 class="section-title">{props.title}</h2>
+        )}
         {sort_toggle_fun(sort_by, sort_desc, on_sort_fun)}
         {/* the scroll box caps the height so a long token list never
             pushes the rest of the page off screen. */}
-        <div class="huggies-scroll">
+        <div class="scroll">
           <table data-huggies-balance-account={props.account_id ?? undefined}>
             <tbody>
               {is_loading && (
@@ -223,7 +223,7 @@ export function huggies_balance_table_fun(
               <tr>
                 <th scope="row">
                   TOTAL
-                  <span class="huggies-total-usd">
+                  <span class="total-usd">
                     {HUGGIES_AMOUNT_FORMAT.usd(total_usd)}
                   </span>
                 </th>

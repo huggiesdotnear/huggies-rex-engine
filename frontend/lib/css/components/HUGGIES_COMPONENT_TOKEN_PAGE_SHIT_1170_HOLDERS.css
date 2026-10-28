@@ -3,61 +3,61 @@
    the holder table: the rank, the account, the amount, the usd value,
    the share of the supply and the holder type. */
 /*==================================*/
-.huggies-shit-holders h2 {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holders h2 {
   text-align: left;
   font-size: 17px;
   border-bottom: 1px solid #474747;
   padding-bottom: 6px;
 }
-.huggies-shit-holders-scroll {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holders-scroll {
   max-height: 520px;
   overflow-y: auto;
   overflow-x: auto;
 }
-.huggies-shit-holders table {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
 }
-.huggies-shit-holders th,
-.huggies-shit-holders td {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS th,
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS td {
   text-align: left;
   padding: 6px 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   vertical-align: middle;
 }
-.huggies-shit-holder-rank {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-rank {
   width: 34px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: var(--color-middle);
 }
-.huggies-shit-holder-type {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-type {
   margin-right: 6px;
   font-size: 13px;
 }
-.huggies-shit-holder-account {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-account {
   font-family: Arial, Helvetica, sans-serif;
   overflow-wrap: anywhere;
 }
-.huggies-shit-holder-amount {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-amount {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   color: #8ef0a0;
   white-space: nowrap;
 }
-.huggies-shit-holder-usd {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-usd {
   font-family: Arial, Helvetica, sans-serif;
   white-space: nowrap;
   opacity: 0.9;
 }
-.huggies-shit-holder-percent {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-percent {
   font-family: Arial, Helvetica, sans-serif;
   white-space: nowrap;
   opacity: 0.75;
 }
 /* the type tag on each holder row */
-.huggies-shit-holder-tag {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag {
   display: inline-block;
   border-radius: 999px;
   padding: 2px 8px;
@@ -67,38 +67,42 @@
   white-space: nowrap;
   background: rgba(255, 255, 255, 0.16);
 }
-.huggies-shit-holder-tag.is-dev {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag.is-dev {
   background: rgba(142, 240, 160, 0.22);
 }
-.huggies-shit-holder-tag.is-dex {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag.is-dex {
   background: rgba(33, 150, 243, 0.28);
 }
-.huggies-shit-holder-tag.is-nft {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag.is-nft {
   background: rgba(255, 152, 0, 0.28);
 }
-.huggies-shit-holder-tag.is-vault {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag.is-vault {
   background: rgba(0, 198, 215, 0.28);
 }
-.huggies-shit-holder-tag.is-burn {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag.is-burn {
   background: rgba(218, 41, 28, 0.4);
 }
 /* the coloured stripe down the left of a holder row */
-.huggies-shit-holder.is-dev td:first-child {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder.is-dev td:first-child {
   border-left: 3px solid #8ef0a0;
 }
-.huggies-shit-holder.is-dex td:first-child {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder.is-dex td:first-child {
   border-left: 3px solid #2196f3;
 }
-.huggies-shit-holder.is-nft td:first-child {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder.is-nft td:first-child {
   border-left: 3px solid #ff9800;
 }
-.huggies-shit-holder.is-vault td:first-child {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS
+  .holder.is-vault
+  td:first-child {
   border-left: 3px solid var(--color-middle);
 }
-.huggies-shit-holder.is-burn td:first-child {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder.is-burn td:first-child {
   border-left: 3px solid var(--color-backend);
 }
-.huggies-shit-holder.is-regular td:first-child {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS
+  .holder.is-regular
+  td:first-child {
   border-left: 3px solid rgba(255, 255, 255, 0.3);
 }
 /*==================================*/

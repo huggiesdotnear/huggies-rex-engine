@@ -31,26 +31,24 @@ function render_holder_fun(
   depth: number,
 ): preact.JSX.Element {
   return (
-    <tr class={`huggies-shit-holder is-${holder.type}`}>
-      <td class="huggies-shit-holder-rank">{rank}</td>
+    <tr class={`holder is-${holder.type}`}>
+      <td class="holder-rank">{rank}</td>
       <td>
-        <span class="huggies-shit-holder-type">
-          {shit_holder_icon_fun(holder.type)}
-        </span>
+        <span class="holder-type">{shit_holder_icon_fun(holder.type)}</span>
         <a
-          class="huggies-shit-holder-account"
+          class="holder-account"
           href={holder_account_href_fun(holder.account_id, depth)}
         >
           {holder.account_id}
         </a>
       </td>
-      <td class="huggies-shit-holder-amount" title={holder.balance}>
+      <td class="holder-amount" title={holder.balance}>
         {holder.amount_formatted}
       </td>
-      <td class="huggies-shit-holder-usd">{holder.usd_formatted}</td>
-      <td class="huggies-shit-holder-percent">{holder.percent_formatted}</td>
+      <td class="holder-usd">{holder.usd_formatted}</td>
+      <td class="holder-percent">{holder.percent_formatted}</td>
       <td>
-        <span class={`huggies-shit-holder-tag is-${holder.type}`}>
+        <span class={`holder-tag is-${holder.type}`}>
           {shit_holder_type_label_fun(holder.type)}
         </span>
       </td>
@@ -105,7 +103,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
       : state.holders.filter((holder) => holder.type === state.active_filter);
 
   return (
-    <section class="huggies-shit-holders">
+    <section class="holders">
       <h2>
         HOLDERS (
         {state.active_filter === "all"
@@ -116,7 +114,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
       {filtered_holders.length === 0 ? (
         <p>NO HOLDERS IN THIS CATEGORY</p>
       ) : (
-        <div class="huggies-shit-holders-scroll">
+        <div class="holders-scroll">
           <table>
             <thead>
               <tr>

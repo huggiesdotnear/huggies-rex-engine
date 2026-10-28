@@ -20,7 +20,7 @@ export function huggies_contract_coming_soon_fun(
     <>
       <h1>{props.title}</h1>
       <p>COMING SOON</p>
-      <p class="huggies-contract-coming-soon-id">
+      <p class="coming-soon-id">
         <code>{props.contract_id}</code>
       </p>
     </>

@@ -31,7 +31,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK_FUN() {
   // up to app/ and back down into token/.
   const href = `${"../".repeat(current_app_depth_fun())}token/shit-1170.html`;
   return (
-    <a class="huggies-shit-link" href={href}>
+    <a class="link" href={href}>
       💩 $SHIT
     </a>
   );

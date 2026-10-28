@@ -16,13 +16,9 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS_FUN() {
   return (
-    <div class="huggies-quick-links">
-      <a class="huggies-quick-link" href="game.html">
-        🃏 EMOJI GAME
-      </a>
-      <a class="huggies-quick-link" href="burn.html">
-        🔥 BURN
-      </a>
+    <div>
+      <a href="game.html">🃏 EMOJI GAME</a>
+      <a href="burn.html">🔥 BURN</a>
     </div>
   );
 }

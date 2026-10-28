@@ -23,7 +23,7 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE_FUN() {
   return (
     <>
       <a
-        class="huggies-pumpopoly-invite"
+        class="invite"
         href={pumpopoly_invite_link_fun(HUGGIES_PUMPOPOLY_INVITE_ACCOUNT)}
         target="_blank"
         rel="noreferrer"

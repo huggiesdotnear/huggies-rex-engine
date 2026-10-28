@@ -6,14 +6,13 @@
    the page's sections — CONTRACTS and TOKENS — are plain <section>
    elements in the page column. their spacing and their heading are
    styled by base/main.css. */
+@import url(./shared/sort_control.css);
+
 /*==================================*/
-/* --- controls: search stacked above the sort buttons --- */
-/* --- WHY --- the search box sits on its own row above the sort
-   buttons, not beside them. the page column is 500px wide and the
-   sort row already needs most of it; putting the search beside it
-   squeezed both. stacked, the search gets the full width and the
-   sort buttons get a full row of their own. --- */
-.huggies-token-discover-controls {
+/* the search box sits on its own row above the sort buttons, not beside
+   them. the page column is 500px wide and the sort row already needs
+   most of it. */
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .controls {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -22,17 +21,18 @@
   width: 100%;
   min-width: 0;
 }
-.huggies-token-search {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .search {
   display: flex;
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
   flex-direction: column;
   margin-bottom: 0;
-} /* the sort control's own row. it is the full width of the column, so
+}
+/* the sort control's own row. it is the full width of the column, so
    the buttons can be spread across it rather than bunched at the left
    edge under the search box. */
-.huggies-token-discover-sort {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort {
   display: flex;
   width: 100%;
   min-width: 0;
@@ -40,22 +40,22 @@
 /* the control itself fills that row, and its buttons share the width
    evenly — so the sort row reads as one bar, not three small buttons
    floating in a wide empty space. */
-.huggies-token-discover-sort .huggies-sort-control {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort .sort-control {
   display: flex;
   flex: 1 1 auto;
   width: 100%;
 }
-.huggies-token-discover-sort .huggies-sort-button {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort .sort-button {
   flex: 1 1 0;
   justify-content: center;
 }
 /* the direction button keeps its own width: it is a small toggle, not
    a third sort key, so it does not share the row evenly with them. */
-.huggies-token-discover-sort .huggies-sort-direction {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort .sort-direction {
   flex: 0 0 auto;
 }
 /* --- the search box --- */
-.huggies-token-search input {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .search input {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -65,42 +65,29 @@
   padding: 10px 12px;
   font: inherit;
 }
-.huggies-token-search input:focus {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .search input:focus {
   outline: 2px solid var(--color-middle);
   outline-offset: 1px;
 }
-/* --- searching note --- */
-.huggies-token-searching {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  opacity: 0.6;
-  margin: 0 0 8px;
-}
-/* --- token rows --- */
-/* --- WHY --- the scroll box is a WRAPPER around the results, not the
-   results themselves. the wrapper is what the page listens to for
-   the scroll event that asks for the next page, so it has to be the
-   element that actually scrolls — the rows inside it grow as the
-   pages are appended. --- */
-.huggies-token-results-scroll {
+/* the scroll box is a WRAPPER around the results, not the results
+   themselves. the wrapper is what the page listens to for the scroll
+   event that asks for the next page. */
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .results-scroll {
   max-height: 460px;
   overflow-y: auto;
   width: 100%;
   min-width: 0;
 }
-.huggies-token-results {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .results {
   display: flex;
   flex-direction: column;
   width: 100%;
   min-width: 0;
   gap: 6px;
 }
-/* --- the loading / scroll-for-more notes --- */
-/* --- WHY --- these sit INSIDE the scroll box, below the rows, so they
-   are the last thing in the list and the reader sees them when they
-   reach the end. --- */
-.huggies-token-loading {
+/* the loading / scroll-for-more notes sit INSIDE the scroll box, below
+   the rows, so they are the last thing in the list. */
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .loading {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -109,7 +96,7 @@
   margin: 8px 0 0;
 }
 /* --- a failed request --- */
-.huggies-token-error {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .error {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -118,7 +105,7 @@
 }
 /*==================================*/
 /* --- one token row --- */
-.huggies-token-result {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result {
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
@@ -131,50 +118,48 @@
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.14);
 }
-.huggies-token-result:hover {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result:hover {
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.24);
 }
-/* --- marked tokens: our own and the meme set --- */
-/* --- WHY --- these tokens are MARKED, not pinned. they are styled so
-   they stand out wherever the chosen sort puts them, but they never
-   override the order — the reader's sort is the order. --- */
-.huggies-token-result.is-marked {
+/* marked tokens are styled so they stand out wherever the chosen sort
+   puts them, but they never override the order. */
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result.is-marked {
   border-color: var(--color-middle);
   background: rgba(0, 0, 0, 0.2);
 }
-.huggies-token-result.is-marked strong {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result.is-marked strong {
   color: var(--color-middle);
 }
-.huggies-token-result-icon {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-icon {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
 }
-.huggies-token-result-icon.is-empty {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-icon.is-empty {
   display: inline-block;
   background: rgba(255, 255, 255, 0.25);
 }
-.huggies-token-result-copy,
-.huggies-token-result-values {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-copy,
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-values {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
-.huggies-token-result-copy span,
-.huggies-token-result-copy code,
-.huggies-token-result-values span {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-copy span,
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-copy code,
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-values span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.huggies-token-result-copy code {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-copy code {
   font-size: 10px;
   opacity: 0.55;
 }
-.huggies-token-result-values {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-values {
   align-items: flex-end;
   font-size: 11px;
   font-variant-numeric: tabular-nums;

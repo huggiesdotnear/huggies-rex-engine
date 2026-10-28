@@ -2,19 +2,18 @@
 /* HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES
    the community burn addresses, as cards.
 
-   --- WHY --- one card per row and not a grid: there are only two of
-   them, and each card carries a long account id that has to stay
-   readable. a grid would squeeze the id into a narrow column. */
+   one card per row and not a grid: there are only two of them, and
+   each card carries a long account id that has to stay readable. */
 /*==================================*/
-.huggies-burn-addresses {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES {
   text-align: left;
 }
-.huggies-burn-addresses-list {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES > section > div {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-.huggies-burn-address-card {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES a {
   display: flex;
   align-items: center;
   gap: 0.7rem;
@@ -31,29 +30,29 @@
     border-color 0.2s ease,
     background-color 0.2s ease;
 }
-.huggies-burn-address-card:hover,
-.huggies-burn-address-card:focus-visible {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES a:hover,
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES a:focus-visible {
   border-color: rgba(255, 255, 255, 0.45);
   background: rgba(0, 0, 0, 0.22);
 }
-.huggies-burn-address-emoji {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES .emoji {
   flex: 0 0 auto;
   font-size: 1.7rem;
   line-height: 1;
 }
-.huggies-burn-address-body {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES a > span:last-child {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
   flex: 1 1 auto;
 }
-.huggies-burn-address-label {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES strong {
   font-family: "Lilita One", sans-serif;
   font-size: 14px;
   letter-spacing: 0.08em;
 }
-.huggies-burn-address-id {
+#HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES code {
   font-size: 11px;
   opacity: 0.65;
   overflow: hidden;

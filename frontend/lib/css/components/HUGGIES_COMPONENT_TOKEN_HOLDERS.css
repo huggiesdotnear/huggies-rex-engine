@@ -3,31 +3,33 @@
    the indexed holders table: the rank, the account, the balance and
    the usd value.
 
-   the row itself is a shared component
-   (HUGGIES_COMPONENT_TOKEN_HOLDER_ROW.css), so both the column widths
-   and the row's own look live in their own files. */
+   the row itself is a shared component (shared/token_holder_row.css),
+   so both the column widths and the row's own look live in their own
+   files. */
+@import url(./shared/token_holder_row.css);
+
 /*==================================*/
-.huggies-token-holders {
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders {
   margin-top: 20px;
 }
-.huggies-token-holders h2 {
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders h2 {
   text-align: left;
   font-size: 17px;
   border-bottom: 1px solid #474747;
   padding-bottom: 6px;
 }
-.huggies-token-holders .huggies-scroll {
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders .scroll {
   max-height: 420px;
   overflow-y: auto;
 }
-.huggies-token-holders table {
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders table {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 12px;
 }
-.huggies-token-holders th,
-.huggies-token-holders td {
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders th,
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders td {
   text-align: left;
   padding: 6px 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -35,7 +37,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.huggies-token-holders button {
+#HUGGIES_COMPONENT_TOKEN_HOLDERS .token-holders button {
   margin-top: 8px;
 }
 /*==================================*/

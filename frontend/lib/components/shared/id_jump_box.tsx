@@ -38,7 +38,7 @@ export interface HUGGIES_ID_JUMP_BOX_PROPS {
   // the url parameter the id is written to. "id" for most pages,
   // "dao_id" for the DAO page.
   param_name: string;
-  // the css class prefix, e.g. "huggies-pumpopoly".
+  // the css class prefix, e.g. "pumpopoly".
   class_prefix: string;
 }
 // ========================================
@@ -85,7 +85,6 @@ export function huggies_id_jump_box_fun(
       </button>
     </section>
   );
-}
-// ========================================
+} // ========================================
 // copyright 2026 by sleet.near
 // ========================================

@@ -3,7 +3,7 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { huggies_contract_coming_soon_fun } from "./contract_coming_soon";
+import { huggies_contract_coming_soon_fun } from "./shared/contract_coming_soon";
 // ========================================
 // the Rhea DCL v2 contract page component.
 function HUGGIES_COMPONENT_CONTRACT_PAGE_RHEA_DCL_V2_PAGE_FUN() {

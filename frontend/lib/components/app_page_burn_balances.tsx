@@ -31,52 +31,41 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
   const is_loading = page_data === null;
 
   return (
-    <section class="huggies-burn-balances">
+    <section>
       <h2>TOKEN BALANCES IN BURN ACCOUNT</h2>
-      {is_loading && <p class="huggies-burn-note">LOADING...</p>}
+      {is_loading && <p class="note">LOADING...</p>}
       {!is_loading && tokens.length === 0 && (
-        <p class="huggies-burn-note">NO TOKENS BURNED YET</p>
+        <p class="note">NO TOKENS BURNED YET</p>
       )}
-      <div class="huggies-burn-tokens-list">
+      <div class="token-list">
         {tokens.map((token) => (
-          <a
-            class="huggies-burn-token-card"
-            href={token_detail_href_fun(token.id)}
-          >
-            <div class="huggies-burn-token-header">
-              <span class="huggies-burn-token-icon-wrap">
+          <a href={token_detail_href_fun(token.id)}>
+            <div class="token-header">
+              <span class="icon-wrap">
                 {token.icon !== null ? (
-                  <img
-                    class="huggies-burn-token-icon"
-                    src={token.icon}
-                    alt=""
-                  />
+                  <img class="icon" src={token.icon} alt="" />
                 ) : (
-                  <span class="huggies-burn-token-icon-placeholder">
-                    {token.symbol.charAt(0)}
-                  </span>
+                  <span class="icon-placeholder">{token.symbol.charAt(0)}</span>
                 )}
               </span>
-              <span class="huggies-burn-token-info">
-                <strong class="huggies-burn-token-label">{token.symbol}</strong>
-                <code class="huggies-burn-token-id">{token.id}</code>
+              <span class="token-info">
+                <strong class="token-label">{token.symbol}</strong>
+                <code class="token-id">{token.id}</code>
               </span>
             </div>
-            <div class="huggies-burn-token-details">
-              <div class="huggies-burn-token-detail">
-                <span class="huggies-burn-token-detail-label">BURNED</span>
-                <span class="huggies-burn-token-detail-value">
+            <div class="token-details">
+              <div class="token-detail">
+                <span class="detail-label">BURNED</span>
+                <span class="detail-value">
                   {HUGGIES_AMOUNT_FORMAT.balance(token.raw, {
                     decimals: token.decimals,
                   })}{" "}
                   {token.symbol}
                 </span>
               </div>
-              <div class="huggies-burn-token-detail">
-                <span class="huggies-burn-token-detail-label">
-                  OF TOTAL SUPPLY
-                </span>
-                <span class="huggies-burn-token-detail-value">
+              <div class="token-detail">
+                <span class="detail-label">OF TOTAL SUPPLY</span>
+                <span class="detail-value">
                   {HUGGIES_SUPPLY_PERCENT.format(token.percent)}
                 </span>
               </div>
@@ -85,9 +74,9 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
         ))}
       </div>
       {page_data !== null && page_data.errors.length > 0 && (
-        <div class="huggies-burn-errors">
+        <div class="errors">
           {page_data.errors.map((error) => (
-            <p class="huggies-burn-note">{error}</p>
+            <p class="note">{error}</p>
           ))}
         </div>
       )}

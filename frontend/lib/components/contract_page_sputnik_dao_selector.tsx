@@ -17,7 +17,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_AUTH } from "../ts/auth_status";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_id_jump_box_fun } from "./id_jump_box";
+import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
 import { HUGGIES_URL_ID } from "../ts/url_id";
 // ========================================
 // ========================================
@@ -60,10 +60,10 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
         placeholder: "dao.sputnik-dao.near",
         button_text: "OPEN DAO",
         param_name: "id",
-        class_prefix: "huggies-dao",
+        class_prefix: "dao",
       })}
       {has_choice && (
-        <label class="huggies-dao-select">
+        <label class="select">
           <span>YOUR DAOS</span>
           <select
             value={dao_id ?? ""}

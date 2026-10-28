@@ -11,12 +11,9 @@ import {
 // shared smart-contract discover component.
 function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
   return (
-    <div class="huggies-contract-cards">
+    <div>
       {list_contract_cards_fun().map((card) => (
-        <a
-          class="huggies-contract-card"
-          href={contract_page_href_fun(card.page)}
-        >
+        <a href={contract_page_href_fun(card.page)}>
           <strong>{card.title}</strong>
           <code>{card.contract_id}</code>
         </a>

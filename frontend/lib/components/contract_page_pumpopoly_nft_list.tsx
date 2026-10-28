@@ -22,8 +22,8 @@ import { ArrowDown, ArrowUp } from "lucide-preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_error_card_fun } from "./error_card";
-import { huggies_stat_tile_fun } from "./stat_tile";
+import { huggies_error_card_fun } from "./shared/error_card";
+import { huggies_stat_tile_fun } from "./shared/stat_tile";
 // ========================================
 // ========================================
 // --- SORT ------------------------------
@@ -67,10 +67,10 @@ function nft_sort_control_fun(props: {
 }): preact.JSX.Element {
   const Icon = props.direction === "desc" ? ArrowDown : ArrowUp;
   return (
-    <div class="huggies-sort-control huggies-pumpopoly-nft-sort">
+    <div class="sort-control">
       <button
         type="button"
-        class="huggies-sort-button is-active"
+        class="sort-button is-active"
         aria-pressed="true"
         onClick={() =>
           props.on_direction(props.direction === "desc" ? "asc" : "desc")
@@ -115,15 +115,15 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
       {huggies_error_card_fun({
         error: page_data?.errors.nfts ?? null,
         label: "NFTS",
-        class_prefix: "huggies-pumpopoly",
+        class_prefix: "pumpopoly",
       })}
       <h2>nft.pumpopoly.near</h2>
-      <div class="huggies-pumpopoly-cards">
+      <div class="cards">
         {huggies_stat_tile_fun({
           label: "NFTS HELD",
           value: String(page_data?.nft.count ?? 0),
           sub: "PUMPOPOLY NFTS",
-          class_prefix: "huggies-pumpopoly",
+          class_prefix: "pumpopoly",
         })}
       </div>
       {token_ids.length === 0 ? (
@@ -134,8 +134,8 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
             direction,
             on_direction: (next) => set_direction(next),
           })}
-          <div class="huggies-pumpopoly-nft-scroll">
-            <table class="huggies-pumpopoly-nft-table">
+          <div class="nft-scroll">
+            <table class="nft-table">
               <thead>
                 <tr>
                   <th scope="col">TOKEN ID</th>

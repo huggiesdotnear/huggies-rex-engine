@@ -16,7 +16,7 @@ export interface HUGGIES_ERROR_CARD_PROPS {
   error: string | null;
   // what could not be loaded, e.g. "PLAYER DATA".
   label: string;
-  // the css class prefix, e.g. "huggies-pumpopoly".
+  // the css class prefix, e.g. "pumpopoly".
   class_prefix: string;
 }
 // ========================================
@@ -41,7 +41,6 @@ export function huggies_error_card_fun(
       </div>
     </>
   );
-}
-// ========================================
+} // ========================================
 // copyright 2026 by sleet.near
 // ========================================

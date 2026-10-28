@@ -1,17 +1,13 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_STAT_TILE
+/* stat_tile
    the stat tile: a label, a value, and an optional sub-label.
 
    one tile shape, used by the pumpopoly page's six stat cards and its
    nft count. the tile is shared; the page's own parts of it (the
-   label, value, sub and text styles) live in the page's css.
-
-   --- WHY --- the tile carries the neutral class for its own box and
-   the page prefix for its parts. the box is the same everywhere, but
-   the type inside it belongs to the page. */
+   label, value, sub and text styles) live in the page's css. */
 /*==================================*/
 /* the tile itself. */
-.huggies-stat-tile {
+.stat-tile {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;

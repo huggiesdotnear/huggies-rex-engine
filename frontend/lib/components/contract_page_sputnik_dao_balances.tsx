@@ -17,7 +17,7 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_balance_table_fun } from "./balance_table";
+import { huggies_balance_table_fun } from "./shared/balance_table";
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN() {

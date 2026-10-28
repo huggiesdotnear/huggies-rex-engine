@@ -2,32 +2,31 @@
 /* HUGGIES_COMPONENT_EMOJI_MATCH_GAME
    the emoji memory game, in the huggies style.
    the board keeps the emojifi shape — a four-by-four grid of square
-   cards — but every colour comes from the app's own palette, so the
-   game reads as part of the site rather than a pasted-in page. */
+   cards — but every colour comes from the app's own palette. */
 /*==================================*/
-.huggies-emoji-game {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME {
   width: 100%;
   box-sizing: border-box;
   text-align: left;
 }
-.huggies-emoji-game-header h1 {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME header h1 {
   margin: 0 0 0.25rem;
   font-size: 26px;
 }
-.huggies-emoji-game-header p {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME header p {
   margin: 0 0 1rem;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   opacity: 0.75;
 }
 /* --- score row --- */
-.huggies-emoji-game-stats {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .stats {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
-.huggies-emoji-game-stat {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .stat {
   flex: 1 1 100px;
   display: flex;
   flex-direction: column;
@@ -37,24 +36,24 @@
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.14);
 }
-.huggies-emoji-game-stat strong {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .stat strong {
   font-size: 22px;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
-.huggies-emoji-game-stat span {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .stat span {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   letter-spacing: 0.06em;
   opacity: 0.7;
 }
 /* --- the board --- */
-.huggies-emoji-game-grid {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(0.35rem, 2vw, 0.7rem);
 }
-.huggies-emoji-game-card {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card {
   position: relative;
   aspect-ratio: 1;
   min-width: 0;
@@ -76,28 +75,28 @@
     background-color 0.2s ease,
     border-color 0.2s ease;
 }
-.huggies-emoji-game-card:hover:not(:disabled),
-.huggies-emoji-game-card:focus-visible:not(:disabled) {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card:hover:not(:disabled),
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card:focus-visible:not(:disabled) {
   transform: translateY(-0.1rem);
   border-color: var(--color-middle);
   background: var(--color-middle-dark);
 }
-.huggies-emoji-game-card.revealed {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card.is-revealed {
   background: var(--color-middle);
   border-color: var(--color-middle);
 }
-.huggies-emoji-game-card.matched {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card.is-matched {
   background: var(--color-middle-dark);
   border-color: var(--color-middle-dark);
   cursor: default;
 }
-.huggies-emoji-game-card-face {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card-face {
   display: block;
   font-size: clamp(1.4rem, 7vw, 2.2rem);
   line-height: 1;
 }
 /* the token icon sits in the corner of a revealed card. */
-.huggies-emoji-game-card-icon {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .card-icon {
   position: absolute;
   right: 0.25rem;
   bottom: 0.25rem;
@@ -107,7 +106,7 @@
   border-radius: 50%;
   background: #ffffff;
 }
-.huggies-emoji-game-win {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .win {
   margin: 1rem 0;
   padding: 0.75rem;
   border: 1px solid var(--color-middle);
@@ -116,11 +115,11 @@
   font-weight: 700;
   text-align: center;
 }
-.huggies-emoji-game-new-game {
+#HUGGIES_COMPONENT_EMOJI_MATCH_GAME .new-game {
   margin-top: 1rem;
 }
 @media (max-width: 420px) {
-  .huggies-emoji-game-grid {
+  #HUGGIES_COMPONENT_EMOJI_MATCH_GAME .grid {
     gap: 0.3rem;
   }
 }

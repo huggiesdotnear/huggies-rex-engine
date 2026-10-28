@@ -9,7 +9,7 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { HUGGIES_TOKEN_PAGE_TOKEN } from "../ts/token_page_token";
-import { token_holder_row_fun } from "./token_holder_row";
+import { token_holder_row_fun } from "./shared/token_holder_row";
 import { use_page_store_fun } from "../ts/use_page_store";
 import type { HUGGIES_TOKEN_DETAIL } from "../ts/token_page_token_detail";
 // ========================================
@@ -51,16 +51,16 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
   };
 
   return (
-    <section class="huggies-token-holders">
+    <section class="token-holders">
       <h2>INDEXED HOLDERS ({state.holder_total.toLocaleString()})</h2>
-      <div class="huggies-scroll">
+      <div class="scroll">
         <table>
           <thead>
             <tr>
-              <th class="huggies-holder-rank">#</th>
-              <th class="huggies-holder-account">ACCOUNT</th>
-              <th class="huggies-holder-amount">BALANCE</th>
-              <th class="huggies-holder-usd">USD</th>
+              <th class="holder-rank">#</th>
+              <th class="holder-account">ACCOUNT</th>
+              <th class="holder-amount">BALANCE</th>
+              <th class="holder-usd">USD</th>
             </tr>
           </thead>
           <tbody>

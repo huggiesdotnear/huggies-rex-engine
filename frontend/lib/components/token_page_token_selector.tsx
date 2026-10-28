@@ -11,7 +11,7 @@
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
-import { huggies_id_jump_box_fun } from "./id_jump_box";
+import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -29,7 +29,7 @@ function HUGGIES_COMPONENT_TOKEN_SELECTOR_FUN() {
         placeholder: "token.near",
         button_text: "OPEN TOKEN",
         param_name: "id",
-        class_prefix: "huggies-token",
+        class_prefix: "token",
       })}
     </>
   );

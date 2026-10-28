@@ -3,7 +3,7 @@
    the $SHIT page's status line: what the page says while the load is
    running and when it failed. */
 /*==================================*/
-.huggies-shit-error {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_STATUS .error {
   margin: 10px 0 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;

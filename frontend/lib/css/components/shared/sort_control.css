@@ -1,12 +1,12 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_SORT_CONTROL
+/* sort_control
    the shared sort control: a row of small toggle buttons.
 
    used by the token list on the discover page and by the pumpopoly
    nft list. the token list offers its sort keys as buttons; the nft
    list has one key and uses the direction toggle alone. */
 /*==================================*/
-.huggies-sort-control {
+.sort-control {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -16,12 +16,10 @@
   background: rgba(0, 0, 0, 0.15);
   min-width: 0;
 }
-/* --- WHY --- the global `button` rule in button.css sizes every
-   button to the full 500px page column. the sort buttons sit side by
-   side, so they must opt out of that width and size to their own
-   content instead — otherwise two of them are 1000px wide inside a
-   500px column and blow the page layout apart. --- */
-.huggies-sort-button {
+/* the global `button` rule in button.css sizes every button to the
+   full 500px page column. the sort buttons sit side by side, so they
+   must opt out of that width and size to their own content instead. */
+.sort-button {
   width: auto;
   max-width: none;
   display: inline-flex;
@@ -43,17 +41,14 @@
   opacity: 0.6;
   white-space: nowrap;
 }
-.huggies-sort-button:hover {
+.sort-button:hover {
   background: rgba(255, 255, 255, 0.18);
   color: inherit;
 }
-.huggies-sort-button.is-active,
-.huggies-sort-button.is-active:hover {
+.sort-button.is-active,
+.sort-button.is-active:hover {
   opacity: 1;
   background: var(--color-middle);
   color: var(--color-fontend);
 }
-/* the direction toggle is a `.huggies-sort-button` too — it carries
-   both classes — so it gets its look from the rule above. the page
-   that uses it adds the layout tweak for its own row. */
 /*==================================*/
