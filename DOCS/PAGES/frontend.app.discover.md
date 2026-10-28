@@ -20,7 +20,7 @@ the page lists the supported contracts and a searchable, sortable list of tokens
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
 <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
-<div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_GAME_LINK"></div>
+<div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS"></div>
 ```
 
 ====================

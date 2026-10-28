@@ -1,0 +1,37 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS
+   the quiet links under the auth button: the emoji game and the burn
+   page. they are meant to be found, so they are quiet: small, low
+   contrast, and only a little brighter on hover.
+
+   --- WHY --- one row and not two blocks: the two links are the same
+   kind of thing, so they belong side by side under the auth button
+   rather than stacked. */
+/*==================================*/
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 2px;
+  text-align: center;
+}
+.huggies-quick-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+}
+.huggies-quick-link {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-decoration: none !important;
+  color: inherit;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+.huggies-quick-link:hover,
+.huggies-quick-link:focus-visible {
+  opacity: 0.9;
+}
+/*==================================*/

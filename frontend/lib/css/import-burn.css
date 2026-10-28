@@ -1,0 +1,8 @@
+/*==================================*/
+/* the burn page's css: the components it mounts, and the markup the
+   page itself owns. */
+@import url(./burn.css);
+@import url(./components/HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES.css);
+@import url(./components/HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES.css);
+@import url(./components/HUGGIES_COMPONENT_APP_PAGE_BURN_INFO.css);
+/*==================================*/

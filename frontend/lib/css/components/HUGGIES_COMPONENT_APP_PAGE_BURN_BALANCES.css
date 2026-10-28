@@ -1,0 +1,129 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES
+   the burned tokens, as cards.
+
+   --- WHY --- a grid and not one card per row: there is one card per
+   burned token and there can be many of them. a grid of equal cards
+   reads as a collection, where a stack of full-width rows reads as a
+   list. the card is sized by the page column, so it stays inside the
+   500px the app renders into.
+
+   --- WHY --- the two figures inside a card are stacked and not side
+   by side: "BURNED 12.5M SHIT" and "OF TOTAL SUPPLY 4.21%" are both
+   long, and side by side they would wrap in a narrow card. */
+/*==================================*/
+.huggies-burn-balances {
+  text-align: left;
+}
+.huggies-burn-note {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  text-align: left;
+  margin: 0.5rem 0;
+}
+.huggies-burn-tokens-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.5rem;
+}
+.huggies-burn-token-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+.huggies-burn-token-card:hover,
+.huggies-burn-token-card:focus-visible {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.22);
+}
+.huggies-burn-token-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.huggies-burn-token-icon-wrap {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.huggies-burn-token-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.huggies-burn-token-icon-placeholder {
+  font-family: "Lilita One", sans-serif;
+  font-size: 16px;
+  color: #474747;
+  line-height: 1;
+}
+.huggies-burn-token-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.huggies-burn-token-label {
+  font-family: "Lilita One", sans-serif;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.huggies-burn-token-id {
+  font-size: 10px;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.huggies-burn-token-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.huggies-burn-token-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  min-width: 0;
+}
+.huggies-burn-token-detail-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+.huggies-burn-token-detail-value {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.huggies-burn-errors {
+  margin-top: 0.5rem;
+}
+/*==================================*/

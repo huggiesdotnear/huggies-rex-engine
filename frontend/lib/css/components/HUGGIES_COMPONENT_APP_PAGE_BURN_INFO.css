@@ -1,0 +1,44 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_APP_PAGE_BURN_INFO
+   the "about burning on NEAR" section: what burning is, and what a
+   burn address is.
+
+   --- WHY --- two cards side by side: they are two short ideas, and a
+   reader takes one of them in at a time. side by side they can be
+   compared; stacked they would just be two paragraphs.
+
+   --- WHY --- the text is left aligned: a paragraph of five lines set
+   centred is hard to read, because every line starts in a different
+   place. the cards themselves are centred so they read as a pair. */
+/*==================================*/
+.huggies-burn-info {
+  text-align: center;
+}
+.huggies-burn-info-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+.huggies-burn-info-card {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+.huggies-burn-info-card h3 {
+  margin: 0 0 0.4rem;
+  padding-bottom: 4px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+.huggies-burn-info-card p {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  opacity: 0.9;
+}
+/*==================================*/

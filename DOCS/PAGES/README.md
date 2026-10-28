@@ -54,6 +54,7 @@ everything for that page. no component fetches anything.
 - [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - FEED
 - [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html` - AUTH
 - [`frontend.app.discover.md`](./frontend.app.discover.md) - `frontend/app/discover.html`
+- [`frontend.app.burn.md`](./frontend.app.burn.md) - `frontend/app/burn.html` - BURN
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
 - [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id=
