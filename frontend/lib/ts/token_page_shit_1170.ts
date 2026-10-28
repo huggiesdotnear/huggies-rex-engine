@@ -5,27 +5,29 @@
 // whole point of it.
 //
 // WHAT THE PAGE REQUESTS
-//   1. GET /tokens     the token's summary: decimals, total supply, and
-//                      the metadata the page shows.
-//   2. GET /price      the token's price from the intear price api.
-//   3. GET /holders    one page of the token's holders, 100 rows at a
+//   1. GET /tokens     the token's summary: the price, the decimals,
+//                      the total supply, and the metadata the page
+//                      shows.
+//   2. GET /holders    one page of the token's holders, 100 rows at a
 //                      time, paged by cursor.
 //
 // --- WHY --- the summary loads FIRST and alone. it carries the token's
-// decimals and its total supply, and the holder rows need both.
-// nothing about the token is hardcoded, so the holder math cannot start
-// before the api has answered.
+// price, its decimals and its total supply, and the holder rows need
+// all three. nothing about the token is hardcoded, so the holder math
+// cannot start before the api has answered.
 //
-// --- WHY --- the holders wait for the price. the holder rows carry a
+// --- WHY --- there is no separate price request. the summary asks for
+// `price_usd` and gets it, so asking for the price again would fetch
+// the same number twice over the wire.
+//
+// --- WHY --- the holders wait for the summary. the holder rows carry a
 // usd column, and a row priced with a price of zero reads as "$0.00",
 // which is a lie rather than a missing number. so the price is known
 // before the first holder page is asked for.
 import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
 import { fetch_shit_summary_fun } from "./token_page_shit_1170_summary";
-import { fetch_shit_price_fun } from "./token_page_shit_1170_price";
 import { fetch_shit_holders_fun } from "./token_page_shit_1170_holders";
 import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
-import type { HUGGIES_SHIT_PRICE } from "./token_page_shit_1170_price";
 import type {
   HUGGIES_SHIT_HOLDER,
   HUGGIES_SHIT_HOLDERS_PAGE,
@@ -54,12 +56,6 @@ async function fetch_shit_summary_page_fun(): Promise<HUGGIES_SHIT_SUMMARY | nul
   return await fetch_shit_summary_fun();
 }
 // ========================================
-// --- PRICE -----------------------------
-// fetch the token's price.
-async function fetch_shit_price_page_fun(): Promise<HUGGIES_SHIT_PRICE> {
-  return await fetch_shit_price_fun();
-}
-// ========================================
 // --- HOLDERS ---------------------------
 // fetch one cursor page of the token's holders, priced and classified.
 async function fetch_shit_holders_page_fun(
@@ -81,7 +77,6 @@ async function fetch_shit_holders_page_fun(
 export const HUGGIES_TOKEN_PAGE_SHIT_1170 = {
   token_id: HUGGIES_SHIT_TOKEN_ID,
   load_summary: fetch_shit_summary_page_fun,
-  load_price: fetch_shit_price_page_fun,
   load_holders: fetch_shit_holders_page_fun,
   bigint_or_zero: bigint_or_zero_fun,
 };

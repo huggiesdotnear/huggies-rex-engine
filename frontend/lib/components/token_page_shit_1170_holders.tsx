@@ -66,7 +66,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
   const load_more_fun = () => {
     const cursor = state.next_cursor;
     if (cursor === null || state.loading_more) return;
-    const price_usd = state.price?.price_usd ?? state.summary?.price_usd ?? 0;
+    const price_usd = state.summary?.price_usd ?? 0;
     HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
       ...state,
       loading_more: true,

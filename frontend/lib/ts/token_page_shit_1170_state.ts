@@ -12,7 +12,6 @@
 // throwing subscriber cannot break.
 import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "./token_page_shit_1170";
 import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
-import type { HUGGIES_SHIT_PRICE } from "./token_page_shit_1170_price";
 import type { HUGGIES_SHIT_HOLDER } from "./token_page_shit_1170_holders";
 import type { HUGGIES_SHIT_HOLDER_TYPE } from "./token_page_shit_1170_known_holders";
 // ========================================
@@ -24,10 +23,9 @@ export type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_TYPE | "all";
 // the page's state. the empty state is what the page holds before the
 // first load answers.
 export interface HUGGIES_SHIT_1170_STATE {
-  // the token's summary, once it has loaded.
+  // the token's summary, once it has loaded. it carries the price, so
+  // the page needs no separate price request.
   summary: HUGGIES_SHIT_SUMMARY | null;
-  // the price, once it has loaded.
-  price: HUGGIES_SHIT_PRICE | null;
   // the holder rows loaded so far.
   holders: HUGGIES_SHIT_HOLDER[];
   // how many holders the api says there are in total.
@@ -48,7 +46,6 @@ export interface HUGGIES_SHIT_1170_STATE {
 // the empty state the page starts from.
 let state: HUGGIES_SHIT_1170_STATE = {
   summary: null,
-  price: null,
   holders: [],
   holder_total: 0,
   next_cursor: null,
@@ -104,7 +101,6 @@ function subscribe_fun(listener: () => void): () => void {
 function reset_fun(): void {
   set_state_fun({
     summary: null,
-    price: null,
     holders: [],
     holder_total: 0,
     next_cursor: null,
@@ -133,11 +129,16 @@ function set_active_filter_fun(filter: HUGGIES_SHIT_ACTIVE_FILTER): void {
 // ignored, so the page cannot fetch twice because two components asked
 // for it.
 //
-// --- WHY --- the three steps run in order, not together: the summary
-// carries the decimals and the total supply, and the holder rows need
-// both. the holder rows also need the price, because a row priced with
-// a price of zero reads as "$0.00" — a lie rather than a missing
-// number.
+// --- WHY --- the two steps run in order, not together: the summary
+// carries the price, the decimals and the total supply, and the holder
+// rows need all three. the holder rows also need the price, because a
+// row priced with a price of zero reads as "$0.00" — a lie rather than
+// a missing number.
+//
+// --- WHY --- there is NO separate price request. the summary request
+// asks for `price_usd` and gets it, so a second call for the same
+// number would only fetch it twice over the wire. this is the same
+// reasoning the regular token page uses (see token_page_token.ts).
 async function token_page_shit_1170_state_load_fun(): Promise<void> {
   if (loading) return;
   loading = true;
@@ -145,9 +146,7 @@ async function token_page_shit_1170_state_load_fun(): Promise<void> {
   notify_fun();
   try {
     const summary = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_summary();
-    const price = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_price();
-    const price_usd =
-      price.price_usd > 0 ? price.price_usd : (summary?.price_usd ?? 0);
+    const price_usd = summary?.price_usd ?? 0;
     const total_supply_raw = HUGGIES_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
       summary?.total_supply_raw ?? "0",
     );
@@ -160,7 +159,6 @@ async function token_page_shit_1170_state_load_fun(): Promise<void> {
     set_state_fun({
       ...state,
       summary,
-      price,
       holders: page.rows,
       holder_total: page.total,
       next_cursor: page.next_cursor,
