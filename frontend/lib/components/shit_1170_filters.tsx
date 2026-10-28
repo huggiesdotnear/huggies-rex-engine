@@ -9,15 +9,15 @@
 // emoji explains what that group of holders is.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
-import { HUGGIES_SHIT_FILTERS } from "../ts/tokens_page_shit_1170_filters";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
+import { HUGGIES_SHIT_FILTERS } from "../ts/token_page_shit_1170_filters";
 import { use_page_store_fun } from "../ts/use_page_store";
-import type { HUGGIES_SHIT_ACTIVE_FILTER } from "../ts/tokens_page_shit_1170_state";
+import type { HUGGIES_SHIT_ACTIVE_FILTER } from "../ts/token_page_shit_1170_state";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_FILTERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
   const active_filter = state.active_filter;
 
   return (
@@ -35,7 +35,7 @@ function HUGGIES_COMPONENT_SHIT_1170_FILTERS_FUN() {
           aria-label={filter.label}
           title={`${filter.label} — ${filter.description}`}
           onClick={() =>
-            HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.set_active_filter(
+            HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set_active_filter(
               filter.key as HUGGIES_SHIT_ACTIVE_FILTER,
             )
           }

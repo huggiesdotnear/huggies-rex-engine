@@ -1,4 +1,4 @@
-# frontend/app/tokens/token.html ?id={token_id}
+# frontend/app/token/index.html ?id={token_id}
 
 the page shows one token: its card, its metadata, and the indexed holders of it, taken from the `?id=` url parameter.
 

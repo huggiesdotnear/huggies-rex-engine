@@ -4,17 +4,17 @@
 //
 // the components on this page do not fetch. they read this store. that
 // is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/tokens_page_shit_1170.ts), so there is exactly one set
+// loader (lib/ts/token_page_shit_1170.ts), so there is exactly one set
 // of requests.
 //
-// the store has the same shape as lib/ts/tokens_page_token_state.ts:
+// the store has the same shape as lib/ts/token_page_token_state.ts:
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
-import { HUGGIES_TOKENS_PAGE_SHIT_1170 } from "./tokens_page_shit_1170";
-import type { HUGGIES_SHIT_SUMMARY } from "./tokens_page_shit_1170_summary";
-import type { HUGGIES_SHIT_PRICE } from "./tokens_page_shit_1170_price";
-import type { HUGGIES_SHIT_HOLDER } from "./tokens_page_shit_1170_holders";
-import type { HUGGIES_SHIT_HOLDER_TYPE } from "./tokens_page_shit_1170_known_holders";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "./token_page_shit_1170";
+import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
+import type { HUGGIES_SHIT_PRICE } from "./token_page_shit_1170_price";
+import type { HUGGIES_SHIT_HOLDER } from "./token_page_shit_1170_holders";
+import type { HUGGIES_SHIT_HOLDER_TYPE } from "./token_page_shit_1170_known_holders";
 // ========================================
 // ========================================
 // --- TYPES -----------------------------
@@ -70,7 +70,7 @@ function notify_fun(): void {
     try {
       listener();
     } catch (err) {
-      console.error("[tokens_page_shit_1170_state] listener failed", err);
+      console.error("[token_page_shit_1170_state] listener failed", err);
     }
   }
 }
@@ -138,20 +138,20 @@ function set_active_filter_fun(filter: HUGGIES_SHIT_ACTIVE_FILTER): void {
 // both. the holder rows also need the price, because a row priced with
 // a price of zero reads as "$0.00" — a lie rather than a missing
 // number.
-async function tokens_page_shit_1170_state_load_fun(): Promise<void> {
+async function token_page_shit_1170_state_load_fun(): Promise<void> {
   if (loading) return;
   loading = true;
   reset_fun();
   notify_fun();
   try {
-    const summary = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_summary();
-    const price = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_price();
+    const summary = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_summary();
+    const price = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_price();
     const price_usd =
       price.price_usd > 0 ? price.price_usd : (summary?.price_usd ?? 0);
-    const total_supply_raw = HUGGIES_TOKENS_PAGE_SHIT_1170.bigint_or_zero(
+    const total_supply_raw = HUGGIES_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
       summary?.total_supply_raw ?? "0",
     );
-    const page = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_holders(
+    const page = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_holders(
       null,
       price_usd,
       summary?.decimals ?? 18,
@@ -181,13 +181,13 @@ async function tokens_page_shit_1170_state_load_fun(): Promise<void> {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_TOKENS_PAGE_SHIT_1170_STATE = {
+export const HUGGIES_TOKEN_PAGE_SHIT_1170_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,
   reset: reset_fun,
   set_active_filter: set_active_filter_fun,
-  load: tokens_page_shit_1170_state_load_fun,
+  load: token_page_shit_1170_state_load_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

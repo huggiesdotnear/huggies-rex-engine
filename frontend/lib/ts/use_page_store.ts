@@ -9,7 +9,7 @@
 // a component that uses it only displays. it never loads and it never
 // subscribes:
 //
-//   const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_TOKEN_STATE);
+//   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
 //
 // --- WHY --- this lives in lib/ts and not in lib/components: a hook
 // does not need jsx. it is plain ts that happens to call preact's

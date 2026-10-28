@@ -21,15 +21,15 @@
 // which is a lie rather than a missing number. so the price is known
 // before the first holder page is asked for.
 import { HUGGIES_SHIT_TOKEN_ID } from "./shit_token";
-import { fetch_shit_summary_fun } from "./tokens_page_shit_1170_summary";
-import { fetch_shit_price_fun } from "./tokens_page_shit_1170_price";
-import { fetch_shit_holders_fun } from "./tokens_page_shit_1170_holders";
-import type { HUGGIES_SHIT_SUMMARY } from "./tokens_page_shit_1170_summary";
-import type { HUGGIES_SHIT_PRICE } from "./tokens_page_shit_1170_price";
+import { fetch_shit_summary_fun } from "./token_page_shit_1170_summary";
+import { fetch_shit_price_fun } from "./token_page_shit_1170_price";
+import { fetch_shit_holders_fun } from "./token_page_shit_1170_holders";
+import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
+import type { HUGGIES_SHIT_PRICE } from "./token_page_shit_1170_price";
 import type {
   HUGGIES_SHIT_HOLDER,
   HUGGIES_SHIT_HOLDERS_PAGE,
-} from "./tokens_page_shit_1170_holders";
+} from "./token_page_shit_1170_holders";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -78,7 +78,7 @@ async function fetch_shit_holders_page_fun(
 // ========================================
 // --- PUBLIC ---------------------------
 // the page's load surface. one call per thing the page loads.
-export const HUGGIES_TOKENS_PAGE_SHIT_1170 = {
+export const HUGGIES_TOKEN_PAGE_SHIT_1170 = {
   token_id: HUGGIES_SHIT_TOKEN_ID,
   load_summary: fetch_shit_summary_page_fun,
   load_price: fetch_shit_price_page_fun,

@@ -57,8 +57,8 @@ everything for that page. no component fetches anything.
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
 - [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id=
-- [`frontend.app.tokens.token.md`](./frontend.app.tokens.token.md) - `frontend/app/tokens/token.html` - ?id= - TOKEN
-- [`frontend.app.tokens.shit-1170.md`](./frontend.app.tokens.shit-1170.md) - `frontend/app/tokens/shit-1170.html`
+- [`frontend.app.token.index.md`](./frontend.app.token.index.md) - `frontend/app/token/index.html` - ?id= - TOKEN
+- [`frontend.app.token.shit-1170.md`](./frontend.app.token.shit-1170.md) - `frontend/app/token/shit-1170.html`
 - [`frontend.app.contract.rhea-amm.md`](./frontend.app.contract.rhea-amm.md) - `frontend/app/contract/rhea-amm.html`
 - [`frontend.app.contract.rhea-dcl-v2.md`](./frontend.app.contract.rhea-dcl-v2.md) - `frontend/app/contract/rhea-dcl-v2.html`
 - [`frontend.app.contract.intear-dex.md`](./frontend.app.contract.intear-dex.md) - `frontend/app/contract/intear-dex.html`

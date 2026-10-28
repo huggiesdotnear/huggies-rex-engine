@@ -12,18 +12,18 @@
 // it.
 //
 // --- WHY --- the store owns the load and this file only asks for it:
-// the fetching itself lives in lib/ts/tokens_page_token.ts, so the
+// the fetching itself lives in lib/ts/token_page_token.ts, so the
 // page's request list is still knowable by reading one file.
 //
 // --- WHY --- the token id comes from the url: the page shows the
 // token named by `?id=`, and the components read the same id from the
 // same place, so there is one source for it.
-import { HUGGIES_TOKENS_PAGE_TOKEN_STATE } from "./tokens_page_token_state";
+import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "./token_page_token_state";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // begin the page's load for the token the url names.
-void HUGGIES_TOKENS_PAGE_TOKEN_STATE.load();
+void HUGGIES_TOKEN_PAGE_TOKEN_STATE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

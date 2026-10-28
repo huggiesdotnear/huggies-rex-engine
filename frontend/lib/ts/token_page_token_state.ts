@@ -10,9 +10,9 @@
 // state, a subscribe/unsubscribe pair, and a notify that a throwing
 // subscriber cannot break.
 // ========================================
-import { HUGGIES_TOKENS_PAGE_TOKEN } from "./tokens_page_token";
-import { HUGGIES_TOKENS_PAGE_TOKEN_ID } from "./tokens_page_token_id";
-import type { HUGGIES_TOKEN_PAGE_STATE } from "./tokens_page_token_detail";
+import { HUGGIES_TOKEN_PAGE_TOKEN } from "./token_page_token";
+import { HUGGIES_TOKEN_PAGE_TOKEN_ID } from "./token_page_token_id";
+import type { HUGGIES_TOKEN_PAGE_STATE } from "./token_page_token_detail";
 // ========================================
 // --- STATE ------------------------------
 // the page's state. the empty state is what the page holds before the
@@ -47,7 +47,7 @@ function notify_fun(): void {
     try {
       listener();
     } catch (err) {
-      console.error("[tokens_page_token_state] listener failed", err);
+      console.error("[token_page_token_state] listener failed", err);
     }
   }
 }
@@ -107,8 +107,8 @@ function reset_fun(): void {
 // it by the token's decimals, and both come from the metadata
 // response. but the holders request does not need them — it returns
 // raw balances — so there is nothing to wait for.
-async function tokens_page_token_state_load_fun(): Promise<void> {
-  const next_token_id = HUGGIES_TOKENS_PAGE_TOKEN_ID.get();
+async function token_page_token_state_load_fun(): Promise<void> {
+  const next_token_id = HUGGIES_TOKEN_PAGE_TOKEN_ID.get();
   // --- WHY --- the id is stored even when there is none: the
   // components read it to know there is nothing to show, and they read
   // it through the store so they follow it when it changes.
@@ -125,8 +125,8 @@ async function tokens_page_token_state_load_fun(): Promise<void> {
   notify_fun();
   try {
     const [detail, holder_page] = await Promise.all([
-      HUGGIES_TOKENS_PAGE_TOKEN.load_detail(load_token_id),
-      HUGGIES_TOKENS_PAGE_TOKEN.load_holders(load_token_id, null),
+      HUGGIES_TOKEN_PAGE_TOKEN.load_detail(load_token_id),
+      HUGGIES_TOKEN_PAGE_TOKEN.load_holders(load_token_id, null),
     ]);
     // a load for an older token id must not overwrite a newer one.
     if (loaded_token_id !== load_token_id) return;
@@ -166,12 +166,12 @@ function get_token_id_fun(): string | null {
 }
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_TOKENS_PAGE_TOKEN_STATE = {
+export const HUGGIES_TOKEN_PAGE_TOKEN_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,
   reset: reset_fun,
-  load: tokens_page_token_state_load_fun,
+  load: token_page_token_state_load_fun,
   get_token_id: get_token_id_fun,
 };
 // ========================================

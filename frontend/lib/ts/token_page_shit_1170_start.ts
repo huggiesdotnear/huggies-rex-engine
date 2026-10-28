@@ -12,17 +12,17 @@
 // it.
 //
 // --- WHY --- the store owns the load and this file only asks for it:
-// the fetching itself lives in lib/ts/tokens_page_shit_1170.ts, so the
+// the fetching itself lives in lib/ts/token_page_shit_1170.ts, so the
 // page's request list is still knowable by reading one file.
 //
 // --- WHY --- the page is for ONE token: the token id is a constant
 // (lib/ts/shit_token.ts), so the start file needs no id from the url.
-import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "./tokens_page_shit_1170_state";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "./token_page_shit_1170_state";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // begin the page's load.
-void HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.load();
+void HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

@@ -24,9 +24,9 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK_FUN() {
   const token_id = token_id_from_url_fun();
   if (token_id !== HUGGIES_SHIT_TOKEN_ID) return null;
   // the link is relative, so it resolves against whatever page it sits
-  // on. the holders page lives in app/tokens/, so the prefix walks back
-  // up to app/ and back down into tokens/.
-  const href = `${"../".repeat(current_app_depth_fun())}tokens/shit-1170.html`;
+  // on. the holders page lives in app/token/, so the prefix walks back
+  // up to app/ and back down into token/.
+  const href = `${"../".repeat(current_app_depth_fun())}token/shit-1170.html`;
   return (
     <a class="huggies-shit-link" href={href}>
       💩 $SHIT

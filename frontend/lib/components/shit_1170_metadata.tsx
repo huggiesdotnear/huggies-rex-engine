@@ -7,11 +7,11 @@
 // store. it fetches nothing.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { shit_total_supply_formatted_fun } from "../ts/tokens_page_shit_1170_holders";
-import type { HUGGIES_SHIT_SUMMARY } from "../ts/tokens_page_shit_1170_summary";
-import type { HUGGIES_SHIT_PRICE } from "../ts/tokens_page_shit_1170_price";
+import { shit_total_supply_formatted_fun } from "../ts/token_page_shit_1170_holders";
+import type { HUGGIES_SHIT_SUMMARY } from "../ts/token_page_shit_1170_summary";
+import type { HUGGIES_SHIT_PRICE } from "../ts/token_page_shit_1170_price";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -35,7 +35,7 @@ function shit_meta_row_fun(label: string, value: string): preact.JSX.Element {
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_METADATA_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
   const summary = state.summary;
   const price = state.price;
   // no summary yet — there is nothing to show.

@@ -15,7 +15,7 @@ WORKFLOW
 - always pull first.
 - undo local chages/commits if commits on the remote that are not local, rather than some rebase/force bullshit, then manually reapply changes if applicable.
 - commit and push after making changes.
-- 
+-
 
 ---
 

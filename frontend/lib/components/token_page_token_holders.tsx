@@ -7,33 +7,33 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_TOKEN_STATE } from "../ts/tokens_page_token_state";
-import { HUGGIES_TOKENS_PAGE_TOKEN } from "../ts/tokens_page_token";
+import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
+import { HUGGIES_TOKEN_PAGE_TOKEN } from "../ts/token_page_token";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { token_holder_row_fun } from "./token_holder_row";
 import { use_page_store_fun } from "../ts/use_page_store";
-import type { HUGGIES_TOKEN_DETAIL } from "../ts/tokens_page_token_detail";
+import type { HUGGIES_TOKEN_DETAIL } from "../ts/token_page_token_detail";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_TOKEN_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
   const detail = state.detail;
   if (detail === null) return null;
 
   // ask the loader for the next holder page and fold it into the store.
   const load_more_fun = () => {
-    const token_id = HUGGIES_TOKENS_PAGE_TOKEN_STATE.get_token_id();
+    const token_id = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get_token_id();
     const cursor = state.next_cursor;
     if (token_id === null || cursor === null || state.loading_more) return;
-    HUGGIES_TOKENS_PAGE_TOKEN_STATE.set({
+    HUGGIES_TOKEN_PAGE_TOKEN_STATE.set({
       ...state,
       loading_more: true,
     });
-    void HUGGIES_TOKENS_PAGE_TOKEN.load_holders(token_id, cursor)
+    void HUGGIES_TOKEN_PAGE_TOKEN.load_holders(token_id, cursor)
       .then((page) => {
-        const current = HUGGIES_TOKENS_PAGE_TOKEN_STATE.get();
-        HUGGIES_TOKENS_PAGE_TOKEN_STATE.set({
+        const current = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get();
+        HUGGIES_TOKEN_PAGE_TOKEN_STATE.set({
           ...current,
           holders: [...current.holders, ...page.rows],
           holder_total: page.total,
@@ -42,8 +42,8 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
         });
       })
       .catch((err: unknown) => {
-        const current = HUGGIES_TOKENS_PAGE_TOKEN_STATE.get();
-        HUGGIES_TOKENS_PAGE_TOKEN_STATE.set({
+        const current = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get();
+        HUGGIES_TOKEN_PAGE_TOKEN_STATE.set({
           ...current,
           loading_more: false,
           error: err instanceof Error ? err.message : String(err),

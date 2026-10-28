@@ -6,8 +6,8 @@
 // balance of every holder in a group and turns it into a share of the
 // SHIT total supply, which comes from the intear api.
 // ========================================
-import type { HUGGIES_SHIT_HOLDER } from "./tokens_page_shit_1170_holders";
-import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./tokens_page_shit_1170_known_holders";
+import type { HUGGIES_SHIT_HOLDER } from "./token_page_shit_1170_holders";
+import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./token_page_shit_1170_known_holders";
 // ========================================
 // the share of the total supply one group of holders holds.
 export interface HUGGIES_SHIT_HOLDER_GROUP {

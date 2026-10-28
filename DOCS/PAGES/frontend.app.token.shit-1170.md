@@ -1,4 +1,4 @@
-# frontend/app/tokens/shit-1170.html
+# frontend/app/token/shit-1170.html
 
 the page shows the $SHIT token: its holders, the share of the supply each group of holders holds, and the token's own metadata.
 

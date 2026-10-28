@@ -4,7 +4,7 @@
 import {
   HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
   type HUGGIES_SHIT_HOLDER_ROW_TYPE,
-} from "./tokens_page_shit_1170_known_holders";
+} from "./token_page_shit_1170_known_holders";
 // ========================================
 // one filter: a key, a label, an icon, and the tooltip that explains
 // what the type is.

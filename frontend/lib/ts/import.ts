@@ -9,7 +9,7 @@
 // --- WHY --- this app is mainnet-only. the pin has to happen before
 // the first near_connect_client() call, and some pages load
 // app_page_account_route.ts (which inits auth) ahead of this file.
-// the pages under app/contract/ and app/tokens/ do not load
+// the pages under app/contract/ and app/token/ do not load
 // hello.ts themselves, so it is imported here for them.
 import "./hello";
 import "../components/nav";
@@ -34,14 +34,14 @@ import "../components/contract_page_pumpopoly_nft_list";
 import "../components/contract_page_pumpopoly_invite";
 import "../components/contract_discover";
 import "../components/token_discover";
-import "../components/tokens_page_token_selector";
-import "../components/tokens_page_token_detail";
-import "../components/tokens_page_token_holders";
-import "../components/tokens_page_token_status";
+import "../components/token_page_token_selector";
+import "../components/token_page_token_detail";
+import "../components/token_page_token_holders";
+import "../components/token_page_token_status";
 import "../components/app_page_game_emoji_match_game";
 import "../components/app_page_game_meme_tokens";
 import "../components/game_link";
-import "../components/tokens_page_shit_1170_page_link";
+import "../components/token_page_shit_1170_page_link";
 import "../components/sort_control";
 import "../components/shit_1170_status";
 import "../components/shit_1170_header";

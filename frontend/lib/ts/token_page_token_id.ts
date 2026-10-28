@@ -19,7 +19,7 @@ function token_id_from_url_fun(): string | null {
 }
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_TOKENS_PAGE_TOKEN_ID = {
+export const HUGGIES_TOKEN_PAGE_TOKEN_ID = {
   get: token_id_from_url_fun,
 };
 // ========================================

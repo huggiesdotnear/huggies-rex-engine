@@ -33,7 +33,7 @@ import { icon_hash_of_fun, token_icon_url_fun } from "./token_icon_url";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,
-} from "./tokens_page_token_detail";
+} from "./token_page_token_detail";
 // ========================================
 // the fields the metadata request asks for.
 //
@@ -129,7 +129,7 @@ async function fetch_token_holders_fun(
 // ========================================
 // --- PUBLIC ---------------------------
 // the page's load surface. one call per thing the page loads.
-export const HUGGIES_TOKENS_PAGE_TOKEN = {
+export const HUGGIES_TOKEN_PAGE_TOKEN = {
   load_detail: fetch_token_detail_fun,
   load_holders: fetch_token_holders_fun,
 };

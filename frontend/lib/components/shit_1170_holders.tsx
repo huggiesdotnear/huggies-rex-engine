@@ -6,15 +6,15 @@
 // — the load more button asks the page's loader for the next page.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
-import { HUGGIES_TOKENS_PAGE_SHIT_1170 } from "../ts/tokens_page_shit_1170";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "../ts/token_page_shit_1170";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { use_page_store_fun } from "../ts/use_page_store";
 import {
   shit_holder_icon_fun,
   shit_holder_type_label_fun,
   type HUGGIES_SHIT_HOLDER,
-} from "../ts/tokens_page_shit_1170_holders";
+} from "../ts/token_page_shit_1170_holders";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -60,28 +60,28 @@ function render_holder_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_HOLDERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
 
   // ask the loader for the next holder page and fold it into the store.
   const load_more_fun = () => {
     const cursor = state.next_cursor;
     if (cursor === null || state.loading_more) return;
     const price_usd = state.price?.price_usd ?? state.summary?.price_usd ?? 0;
-    HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.set({
+    HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
       ...state,
       loading_more: true,
     });
-    void HUGGIES_TOKENS_PAGE_SHIT_1170.load_holders(
+    void HUGGIES_TOKEN_PAGE_SHIT_1170.load_holders(
       cursor,
       price_usd,
       state.summary?.decimals ?? 18,
-      HUGGIES_TOKENS_PAGE_SHIT_1170.bigint_or_zero(
+      HUGGIES_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
         state.summary?.total_supply_raw ?? "0",
       ),
     )
       .then((page) => {
-        const current = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get();
-        HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.set({
+        const current = HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.get();
+        HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
           ...current,
           holders: [...current.holders, ...page.rows],
           holder_total: page.total,
@@ -90,8 +90,8 @@ function HUGGIES_COMPONENT_SHIT_1170_HOLDERS_FUN() {
         });
       })
       .catch((err: unknown) => {
-        const current = HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get();
-        HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.set({
+        const current = HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.get();
+        HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
           ...current,
           loading_more: false,
           error: err instanceof Error ? err.message : String(err),

@@ -6,13 +6,13 @@
 // nothing — the page's start script runs the load.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_TOKEN_STATE } from "../ts/tokens_page_token_state";
+import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { use_page_store_fun } from "../ts/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_STATUS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_TOKEN_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
 
   // --- WHY --- the status only shows while there is no token card to
   // show. once the metadata has loaded, the card and the holders table
@@ -20,7 +20,7 @@ function HUGGIES_COMPONENT_TOKEN_STATUS_FUN() {
   // answer.
   if (state.detail !== null) return null;
 
-  if (HUGGIES_TOKENS_PAGE_TOKEN_STATE.get_token_id() === null) {
+  if (HUGGIES_TOKEN_PAGE_TOKEN_STATE.get_token_id() === null) {
     return <p>TOKEN ID MISSING</p>;
   }
   if (state.error !== null) return <p>{state.error}</p>;

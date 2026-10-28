@@ -150,7 +150,7 @@ async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
 // --- WHY --- the favourites and the page are fetched at the same time:
 // neither waits for the other, so the page is as slow as its slowest
 // request rather than the sum of the two.
-async function load_tokens_page_fun(
+async function load_token_page_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
   offset: number,
@@ -208,7 +208,7 @@ async function load_search_fun(
 // --- PUBLIC ---------------------------
 // the page's load surface. one call per thing the page loads.
 export const HUGGIES_APP_PAGE_DISCOVER = {
-  load_tokens_page: load_tokens_page_fun,
+  load_tokens_page: load_token_page_fun,
   load_icons: load_icons_fun,
   load_favourites: fetch_favourites_fun,
   search: load_search_fun,

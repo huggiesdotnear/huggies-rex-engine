@@ -6,8 +6,8 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_TOKEN_STATE } from "../ts/tokens_page_token_state";
-import { format_price_usd_fun } from "../ts/tokens_page_token_price_format";
+import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
+import { format_price_usd_fun } from "../ts/token_page_token_price_format";
 import { use_page_store_fun } from "../ts/use_page_store";
 // ========================================
 // ========================================
@@ -27,7 +27,7 @@ function token_metadata_row_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_TOKEN_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
   const detail = state.detail;
   if (detail === null) return null;
 

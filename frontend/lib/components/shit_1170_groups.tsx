@@ -9,17 +9,17 @@
 // the type. the card of the ACTIVE tab is the filled-in one.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKENS_PAGE_SHIT_1170_STATE } from "../ts/tokens_page_shit_1170_state";
-import { HUGGIES_TOKENS_PAGE_SHIT_1170 } from "../ts/tokens_page_shit_1170";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "../ts/token_page_shit_1170";
 import { use_page_store_fun } from "../ts/use_page_store";
 import {
   shit_holder_groups_fun,
   type HUGGIES_SHIT_HOLDER_GROUP,
-} from "../ts/tokens_page_shit_1170_holder_groups";
+} from "../ts/token_page_shit_1170_holder_groups";
 import {
   shit_holder_icon_fun,
   shit_holder_type_label_fun,
-} from "../ts/tokens_page_shit_1170_holders";
+} from "../ts/token_page_shit_1170_holders";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -54,14 +54,14 @@ function render_group_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SHIT_1170_GROUPS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKENS_PAGE_SHIT_1170_STATE);
+  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
   // the groups are the loaded holders added up per type. before the
   // first page of holders lands there is nothing to add up.
   if (state.holders.length === 0) return null;
 
   const groups = shit_holder_groups_fun(
     state.holders,
-    HUGGIES_TOKENS_PAGE_SHIT_1170.bigint_or_zero(
+    HUGGIES_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
       state.summary?.total_supply_raw ?? "0",
     ),
   );
