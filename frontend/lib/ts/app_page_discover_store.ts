@@ -90,7 +90,7 @@ async function load_fun(
   loaded_desc = desc;
   notify_fun();
   try {
-    const tokens = await HUGGIES_APP_PAGE_DISCOVER.load_tokens_page(
+    const token_list = await HUGGIES_APP_PAGE_DISCOVER.load_token_list(
       sort,
       desc,
       0,
@@ -100,7 +100,7 @@ async function load_fun(
     // the icons for the rows on screen. the cache is read first, so
     // on a warm cache this costs no network at all.
     const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
-      tokens.rows,
+      token_list.rows,
       sort,
       desc,
     );
@@ -109,11 +109,11 @@ async function load_fun(
     // while a search was on screen, and the search rows belong to the
     // old view — showing them under a new sort is showing one list
     // under another's label.
-    data = { tokens, search: null, icons, errors: [] };
+    data = { token_list, search: null, icons, errors: [] };
   } catch (err) {
     if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
-      tokens: { rows: [], has_more: false, fetched: 0 },
+      token_list: { rows: [], has_more: false, fetched: 0 },
       search: null,
       icons: {},
       errors: [err instanceof Error ? err.message : String(err)],
@@ -147,8 +147,8 @@ async function load_more_fun(
     // screen: the favourites are pinned on top of the first page and
     // were never part of the api's paging, so counting them would
     // skip rows at the start of the next page.
-    const offset = data.tokens.fetched;
-    const next = await HUGGIES_APP_PAGE_DISCOVER.load_tokens_page(
+    const offset = data.token_list.fetched;
+    const next = await HUGGIES_APP_PAGE_DISCOVER.load_token_list(
       sort,
       desc,
       offset,
@@ -164,8 +164,8 @@ async function load_more_fun(
     if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
       ...data,
-      tokens: {
-        rows: [...data.tokens.rows, ...next.rows],
+      token_list: {
+        rows: [...data.token_list.rows, ...next.rows],
         has_more: next.has_more,
         fetched: next.fetched,
       },
@@ -211,7 +211,7 @@ async function search_fun(query: string): Promise<void> {
     // until the list was fetched again.
     data = {
       ...(data ?? {
-        tokens: { rows: [], has_more: false, fetched: 0 },
+        token_list: { rows: [], has_more: false, fetched: 0 },
         search: null,
         icons: {},
         errors: [],
@@ -222,7 +222,7 @@ async function search_fun(query: string): Promise<void> {
   } catch (err) {
     data = {
       ...(data ?? {
-        tokens: { rows: [], has_more: false, fetched: 0 },
+        token_list: { rows: [], has_more: false, fetched: 0 },
         search: null,
         icons: {},
         errors: [],

@@ -31,7 +31,7 @@
 // warm cache every visible icon is already stored.
 // ========================================
 import { api_intear_tokens_get } from "../../../middleman";
-import { HUGGIES_DISCOVER_TOKEN_PAGE } from "./app_page_discover_token_page";
+import { HUGGIES_DISCOVER_TOKEN_LIST } from "./app_page_discover_token_list";
 import { fetch_token_icons_fun } from "./app_page_discover_token_icons";
 import { search_tokens_fun } from "./app_page_discover_token_search";
 import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
@@ -43,7 +43,7 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_resu
 // ========================================
 // --- TYPES ------------------------------
 // one page of the token list, as the page holds it.
-export interface HUGGIES_APP_PAGE_DISCOVER_TOKENS {
+export interface HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST {
   // the rows on screen.
   rows: HUGGIES_TOKEN_SEARCH_RESULT[];
   // true when the api has more rows behind this one.
@@ -58,7 +58,7 @@ export interface HUGGIES_APP_PAGE_DISCOVER_TOKENS {
 // everything the discover page has loaded.
 export interface HUGGIES_APP_PAGE_DISCOVER_DATA {
   // the token list, page by page.
-  tokens: HUGGIES_APP_PAGE_DISCOVER_TOKENS;
+  token_list: HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST;
   // the search results, when the reader has typed something.
   search: HUGGIES_TOKEN_SEARCH_RESULT[] | null;
   // the icons for the rows on screen, by token id.
@@ -150,13 +150,13 @@ async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
 // --- WHY --- the favourites and the page are fetched at the same time:
 // neither waits for the other, so the page is as slow as its slowest
 // request rather than the sum of the two.
-async function load_token_page_fun(
+async function load_token_list_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
   offset: number,
-): Promise<HUGGIES_APP_PAGE_DISCOVER_TOKENS> {
+): Promise<HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST> {
   const [page, favourites] = await Promise.all([
-    HUGGIES_DISCOVER_TOKEN_PAGE.fetch(sort, desc, offset),
+    HUGGIES_DISCOVER_TOKEN_LIST.fetch(sort, desc, offset),
     offset === 0 && sort === "default"
       ? fetch_favourites_fun()
       : Promise.resolve([]),
@@ -208,7 +208,7 @@ async function load_search_fun(
 // --- PUBLIC ---------------------------
 // the page's load surface. one call per thing the page loads.
 export const HUGGIES_APP_PAGE_DISCOVER = {
-  load_tokens_page: load_token_page_fun,
+  load_token_list: load_token_list_fun,
   load_icons: load_icons_fun,
   load_favourites: fetch_favourites_fun,
   search: load_search_fun,

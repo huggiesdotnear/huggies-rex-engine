@@ -127,7 +127,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   // searching, the list pages otherwise.
   const tokens = use_memo(() => {
     if (searching) return page_data?.search ?? [];
-    const rows = page_data?.tokens.rows ?? [];
+    const rows = page_data?.token_list.rows ?? [];
     return order_discover_tokens_fun(rows, sort);
   }, [searching, page_data, sort, direction]);
 
@@ -138,7 +138,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   // bottom of the list, not when they reach it exactly: the request
   // takes a moment, and asking early means the rows are usually
   // already there by the time they scroll to them.
-  const has_more = page_data?.tokens.has_more ?? false;
+  const has_more = page_data?.token_list.has_more ?? false;
   use_effect(() => {
     if (searching || !has_more || loading) return;
     const element = scroll_ref.current;

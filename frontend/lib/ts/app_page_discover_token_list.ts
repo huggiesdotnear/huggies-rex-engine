@@ -97,7 +97,7 @@ function map_token_row_fun(
 // carries one. the `default` sort is not a real field — it is the
 // favourites-first view — so it pages by volume and the favourites
 // are pinned on top afterwards.
-export interface HUGGIES_TOKEN_PAGE {
+export interface HUGGIES_DISCOVER_TOKEN_LIST {
   rows: HUGGIES_TOKEN_SEARCH_RESULT[];
   // true when the api has more rows behind this one.
   has_more: boolean;
@@ -110,12 +110,12 @@ export interface HUGGIES_TOKEN_PAGE {
 //
 // `offset` is the row count already served by the api, so page two
 // asks for the rows after the first page.
-async function fetch_token_page_fun(
+async function fetch_token_list_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
   offset: number,
   limit: number = HUGGIES_TOKEN_PAGE_SIZE,
-): Promise<HUGGIES_TOKEN_PAGE> {
+): Promise<HUGGIES_DISCOVER_TOKEN_LIST> {
   const response = await api_intear_tokens_get({
     fields: HUGGIES_TOKEN_LIST_FIELDS,
     sort: {
@@ -139,8 +139,8 @@ async function fetch_token_page_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_DISCOVER_TOKEN_PAGE = {
-  fetch: fetch_token_page_fun,
+export const HUGGIES_DISCOVER_TOKEN_LIST = {
+  fetch: fetch_token_list_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near
