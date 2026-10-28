@@ -30,7 +30,11 @@ the error codes are `invalid_account_id`, `trezu_unreachable`,
 ## CLIENT
 
 the typed client lives in `middleman/huggies/`:
-`api_trezu_treasuries_get({ accountId, includeHidden })`.
+`api_trezu_treasuries_get(base_url, { accountId, includeHidden })`.
+
+the base url is the first argument, not a constant: the frontend
+passes the origin of the page it is served from, and a bin passes
+whatever backend it was told to talk to.
 
 it is same-origin: the browser calls our backend, our backend calls
 trezu. no upstream auth is needed, trezu's treasuries endpoint is

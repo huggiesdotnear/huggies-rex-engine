@@ -20,8 +20,8 @@ user info and session managmnets
 
 - `/api/huggies/ping` - liveness check, returns `{ "ok": true, "app": "huggies-rex-engine" }`
 
-  the typed client is `api_huggies_ping_get()`. it is named after us
-  because it is OUR route — nothing is proxied through it.
+  the typed client is `api_huggies_ping_get(base_url)`. it is named
+  after us because it is OUR route — nothing is proxied through it.
 
 ### `/api/trezu/` - trezu specifics
 

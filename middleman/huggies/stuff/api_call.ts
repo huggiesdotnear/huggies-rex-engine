@@ -1,0 +1,134 @@
+// ========================================
+// API_CALL
+// the single fetch+log+error helper every wrapper in middleman/huggies
+// goes through. the goal: one place to change if we ever want to add
+// retries, timeouts, tracing, or different log formatting.
+//
+// flow:
+//   1. resolve url = base_url + endpoint_url(key, params)
+//   2. if `query` is supplied, append ?key=value&...
+//   3. fetch with the supplied method/body/headers
+//   4. on non-2xx: parse_error() logs and throws
+//   5. on 2xx:    parse json, log the success block, return it
+//
+// `params` substitutes :name placeholders in the path template.
+// `query` (optional) appends extra key=value pairs as a query
+// string. `body`, when supplied, is JSON.stringified and sent with
+// content-type: application/json — omit for GET / DELETE-with-no-body.
+//
+// --- WHY --- the base url is a parameter, not a constant. the
+// frontend passes the origin of the page it is served from; a bin
+// passes whatever backend it was told to talk to. a constant baked
+// into this module would be "" outside a browser, so a bin could
+// never reach the backend at all.
+//
+// --- WHY --- the query builder drops undefined/null/"" but keeps
+// false and 0. our routes read those two as real values, so
+// dropping them would silently change what the route does.
+//
+// `label` is the human-readable name that shows up in the success
+// log block (e.g. "TREZU TREASURIES GET"). `fallback` is the prefix
+// on the thrown error (e.g. "api_trezu_treasuries_get failed"). the
+// two are usually the same string.
+//
+// the `url` + `method` are passed through to parse_error() on
+// failure so the error log block can show exactly which request
+// blew up.
+// ========================================
+
+import { endpoint_url } from "./endpoint_url";
+import type { EndpointKey } from "./endpoint_paths";
+import { parse_error } from "./parse_error";
+import { build_headers, type REQUEST_OPTIONS } from "./request_options";
+
+export interface API_CALL_PARAMS {
+  base_url: string;
+  key: EndpointKey;
+  params?: Record<string, string | number>;
+  query?: Record<string, string | number | boolean | undefined>;
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  body?: unknown;
+  options?: REQUEST_OPTIONS;
+  // success log label. e.g. "TREZU TREASURIES GET".
+  label: string;
+  // error message prefix. e.g. "api_trezu_treasuries_get failed".
+  fallback: string;
+}
+
+export async function api_call<T = unknown>({
+  base_url,
+  key,
+  params = {},
+  query,
+  method,
+  body,
+  options = {},
+  label,
+  fallback,
+}: API_CALL_PARAMS): Promise<T> {
+  // ========================================
+  let url = `${base_url}${endpoint_url(key, params)}`;
+  if (query) {
+    const entries = Object.entries(query).filter(
+      (entry): entry is [string, string | number | boolean] =>
+        entry[1] !== undefined && entry[1] !== null && entry[1] !== "",
+    );
+    if (entries.length > 0) {
+      const qs = new URLSearchParams(
+        Object.fromEntries(
+          entries.map(([k, v]) => [k, encode_query_value_fun(v)]),
+        ),
+      ).toString();
+      url = `${url}?${qs}`;
+    }
+  }
+
+  const init: RequestInit = {
+    method,
+    headers: build_headers(
+      options,
+      body !== undefined ? { "content-type": "application/json" } : {},
+    ),
+  };
+  if (body !== undefined) {
+    init.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(url, init);
+  if (!res.ok) {
+    throw await parse_error(res, fallback, {
+      url,
+      method,
+      label,
+      // init.body is the post-JSON.stringify form, exactly
+      // what hit the wire. undefined for body-less calls
+      // (GET, DELETE), which parse_error then omits from
+      // the banner.
+      request_body: init.body,
+    });
+  }
+
+  const json = (await res.json()) as T;
+  // ========================================
+  // framed success log; response redacted via redact_value.
+  console.log("=============================");
+  console.log(` ${label} via ${method} on:`, url);
+  console.log("RESPONSE STATUS:", `${res.status} - ${res.statusText}`);
+  console.log("RESPONSE:", json);
+  console.log("=============================");
+  // ========================================
+  return json;
+}
+
+// ========================================
+// render one query value. booleans become "true"/"false", numbers
+// keep their literal form, everything else is stringified.
+function encode_query_value_fun(value: string | number | boolean): string {
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? String(value) : "null";
+  }
+  return String(value);
+}
+// ========================================
+// copyright 2026 by sleet.near
