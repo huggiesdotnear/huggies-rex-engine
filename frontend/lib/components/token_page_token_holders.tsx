@@ -9,7 +9,6 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { HUGGIES_TOKEN_PAGE_TOKEN } from "../ts/token_page_token";
-import { current_app_depth_fun } from "../ts/app_depth";
 import { token_holder_row_fun } from "./token_holder_row";
 import { use_page_store_fun } from "../ts/use_page_store";
 import type { HUGGIES_TOKEN_DETAIL } from "../ts/token_page_token_detail";

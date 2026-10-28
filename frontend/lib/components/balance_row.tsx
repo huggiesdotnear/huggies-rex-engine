@@ -20,7 +20,7 @@ import { current_app_depth_fun } from "../ts/app_depth";
 // --- WHY --- <img> with the api's data: url directly: the icon field is
 // already a self-contained data uri, so there is no extra request and
 // no origin problem to configure.
-export function huggies_token_icon_fun(
+function huggies_token_icon_fun(
   icon: string | null,
   symbol: string,
 ): preact.JSX.Element {

@@ -17,7 +17,7 @@ export type HUGGIES_SHIT_HOLDER_ROW_TYPE =
   HUGGIES_SHIT_HOLDER_TYPE | typeof HUGGIES_SHIT_HOLDER_TYPE_REGULAR;
 // ========================================
 // known accounts mapping
-export const KNOWN_HOLDERS_ACCOUNTS: Record<string, HUGGIES_SHIT_HOLDER_TYPE> =
+const KNOWN_HOLDERS_ACCOUNTS: Record<string, HUGGIES_SHIT_HOLDER_TYPE> =
   {
     "sleet.near": "dev",
     "vault.huggies.near": "vault",

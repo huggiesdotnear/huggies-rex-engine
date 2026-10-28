@@ -72,7 +72,7 @@ function parse_count_fun(value: unknown): number {
 }
 // ========================================
 // format a Pumpopoly base-unit balance as a human-readable amount.
-export function format_pumpopoly_balance_fun(raw: string): string {
+function format_pumpopoly_balance_fun(raw: string): string {
   try {
     const amount = BigInt(raw);
     const negative = amount < 0n;

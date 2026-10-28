@@ -49,7 +49,7 @@ const HUGGIES_TOKEN_LIST_FIELDS = [
 ] as const;
 // how many rows one page holds. the list scrolls, so this is how many
 // icons get fetched for it.
-export const HUGGIES_TOKEN_PAGE_SIZE = 300;
+const HUGGIES_TOKEN_PAGE_SIZE = 300;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

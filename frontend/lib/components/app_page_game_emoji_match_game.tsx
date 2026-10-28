@@ -45,7 +45,7 @@ function new_emoji_cards_fun(): HUGGIES_EMOJI_CARD[] {
 }
 // ========================================
 // emoji memory match game component.
-export function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
+function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
   // the page's icons, by token id. the store owns the load, so this
   // component only reads.
   const page_data = use_page_store_fun(HUGGIES_APP_PAGE_GAME_STORE);

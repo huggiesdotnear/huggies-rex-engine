@@ -24,7 +24,7 @@ export interface HUGGIES_SHIT_HOLDER_GROUP {
 }
 // ========================================
 // the groups the breakdown lists, in display order.
-export const HUGGIES_SHIT_HOLDER_GROUP_ORDER: ReadonlyArray<HUGGIES_SHIT_HOLDER_ROW_TYPE> =
+const HUGGIES_SHIT_HOLDER_GROUP_ORDER: ReadonlyArray<HUGGIES_SHIT_HOLDER_ROW_TYPE> =
   ["dev", "dex", "vault", "nft", "burn", "regular"];
 // ========================================
 // --- HELPERS ----------------------------

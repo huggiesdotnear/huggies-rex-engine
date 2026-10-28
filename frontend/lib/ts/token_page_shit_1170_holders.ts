@@ -41,7 +41,7 @@ export interface HUGGIES_SHIT_HOLDERS_PAGE {
 }
 // ========================================
 // how many holders the INTEAR holders endpoint returns per page.
-export const HUGGIES_SHIT_HOLDERS_PAGE_SIZE = 100;
+const HUGGIES_SHIT_HOLDERS_PAGE_SIZE = 100;
 // ========================================
 // --- HELPERS ----------------------------
 // scale a raw token amount down by its decimals.
