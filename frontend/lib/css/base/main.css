@@ -8,18 +8,8 @@ main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* --- WHY --- stretch, not center. the page content sits directly
-     inside main — there is no wrapper div — so every child is a flex
-     item here and `align-items:center` would shrink each one to its
-     content width. stretch makes them fill the column, and
-     `min-width:0` lets a long id or a wide grid shrink instead of
-     pushing the column open. */
   align-items: stretch;
   justify-content: flex-start;
-  /* --- WHY --- left, not center. body centers text, but a page reads
-     better flush left. the pages that still wrap their content set
-     this on the wrapper instead; the pages that dropped the wrapper
-     need it here. */
   text-align: left;
   width: 500px;
   max-width: 90vw;
@@ -29,25 +19,5 @@ main {
   margin-bottom: 20px;
   /*----------------------*/
   /*border: 1px solid purple;*/
-}
-/*==================================*/
-/* the section heading inside the page column.
-   --- WHY --- it lives here and not on a page's own wrapper: main is
-   the column, so a heading in it is a section of the page. the rule
-   under the heading separates it from what follows. */
-main h2 {
-  text-align: left;
-  font-size: 18px;
-  border-bottom: 1px solid #474747;
-  padding-bottom: 6px;
-  margin: 20px 0 10px;
-}
-/*==================================*/
-/* a section inside the page column.
-   --- WHY --- a section is a block of the page, so the gap under it
-   belongs to the column and not to the page that happens to use one.
-   it keeps two sections from running into each other. */
-main section {
-  margin-bottom: 28px;
 }
 /*==================================*/
