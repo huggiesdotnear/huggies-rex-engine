@@ -9,7 +9,7 @@ import {
 } from "../ts/app_page_discover_contract_cards";
 // ========================================
 // shared smart-contract discover component.
-function HUGGIES_COMPONENT_CONTRACT_DISCOVER_FUN() {
+function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
   return (
     <div class="huggies-contract-cards">
       {list_contract_cards_fun().map((card) => (
@@ -27,11 +27,12 @@ function HUGGIES_COMPONENT_CONTRACT_DISCOVER_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_DISCOVER;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_DISCOVER_FUN />, el);
+    render(<HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN />, el);
   }
 }
 // ========================================

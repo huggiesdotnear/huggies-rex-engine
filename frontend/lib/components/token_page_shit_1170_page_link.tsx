@@ -7,7 +7,7 @@
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { current_app_depth_fun } from "../ts/app_depth";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token_page_shit_1170_token";
 // ========================================
 // the token id on the page, or null when there is none.
 function token_id_from_url_fun(): string | null {
@@ -17,7 +17,7 @@ function token_id_from_url_fun(): string | null {
 }
 // ========================================
 // the easter-egg link to the $SHIT holders page.
-function HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK_FUN() {
+function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK_FUN() {
   // --- WHY --- the mount div is on every token page, so the link
   // checks the token id itself and renders nothing for any other
   // token. it is an easter egg, so it only appears on its own token.
@@ -36,10 +36,12 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK_FUN />, el);
+  if (el !== null)
+    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

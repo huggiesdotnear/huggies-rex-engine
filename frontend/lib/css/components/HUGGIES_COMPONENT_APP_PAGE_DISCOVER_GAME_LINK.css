@@ -1,10 +1,10 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_GAME_LINK
+/* HUGGIES_COMPONENT_APP_PAGE_DISCOVER_GAME_LINK
    the hidden game link, under the auth button. it is meant to be
    found, so it is quiet: small, low contrast, and only a little
    brighter on hover. */
 /*==================================*/
-#HUGGIES_COMPONENT_GAME_LINK {
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_GAME_LINK {
   width: 500px;
   max-width: 90vw;
   box-sizing: border-box;

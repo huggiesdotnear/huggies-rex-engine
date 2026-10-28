@@ -9,18 +9,18 @@ the page lists the supported contracts and a searchable, sortable list of tokens
   <!--==========================================-->
   <section>
     <h2>CONTRACTS</h2>
-    <div id="HUGGIES_COMPONENT_CONTRACT_DISCOVER"></div>
+    <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER"></div>
   </section>
   <!--==========================================-->
   <section>
     <h2>TOKENS</h2>
-    <div id="HUGGIES_COMPONENT_TOKEN_DISCOVER"></div>
+    <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER"></div>
   </section>
   <!--==========================================-->
 </main>
 <nav id="HUGGIES_COMPONENT_NAV"></nav>
 <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
-<div id="HUGGIES_COMPONENT_GAME_LINK"></div>
+<div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_GAME_LINK"></div>
 ```
 
 ====================

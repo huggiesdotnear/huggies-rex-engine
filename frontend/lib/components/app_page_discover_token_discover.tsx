@@ -9,7 +9,7 @@
 // the list is paged: the api sorts and paginates on its own, so the
 // page asks for one page of rows at a time and asks for the next one
 // when the reader scrolls to the bottom. mounts into
-// <div id="HUGGIES_COMPONENT_TOKEN_DISCOVER">.
+// <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER">.
 import { render } from "preact";
 import {
   useEffect as use_effect,
@@ -74,7 +74,7 @@ function token_result_row_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
+function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   const [query, set_query] = use_state("");
   const [sort, set_sort] = use_state<HUGGIES_TOKEN_SORT>(
     HUGGIES_DEFAULT_TOKEN_SORT,
@@ -165,8 +165,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
   return (
     <section class="huggies-token-discover">
       <div class="huggies-token-discover-controls">
-        <label class="huggies-token-search">
-          <span>SEARCH TOKENS</span>
+        <div class="huggies-token-search">
           <input
             type="search"
             value={query}
@@ -175,7 +174,7 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
               set_query((event.currentTarget as HTMLInputElement).value);
             }}
           />
-        </label>
+        </div>
         <div class="huggies-token-discover-sort">
           {huggies_sort_control_fun({
             sort,
@@ -216,10 +215,12 @@ function HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_DISCOVER;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_TOKEN_DISCOVER_FUN />, el);
+  if (el !== null)
+    render(<HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

@@ -20,7 +20,7 @@
 // usd column, and a row priced with a price of zero reads as "$0.00",
 // which is a lie rather than a missing number. so the price is known
 // before the first holder page is asked for.
-import { HUGGIES_SHIT_TOKEN_ID } from "./shit_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
 import { fetch_shit_summary_fun } from "./token_page_shit_1170_summary";
 import { fetch_shit_price_fun } from "./token_page_shit_1170_price";
 import { fetch_shit_holders_fun } from "./token_page_shit_1170_holders";

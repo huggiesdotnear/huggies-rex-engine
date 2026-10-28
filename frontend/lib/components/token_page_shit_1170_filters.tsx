@@ -16,7 +16,7 @@ import type { HUGGIES_SHIT_ACTIVE_FILTER } from "../ts/token_page_shit_1170_stat
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SHIT_1170_FILTERS_FUN() {
+function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
   const active_filter = state.active_filter;
 
@@ -49,10 +49,12 @@ function HUGGIES_COMPONENT_SHIT_1170_FILTERS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SHIT_1170_FILTERS;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SHIT_1170_FILTERS_FUN />, el);
+  if (el !== null)
+    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

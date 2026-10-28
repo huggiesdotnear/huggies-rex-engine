@@ -16,7 +16,7 @@
 // not show them, so the pool is not fetched at all — a missing pool
 // must not hold up the price, and a price nobody asked for is just a
 // request for nothing.
-import { HUGGIES_SHIT_TOKEN_ID } from "./shit_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
 // ========================================
 // the price api that answers a raw price string for a token id.
 const HUGGIES_PRICE_API_URL = "https://prices.intear.tech/price";

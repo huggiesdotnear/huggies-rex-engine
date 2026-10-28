@@ -1,9 +1,9 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_SHIT_1170_METADATA
+/* HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA
    the token metadata block at the bottom of the $SHIT page.
 
    the metadata grid itself is the shared one the token page uses, so
-   its rows are styled by HUGGIES_COMPONENT_TOKEN_DETAIL.css. */
+   its rows are styled by HUGGIES_COMPONENT_TOKEN_META_GRID.css. */
 /*==================================*/
 .huggies-shit-metadata {
   margin-top: 24px;

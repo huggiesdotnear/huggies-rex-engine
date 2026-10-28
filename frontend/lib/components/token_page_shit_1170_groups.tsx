@@ -53,7 +53,7 @@ function render_group_fun(
 }
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SHIT_1170_GROUPS_FUN() {
+function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS_FUN() {
   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
   // the groups are the loaded holders added up per type. before the
   // first page of holders lands there is nothing to add up.
@@ -80,10 +80,12 @@ function HUGGIES_COMPONENT_SHIT_1170_GROUPS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SHIT_1170_GROUPS;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SHIT_1170_GROUPS_FUN />, el);
+  if (el !== null)
+    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

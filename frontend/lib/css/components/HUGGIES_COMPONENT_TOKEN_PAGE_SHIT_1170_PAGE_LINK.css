@@ -1,10 +1,10 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK
+/* HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK
    the hidden $SHIT link, under the auth button. it is meant to be
    found, so it is quiet: small, low contrast, and only a little
    brighter on hover. same treatment as the game link. */
 /*==================================*/
-#HUGGIES_COMPONENT_SHIT_1170_PAGE_LINK {
+#HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK {
   width: 500px;
   max-width: 90vw;
   box-sizing: border-box;

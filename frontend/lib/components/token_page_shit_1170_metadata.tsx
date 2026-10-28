@@ -12,6 +12,7 @@ import { use_page_store_fun } from "../ts/use_page_store";
 import { shit_total_supply_formatted_fun } from "../ts/token_page_shit_1170_holders";
 import type { HUGGIES_SHIT_SUMMARY } from "../ts/token_page_shit_1170_summary";
 import type { HUGGIES_SHIT_PRICE } from "../ts/token_page_shit_1170_price";
+import { huggies_token_meta_grid_fun } from "./token_meta_grid";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -23,18 +24,8 @@ function format_price_usd_fun(value: number): string {
   return `$${value.toFixed(8)}`;
 }
 // ========================================
-// render one metadata row of the metadata grid.
-function shit_meta_row_fun(label: string, value: string): preact.JSX.Element {
-  return (
-    <div class="huggies-token-meta-row">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-// ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SHIT_1170_METADATA_FUN() {
+function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
   const summary = state.summary;
   const price = state.price;
@@ -47,28 +38,28 @@ function HUGGIES_COMPONENT_SHIT_1170_METADATA_FUN() {
   return (
     <section class="huggies-shit-metadata">
       <h2>TOKEN METADATA</h2>
-      <div class="huggies-token-meta">
-        {shit_meta_row_fun("PRICE", format_price_usd_fun(price_usd))}
-        {shit_meta_row_fun("HOLDERS", summary.holders.toLocaleString())}
-        {shit_meta_row_fun(
-          "TOTAL SUPPLY",
-          shit_total_supply_formatted_fun(summary.total_supply),
-        )}
-        {shit_meta_row_fun("DECIMALS", String(summary.decimals))}
-        {shit_meta_row_fun("REPUTATION", summary.reputation)}
-        {shit_meta_row_fun(
-          "LIQUIDITY",
-          `$${summary.liquidity_usd.toLocaleString(undefined, {
+      {huggies_token_meta_grid_fun([
+        { label: "PRICE", value: format_price_usd_fun(price_usd) },
+        { label: "HOLDERS", value: summary.holders.toLocaleString() },
+        {
+          label: "TOTAL SUPPLY",
+          value: shit_total_supply_formatted_fun(summary.total_supply),
+        },
+        { label: "DECIMALS", value: String(summary.decimals) },
+        { label: "REPUTATION", value: summary.reputation },
+        {
+          label: "LIQUIDITY",
+          value: `$${summary.liquidity_usd.toLocaleString(undefined, {
             maximumFractionDigits: 2,
           })}`,
-        )}
-        {shit_meta_row_fun(
-          "MARKET CAP",
-          `$${summary.market_cap_usd.toLocaleString(undefined, {
+        },
+        {
+          label: "MARKET CAP",
+          value: `$${summary.market_cap_usd.toLocaleString(undefined, {
             maximumFractionDigits: 2,
           })}`,
-        )}
-      </div>
+        },
+      ])}
       {price !== null && price.price_error !== null && (
         <p class="huggies-shit-price-error">
           PRICE UNAVAILABLE: {price.price_error}
@@ -80,10 +71,12 @@ function HUGGIES_COMPONENT_SHIT_1170_METADATA_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SHIT_1170_METADATA;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SHIT_1170_METADATA_FUN />, el);
+  if (el !== null)
+    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

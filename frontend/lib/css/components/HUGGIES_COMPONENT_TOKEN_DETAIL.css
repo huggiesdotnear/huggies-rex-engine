@@ -46,7 +46,7 @@
 }
 /* --- metadata grid ---
    the grid itself is shared with the $SHIT page, so its rules live in
-   HUGGIES_COMPONENT_TOKEN_META.css. --- */
+   HUGGIES_COMPONENT_TOKEN_META_GRID.css. --- */
 /* --- about card --- */
 .huggies-token-description-card {
   margin: 1rem 0;

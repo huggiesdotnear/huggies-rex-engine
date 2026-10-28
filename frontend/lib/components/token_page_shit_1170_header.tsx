@@ -6,11 +6,11 @@
 // for.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shit_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token_page_shit_1170_token";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SHIT_1170_HEADER_FUN() {
+function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER_FUN() {
   return (
     <header class="huggies-shit-header">
       <h1>{HUGGIES_SHIT_TOKEN_ID}</h1>
@@ -20,10 +20,12 @@ function HUGGIES_COMPONENT_SHIT_1170_HEADER_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SHIT_1170_HEADER;
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SHIT_1170_HEADER_FUN />, el);
+  if (el !== null)
+    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

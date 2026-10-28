@@ -1,5 +1,5 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_TOKEN_DISCOVER
+/* HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER
    the searchable token list on the discover page: the search box, the
    sort row, the results and the notes.
 
@@ -28,7 +28,6 @@
   width: 100%;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
   margin-bottom: 0;
 } /* the sort control's own row. it is the full width of the column, so
    the buttons can be spread across it rather than bunched at the left
@@ -56,11 +55,6 @@
   flex: 0 0 auto;
 }
 /* --- the search box --- */
-.huggies-token-search span {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-}
 .huggies-token-search input {
   width: 100%;
   box-sizing: border-box;

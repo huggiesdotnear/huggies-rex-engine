@@ -1,7 +1,7 @@
 /*==================================*/
 /* the discover page's css: the components it mounts. */
-@import url(./components/HUGGIES_COMPONENT_CONTRACT_DISCOVER.css);
-@import url(./components/HUGGIES_COMPONENT_TOKEN_DISCOVER.css);
+@import url(./components/HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER.css);
+@import url(./components/HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER.css);
 @import url(./components/HUGGIES_COMPONENT_SORT_CONTROL.css);
-@import url(./components/HUGGIES_COMPONENT_GAME_LINK.css);
+@import url(./components/HUGGIES_COMPONENT_APP_PAGE_DISCOVER_GAME_LINK.css);
 /*==================================*/

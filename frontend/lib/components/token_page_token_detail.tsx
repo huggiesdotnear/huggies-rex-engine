@@ -9,21 +9,8 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { format_price_usd_fun } from "../ts/token_page_token_price_format";
 import { use_page_store_fun } from "../ts/use_page_store";
+import { huggies_token_meta_grid_fun } from "./token_meta_grid";
 // ========================================
-// ========================================
-// --- HELPERS ----------------------------
-// render one metadata value for the detail grid.
-function token_metadata_row_fun(
-  label: string,
-  value: string,
-): preact.JSX.Element {
-  return (
-    <div class="huggies-token-meta-row">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
@@ -43,23 +30,20 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
           <code>{detail.id}</code>
         </div>
       </header>
-      <section class="huggies-token-meta">
-        {token_metadata_row_fun(
-          "PRICE",
-          format_price_usd_fun(detail.price_usd),
-        )}
-        {token_metadata_row_fun("REPUTATION", detail.reputation)}
-        {token_metadata_row_fun("HOLDERS", detail.holders.toLocaleString())}
-        {token_metadata_row_fun(
-          "LIQUIDITY",
-          format_price_usd_fun(detail.liquidity_usd),
-        )}
-        {token_metadata_row_fun(
-          "MARKET CAP",
-          format_price_usd_fun(detail.market_cap_usd),
-        )}
-        {token_metadata_row_fun("DECIMALS", String(detail.decimals))}
-      </section>
+      {huggies_token_meta_grid_fun([
+        { label: "PRICE", value: format_price_usd_fun(detail.price_usd) },
+        { label: "REPUTATION", value: detail.reputation },
+        { label: "HOLDERS", value: detail.holders.toLocaleString() },
+        {
+          label: "LIQUIDITY",
+          value: format_price_usd_fun(detail.liquidity_usd),
+        },
+        {
+          label: "MARKET CAP",
+          value: format_price_usd_fun(detail.market_cap_usd),
+        },
+        { label: "DECIMALS", value: String(detail.decimals) },
+      ])}
       {detail.description !== null && (
         <section class="huggies-token-description-card">
           <h2>DESCRIPTION:</h2>
