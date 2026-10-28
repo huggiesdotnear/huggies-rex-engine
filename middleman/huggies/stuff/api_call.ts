@@ -14,8 +14,7 @@
 // `query` (optional) appends extra key=value pairs as a query string.
 // `body`, when supplied, is JSON.stringified and sent with
 // content-type: application/json — omit for GET / DELETE-with-no-body.
-// `options` carries the session token and the encryption password, for
-// the routes that need them.
+// `options` carries the session token, for the routes that need one.
 //
 // --- WHY --- the base url is a parameter, not a constant. the
 // frontend passes the origin of the page it is served from; a bin
