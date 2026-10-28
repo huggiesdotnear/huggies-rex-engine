@@ -28,13 +28,11 @@ export { api_call } from "./stuff/api_call";
 export type { API_CALL_PARAMS } from "./stuff/api_call";
 export { ENDPOINT_PATHS } from "./stuff/endpoint_paths";
 export type { EndpointKey } from "./stuff/endpoint_paths";
-export { endpoint_url } from "./stuff/endpoint_url";
 export { parse_error } from "./stuff/parse_error";
 export type {
   HUGGIES_API_ERROR,
   PARSE_ERROR_CONTEXT,
 } from "./stuff/parse_error";
-export { render_path } from "./stuff/render_path";
 export { build_headers } from "./stuff/request_options";
 export type { REQUEST_OPTIONS } from "./stuff/request_options";
 

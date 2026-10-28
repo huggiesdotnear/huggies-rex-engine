@@ -3,8 +3,7 @@
 // path templates for every backend route the huggies middleman calls,
 // written down exactly once.
 //
-// no base url — the caller supplies it. placeholders use :name to
-// match axum's route syntax.
+// no base url — the caller supplies it.
 //
 // --- WHY --- one table, not one per api. the routes live under
 // different prefixes because the prefix names the api being talked

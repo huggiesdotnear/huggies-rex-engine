@@ -5,16 +5,17 @@
 // retries, timeouts, tracing, or different log formatting.
 //
 // flow:
-//   1. resolve url = base_url + endpoint_url(key, params)
+//   1. resolve url = base_url + ENDPOINT_PATHS[key]
 //   2. if `query` is supplied, append ?key=value&...
 //   3. fetch with the supplied method/body/headers
 //   4. on non-2xx: parse_error() logs and throws
 //   5. on 2xx:    parse json, log the success block, return it
 //
-// `params` substitutes :name placeholders in the path template.
-// `query` (optional) appends extra key=value pairs as a query
-// string. `body`, when supplied, is JSON.stringified and sent with
+// `query` (optional) appends extra key=value pairs as a query string.
+// `body`, when supplied, is JSON.stringified and sent with
 // content-type: application/json — omit for GET / DELETE-with-no-body.
+// `options` carries the session token and the encryption password, for
+// the routes that need them.
 //
 // --- WHY --- the base url is a parameter, not a constant. the
 // frontend passes the origin of the page it is served from; a bin
@@ -36,15 +37,13 @@
 // blew up.
 // ========================================
 
-import { endpoint_url } from "./endpoint_url";
-import type { EndpointKey } from "./endpoint_paths";
+import { ENDPOINT_PATHS, type EndpointKey } from "./endpoint_paths";
 import { parse_error } from "./parse_error";
 import { build_headers, type REQUEST_OPTIONS } from "./request_options";
 
 export interface API_CALL_PARAMS {
   base_url: string;
   key: EndpointKey;
-  params?: Record<string, string | number>;
   query?: Record<string, string | number | boolean | undefined>;
   method: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
@@ -58,7 +57,6 @@ export interface API_CALL_PARAMS {
 export async function api_call<T = unknown>({
   base_url,
   key,
-  params = {},
   query,
   method,
   body,
@@ -67,7 +65,7 @@ export async function api_call<T = unknown>({
   fallback,
 }: API_CALL_PARAMS): Promise<T> {
   // ========================================
-  let url = `${base_url}${endpoint_url(key, params)}`;
+  let url = `${base_url}${ENDPOINT_PATHS[key]}`;
   if (query) {
     const entries = Object.entries(query).filter(
       (entry): entry is [string, string | number | boolean] =>
@@ -110,7 +108,7 @@ export async function api_call<T = unknown>({
 
   const json = (await res.json()) as T;
   // ========================================
-  // framed success log; response redacted via redact_value.
+  // framed success log.
   console.log("=============================");
   console.log(` ${label} via ${method} on:`, url);
   console.log("RESPONSE STATUS:", `${res.status} - ${res.statusText}`);
