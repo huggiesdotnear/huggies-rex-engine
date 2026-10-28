@@ -1,22 +1,28 @@
 // ========================================
-// TREZU_PARSE_ERROR
-// turn a non-2xx backend response into a thrown Error. the backend
+// HUGGIES_PARSE_ERROR
+// turn a non-2xx backend response into a thrown Error. our backend
 // answers failures with `{ "error": { "code", "message" } }`, so the
 // code and message are pulled out and put on the error itself.
+//
+// --- WHY --- this is named after us and not after trezu: the error
+// envelope is OURS. the backend builds it (see trezu_error_fun.rs on
+// the rust side, which is the trezu proxy's error shape), so every
+// route of our backend answers failures the same way — the ping route
+// included, even though it never fails that way today.
 // ========================================
 
 const is_record = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-export interface TREZU_API_ERROR extends Error {
+export interface HUGGIES_API_ERROR extends Error {
   status: number;
   code: string;
 }
 
-export async function trezu_parse_error(
+export async function huggies_parse_error(
   response: Response,
   fallback: string,
-): Promise<TREZU_API_ERROR> {
+): Promise<HUGGIES_API_ERROR> {
   const text = await response.text();
   let parsed: unknown = null;
   try {
@@ -39,8 +45,8 @@ export async function trezu_parse_error(
 
   const error = new Error(
     `${fallback}: ${code}: ${message}`,
-  ) as TREZU_API_ERROR;
-  error.name = "TREZU_API_ERROR";
+  ) as HUGGIES_API_ERROR;
+  error.name = "HUGGIES_API_ERROR";
   error.status = response.status;
   error.code = code;
   return error;

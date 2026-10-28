@@ -9,8 +9,9 @@
 // ========================================
 
 import { HUGGIES_BASE_URL } from "../stuff/huggies_base_url";
+import { huggies_build_query } from "../stuff/huggies_build_query";
+import { huggies_parse_error } from "../stuff/huggies_parse_error";
 import { TREZU_ENDPOINT_PATHS } from "../stuff/trezu_endpoint_paths";
-import { trezu_parse_error } from "../stuff/trezu_parse_error";
 import type { TREZU_TREASURY } from "../types/trezu_treasury";
 import type { TREZU_TREASURIES_QUERY } from "../types/trezu_treasuries_query";
 
@@ -24,13 +25,16 @@ export async function api_trezu_treasuries_get(
     );
   }
 
-  const params = new URLSearchParams();
-  params.set("accountId", account_id);
-  if (query.includeHidden !== undefined) {
-    params.set("includeHidden", query.includeHidden ? "true" : "false");
-  }
+  const params = huggies_build_query({
+    accountId: account_id,
+    includeHidden: query.includeHidden,
+  });
 
-  const url = `${HUGGIES_BASE_URL}${TREZU_ENDPOINT_PATHS.api_trezu_treasuries}?${params.toString()}`;
+  const path = TREZU_ENDPOINT_PATHS.api_trezu_treasuries;
+  const url =
+    params.length > 0
+      ? `${HUGGIES_BASE_URL}${path}?${params}`
+      : `${HUGGIES_BASE_URL}${path}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -38,7 +42,7 @@ export async function api_trezu_treasuries_get(
   });
 
   if (!response.ok) {
-    const error = await trezu_parse_error(
+    const error = await huggies_parse_error(
       response,
       "api_trezu_treasuries_get failed",
     );

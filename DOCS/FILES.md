@@ -25,8 +25,12 @@ some files/folders
     directly from the browser. does NOT go through our backend, so
     the backend is never rate limited by intear.
   - `middleman/huggies/` - typed client for our own backend routes.
-    holds the trezu proxy client, named after the api it fronts
-    (`api_trezu_*`), not after us.
+    the client is named after the api it fronts, not after us:
+    `api_huggies_*` for our own routes (`/api/huggies/*`) and
+    `api_trezu_*` for the trezu routes we proxy (`/api/trezu/*`).
+    the shared plumbing keeps the app name: `huggies_base_url.ts`
+    (our own origin), `huggies_build_query.ts` (our query string
+    rules) and `huggies_parse_error.ts` (our error envelope).
 - `bin/` - ts files that i can run with bun. see [`bin/README.md`](../bin/README.md)
   for the cli usage.
 
