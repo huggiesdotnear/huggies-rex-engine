@@ -37,6 +37,8 @@ let account_id: string | null = null;
 let loaded_account_id: string | null = null;
 // true while a load is running.
 let loading = false;
+// true once the page's id is being watched, so watch() is set up once.
+let watching = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
@@ -126,6 +128,11 @@ async function contract_page_pumpopoly_store_load_fun(): Promise<void> {
 // signs out, or the id in the url changes. the store re-loads by
 // itself, so no component has to watch for it.
 function contract_page_pumpopoly_store_watch_fun(): void {
+  // --- WHY --- the subscription is set up once: a second watch() would
+  // add a second listener, and the id would then load twice for every
+  // change.
+  if (watching) return;
+  watching = true;
   const unsubscribe = HUGGIES_PAGE_ACCOUNT_ID.subscribe(() => {
     // --- WHY --- the public load and not the internal one: the public
     // one is what the page and the tests go through, so it is the one

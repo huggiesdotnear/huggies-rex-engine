@@ -21,15 +21,18 @@ import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 // ========================================
 // the shape every page's store has, so this hook can drive any of them.
 //
-// the store owns the data and the loading. the components read it.
+// --- WHY --- only get and subscribe are here: those are the two the
+// hook actually uses. the store's load is NOT in this shape — the hook
+// never calls it, and a page's load takes whatever that page needs
+// (an id, a sort, nothing at all), so putting it here would either
+// force every page's load to have the same signature or hide the
+// difference behind a type that accepts anything.
 export interface HUGGIES_PAGE_STORE<STATE> {
   // the current state.
   get: () => STATE;
   // register a callback that fires when the state changes. returns an
   // unsubscribe so a component can clean up on unmount.
   subscribe: (listener: () => void) => () => void;
-  // start the page's load.
-  load: (...args: never[]) => Promise<void>;
 }
 // ========================================
 // --- HOOK ------------------------------
