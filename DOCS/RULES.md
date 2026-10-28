@@ -1,6 +1,6 @@
 # RULES
 
-🧬 human put rules, do not add this to rules you add yourslef
+🧬 human put rules, do not add this to rules you add yourslef, even if it was something i said.
 
 - 🧬 one function per a file, clean clear sanke_case nameing for functions. and file name should match function name.
 - 🧬 `========================================` comments at the top of the file between import statemnets, and at the bottom of the file. and in vaires places in the html files. never remove these comments.
