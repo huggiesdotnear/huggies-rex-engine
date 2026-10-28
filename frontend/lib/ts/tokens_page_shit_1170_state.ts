@@ -11,7 +11,7 @@
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 import type { HUGGIES_SHIT_SUMMARY } from "./tokens_page_shit_1170_summary";
-import type { HUGGIES_SHIT_PRICE_REF } from "./tokens_page_shit_1170_price_ref";
+import type { HUGGIES_SHIT_PRICE } from "./tokens_page_shit_1170_price";
 import type { HUGGIES_SHIT_HOLDER } from "./tokens_page_shit_1170_holders";
 import type { HUGGIES_SHIT_HOLDER_TYPE } from "./tokens_page_shit_1170_known_holders";
 // ========================================
@@ -25,8 +25,8 @@ export type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_TYPE | "all";
 export interface HUGGIES_SHIT_1170_STATE {
   // the token's summary, once it has loaded.
   summary: HUGGIES_SHIT_SUMMARY | null;
-  // the price and the LP-pool reference, once they have loaded.
-  price_ref: HUGGIES_SHIT_PRICE_REF | null;
+  // the price, once it has loaded.
+  price: HUGGIES_SHIT_PRICE | null;
   // the holder rows loaded so far.
   holders: HUGGIES_SHIT_HOLDER[];
   // how many holders the api says there are in total.
@@ -47,7 +47,7 @@ export interface HUGGIES_SHIT_1170_STATE {
 // the empty state the page starts from.
 let state: HUGGIES_SHIT_1170_STATE = {
   summary: null,
-  price_ref: null,
+  price: null,
   holders: [],
   holder_total: 0,
   next_cursor: null,
@@ -101,7 +101,7 @@ function subscribe_fun(listener: () => void): () => void {
 function reset_fun(): void {
   set_state_fun({
     summary: null,
-    price_ref: null,
+    price: null,
     holders: [],
     holder_total: 0,
     next_cursor: null,

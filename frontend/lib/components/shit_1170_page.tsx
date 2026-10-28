@@ -20,23 +20,20 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
   // the one load. it renders nothing.
   //
   // --- WHY --- the three steps run in order, not together: the summary
-  // carries the decimals, the total supply and the main pool, and the
-  // price reference and the holder rows both need them. the holder rows
-  // also need the price, because a row priced with a price of zero
-  // reads as "$0.00" — a lie rather than a missing number.
+  // carries the decimals and the total supply, and the holder rows need
+  // both. the holder rows also need the price, because a row priced with
+  // a price of zero reads as "$0.00" — a lie rather than a missing
+  // number.
   use_effect(() => {
     HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.reset();
     let cancelled = false;
     void HUGGIES_TOKENS_PAGE_SHIT_1170.load_summary()
       .then(async (summary) => {
         if (cancelled) return;
-        const price_ref =
-          await HUGGIES_TOKENS_PAGE_SHIT_1170.load_price_ref(summary);
+        const price = await HUGGIES_TOKENS_PAGE_SHIT_1170.load_price();
         if (cancelled) return;
         const price_usd =
-          price_ref.price_usd > 0
-            ? price_ref.price_usd
-            : (summary?.price_usd ?? 0);
+          price.price_usd > 0 ? price.price_usd : (summary?.price_usd ?? 0);
         const total_supply_raw = HUGGIES_TOKENS_PAGE_SHIT_1170.bigint_or_zero(
           summary?.total_supply_raw ?? "0",
         );
@@ -50,7 +47,7 @@ function HUGGIES_COMPONENT_SHIT_1170_PAGE_FUN() {
         HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.set({
           ...HUGGIES_TOKENS_PAGE_SHIT_1170_STATE.get(),
           summary,
-          price_ref,
+          price,
           holders: page.rows,
           holder_total: page.total,
           next_cursor: page.next_cursor,
