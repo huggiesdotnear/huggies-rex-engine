@@ -42,11 +42,8 @@
   padding: 6px 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
-#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table code {
-  font-size: 11px;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
+/* the token id in a cell gets its size, its breaking and its color
+   from the base code rule. */
 /*==================================*/
 /* --- the nft sort control ---
    the nft list sorts by one thing, so its control is a single

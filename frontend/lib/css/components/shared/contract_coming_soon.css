@@ -7,9 +7,10 @@
 .coming-soon-id {
   margin: 0.4rem 0 0;
 }
+/* the contract id is a little bigger than the usual chip. the
+   breaking comes from the base code rule, and the color is the text
+   color — no dimming. */
 .coming-soon-id code {
   font-size: 12px;
-  opacity: 0.65;
-  overflow-wrap: anywhere;
 }
 /*==================================*/

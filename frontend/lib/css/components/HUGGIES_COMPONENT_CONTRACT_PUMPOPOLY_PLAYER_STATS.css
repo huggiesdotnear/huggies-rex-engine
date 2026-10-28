@@ -55,9 +55,9 @@
   line-height: 1.1;
   overflow-wrap: anywhere;
 }
+/* the raw balance under the big number. it is smaller than the
+   number, but the same color — the size is what tells it apart. */
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .raw {
   font-size: 10px;
-  opacity: 0.5;
-  overflow-wrap: anywhere;
 }
 /*==================================*/

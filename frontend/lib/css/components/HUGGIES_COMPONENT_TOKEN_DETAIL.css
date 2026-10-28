@@ -29,12 +29,12 @@
   font-size: 13px;
   opacity: 0.75;
 }
+/* the token id sits on its own line under the heading, so it is a
+   block. the breaking comes from the base code rule, and the color
+   is the text color — no dimming. */
 #HUGGIES_COMPONENT_TOKEN_DETAIL header code {
   display: block;
   font-size: 10px;
-  opacity: 0.55;
-  overflow-wrap: anywhere;
-  word-break: break-all;
 }
 #HUGGIES_COMPONENT_TOKEN_DETAIL .icon {
   width: 52px;

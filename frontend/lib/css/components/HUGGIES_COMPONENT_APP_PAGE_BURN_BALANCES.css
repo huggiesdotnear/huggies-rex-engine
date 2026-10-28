@@ -85,9 +85,10 @@
   font-size: 15px;
   line-height: 1.2;
 }
+/* the token id under the ticker. it is cut off with an ellipsis, and
+   it is the same color as the text — the size tells it apart. */
 #HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-id {
   font-size: 10px;
-  opacity: 0.55;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -1,24 +1,16 @@
 /*==================================*/
-/* link styling.
-   scoped to main so the fixed bottom nav keeps its
-   own look (nav links are NOT underlined). links inherit the page
-   text color instead of the browser default blue/purple, which is
-   unreadable on the red background.
+/* the `a` element, app-wide.
+   links inherit the page text color instead of the browser default
+   blue/purple, which is unreadable on the red background.
 
    --- WHY --- links are NOT underlined by default. a page of cards
    and rows is mostly links, and underlining every one of them turns
    the page into a wall of stripes. a link that IS the content gets
    its underline from its own component's css. */
 /*==================================*/
-main a {
+a {
   color: inherit;
   text-decoration: none;
   overflow-wrap: anywhere;
-}
-/* a code chip inside a link keeps its own small size, so the link
-   text does not jump when the code rule shrinks it. */
-main a code {
-  font-size: 0.85em;
-  color: inherit;
 }
 /*==================================*/

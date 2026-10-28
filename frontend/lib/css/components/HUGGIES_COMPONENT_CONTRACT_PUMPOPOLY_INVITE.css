@@ -4,9 +4,9 @@
 
    the invite is a full-width button, not a text link. it is the one
    thing on the page a NEW visitor wants, so it has to read as a
-   button. the `main a` rule in links.css sets `color:inherit`, which
-   would make this label white on a white fill, so the color is
-   restated with a selector that beats it. */
+   button. the `a` rule in a.css sets `color:inherit`, which would
+   make this label white on a white fill, so the color is restated
+   with a selector that beats it. */
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE .invite {
   display: block;
@@ -29,11 +29,11 @@
     color 0.2s ease,
     border-color 0.2s ease;
 }
-main a.invite {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE a.invite {
   color: var(--color-backend);
 }
-main a.invite:hover,
-main a.invite:focus-visible {
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE a.invite:hover,
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE a.invite:focus-visible {
   background: var(--color-middle);
   color: var(--color-fontend);
   border-color: var(--color-middle-dark);

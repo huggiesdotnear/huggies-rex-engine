@@ -8,7 +8,8 @@
 @import url(./base/colors.css);
 @import url(./base/font.css);
 @import url(./base/body.css);
-@import url(./base/links.css);
+@import url(./base/a.css);
+@import url(./base/code.css);
 @import url(./base/button.css);
 /*@import url(./base/footer.css);*/
 @import url(./base/main.css);

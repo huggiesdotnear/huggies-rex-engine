@@ -32,9 +32,11 @@
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER a:hover {
   border-color: rgba(255, 255, 255, 0.45);
 }
+/* the contract id is cut off with an ellipsis instead of wrapping.
+   the size comes from the base code rule, and the color is the
+   text color — no dimming. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER code {
   font-size: 10px;
-  opacity: 0.55;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

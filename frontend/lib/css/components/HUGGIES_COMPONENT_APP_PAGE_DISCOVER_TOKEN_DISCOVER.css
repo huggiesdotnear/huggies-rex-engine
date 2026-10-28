@@ -155,9 +155,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* the token id is cut off with an ellipsis instead of wrapping. the
+   size comes from the base code rule, and the color is the text
+   color — no dimming. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-copy code {
   font-size: 10px;
-  opacity: 0.55;
 }
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-values {
   align-items: flex-end;

@@ -18,13 +18,12 @@
   margin: 0 0 0.2rem;
   font-size: 24px;
 }
+/* the dao id sits on its own line under the heading, so it is a
+   block. the size and the breaking come from the base code rule, and
+   the color is the text color — no dimming. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER header code {
   display: block;
-  font-family: monospace;
   font-size: 12px;
-  opacity: 0.65;
-  overflow-wrap: anywhere;
-  word-break: break-all;
   line-height: 1.3;
 }
 /* the dao's purpose, under the heading. */
