@@ -15,7 +15,9 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
       {list_contract_cards_fun().map((card) => (
         <a href={contract_page_href_fun(card.page)}>
           <strong>{card.title}</strong>
-          <code>{card.contract_id}</code>
+          {card.contract_ids.map((contract_id) => (
+            <code>{contract_id}</code>
+          ))}
         </a>
       ))}
     </div>

@@ -1,10 +1,10 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER
    the contract cards on the discover page: one card per supported
-   contract, each carrying its title and its contract id.
+   contract, each carrying its title and its contract ids.
 
    stacked, full width: the cards are links to a contract page and each
-   carries a title plus its contract id; side by side the ids were
+   carries a title plus its contract ids; side by side the ids were
    squeezed into a 150px column and clipped. */
 /*==================================*/
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER > div {
@@ -40,5 +40,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* a card can carry more than one contract id. the ids stack under
+   the title, one per line, so both stay readable. */
+#HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER code + code {
+  margin-top: 2px;
 }
 /*==================================*/

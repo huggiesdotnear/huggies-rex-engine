@@ -11,7 +11,7 @@ function HUGGIES_COMPONENT_CONTRACT_PAGE_INTEAR_DEX_PAGE_FUN() {
     <>
       {huggies_contract_coming_soon_fun({
         title: "INTEAR DEX engine",
-        contract_id: "dex.intear.near",
+        contract_ids: ["dex.intear.near"],
       })}
     </>
   );

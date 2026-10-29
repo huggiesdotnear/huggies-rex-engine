@@ -1,8 +1,8 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_CONTRACT_PAGE_RHEA_AMM_PAGE
+/* HUGGIES_COMPONENT_CONTRACT_PAGE_RHEA_PAGE
    this component's own rules. the shared components it renders
    bring their own css in with the @imports below.
-*/
+ */
 /*==================================*/
 @import url(./shared/contract_coming_soon.css);
 /*==================================*/

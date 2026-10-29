@@ -26,8 +26,7 @@ remov items as you complete
 
 OUT OF SCOPE FOR NOW, BASIC COMING SOON
 
-- [ ] `frontend/app/contract/rhea-amm.html` — RHEA AMM
-- [ ] `frontend/app/contract/rhea-dcl-v2.html` — RHEA DCL V2
+- [ ] `frontend/app/contract/rhea.html` — RHEA
 - [ ] `frontend/app/contract/intear-dex.html` — INTEAR DEX
 
 =====================

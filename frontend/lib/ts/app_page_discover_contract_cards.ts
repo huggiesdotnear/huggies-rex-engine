@@ -1,10 +1,15 @@
 // ========================================
 // shared discover-card definitions for supported smart contracts.
+//
+// a card can carry more than one contract id — the rhea card carries
+// both rhea contracts, and the pumpopoly card carries the world and
+// the nft contract. the card shows every id it carries, each on its
+// own line.
 // ========================================
 export interface HUGGIES_CONTRACT_CARD {
   key: string;
   title: string;
-  contract_id: string;
+  contract_ids: string[];
   page: string;
 }
 // ========================================
@@ -12,33 +17,27 @@ export interface HUGGIES_CONTRACT_CARD {
 export function list_contract_cards_fun(): HUGGIES_CONTRACT_CARD[] {
   return [
     {
-      key: "rhea-amm",
-      title: "Rhea AMM",
-      contract_id: "v2.ref-finance.near",
-      page: "rhea-amm.html",
-    },
-    {
-      key: "rhea-dcl-v2",
-      title: "Rhea DCL v2",
-      contract_id: "dclv2.ref-labs.near",
-      page: "rhea-dcl-v2.html",
+      key: "rhea",
+      title: "Rhea",
+      contract_ids: ["v2.ref-finance.near", "dclv2.ref-labs.near"],
+      page: "rhea.html",
     },
     {
       key: "intear-dex",
       title: "INTEAR DEX engine",
-      contract_id: "dex.intear.near",
+      contract_ids: ["dex.intear.near"],
       page: "intear-dex.html",
     },
     {
       key: "sputnik-dao",
       title: "Sputnik DAO",
-      contract_id: "sputnik-dao.near",
+      contract_ids: ["sputnik-dao.near"],
       page: "sputnik-dao.html",
     },
     {
       key: "pumpopoly",
       title: "Pumpopoly",
-      contract_id: "world.pumpopoly.near",
+      contract_ids: ["world.pumpopoly.near", "nft.pumpopoly.near"],
       page: "pumpopoly.html",
     },
   ];
