@@ -128,6 +128,10 @@ the accounts, not the role slots.
    `result` field, so a caller must treat "no result" as "no
    proposals", not as a failure. the actions log shows the proposals
    existed and were removed.
+   --- WHY --- the page does not need to handle this itself:
+   `sputnik_dao_get_proposals_fun_json` from `@near-kit-tool-box/fun`
+   reads both shapes as an empty list, so an empty dao is never
+   mistaken for a broken contract.
 
 3. **`last_proposal_id` is the next id, not a count.** the contract
    starts it at 0 and increments on every add. a dao whose proposals

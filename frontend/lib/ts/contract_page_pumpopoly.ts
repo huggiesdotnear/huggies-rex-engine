@@ -10,7 +10,7 @@
 // the shapes are parsed in lib/ts/contract_page_pumpopoly_parse.ts.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
-import { near_kit_contract_view_fun_json } from "../../../middleman/near-kit-tool-box";
+import { generic_contract_view_fun_json } from "@near-kit-tool-box/fun";
 import {
   parse_pumpopoly_player_fun,
   pumpopoly_credit_score_fun,
@@ -47,7 +47,7 @@ export async function load_pumpopoly_page_fun(
   if (account_id !== null) {
     try {
       player = parse_pumpopoly_player_fun(
-        await near_kit_contract_view_fun_json<unknown>(
+        await generic_contract_view_fun_json<unknown>(
           near,
           "world.pumpopoly.near",
           "view_player",
@@ -58,7 +58,7 @@ export async function load_pumpopoly_page_fun(
       errors.player = err instanceof Error ? err.message : String(err);
     }
     try {
-      const raw = await near_kit_contract_view_fun_json<
+      const raw = await generic_contract_view_fun_json<
         Array<{ token_id?: unknown }>
       >(near, "nft.pumpopoly.near", "nft_tokens_for_owner", {
         account_id,

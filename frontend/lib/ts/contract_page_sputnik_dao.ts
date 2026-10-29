@@ -27,7 +27,13 @@
 // see DOCS/SPUTNIK_DAO.md.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
-import { near_kit_contract_view_fun_json } from "../../../middleman/near-kit-tool-box";
+import {
+  sputnik_dao_get_config_fun_json,
+  sputnik_dao_get_policy_fun_json,
+  sputnik_dao_get_proposals_fun_json,
+  sputnik_dao_get_available_amount_fun_json,
+  sputnik_dao_get_locked_storage_amount_fun_json,
+} from "@near-kit-tool-box/fun";
 import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import type { TREZU_TREASURY } from "../../../middleman/huggies";
@@ -438,58 +444,48 @@ async function load_dao_fun(dao_id: string): Promise<HUGGIES_DAO_INFO> {
 
   // the contract reads run together, so the page is as slow as its
   // slowest one rather than the sum of the four.
+  //
+  // --- WHY --- the typed helpers are used here, not the generic
+  // view helper: each one names the fields it reads and validates
+  // the answer. `get_proposals` also reads a DAO with no proposals
+  // as an empty list, so it never lands in `errors`.
   const [config, policy, proposals, available, locked] = await Promise.all([
-    near_kit_contract_view_fun_json<Record<string, unknown>>(
-      near,
-      dao_id,
-      "get_config",
-    ).catch((err: unknown) => {
+    sputnik_dao_get_config_fun_json(near, dao_id).catch((err: unknown) => {
       errors.push(
         `config: ${err instanceof Error ? err.message : String(err)}`,
       );
       return null;
     }),
-    near_kit_contract_view_fun_json<unknown>(near, dao_id, "get_policy").catch(
+    sputnik_dao_get_policy_fun_json(near, dao_id).catch((err: unknown) => {
+      errors.push(
+        `policy: ${err instanceof Error ? err.message : String(err)}`,
+      );
+      return null;
+    }),
+    sputnik_dao_get_proposals_fun_json(near, dao_id, 0, 100).catch(
       (err: unknown) => {
         errors.push(
-          `policy: ${err instanceof Error ? err.message : String(err)}`,
+          `proposals: ${err instanceof Error ? err.message : String(err)}`,
         );
-        return null;
+        return [];
       },
     ),
-    near_kit_contract_view_fun_json<unknown>(near, dao_id, "get_proposals", {
-      from_index: 0,
-      limit: 100,
-    }).catch((err: unknown) => {
-      // --- WHY --- an empty proposal list makes the contract answer
-      // with an error rather than an empty array. that is "no
-      // proposals", not a failure, so it is not collected as one.
-      const message = err instanceof Error ? err.message : String(err);
-      if (!message.includes("no result")) {
-        errors.push(`proposals: ${message}`);
-      }
-      return [];
-    }),
-    near_kit_contract_view_fun_json<string>(
-      near,
-      dao_id,
-      "get_available_amount",
-    ).catch((err: unknown) => {
-      errors.push(
-        `available amount: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      return "";
-    }),
-    near_kit_contract_view_fun_json<string>(
-      near,
-      dao_id,
-      "get_locked_storage_amount",
-    ).catch((err: unknown) => {
-      errors.push(
-        `locked amount: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      return "";
-    }),
+    sputnik_dao_get_available_amount_fun_json(near, dao_id).catch(
+      (err: unknown) => {
+        errors.push(
+          `available amount: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        return "";
+      },
+    ),
+    sputnik_dao_get_locked_storage_amount_fun_json(near, dao_id).catch(
+      (err: unknown) => {
+        errors.push(
+          `locked amount: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        return "";
+      },
+    ),
   ]);
 
   const roles = parse_roles_fun(policy);

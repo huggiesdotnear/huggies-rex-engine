@@ -34,13 +34,11 @@ import { near_kit_client } from "@near-kit-tool-box/web";
 import {
   rhea_ammv2_contractid,
   rhea_ammv2_get_deposits_fun_json,
-} from "@near-kit-tool-box/fun";
-import {
   rhea_dclv2_list_user_assets_fun_json,
   intear_dex_engine_registered_assets_of_fun_json,
-  intear_dex_asset_token_id_fun,
-  NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
-} from "../../../middleman/near-kit-tool-box";
+  intear_dex_asset_token_id,
+  intear_dex_engine_contractid,
+} from "@near-kit-tool-box/fun";
 import { api_intear_balances_get } from "../../../middleman";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
@@ -181,7 +179,7 @@ async function fetch_raw_intear_fun(
   try {
     const registered = await intear_dex_engine_registered_assets_of_fun_json(
       near_kit_client(),
-      NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
+      intear_dex_engine_contractid("mainnet"),
       account_id,
       null,
       0,
@@ -190,7 +188,7 @@ async function fetch_raw_intear_fun(
     const balances = new Map<string, string>();
     for (const row of registered) {
       if (row.balance === "0") continue;
-      balances.set(intear_dex_asset_token_id_fun(row.asset_id), row.balance);
+      balances.set(intear_dex_asset_token_id(row.asset_id), row.balance);
     }
     return { balances, error: null };
   } catch (err) {
