@@ -23,8 +23,8 @@
 //
 // --- WHY --- the contract's `get_proposals` returns NOTHING for an
 // empty list: the rpc answers with `result.error` and no `result`
-// field. that is not a failure, it is "this dao has no proposals".
-// see DOCS/SPUTNIK_DAO.md.
+// field. that is not a failure, it is "this dao has no proposals" —
+// the typed helper reads both shapes as an empty list.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
 import {
