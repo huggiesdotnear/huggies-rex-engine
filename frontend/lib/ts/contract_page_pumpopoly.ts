@@ -10,7 +10,7 @@
 // the shapes are parsed in lib/ts/contract_page_pumpopoly_parse.ts.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
-import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
+import { near_kit_contract_view_fun_json } from "../../../middleman/near-kit-tool-box";
 import {
   parse_pumpopoly_player_fun,
   pumpopoly_credit_score_fun,

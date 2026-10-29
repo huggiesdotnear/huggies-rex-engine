@@ -27,7 +27,7 @@
 // see DOCS/SPUTNIK_DAO.md.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
-import { near_kit_contract_view_fun_json } from "../../../middleman/near_kit_tool_box";
+import { near_kit_contract_view_fun_json } from "../../../middleman/near-kit-tool-box";
 import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import type { TREZU_TREASURY } from "../../../middleman/huggies";

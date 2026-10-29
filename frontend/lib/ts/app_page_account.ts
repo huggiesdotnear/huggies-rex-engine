@@ -40,7 +40,7 @@ import {
   intear_dex_engine_registered_assets_of_fun_json,
   intear_dex_asset_token_id_fun,
   NEAR_KIT_INTEAR_DEX_ENGINE_CONTRACT_ID,
-} from "../../../middleman/near_kit_tool_box";
+} from "../../../middleman/near-kit-tool-box";
 import { api_intear_balances_get } from "../../../middleman";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";

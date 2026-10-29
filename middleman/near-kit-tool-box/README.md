@@ -3,7 +3,7 @@
 💩 a LOCAL stand-in for `@near-kit-tool-box/fun`.
 
 ```
-middleman/near_kit_tool_box/
+middleman/near-kit-tool-box/
 ├── fun/     one exported chain helper per file
 ├── types/   the typed response shapes those helpers return
 ├── stuff/   shared plumbing (borsh reader/writer, dex_view plumbing)
@@ -47,7 +47,7 @@ published package uses:
 
 ```ts
 // this repo, today:
-import { rhea_dclv2_list_user_assets_fun_json } from "../../../middleman/near_kit_tool_box";
+import { rhea_dclv2_list_user_assets_fun_json } from "../../../middleman/near-kit-tool-box";
 
 const assets = await rhea_dclv2_list_user_assets_fun_json(
   near_kit_client(),
@@ -63,7 +63,7 @@ import { rhea_dclv2_list_user_assets_fun_json } from "@near-kit-tool-box/fun";
 
 ## WHEN THE PACKAGE PUBLISHES THE HELPERS
 
-1. delete the whole `middleman/near_kit_tool_box/` folder
+1. delete the whole `middleman/near-kit-tool-box/` folder
 2. point the imports at `@near-kit-tool-box/fun` (one line per file)
 3. drop the now-unused `near-kit` dependency if nothing else needs it
 
