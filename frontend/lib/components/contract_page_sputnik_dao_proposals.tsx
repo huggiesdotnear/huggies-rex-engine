@@ -1,11 +1,15 @@
 // ========================================
-// the DAO's proposals: one row per proposal — id, kind, what it does,
+// the DAO's proposals: one card per proposal — id, kind, what it does,
 // status, proposer, votes, date.
 //
-// the row shows the kind's real content, because that is the
+// the card shows the kind's real content, because that is the
 // proposal: a Transfer says how much of which token went to whom, and
-// a row reading only "Transfer" says nothing. the proposer's own note
-// is the description, and it sits in the expanded part of the row.
+// a card reading only "Transfer" says nothing. the proposer's own note
+// is the description, and it sits in the expanded part of the card.
+//
+// --- WHY --- the card expands in place rather than opening a second
+// panel: the note and the votes belong to their proposal, so they read
+// best directly under it.
 //
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
@@ -40,8 +44,8 @@ function status_slug_fun(status: string): string {
 // the human date of a nanosecond timestamp.
 //
 // --- WHY --- the date is day and month and year, with no weekday and
-// no time: the date column is narrow, and "Mar 14, 2026" is as much
-// of a proposal's date as anyone reads.
+// no time: the card's date line is narrow, and "Mar 14, 2026" is as
+// much of a proposal's date as anyone reads.
 function format_time_fun(nanoseconds: string): string {
   if (nanoseconds.length === 0) return "—";
   const value = Number(nanoseconds);
@@ -85,82 +89,71 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
     <section>
       <h2>PROPOSALS ({dao.proposals.length})</h2>
       <div class="proposals-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-id">#</th>
-              <th class="col-kind">KIND</th>
-              <th class="col-what">WHAT</th>
-              <th class="col-status">STATUS</th>
-              <th class="col-proposer">PROPOSER</th>
-              <th class="col-votes">VOTES</th>
-              <th class="col-date">DATE</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dao.proposals.map((proposal) => {
-              const is_open = open_ids.includes(proposal.id);
-              return (
-                <>
-                  <tr
-                    key={proposal.id}
-                    class={`row is-${status_slug_fun(proposal.status)}`}
-                  >
-                    <td class="col-id">{proposal.id}</td>
-                    <td class="col-kind">{proposal.kind}</td>
-                    <td class="col-what">{proposal.kind_summary}</td>
-                    <td class="col-status">
+        <div class="proposals">
+          {dao.proposals.map((proposal) => {
+            const is_open = open_ids.includes(proposal.id);
+            return (
+              <div
+                key={proposal.id}
+                class={`proposal is-${status_slug_fun(proposal.status)}`}
+              >
+                <div class="proposal-head">
+                  <span class="proposal-id">{proposal.id}</span>
+                  <span class="proposal-copy">
+                    <span class="proposal-kind">{proposal.kind}</span>
+                    <span class="proposal-what">{proposal.kind_summary}</span>
+                  </span>
+                  <span class="proposal-meta">
+                    <span class="proposal-status">
                       <span class="status">{proposal.status}</span>
-                    </td>
-                    <td class="col-proposer">
-                      {proposal.proposer.length === 0 ? (
-                        "—"
-                      ) : (
-                        <a
-                          href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(proposal.proposer)}`}
-                        >
-                          {proposal.proposer}
-                        </a>
-                      )}
-                    </td>
-                    <td class="col-votes">{proposal.votes_count}</td>
-                    <td class="col-date">
-                      <button
-                        type="button"
-                        class="toggle"
-                        onClick={() => toggle_fun(proposal.id)}
-                        aria-expanded={is_open}
+                    </span>
+                    <span class="proposal-votes">{proposal.votes_count} VOTES</span>
+                  </span>
+                </div>
+                <div class="proposal-foot">
+                  <span class="proposal-proposer">
+                    {proposal.proposer.length === 0 ? (
+                      "—"
+                    ) : (
+                      <a
+                        href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(proposal.proposer)}`}
                       >
-                        {format_time_fun(proposal.submission_time)}
-                        <span class="caret">{is_open ? "▲" : "▼"}</span>
-                      </button>
-                    </td>
-                  </tr>
-                  {is_open && (
-                    <tr key={`${proposal.id}-detail`} class="detail-row">
-                      <td colSpan={7}>
-                        {proposal.description.length > 0 && (
-                          <p class="note">{proposal.description}</p>
-                        )}
-                        {proposal.votes.length > 0 && (
-                          <p class="vote-list">
-                            {proposal.votes
-                              .map((vote) => `${vote.account_id} ${vote.vote}`)
-                              .join(" · ")}
-                          </p>
-                        )}
-                        {proposal.description.length === 0 &&
-                          proposal.votes.length === 0 && (
-                            <p class="note">NO DETAIL</p>
-                          )}
-                      </td>
-                    </tr>
-                  )}
-                </>
-              );
-            })}
-          </tbody>
-        </table>
+                        {proposal.proposer}
+                      </a>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    class="toggle"
+                    onClick={() => toggle_fun(proposal.id)}
+                    aria-expanded={is_open}
+                  >
+                    {format_time_fun(proposal.submission_time)}
+                    <span class="caret">{is_open ? "▲" : "▼"}</span>
+                  </button>
+                </div>
+                {is_open && (
+                  <div class="proposal-detail">
+                    {proposal.description.length > 0 && (
+                      <p class="note">{proposal.description}</p>
+                    )}
+                    {proposal.votes.length > 0 && (
+                      <p class="vote-list">
+                        {proposal.votes
+                          .map((vote) => `${vote.account_id} ${vote.vote}`)
+                          .join(" · ")}
+                      </p>
+                    )}
+                    {proposal.description.length === 0 &&
+                      proposal.votes.length === 0 && (
+                        <p class="note">NO DETAIL</p>
+                      )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

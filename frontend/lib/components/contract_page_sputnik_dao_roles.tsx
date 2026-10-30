@@ -1,16 +1,16 @@
 // ========================================
-// the DAO's members: one table, one row per account, with the roles
-// that account is in and the permissions those roles grant.
+// the DAO's members: one card per account, with the roles that account
+// is in and the permissions those roles grant.
 //
-// --- WHY --- one table and not one tab per role: an account can be in
-// several roles, and a table that repeats the account for each of them
-// makes the reader count the duplicates by hand. the roles the account
-// is in become a column instead.
+// --- WHY --- one card per account and not one tab per role: an account
+// can be in several roles, and a list that repeats the account for each
+// of them makes the reader count the duplicates by hand. the roles the
+// account is in become a row inside its card instead.
 //
-// --- WHY --- the roles that are open to everyone are not rows. the
+// --- WHY --- the roles that are open to everyone are not cards. the
 // contract answers `"kind": "Everyone"` for them, with no member list
-// at all, so there is nothing to put in a row. they are a note under
-// the table.
+// at all, so there is nothing to put in one. they are a note under the
+// cards.
 //
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
@@ -27,9 +27,8 @@ import { current_app_depth_fun } from "../ts/app_depth";
 // --- WHY --- the raw permissions are a wall of text: `call:VoteRemove`,
 // `transfer:VoteRemove`, `policy_update_parameters:*` and a dozen
 // more. the part before the colon is what is acted on — the action —
-// and the part after is the scope. so the cell lists the actions, one
-// per line, and the full list with every scope is in the cell's
-// title.
+// and the part after is the scope. so the card lists the actions, and
+// the full list with every scope is in the card's title.
 function permission_actions_fun(permissions: ReadonlyArray<string>): string[] {
   const actions = new Set<string>();
   for (const permission of permissions) {
@@ -63,45 +62,37 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
     <section>
       <h2>MEMBERS ({dao.members.length})</h2>
       <div class="members-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th class="col-rank">#</th>
-              <th class="col-account">ACCOUNT</th>
-              <th class="col-roles">ROLES</th>
-              <th class="col-permissions">PERMISSIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dao.members.map((member, index) => (
-              <tr key={member.account_id}>
-                <td class="col-rank">{index + 1}</td>
-                <td class="col-account">
-                  <a
-                    href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(member.account_id)}`}
-                  >
-                    {member.account_id}
-                  </a>
-                </td>
-                <td class="col-roles">
+        <div class="members">
+          {dao.members.map((member, index) => (
+            <div
+              class="member"
+              key={member.account_id}
+              title={member.permissions.join(", ")}
+            >
+              <span class="member-rank">{index + 1}</span>
+              <span class="member-copy">
+                <a
+                  class="member-account"
+                  href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(member.account_id)}`}
+                >
+                  {member.account_id}
+                </a>
+                <span class="member-roles">
                   {member.roles.map((role) => (
                     <span class="role-chip">{role}</span>
                   ))}
-                </td>
-                <td
-                  class="col-permissions"
-                  title={member.permissions.join(", ")}
-                >
-                  {member.permissions.length === 0
-                    ? "—"
-                    : permission_actions_fun(member.permissions).map(
-                        (action) => <span class="permission">{action}</span>,
-                      )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </span>
+              </span>
+              <span class="member-permissions">
+                {member.permissions.length === 0
+                  ? "—"
+                  : permission_actions_fun(member.permissions).map(
+                      (action) => <span class="permission">{action}</span>,
+                    )}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
       {dao.open_roles.length > 0 && (
         <p class="open-roles">

@@ -1,7 +1,11 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES
-   the DAO's members: one table, one row per account, with the roles
-   that account is in and the permissions those roles grant.
+   the DAO's members: one card per account, with the roles that account
+   is in and the permissions those roles grant.
+
+   the card shape follows the discover page's token rows — a bordered,
+   rounded tile over the page — so the two lists read as the same kind
+   of thing on the page.
 
    the section heading is styled by base/main.css — the h2 rule is
    app-wide, not the page's own. */
@@ -10,49 +14,62 @@
   margin-top: 20px;
 }
 /*==================================*/
-/* --- the members table ---
-   the table is laid out with auto widths, not fixed ones: the roles
-   and the permissions both need room, and a fixed width clips them
-   instead of wrapping. the account column is the only one with a
-   set width, because the ids are the thing being scanned. */
+/* --- the members list ---
+   the cards stack in one column. the scroll box caps the height, so a
+   dao with a hundred members does not push the proposals off the
+   page. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .members-scroll {
   max-height: 460px;
   overflow-y: auto;
   overflow-x: hidden;
 }
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES table {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .members {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  table-layout: auto;
-  border-collapse: collapse;
-  font-size: 12px;
+  min-width: 0;
+  gap: 6px;
 }
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES th,
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES td {
+/*==================================*/
+/* --- one member card ---
+   the rank, then the account and its roles, then the permissions. the
+   permissions sit on the right, so the eye can run down the accounts
+   and read who can do what without the two lists running into each
+   other. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) minmax(0, 40%);
+  align-items: start;
+  gap: 10px;
   text-align: left;
-  padding: 8px 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  /* the roles and the permissions wrap onto as many lines as they
-     need. clipping them hid the roles an account is in. */
-  overflow: visible;
-  white-space: normal;
-  vertical-align: top;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
 }
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES th {
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.24);
+}
+/* the rank is a quiet number in the corner. it says which order the
+   policy names the members in. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-rank {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.7;
-}
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-rank {
-  width: 26px;
+  font-size: 11px;
   text-align: right;
   opacity: 0.6;
+  font-variant-numeric: tabular-nums;
 }
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-account {
-  width: 28%;
+/* the account and its roles, stacked. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES td.col-account a {
+/* the account id is the thing being scanned, so it gets its own line
+   and breaks anywhere rather than pushing the roles off the card. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-account {
   display: block;
   overflow-wrap: anywhere;
   word-break: break-all;
@@ -60,14 +77,17 @@
   font-family: monospace;
   font-size: 10px;
 }
-/* the roles an account is in, as chips. they stack: one per line, so
-   every role is visible and none is clipped. */
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-roles {
-  width: 22%;
+/* the roles an account is in, as chips. they wrap onto as many lines
+   as they need, so every role is visible and none is clipped. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-width: 0;
 }
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .role-chip {
-  display: block;
-  margin: 0 0 3px;
+  display: inline-block;
+  margin: 0;
   padding: 2px 7px;
   border-radius: 999px;
   background: rgba(0, 198, 215, 0.24);
@@ -76,26 +96,37 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   white-space: nowrap;
-  width: fit-content;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 /* what the roles grant: a wrapped inline list, not one per line. the
-   full list with every scope is in the cell's title. */
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .col-permissions {
+   full list with every scope is in the card's title.
+
+   --- WHY --- the actions break on word boundaries and not anywhere:
+   `overflow-wrap: anywhere` broke `transfer` into `trans` / `fer`,
+   because the column is narrow and a long action has no spaces to
+   break at. the actions are single words, so they stay whole and the
+   list wraps between them instead. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-permissions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 6px;
+  min-width: 0;
   font-size: 10px;
   line-height: 1.6;
   opacity: 0.75;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .permission {
   display: inline-block;
-  margin: 0 6px 0 0;
+  margin: 0;
+  white-space: nowrap;
 }
 /*==================================*/
 /* --- the roles that are open to everyone ---
-   they name no accounts, so there is no row for them. the note says
+   they name no accounts, so there is no card for them. the note says
    they exist and what they can do. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles {
   margin: 10px 0 0;
