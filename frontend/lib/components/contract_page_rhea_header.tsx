@@ -6,13 +6,13 @@
 //   v2.ref-finance.near  - the amm (ref finance v2)
 //   dclv2.ref-labs.near  - the dcl v2 (ref labs)
 //
-// they are cards and not a list of ids because a reader who wants one
-// of them wants to know WHICH one they are looking at, and a bare
-// contract id does not say that.
+// they are cards and not a list of ids because a reader who wants one of
+// them wants to know WHICH one they are looking at, and a bare contract
+// id does not say that.
 //
 // this component does NOT fetch. the rhea page has one loader
-// (lib/ts/contract_page_rhea.ts) and this component reads its result
-// from the page store (lib/ts/contract_page_rhea_store.ts).
+// (lib/ts/contract_page_rhea.ts); this reads its store
+// (lib/ts/contract_page_rhea_store.ts).
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -22,8 +22,6 @@ import { compact_usd_fun } from "../ts/compact_usd";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// the two rhea contracts, as the header shows them.
-//
 // --- WHY --- these ids are a constant and not a fetched value: they
 // are the two contracts the page is ABOUT, not something the api
 // reports. the api reports the pools, not the contracts behind them.

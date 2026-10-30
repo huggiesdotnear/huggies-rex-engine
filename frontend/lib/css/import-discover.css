@@ -1,6 +1,5 @@
 /*==================================*/
-/* the discover page's css: the components it mounts. each one brings
-   the shared css it needs with its own @imports. */
+/* the discover page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER.css);
 @import url(./components/HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER.css);
 @import url(./components/HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS.css);

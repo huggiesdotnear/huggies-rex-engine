@@ -1,7 +1,7 @@
 // ========================================
 // the account id box on the Pumpopoly page.
 //
-// the box itself is shared — frontend/lib/components/id_jump_box.tsx
+// the box itself is shared — frontend/lib/components/shared/id_jump_box.tsx
 // — because the token page and the DAO page have the same box with
 // different wording. this component supplies the Pumpopoly wording.
 //
@@ -17,9 +17,8 @@ import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR_FUN() {
-  // --- WHY --- the id comes from the store: the store watches the id
-  // and re-loads when it changes, so the components read one place for
-  // both the id and the data, and they follow it.
+  // --- WHY --- the id comes from the store: it watches the id and
+  // re-loads when it changes, so the id and the data change together.
   use_page_store_fun(HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE);
   const account_id = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
 

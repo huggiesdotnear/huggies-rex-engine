@@ -1,11 +1,10 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_APP_PAGE_BURN_INFO
-   the "about burning on NEAR" section: what burning is, and what a
-   burn address is.
+   the "about burning on NEAR" section: what burning is, and what a burn
+   address is.
 
-   two cards side by side: they are two short ideas, and a reader takes
-   one of them in at a time. the text is left aligned: a paragraph of
-   five lines set centred is hard to read. */
+   two cards side by side: two short ideas, and a reader takes one at a
+   time. the text is left aligned: a centred paragraph is hard to read. */
 /*==================================*/
 #HUGGIES_COMPONENT_APP_PAGE_BURN_INFO {
   text-align: center;

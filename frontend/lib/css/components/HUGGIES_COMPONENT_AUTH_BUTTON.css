@@ -2,16 +2,15 @@
 /* HUGGIES_COMPONENT_AUTH_BUTTON
    the sign-in button and the account dropdown.
 
-   the account list that drops down from the auth button. sits in
-   normal flow under the button rather than floating, so it never
-   covers the nav or the rest of the page.
+   the account list sits in normal flow under the button rather than
+   floating, so it never covers the nav or the rest of the page.
 
-   the menu items reuse the base button look, but at a smaller
-   padding and a left-aligned label — a full-width button with a
-   long account id reads as a wall of text.
+   the menu items reuse the base button look, but at a smaller padding
+   and a left-aligned label — a full-width button with a long account id
+   reads as a wall of text.
 
-   the active account is marked with a filled dot so the current
-   one is obvious at a glance; the others use an empty dot. */
+   the active account is marked with a filled dot, the others an empty
+   one. */
 /*==================================*/
 [data-huggies-auth-root] {
   width: 500px;
@@ -41,9 +40,9 @@
   color: var(--color-backend);
 }
 /*----------------------*/
-/* one account row: the pick button plus its remove button. */
-/* the row is a flex line so the ✕ sits at the far right instead  */
-/* of dropping onto its own line under a full-width pick button.  */
+/* one account row: the pick button plus its remove button. the row is a
+   flex line so the ✕ sits at the far right instead of dropping onto
+   its own line under a full-width pick button. */
 [data-huggies-auth-account] {
   display: flex;
   align-items: stretch;
@@ -66,8 +65,8 @@
   white-space: nowrap;
 }
 /*----------------------*/
-/* the ✕ that forgets one account. square, so it lines up with  */
-/* the row's height instead of stretching to the column width.   */
+/* the ✕ that forgets one account. square, so it lines up with the
+   row's height instead of stretching to the column width. */
 [data-huggies-auth-account] > button.account-remove {
   flex: 0 0 auto;
   width: 38px;
@@ -76,9 +75,9 @@
   text-align: center;
 }
 /*----------------------*/
-/* the account the app is currently acting as. */
-/* the filled dot plus a bolder label, so it reads as "current"   */
-/* even without relying on the dot's color alone.                  */
+/* the account the app is currently acting as. the filled dot plus a
+   bolder label, so it reads as "current" without relying on the
+   dot's color alone. */
 [data-huggies-auth-account] > button.account.is-active {
   font-weight: 700;
   background-color: var(--color-middle);
@@ -86,8 +85,8 @@
   border-color: var(--color-middle-dark);
 }
 /*----------------------*/
-/* ADD ACCOUNT / SIGN OUT keep the base button look but sit       */
-/* inside the menu, so they lose the menu's outer margins.        */
+/* ADD ACCOUNT / SIGN OUT keep the base button look but sit inside
+   the menu, so they lose the menu's outer margins. */
 [data-huggies-auth-menu] > button {
   width: 100%;
   margin-top: 0;

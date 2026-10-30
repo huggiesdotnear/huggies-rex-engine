@@ -1,13 +1,10 @@
 /*==================================*/
 /* id_jump_box
    the id jump box: a text field and a button that open an id on the
-   current page.
-
-   the box writes `<prefix>-selector`, `<prefix>-input` and
-   `<prefix>-open`, and the page that uses it passes the prefix. so
-   one file carries the rules for every page that uses the box. */
+   current page. the box writes `<prefix>-selector`, `<prefix>-input` and
+   `<prefix>-open`, and the page that uses it passes the prefix, so one
+   file carries the rules for every page that uses the box. */
 /*==================================*/
-/* the card the box sits in. */
 .pumpopoly-selector {
   display: flex;
   flex-direction: column;
@@ -28,8 +25,7 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.12);
-} /* the label and the field, stacked. */
-.pumpopoly-input,
+} .pumpopoly-input,
 .token-input,
 .dao-input {
   display: flex;
@@ -37,7 +33,6 @@
   gap: 0.35rem;
   min-width: 0;
 }
-/* the small uppercase label above the field. */
 .pumpopoly-input span,
 .token-input span,
 .dao-input span {
@@ -46,7 +41,6 @@
   letter-spacing: 0.06em;
   opacity: 0.75;
 }
-/* the field itself. */
 .pumpopoly-input input,
 .token-input input,
 .dao-input input {
@@ -65,11 +59,11 @@
 /* the button.
 
    the global button rule sets a fixed width:500px so buttons line up
-   with the page column. this card is narrower than that, so the button
-   would hang out past the card's own edge. `width:100%` resolves
-   against the card's CONTENT box — the same box the input above it
-   fills — so the button lines up with the input. `align-self:stretch`
-   is what makes it fill that box in a column flexbox. */
+   with the page column. this card is narrower, so the button would hang
+   out past the card's own edge. `width:100%` resolves against the
+   card's CONTENT box — the same box the input above it fills — so the
+   button lines up with the input. `align-self:stretch` makes it fill
+   that box in a column flexbox. */
 .pumpopoly-open,
 .token-open,
 .dao-open {
@@ -84,7 +78,6 @@
   font-weight: 700;
   cursor: pointer;
 }
-/* the token page's button is a touch wider of text. */
 .token-open {
   padding: 0.7rem 1.1rem;
 }

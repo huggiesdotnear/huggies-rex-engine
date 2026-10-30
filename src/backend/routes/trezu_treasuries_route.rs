@@ -7,12 +7,11 @@
 //
 // the route path mirrors the upstream trezu path (/api/user/treasuries)
 // under the /api/trezu/* prefix, so the app being talked to is obvious
-// from the url alone.
+// from the url.
 //
-// failure modes, all as json:
-//   400 - accountId missing or blank
-//   502 - trezu answered non-2xx, timed out, or sent invalid json
-// the upstream json array is forwarded as-is on success.
+// 400 = accountId missing or blank. 502 = trezu answered non-2xx,
+// timed out, or sent invalid json. the upstream json array is
+// forwarded as-is on success.
 // ====================================
 use axum::{
     Json,

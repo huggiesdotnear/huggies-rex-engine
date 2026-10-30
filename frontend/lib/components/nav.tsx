@@ -1,9 +1,9 @@
 // ========================================
-// top-level nav on every app/* page (except the two redirect
-// pages, which never stay on screen long enough to host a nav).
-// mounts into <nav id="HUGGIES_COMPONENT_NAV">; hrefs are
-// resolved at render time so a nav on a nested page still
-// points back at the bare filenames under /app/.
+// top-level nav on every app/* page (except the two redirect pages,
+// which never stay on screen long enough to host a nav).
+// mounts into <nav id="HUGGIES_COMPONENT_NAV">; hrefs are resolved at
+// render time so a nav on a nested page still points back at the bare
+// filenames under /app/.
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -18,9 +18,8 @@ interface HUGGIES_NAV_LINK {
   label: string;
   Icon: ComponentType<{ size?: number }>;
 }
-// PROFILE points at the router, not account.html directly, so a
-// logged-out user lands on auth.html instead of a blank
-// account.html with no ?id= to read.
+// PROFILE points at the router, not account.html directly, so a logged-out
+// user lands on auth.html instead of a blank account.html with no ?id=.
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
   { href: "discover.html", label: "DISCOVER", Icon: LayoutGrid },

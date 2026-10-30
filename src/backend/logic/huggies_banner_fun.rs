@@ -3,14 +3,12 @@
 //
 // the bind host is usually 0.0.0.0, a wildcard that is not a usable
 // URL, so it is not printed as a link. instead localhost is listed
-// first (it is the one that works for wallet sign-in, see below) and
-// then every real LAN address.
+// first (it is the one that works for wallet sign-in) and then every
+// real LAN address.
 //
 // the localhost note is not cosmetic: the wallet sandbox needs a SECURE
 // CONTEXT for WebCrypto Ed25519, which plain HTTP provides only on
-// localhost/127.0.0.1. opening a LAN address in a browser instead
-// fails sign-in with
-// "Cannot read properties of undefined (reading 'generateKey')".
+// localhost/127.0.0.1. see huggies_local_ips_fun.rs.
 use super::huggies_local_ips_fun::huggies_local_ips_fun;
 pub fn huggies_banner_fun(host: &str, port: u16) {
     let ips = huggies_local_ips_fun();
@@ -20,7 +18,6 @@ pub fn huggies_banner_fun(host: &str, port: u16) {
         println!("huggies-rex-engine bound to {host}:{port}");
         println!();
         println!("open in a browser:");
-        // localhost first: it is a secure context, so wallet sign-in works.
         println!("  http://localhost:{port}   <- use this for wallet login");
         for ip in &ips {
             // pad the address itself, not the formatted string, so the

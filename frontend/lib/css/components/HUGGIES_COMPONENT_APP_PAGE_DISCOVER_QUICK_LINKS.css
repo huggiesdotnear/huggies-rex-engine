@@ -1,11 +1,10 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS
    the quiet links under the auth button: the emoji game and the burn
-   page. they are meant to be found, so they are quiet: small, low
-   contrast, and only a little brighter on hover.
+   page. meant to be found, so they are quiet: small, low contrast, and
+   only a little brighter on hover.
 
-   one row and not two blocks: the two links are the same kind of thing,
-   so they belong side by side. */
+   one row: the two links are the same kind of thing. */
 /*==================================*/
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS {
   width: 500px;

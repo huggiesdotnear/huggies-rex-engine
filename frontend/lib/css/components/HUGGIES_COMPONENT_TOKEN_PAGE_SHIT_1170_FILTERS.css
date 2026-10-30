@@ -1,22 +1,19 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS
-   the holder-type filter tabs.
-
-   one emoji per holder type: a white fill, a 2px border and an 8px
-   radius, on a fixed grid so every tab is the same width and the row
-   spans the whole column. */
+   the holder-type filter tabs. one emoji per holder type: a white fill,
+   a 2px border and an 8px radius, on a fixed grid so every tab is the
+   same width and the row spans the whole column. */
 /*==================================*/
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS .tabs {
   display: grid;
-  /* seven tabs, one row, each an equal share of the column */
-  grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   margin-bottom: 12px;
 }
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS .tab {
-  /* the global button rule pins every button to the page column
-     width. these tabs are grid cells, so the width is reset here and
-     the grid hands out the columns instead. */
+  /* the global button rule pins every button to the page column width.
+     these tabs are grid cells, so the width is reset here and the grid
+     hands out the columns instead. */
   width: auto;
   max-width: none;
   min-width: 0;
@@ -34,9 +31,6 @@
   line-height: 1;
   padding: 8px 0;
   cursor: pointer;
-  /* an explicit list, not `transition: all`. `all` also transitions
-     `background-color`, and the active fill then animates in over
-     200ms — which reads as the fill not landing at all. */
   transition: border-color 0.2s ease;
 }
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS .tab:hover {

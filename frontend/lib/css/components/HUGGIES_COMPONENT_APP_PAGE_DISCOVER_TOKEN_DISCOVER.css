@@ -3,15 +3,13 @@
    the searchable token list on the discover page: the search box, the
    sort row, the results and the notes.
 
-   the page's sections — CONTRACTS and TOKENS — are plain <section>
-   elements in the page column. their spacing and their heading are
-   styled by base/main.css. */
+   the page's CONTRACTS and TOKENS sections are plain <section>
+   elements in the page column, styled by base/main.css. */
 @import url(./shared/sort_control.css);
 
 /*==================================*/
-/* the search box sits on its own row above the sort buttons, not beside
-   them. the page column is 500px wide and the sort row already needs
-   most of it. */
+/* the search box sits on its own row above the sort buttons: the page
+   column is 500px wide and the sort row already needs most of it. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .controls {
   display: flex;
   flex-direction: column;
@@ -29,17 +27,13 @@
   flex-direction: column;
   margin-bottom: 0;
 }
-/* the sort control's own row. it is the full width of the column, so
-   the buttons can be spread across it rather than bunched at the left
-   edge under the search box. */
+/* the sort control's own row, the full width of the column, so the
+   buttons spread across it rather than bunched at the left edge. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort {
   display: flex;
   width: 100%;
   min-width: 0;
 }
-/* the control itself fills that row, and its buttons share the width
-   evenly — so the sort row reads as one bar, not three small buttons
-   floating in a wide empty space. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort .sort-control {
   display: flex;
   flex: 1 1 auto;
@@ -49,12 +43,9 @@
   flex: 1 1 0;
   justify-content: center;
 }
-/* the direction button keeps its own width: it is a small toggle, not
-   a third sort key, so it does not share the row evenly with them. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .sort .sort-direction {
   flex: 0 0 auto;
 }
-/* --- the search box --- */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .search input {
   width: 100%;
   box-sizing: border-box;
@@ -85,8 +76,6 @@
   min-width: 0;
   gap: 6px;
 }
-/* the loading / scroll-for-more notes sit INSIDE the scroll box, below
-   the rows, so they are the last thing in the list. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .loading {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
@@ -95,7 +84,6 @@
   text-align: center;
   margin: 8px 0 0;
 }
-/* --- a failed request --- */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .error {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
@@ -104,7 +92,6 @@
   margin: 0 0 8px;
 }
 /*==================================*/
-/* --- one token row --- */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result {
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr) auto;
@@ -122,8 +109,8 @@
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.24);
 }
-/* marked tokens are styled so they stand out wherever the chosen sort
-   puts them, but they never override the order. */
+/* marked tokens stand out wherever the chosen sort puts them, but they
+   never override the order. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result.is-marked {
   border-color: var(--color-middle);
   background: rgba(0, 0, 0, 0.2);
@@ -155,9 +142,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* the token id is cut off with an ellipsis instead of wrapping. the
-   size comes from the base code rule, and the color is the text
-   color — no dimming. */
 #HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER .result-copy code {
   font-size: 10px;
 }

@@ -1,24 +1,16 @@
 // ========================================
 // one indexeddb store, used by every durable cache in the app.
 //
-// --- WHY --- the token cache and the discover token-list cache each
-// carried their own copy of the same four things: an open helper, a
-// cached connection promise, a batch read and a batch write. they
-// drifted apart, and the subtle parts — the readwrite-transaction
-// trick that makes `oncomplete` fire — were duplicated by hand, so a
-// fix to one had to be remembered in the other.
+// --- WHY --- the token cache and the (now removed) discover
+// token-list cache each carried their own copy of the same four
+// things: an open helper, a cached connection promise, a batch read and
+// a batch write. they drifted apart, and the subtle parts — the
+// readwrite-transaction trick that makes `oncomplete` fire — were
+// duplicated by hand, so a fix to one had to be remembered in the other.
 //
 // this module holds that logic ONCE. a cache is described by its
 // database name, version and store name, and everything else — open,
 // batch get, batch put — comes from here.
-//
-// the open/upgrade behaviour:
-//   * `onupgradeneeded` fires only on the first open or a version
-//     bump, so the store is created exactly once.
-//   * the connection promise is cached, so a second caller shares the
-//     open request instead of making another one.
-//   * the store is only created when missing, so a later version bump
-//     that adds stores does not throw on the ones already there.
 //
 // every function here is safe to call outside a browser: it resolves
 // empty / no-ops rather than throwing, so a caller never has to guard.
@@ -41,11 +33,20 @@ export interface HUGGIES_INDEXED_DB_STORE_CONFIG {
 // --- CONNECTION ------------------------
 // the open connection, cached on the promise so concurrent callers
 // share one open request.
+// --- WHY --- ONE connection for the whole app: the promise is a
+// module-level singleton, so the first caller's db_name wins and a
+// later cache with a DIFFERENT db_name would silently reuse the first
+// database. every cache must therefore live in the same database and
+// differ only by store_name.
 let db_promise: Promise<IDBDatabase> | null = null;
 // ========================================
 // ========================================
 // --- OPEN ------------------------------
 // open the database, creating the store on first use.
+// --- WHY --- `onupgradeneeded` fires only on the first open or a
+// version bump, so the store is created exactly once. it is created
+// only when MISSING, so a later version bump that adds stores does not
+// throw on the ones already there.
 function open_db_fun(
   config: HUGGIES_INDEXED_DB_STORE_CONFIG,
 ): Promise<IDBDatabase> {

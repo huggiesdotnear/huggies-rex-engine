@@ -3,8 +3,7 @@
 //
 // a card can carry more than one contract id — the rhea card carries
 // both rhea contracts, and the pumpopoly card carries the world and
-// the nft contract. the card shows every id it carries, each on its
-// own line.
+// the nft contract. the card shows every id, each on its own line.
 // ========================================
 export interface HUGGIES_CONTRACT_CARD {
   key: string;
@@ -13,7 +12,6 @@ export interface HUGGIES_CONTRACT_CARD {
   page: string;
 }
 // ========================================
-// list contract links for discover surfaces.
 export function list_contract_cards_fun(): HUGGIES_CONTRACT_CARD[] {
   return [
     {
@@ -47,8 +45,8 @@ export function list_contract_cards_fun(): HUGGIES_CONTRACT_CARD[] {
 // segment list. [] means the page sits directly in frontend/app/.
 // --- WHY --- the contract pages live in frontend/app/contract/, so a
 // link to one has to be relative to the page you are ON, not to a
-// fixed depth. a depth-only rule breaks the moment the same component
-// is mounted from a third directory.
+// fixed depth. a depth-only rule breaks when the same component is
+// mounted from a third directory.
 function current_app_dir_segments_fun(): string[] {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return [];
@@ -68,7 +66,7 @@ function current_app_dir_segments_fun(): string[] {
 }
 // ========================================
 // build a relative href from one directory (below frontend/app/) to
-// another. both are given as segment lists.
+// another. both are segment lists.
 function relative_href_fun(
   from_dir: readonly string[],
   to_dir: readonly string[],
@@ -91,8 +89,7 @@ function relative_href_fun(
 }
 // ========================================
 // build the href for one contract page, relative to the page the link
-// is rendered on. the contract pages live in frontend/app/contract/,
-// so the href is that directory relative to the current page.
+// is rendered on. the contract pages live in frontend/app/contract/.
 export function contract_page_href_fun(page: string): string {
   return relative_href_fun(current_app_dir_segments_fun(), ["contract"], page);
 }

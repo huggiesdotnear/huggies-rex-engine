@@ -1,19 +1,17 @@
 // ========================================
 // SPLIT_ARGV
-// bin primitive that separates positional args from flags in one
-// pass, so every bin parses argv the same way.
+// bin primitive that separates positional args from flags in one pass,
+// so every bin parses argv the same way. a flag listed in the bin's own
+// boolean_flags takes no value; every other --flag takes the next token
+// as its value.
 //
-// a flag listed in the bin's own boolean_flags takes no value; every
-// other --flag takes the next token as its value.
-//
-// booleans are tracked by index rather than stored in the map, so a
-// bin reads `seen.has("--desc")` instead of guessing whether the map
+// booleans are recorded in the `seen` set rather than the flags map, so
+// a bin reads `seen.has("--desc")` instead of guessing whether the map
 // holds "true" or an empty string.
 //
 // --- WHY --- the boolean flags are per-bin, not one global set. the
 // huggies bins use --include-hidden, and a shared set would make one
-// bin's flag swallow the next positional in another bin's argv. the
-// caller passes the ones it owns.
+// bin's flag swallow the next positional in another bin's argv.
 // ========================================
 
 export interface SPLIT_ARGV_OPTIONS {

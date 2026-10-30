@@ -1,10 +1,9 @@
 // ========================================
-// the token metadata block at the bottom of the $SHIT page: the price,
-// the holder count, the total supply, the decimals, the reputation, the
+// the token metadata block at the bottom of the $SHIT page: the price, the
+// holder count, the total supply, the decimals, the reputation, the
 // liquidity and the market cap.
 //
-// it reads the loaded summary from the page's store. it fetches
-// nothing.
+// it reads the loaded summary from the page's store. it fetches nothing.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";

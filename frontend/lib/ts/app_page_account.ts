@@ -1,34 +1,28 @@
 // ========================================
 // the account page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the account page requests. that is the
-// whole point of it.
+// read this file to know what the page requests.
 //
 // WHY this exists
-// --- the four balance tables used to fetch independently. each one
-// awaited its own contract call and then asked for token metadata on
-// its own, so the page's request count was the sum of four independent
-// pipelines: four volatile /tokens calls for overlapping token sets,
-// and two of them asking for the same thing at the same time.
+// --- the four balance tables used to fetch independently, each asking
+// for token metadata on its own: four volatile /tokens calls for
+// overlapping token sets.
 //
-// one loader fixes that. the four sources report their raw balances,
-// the token ids are unioned, and the metadata is fetched ONCE for the
-// whole page.
+// one loader fixes that. the four sources report their raw balances, the
+// token ids are unioned, and the metadata is fetched ONCE.
 //
 // WHAT THE PAGE REQUESTS
-//   1. GET /balances              direct + native, the intear api
-//   2. near view                 rhea amm   get_deposits
-//   3. near view                 rhea dcl   list_user_assets
-//   4. near view                 intear     registered_assets_of
-//   5. GET /tokens                durable fields, only for tokens never
-//                                 seen before (skipped on a warm cache)
-//   6. GET /tokens                volatile fields, once, for every token
+//   1. GET /balances   direct + native, the intear api
+//   2. near view      rhea amm  get_deposits
+//   3. near view      rhea dcl  list_user_assets
+//   4. near view      intear    registered_assets_of
+//   5. GET /tokens     durable fields, only for tokens never seen
+//                      before (skipped on a warm cache)
+//   6. GET /tokens     volatile fields, once, for every token
 //
-// the four data sources are four different contracts, so they are four
-// requests — they cannot be merged. the token metadata CAN be merged,
-// and is.
-//
-// each source is independent: one failing never hides the others.
+// the four sources are four different contracts, so they cannot be
+// merged. the token metadata CAN be merged, and is. each source is
+// independent: one failing never hides the others.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
 import {
@@ -47,13 +41,10 @@ import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "./token_info";
 // ========================================
 // --- CONFIG -----------------------------
 // "direct" is what the account holds itself; "native" is the chain's
-// own NEAR balance, which intear reports as its own source. both come
-// from the SAME /balances request — there is no separate endpoint for
-// the NEAR balance. "rhea" (LP positions) is deliberately left out.
+// own NEAR balance. both come from the SAME /balances request. "rhea"
+// (LP positions) is deliberately left out.
 const HUGGIES_BALANCE_SOURCES = ["direct", "native"] as const;
-// the rhea dcl v2 contract.
 const HUGGIES_RHEA_DCL_CONTRACT_ID = "dclv2.ref-labs.near";
-// the rhea amm contract for this app's network.
 // --- WHY --- this app is mainnet-only, so the network is a literal
 // here rather than a value read from somewhere.
 function rhea_amm_contract_id_fun(): string {
@@ -62,7 +53,6 @@ function rhea_amm_contract_id_fun(): string {
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// one token holding in one of the tables.
 export interface HUGGIES_APP_PAGE_ACCOUNT_BALANCE {
   id: string;
   raw: string;
@@ -96,7 +86,6 @@ interface HUGGIES_APP_PAGE_ACCOUNT_RAW {
 // ========================================
 // --- SOURCES ----------------------------
 // the four raw sources. each one returns balances only — no metadata.
-// the metadata is fetched once for the whole page, below.
 //
 // each source is caught on its own so one broken contract leaves the
 // other three tables intact.
@@ -124,7 +113,6 @@ async function fetch_raw_direct_fun(
   }
 }
 // ========================================
-// the rhea amm (ref finance v2) balances held for the account.
 async function fetch_raw_rhea_amm_fun(
   account_id: string,
 ): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
@@ -148,7 +136,6 @@ async function fetch_raw_rhea_amm_fun(
   }
 }
 // ========================================
-// the rhea dcl v2 internal balances.
 async function fetch_raw_rhea_dcl_fun(
   account_id: string,
 ): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
@@ -172,7 +159,6 @@ async function fetch_raw_rhea_dcl_fun(
   }
 }
 // ========================================
-// the intear dex internal balances.
 async function fetch_raw_intear_fun(
   account_id: string,
 ): Promise<HUGGIES_APP_PAGE_ACCOUNT_RAW> {
@@ -201,17 +187,12 @@ async function fetch_raw_intear_fun(
 // ========================================
 // ========================================
 // --- LOAD -------------------------------
-// fetch everything the account page shows.
-//
 // the four sources run at the same time — they are four different
 // contracts, so running them together makes the page as fast as its
 // slowest source instead of the sum of all four.
 //
 // --- WHY --- the token metadata is fetched ONCE, after the sources
-// answer. each source used to ask for its own metadata, so the page
-// made four volatile /tokens calls for token sets that overlapped.
-// the union of every id the page touches is fetched in one call, and
-// every source is answered from that one map.
+// answer. the union of every id the page touches goes in one call.
 async function app_page_account_load_fun(
   account_id: string,
 ): Promise<HUGGIES_APP_PAGE_ACCOUNT_DATA> {
@@ -222,7 +203,6 @@ async function app_page_account_load_fun(
     fetch_raw_intear_fun(account_id),
   ]);
 
-  // the union of every token id the page touches.
   const all_ids = new Set<string>();
   for (const source of [direct, rhea_amm, rhea_dcl, intear]) {
     for (const id of source.balances.keys()) all_ids.add(id);

@@ -56,7 +56,6 @@
   white-space: nowrap;
   opacity: 0.75;
 }
-/* the type tag on each holder row */
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag {
   display: inline-block;
   border-radius: 999px;
@@ -82,7 +81,6 @@
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder-tag.is-burn {
   background: rgba(218, 41, 28, 0.4);
 }
-/* the coloured stripe down the left of a holder row */
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS .holder.is-dev td:first-child {
   border-left: 3px solid #8ef0a0;
 }

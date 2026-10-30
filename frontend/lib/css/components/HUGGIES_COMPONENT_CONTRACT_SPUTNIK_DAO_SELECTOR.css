@@ -1,14 +1,11 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR
    the DAO selector: the id jump box, plus the dropdown of the daos the
-   reader is a member of.
-
-   the box itself is the shared id jump box (shared/id_jump_box.css),
-   so this file holds only the dropdown. */
+   reader is a member of. the box itself is the shared id jump box
+   (shared/id_jump_box.css); this file holds only the dropdown. */
 @import url(./shared/id_jump_box.css);
 
 /*==================================*/
-/* the dropdown, under the box. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR .select {
   display: flex;
   flex-direction: column;

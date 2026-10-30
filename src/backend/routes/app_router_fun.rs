@@ -1,13 +1,12 @@
 // APP_ROUTER_FUN
 // route map: api (/api/huggies/* + /api/trezu/*) + the static folder
-// served from `/` via ServeDir (the static folder is gitignored —
-// populated by `bun build` in the frontend step).
+// served from `/` via ServeDir (gitignored, filled by `bun build`).
 //
-// permissive CORS layer so the static `static/` directory (different
-// origin from any deployed frontend) can hit /api/*. the backend is
-// meant for personal use behind a trusted network, so we allow any
-// origin + any method + any header. if you ever expose this to the
-// public internet, lock the origin down with `CorsLayer::allow_origin([...].map(...))`.
+// SECURITY: the CORS layer is deliberately permissive (any origin, any
+// method, any header) so a static `static/` folder on a different
+// origin can hit /api/*. this backend is for personal use behind a
+// trusted network. if you expose it to the public internet, lock the
+// origin down with `CorsLayer::allow_origin([...].map(...))`.
 // ====================================
 use axum::{
     Router,
@@ -22,8 +21,11 @@ use tower_http::{cors::CorsLayer, services::ServeDir};
 use super::ping_route::ping_route;
 use super::trezu_treasuries_route::trezu_treasuries_route;
 // ====================================
-// CORS preflight middleware — intercepts every OPTIONS request
-// before any handler runs and returns 204 with CORS headers.
+// CORS preflight middleware — intercepts every OPTIONS request before
+// any handler runs and answers 204 with CORS headers.
+//
+// WHY: tower_http's CorsLayer already answers preflight itself, but
+// with a 200. this sits OUTSIDE the cors layer and short-circuits first.
 // ====================================
 async fn cors_preflight_middleware_fun(req: Request, next: Next) -> Response {
     if req.method() == Method::OPTIONS {
@@ -45,12 +47,12 @@ async fn cors_preflight_middleware_fun(req: Request, next: Next) -> Response {
 }
 // ====================================
 // fresh_static_middleware_fun — force the browser to re-validate on
-// every request to the static folder. without this, the user's
-// browser may hold onto an old page_settings_html.js even after a
-// rebuild. no-cache, must-revalidate lets the browser keep a cached
-// copy but requires it to re-check ETag/Last-Modified first, which
-// is exactly what we want for hand-rolled static JS. NO_CONTENT
-// responses (CORS preflight) are left alone.
+// every request to the static folder. without this the browser may
+// hold onto an old bundle after a rebuild. no-cache, must-revalidate
+// lets it keep a cached copy but requires it to re-check ETag/
+// Last-Modified first.
+//
+// WHY the NO_CONTENT guard: a 204 must not carry a body.
 // ====================================
 async fn fresh_static_middleware_fun(req: Request, next: Next) -> Response {
     let mut res = next.run(req).await;
@@ -77,24 +79,23 @@ pub fn app_router_fun() -> Router {
         .allow_headers(tower_http::cors::Any)
         .max_age(std::time::Duration::from_secs(86400));
     // --------------------------------------------------------
-    // api router: every /api/* route lives here, each under the
-    // api it fronts. /api/huggies/* is our own stuff (ping);
-    // /api/trezu/* fronts the trezu api. the static ServeDir
-    // lives at `/` as the FALLBACK so any unmatched GET
-    // (the html root + every .html page + the js/ + img/ trees)
-    // is served from the (gitignored) static folder built by
-    // the frontend bun step. /api/* still takes precedence
-    // because it's registered on the outer Router.
+    // api router: every /api/* route lives here, each under the api it
+    // fronts. /api/huggies/* is our own (ping); /api/trezu/* fronts
+    // the trezu api.
     // --------------------------------------------------------
     let api_router = Router::new()
         .route("/api/huggies/ping", get(ping_route))
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
-    // static fallback lives in its own inner router so the
-    // fresh_static_middleware_fun (Cache-Control: no-cache,
-    // must-revalidate) tags only HTML / JS responses. applying
-    // it to the whole router would also tag /api/* responses,
-    // clobbering any future ETag-based caching on the api layer.
+    // static ServeDir is the FALLBACK at `/`, so any unmatched GET
+    // (the html root + every .html page + the js/ + img/ trees) comes
+    // from the gitignored static folder built by `bun build`. /api/*
+    // still wins, because it is registered on the outer Router.
+    //
+    // it lives in its own inner router so the fresh_static_middleware_fun
+    // (Cache-Control: no-cache, must-revalidate) tags only the static
+    // responses. applying it to the whole router would also tag /api/*
+    // responses, clobbering any future ETag-based caching.
     // --------------------------------------------------------
     let static_service = ServeDir::new("static");
     let static_router = Router::new()
@@ -103,11 +104,10 @@ pub fn app_router_fun() -> Router {
     Router::new()
         .merge(api_router)
         .merge(static_router)
-        // outer→inner layer order (axum wraps them in reverse
-        // declaration order around the request):
-        //   - cors preflight: intercepts OPTIONS, short-circuits to
-        //     204 with CORS headers.
-        //   - cors: adds CORS headers to every other response.
+        // axum wraps layers in REVERSE declaration order, so the
+        // request runs preflight -> cors -> route. the preflight
+        // intercepts OPTIONS and short-circuits to 204 with CORS
+        // headers; the cors layer adds headers to every other response.
         .layer(cors)
         .layer(middleware::from_fn(cors_preflight_middleware_fun))
 }

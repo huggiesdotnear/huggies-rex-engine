@@ -1,9 +1,9 @@
 // ========================================
 // the token id box on the token page.
 //
-// the box itself is shared — frontend/lib/components/id_jump_box.tsx
-// — because the pumpopoly page and the DAO page have the same box
-// with different wording. this component supplies the token wording.
+// the box itself is shared — frontend/lib/components/shared/id_jump_box.tsx
+// — because the pumpopoly page and the DAO page have the same box with
+// different wording. this component supplies the token wording.
 //
 // mounts into
 // <div id="HUGGIES_COMPONENT_TOKEN_SELECTOR">.
@@ -17,8 +17,8 @@ import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_SELECTOR_FUN() {
   // --- WHY --- the id is read once, with no subscription. the jump box
-  // writes a new id to the url and the browser navigates, so the page
-  // is a fresh document with a fresh id — there is nothing to watch.
+  // writes a new id to the url and the browser navigates, so the page is
+  // a fresh document with a fresh id — there is nothing to watch.
   const token_id = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get_token_id();
 
   return (

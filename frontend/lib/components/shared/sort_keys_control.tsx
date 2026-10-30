@@ -3,12 +3,12 @@
 // list's.
 //
 // the discover page's token list has its own sort control
-// (sort_control.tsx), welded to the token sort keys — volume, market
-// cap. a dex pool list sorts by tvl, volume and apy, which are
-// different keys and different types.
+// (sort_control.tsx), welded to the token sort keys — volume, market cap. a
+// dex pool list sorts by tvl, volume and apy, which are different keys and
+// different types.
 //
-// this control takes the keys as a prop, so any list can use it
-// without the control knowing what it is sorting.
+// this control takes the keys as a prop, so any list can use it without
+// the control knowing what it is sorting.
 //
 // this component does NOT fetch. it renders what it is given.
 // ========================================

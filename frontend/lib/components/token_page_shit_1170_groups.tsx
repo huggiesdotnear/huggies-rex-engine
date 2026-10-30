@@ -1,12 +1,10 @@
 // ========================================
-// the share of the supply each group of holders holds, on the $SHIT
-// page.
+// the share of the supply each group of holders holds, on the $SHIT page.
 //
 // it reads the loaded holders from the page's store. it fetches nothing.
 //
-// the groups are a grid of flat white cards, the old SHIT info page's
-// `.filter-btn` look, with a coloured stripe down the left edge for
-// the type. the card of the ACTIVE tab is the filled-in one.
+// the groups are a grid of flat white cards with a coloured stripe down
+// the left edge for the type. the card of the ACTIVE tab is filled in.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
@@ -23,7 +21,6 @@ import {
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// render one group card: the icon, the name, the count and the share.
 function render_group_fun(
   group: HUGGIES_SHIT_HOLDER_GROUP,
   is_active: boolean,
@@ -45,8 +42,8 @@ function render_group_fun(
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS_FUN() {
   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
-  // the groups are the loaded holders added up per type. before the
-  // first page of holders lands there is nothing to add up.
+  // the groups are the loaded holders added up per type. before the first
+  // page of holders lands there is nothing to add up.
   if (state.holders.length === 0) return null;
 
   const groups = shit_holder_groups_fun(

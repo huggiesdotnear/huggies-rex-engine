@@ -1,34 +1,29 @@
 // ========================================
-// the discover page's ONE load: every fetch the page makes happens
-// here.
+// the discover page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the discover page requests. that is the
-// whole point of it.
+// read this file to know what the page requests.
 //
 // WHY this exists
-// --- the discover page used to download EVERY indexed token (about
-// 7,400) in one call, cache it in indexeddb for five minutes, and
-// sort the copy in javascript. that was stale (the cached rows carry
-// volume, market cap, price and holders, and all four move), large
-// (~733KB a visit), and wasteful — the api sorts and paginates
-// natively, so the whole download only existed to be sorted locally.
+// --- the page used to download EVERY indexed token (about 7,400) in one
+// call, cache it for five minutes, and sort the copy in javascript. that was
+// stale (the cached rows carry volume, market cap, price and holders, and
+// all four move), large (~733KB a visit), and wasteful — the api sorts and
+// paginates natively, so the download only existed to be sorted locally.
 //
-// one loader fetches one page at a time. the components read the
-// result and fetch nothing themselves, so the page's request list is
-// knowable by reading one file.
+// one loader fetches one page at a time.
 //
 // WHAT THE PAGE REQUESTS
-//   1. GET /tokens   one page of the list, sorted and paged by the
-//                    api. one request per page, 300 rows each.
-//   2. GET /tokens   the favourites, by id, so they can be pinned on
-//                    top of the `default` view.
-//   3. GET /tokens   the icons for the rows on screen, and only the
-//                    ones the durable cache does not already hold.
-//   4. GET /tokens   the search results, when the reader has typed
-//                    something. the api has a real search index.
+//   1. GET /tokens   one page of the list, sorted and paged by the api.
+//                    one request per page, 300 rows each.
+//   2. GET /tokens   the favourites, by id, so they can be pinned on top
+//                    of the `default` view.
+//   3. GET/POST      the icons for the rows on screen, and only the ones
+//                    the durable cache does not already hold.
+//   4. GET           /tokens/search — the search results, when the reader
+//                    has typed something.
 //
-// the icon request is the only one that can be skipped entirely: on a
-// warm cache every visible icon is already stored.
+// the icon request is the only one that can be skipped entirely: on a warm
+// cache every visible icon is already stored.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "./app_page_discover_token_list";
@@ -42,7 +37,6 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_resu
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// one page of the token list, as the page holds it.
 export interface HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST {
   // the rows on screen.
   rows: HUGGIES_TOKEN_SEARCH_RESULT[];
@@ -78,16 +72,15 @@ function to_finite_number_fun(value: unknown): number {
 // ========================================
 // --- FAVOURITES ------------------------
 // fetch the marked tokens by id, so the `default` view can put them on
-// top of the page.
+// top.
 //
 // --- WHY --- by id and not by sort: the api cannot sort by "our
-// favourites", so they are asked for directly. the ids are few, so
-// this is one small request.
+// favourites", so they are asked for directly.
 //
 // --- WHY --- over POST and not GET: a near account id is 64 hex
 // characters and a token id adds a label on top, so a list of ids does
 // not fit the api's ~8KB url limit. POST carries them in a body with a
-// 64KB limit instead.
+// 64KB limit.
 async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
   const ids = HUGGIES_PINNED_TOKENS.map((entry) => entry.id);
   if (ids.length === 0) return [];
@@ -104,8 +97,7 @@ async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
     ],
     ids,
   });
-  // the rows come back keyed by id; the order the api returned them in
-  // is not the order we want, so the caller pins them by their own
+  // the rows come back keyed by id; the caller pins them by their own
   // weight. a token the api does not know is simply absent.
   //
   // --- WHY --- the same field set as the list page, so a marked token
@@ -143,13 +135,11 @@ async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
 // fetch one page of the token list, plus the icons for its rows.
 //
 // --- WHY --- the favourites ride along with the FIRST page only. the
-// `default` view leads with them, so they belong at the top of the
-// list. on the later pages they would be a duplicate of rows already
-// shown, so only the first page carries them.
+// `default` view leads with them. on the later pages they would be a
+// duplicate of rows already shown.
 //
-// --- WHY --- the favourites and the page are fetched at the same time:
-// neither waits for the other, so the page is as slow as its slowest
-// request rather than the sum of the two.
+// --- WHY --- the favourites and the page are fetched together, so the
+// page is as slow as its slowest request, not the sum of the two.
 async function load_token_list_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
@@ -196,8 +186,7 @@ async function load_icons_fun(
 // --- WHY --- the api has a real search index behind /tokens/search,
 // matching symbol, name, account id and social links. filtering a
 // downloaded list in javascript only ever sees the tokens we happened
-// to download, so a token outside that set was unfindable however the
-// reader typed.
+// to download, so a token outside that set was unfindable.
 async function load_search_fun(
   query: string,
 ): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
@@ -206,7 +195,6 @@ async function load_search_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-// the page's load surface. one call per thing the page loads.
 export const HUGGIES_APP_PAGE_DISCOVER = {
   load_token_list: load_token_list_fun,
   load_icons: load_icons_fun,

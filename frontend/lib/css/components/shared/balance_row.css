@@ -3,7 +3,6 @@
    one row of the balance table: the icon, the ticker and the contract
    id on one line, the human balance and the usd value on the next. */
 /*==================================*/
-/* --- one row, stacked --- */
 .balance-table .row-head {
   display: flex;
   align-items: center;
@@ -60,7 +59,6 @@
   opacity: 0.85;
 }
 /*==================================*/
-/* --- pinned NEAR row --- */
 .balance-table tr.is-pinned td {
   border-top: 1px solid rgba(255, 255, 255, 0.5);
 }

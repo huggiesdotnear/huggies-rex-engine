@@ -13,14 +13,11 @@
 //
 // --- WHY --- this lives in lib/ts and not in lib/components: a hook
 // does not need jsx. it is plain ts that happens to call preact's
-// hooks, so it belongs with the other plain ts of the page.
-//
-// --- WHY --- the store is a parameter and not a hardcoded import: the
-// hook is shared by every page, and each page has its own store.
+// hooks. the store is a parameter and not a hardcoded import because
+// the hook is shared by every page, and each page has its own store.
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 // ========================================
 // the shape every page's store has, so this hook can drive any of them.
-//
 // --- WHY --- only get and subscribe are here: those are the two the
 // hook actually uses. the store's load is NOT in this shape — the hook
 // never calls it, and a page's load takes whatever that page needs
@@ -37,7 +34,6 @@ export interface HUGGIES_PAGE_STORE<STATE> {
 // ========================================
 // --- HOOK ------------------------------
 // read a page's store and re-render when it changes.
-//
 // --- WHY --- the revision counter: preact does not re-render a
 // component because some outside state changed. it only re-renders
 // when its own state changes. so the component keeps a counter and

@@ -2,19 +2,16 @@
 // the account page's shared state: the one load, held here, read by
 // every component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/app_page_account.ts), so there is exactly one set of
-// requests.
+// the components on this page do not fetch. they read this store, so
+// there is exactly one loader (lib/ts/app_page_account.ts).
 //
-// the store has the same shape as lib/ts/app_page_account_id.ts: plain module
-// state, a subscribe/unsubscribe pair, and a notify that a throwing
-// subscriber cannot break.
+// the store has the same shape as lib/ts/app_page_account_id.ts: plain
+// module state, a subscribe/unsubscribe pair, and a notify that a
+// throwing subscriber cannot break.
 //
 // --- WHY --- the store subscribes to the page's account id: the id can
 // change under the page — the reader signs in, signs out, or the id in
-// the url changes. the store loads the new id by itself, so no
-// component has to watch for it and no component has to call load().
+// the url changes. the store loads the new id by itself.
 import { HUGGIES_APP_PAGE_ACCOUNT } from "./app_page_account";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
 import type { HUGGIES_APP_PAGE_ACCOUNT_DATA } from "./app_page_account";
@@ -23,11 +20,9 @@ import type { HUGGIES_APP_PAGE_ACCOUNT_DATA } from "./app_page_account";
 // --- STATE ------------------------------
 // null until the load finishes. components render nothing until then.
 let data: HUGGIES_APP_PAGE_ACCOUNT_DATA | null = null;
-// the account id the page is about.
-//
-// --- WHY --- it lives here as well as in the id module: the components
-// need it to build their links and to know whether there is an account
-// at all, and the store is what they already read.
+// --- WHY --- the account id lives here as well as in the id module: the
+// components need it to build their links and to know whether there is
+// an account at all.
 let account_id: string | null = null;
 // the account id the current load was for, so a new account id starts a
 // new load and clears the old data.
@@ -41,8 +36,7 @@ const listeners: Array<() => void> = [];
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// broadcast a change to every subscriber; one throwing cannot break the
-// flow that notified.
+// broadcast a change to every subscriber; one throwing cannot break the notify.
 function notify_fun(): void {
   for (const listener of [...listeners]) {
     try {
@@ -53,8 +47,7 @@ function notify_fun(): void {
   }
 }
 // ========================================
-// register a re-render callback; returns an unsubscribe so components
-// can clean up on unmount instead of leaking.
+// register a re-render callback; returns an unsubscribe to clean up on unmount.
 function subscribe_fun(listener: () => void): () => void {
   listeners.push(listener);
   return () => {
@@ -64,24 +57,17 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // --- LOAD -------------------------------
-// load the page's data for the account the page is about.
-//
-// the load runs once per account id. a second call for the same id
-// while a load is running is ignored, so the page cannot fetch twice
-// because two components asked for it.
-//
-// --- WHY --- the components used to each trigger their own fetch, so
-// "the page loaded" was really "four loads happened, at four different
-// times". one loader, one load, one request list.
+// the load runs once per account id. a second call for the same id while
+// a load is running is ignored, so the page cannot fetch twice because
+// two components asked for it.
 //
 // --- WHY --- the load takes no argument: the store reads the page's
 // account id itself and watches it, so the page loads whatever the id
-// says at that moment and re-loads when the id changes.
+// says.
 async function app_page_account_store_load_fun(): Promise<void> {
   const next_account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
   // --- WHY --- the id is stored even when there is none: the
-  // components read it to know there is nothing to show, and they read
-  // it through the store so they follow it when it changes.
+  // components read it to know there is nothing to show.
   if (account_id !== next_account_id) {
     account_id = next_account_id;
     notify_fun();
@@ -116,21 +102,12 @@ async function app_page_account_store_load_fun(): Promise<void> {
 }
 // ========================================
 // --- WATCH -----------------------------
-// watch the page's account id and re-load when it changes.
-//
-// --- WHY --- the id can change under the page: the reader signs in,
-// signs out, or the id in the url changes. the store re-loads by
-// itself, so no component has to watch for it.
+// --- WHY --- the subscription is set up once: a second watch() would
+// add a second listener, and the id would load twice per change.
 function app_page_account_store_watch_fun(): void {
-  // --- WHY --- the subscription is set up once: a second watch() would
-  // add a second listener, and the id would then load twice for every
-  // change.
   if (watching) return;
   watching = true;
   const unsubscribe = HUGGIES_APP_PAGE_ACCOUNT_ID.subscribe(() => {
-    // --- WHY --- the public load and not the internal one: the public
-    // one is what the page and the tests go through, so it is the one
-    // that must be called.
     void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
   });
   // the subscription lives as long as the page does, so it is never
@@ -139,7 +116,6 @@ function app_page_account_store_watch_fun(): void {
 }
 // ========================================
 // --- READ ------------------------------
-// the loaded data, or null while it is still loading.
 function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_DATA | null {
   return data;
 }
@@ -147,8 +123,7 @@ function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_DATA | null {
 // the account id the page is about, or null when there is none.
 //
 // --- WHY --- it is read through the store so the components have one
-// place to read from: the id and the data always change together, and
-// the store is what tells the components to re-render.
+// place to read from: the id and the data always change together.
 function get_account_id_fun(): string | null {
   return account_id;
 }

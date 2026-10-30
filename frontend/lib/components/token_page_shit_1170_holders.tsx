@@ -1,9 +1,9 @@
 // ========================================
-// the holder table on the $SHIT page: the rank, the account, the
-// amount, the usd value, the share of the supply and the holder type.
+// the holder table on the $SHIT page: the rank, the account, the amount,
+// the usd value, the share of the supply and the holder type.
 //
-// it reads the loaded holders from the page's store and fetches nothing
-// — the load more button asks the page's loader for the next page.
+// it reads the loaded holders from the page's store and fetches nothing —
+// the load more button asks the page's loader for the next page.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
@@ -18,13 +18,11 @@ import {
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the link to the account page of one holder.
 function holder_account_href_fun(account_id: string, depth: number): string {
   const prefix = "../".repeat(Math.max(0, depth));
   return `${prefix}account.html?id=${encodeURIComponent(account_id)}`;
 }
 // ========================================
-// render one holder row.
 function render_holder_fun(
   holder: HUGGIES_SHIT_HOLDER,
   rank: number,

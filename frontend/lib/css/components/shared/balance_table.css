@@ -1,14 +1,12 @@
 /*==================================*/
 /* balance_table
    the balance table, shared by every page that shows token balances:
-   the account page's four tables and the dao page's one.
-
-   one column, every field stacked in its cell, so the table never needs
-   horizontal scrolling. */
+   the account page's four tables and the dao page's one. one column,
+   every field stacked in its cell, so the table never needs horizontal
+   scrolling. */
 /*==================================*/
 @import url(./balance_row.css);
 /*==================================*/
-/* the table block itself. */
 .balance-table {
   text-align: left;
   width: 100%;
@@ -17,20 +15,18 @@
   margin-top: 20px;
 }
 /*==================================*/
-/* the scroll box: caps the height and scrolls the rest. */
 .balance-table .scroll {
   max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 /*==================================*/
-/* --- the table --- */
 .balance-table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 16px;
-  /* one column: every field stacks inside its cell, so the table
-     never needs horizontal scrolling. */
+  /* one column: every field stacks inside its cell, so the table never
+     needs horizontal scrolling. */
   table-layout: fixed;
 }
 .balance-table td {
@@ -40,7 +36,6 @@
   width: 100%;
 }
 /*==================================*/
-/* --- the total --- */
 .balance-table tfoot th {
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
@@ -59,7 +54,6 @@
   font-variant-numeric: tabular-nums;
 }
 /*==================================*/
-/* --- the section heading above a titled table block --- */
 .balance-table .section-title {
   text-align: left;
   font-size: 18px;
@@ -68,14 +62,12 @@
   margin-bottom: 8px;
 }
 /*==================================*/
-/* --- a note under the table --- */
 .balance-table p {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   opacity: 0.8;
 }
 /*==================================*/
-/* --- the sort control and the dust toggle --- */
 .balance-table .sort {
   display: flex;
   gap: 6px;
@@ -103,7 +95,6 @@
   background-color: rgba(255, 255, 255, 0.15);
 }
 /*==================================*/
-/* --- the dust toggle, below the table --- */
 .balance-table .dust {
   display: flex;
   flex-direction: column;

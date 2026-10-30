@@ -9,7 +9,6 @@ import type { HUGGIES_TOKEN_INFO } from "../../ts/token_info";
 
 // ========================================
 // --- ROW -------------------------------
-// render one holder row.
 export function token_holder_row_fun(props: {
   key?: string;
   rank: number;

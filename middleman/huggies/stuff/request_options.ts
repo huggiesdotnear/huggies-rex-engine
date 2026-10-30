@@ -4,9 +4,9 @@
 // itself: the session token and an optional header passthrough.
 //
 // `build_headers` turns an options bag + caller-supplied headers into
-// the final header map. keys it knows about:
+// the final header map. it knows one key:
 //
-//   session_token -> X-Session-Token: <token>
+//   session_token -> x-session-token: <token>
 //
 // any other header the caller supplies is passed through verbatim.
 // ========================================

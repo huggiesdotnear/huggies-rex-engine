@@ -1,6 +1,5 @@
 /*==================================*/
-/* the pumpopoly page's css: the components it mounts. each one brings
-   the shared css it needs with its own @imports. */
+/* the pumpopoly page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR.css);
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS.css);
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST.css);

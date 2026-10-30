@@ -1,16 +1,16 @@
 // ========================================
 // shared emoji-to-token mapping for the memory match game and the
-// discover spotlight. one list, so the game cards and the discover
-// spotlight can never show a different set of memes.
+// discover spotlight. one list, so they can never show a different set
+// of memes.
+//
 // source: the emojifi project
-// (https://gitlab.com/sleet-dev/sleet_vibe/emojifi), README and
-// src/index.html.
+// (https://gitlab.com/sleet-dev/sleet_vibe/emojifi), README + src/index.html.
 // ========================================
 
 // ========================================
 // --- SHAPE ------------------------------
-// one emoji and the token it stands for. `token_id` is null for the
-// meme cooking label, which is a dao and not a token.
+// `token_id` is null for the meme cooking label, which is a dao and not
+// a token.
 export interface HUGGIES_EMOJI_TOKEN {
   emoji: string;
   token_id: string | null;

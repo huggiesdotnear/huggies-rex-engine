@@ -1,12 +1,12 @@
 // ========================================
 // what burning on NEAR means, and what a burn address is.
 //
-// the section is static text — it is the same on every visit and it is
-// never fetched. so it is a constant, not a loader and not a store.
+// the section is static text — the same on every visit and never
+// fetched. so it is a constant, not a loader and not a store.
 //
-// --- WHY --- "What is Burning?" and "Burn Addresses" are cards: they
-// are two short ideas side by side, and a reader takes one of them in
-// at a time. a single paragraph of both would be a wall.
+// --- WHY --- "What is Burning?" and "Burn Addresses" are cards: they are
+// two short ideas side by side, and a reader takes one of them in at a
+// time. a single paragraph of both would be a wall.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 // ========================================

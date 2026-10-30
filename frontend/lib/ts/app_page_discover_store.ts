@@ -1,15 +1,13 @@
 // ========================================
-// the discover page's shared state: the one load, held here, read by
-// every component on the page.
+// the discover page's shared state: the one load, held here, read by every
+// component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly
-// one loader (lib/ts/app_page_discover.ts), so there is exactly one
-// set of requests.
+// the components on this page do not fetch. they read this store, so there
+// is exactly one loader (lib/ts/app_page_discover.ts).
 //
-// the store has the same shape as lib/ts/app_page_account_store.ts:
-// plain module state, a subscribe/unsubscribe pair, and a notify that
-// a throwing subscriber cannot break.
+// the store has the same shape as lib/ts/app_page_account_store.ts: plain
+// module state, a subscribe/unsubscribe pair, and a notify a throwing
+// subscriber cannot break.
 import { HUGGIES_APP_PAGE_DISCOVER } from "./app_page_discover";
 import type { HUGGIES_APP_PAGE_DISCOVER_DATA } from "./app_page_discover";
 import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort";
@@ -31,17 +29,15 @@ let loading_list = false;
 //
 // --- WHY --- the list and the search have their own flags. they can
 // be in flight at the same time — the reader types while the first
-// page is still loading — and one shared flag made the search wait
-// for the list, or the list wait for the search, which showed as a
-// page that never finished loading.
+// page is still loading — and one shared flag made one wait for the
+// other, which showed as a page that never finished loading.
 let loading_search = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// broadcast a change to every subscriber; one throwing cannot break the
-// flow that notified.
+// broadcast a change to every subscriber; one throwing cannot break the notify.
 function notify_fun(): void {
   for (const listener of [...listeners]) {
     try {
@@ -52,8 +48,7 @@ function notify_fun(): void {
   }
 }
 // ========================================
-// register a re-render callback; returns an unsubscribe so components
-// can clean up on unmount instead of leaking.
+// register a re-render callback; returns an unsubscribe to clean up on unmount.
 function subscribe_fun(listener: () => void): () => void {
   listeners.push(listener);
   return () => {
@@ -64,22 +59,18 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // ========================================
 // --- LOAD -------------------------------
-// load the first page of the token list for a sort.
+// the load runs once per sort. a second call for the same sort while a
+// load is running is ignored, so the page cannot fetch twice because two
+// components asked for it.
 //
-// the load runs once per sort. a second call for the same sort while
-// a load is running is ignored, so the page cannot fetch twice because
-// two components asked for it.
-//
-// --- WHY --- the previous rows are NOT cleared here. the api takes a
-// moment to answer, and wiping the list on every sort change made the
-// page flash "LOADING TOKENS..." and show nothing, which reads as
-// broken. the old rows stay on screen under the loading note until
-// the new ones arrive.
+// --- WHY --- the previous rows are NOT cleared here. wiping the list on
+// every sort change made the page flash "LOADING TOKENS..." and show
+// nothing, which reads as broken.
 //
 // --- WHY --- the sort AND the direction are both remembered. they are
-// one view, and a load for one direction must not overwrite the rows
-// of the other: the reader can flip the direction twice while a
-// request is still in flight, and the last answer has to win.
+// one view, and a load for one direction must not overwrite the rows of
+// the other: the reader can flip the direction twice while a request is
+// in flight, and the last answer has to win.
 async function load_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
@@ -106,9 +97,8 @@ async function load_fun(
     );
     if (loaded_sort !== sort || loaded_desc !== desc) return;
     // the search results are DROPPED here. the reader changed the sort
-    // while a search was on screen, and the search rows belong to the
-    // old view — showing them under a new sort is showing one list
-    // under another's label.
+    // while a search was on screen — showing the old rows under a new
+    // sort is showing one list under another's label.
     data = { token_list, search: null, icons, errors: [] };
   } catch (err) {
     if (loaded_sort !== sort || loaded_desc !== desc) return;
@@ -129,8 +119,8 @@ async function load_fun(
 // load the NEXT page of the list and append it to the rows on screen.
 //
 // the page is appended rather than replacing, so the reader keeps what
-// they scrolled to. a load that fails leaves the rows already on
-// screen alone and records the error.
+// they scrolled to. a load that fails leaves the rows on screen alone
+// and records the error.
 async function load_more_fun(
   sort: HUGGIES_TOKEN_SORT,
   desc: boolean,
@@ -138,7 +128,7 @@ async function load_more_fun(
   if (loading_list || data === null) return;
   // the next page belongs to the view on screen. if the reader changed
   // the sort or the direction since, this page is for a view that is
-  // no longer there.
+  // gone.
   if (loaded_sort !== sort || loaded_desc !== desc) return;
   loading_list = true;
   notify_fun();
@@ -186,16 +176,13 @@ async function load_more_fun(
   }
 }
 // ========================================
-// run a search and hold its results.
-//
 // the search results live in their own field, beside the list rows.
 // the component shows whichever one applies.
 async function search_fun(query: string): Promise<void> {
   // --- WHY --- a search is NOT dropped when a load is running. the
   // reader can type while the first page is still in flight, and
   // dropping the search meant the page sat on "SEARCHING..." forever
-  // with no results and no error. the search runs alongside the load
-  // instead, and whichever lands last is the one on screen.
+  // with no results and no error.
   loading_search = true;
   notify_fun();
   try {
@@ -205,10 +192,10 @@ async function search_fun(query: string): Promise<void> {
       "volume_usd_24h",
       true,
     );
-    // the list rows are KEPT. the search results live in their own
-    // field, and the component shows whichever one applies. clearing
-    // the list meant that clearing the search box left an empty page
-    // until the list was fetched again.
+    // --- WHY --- the list rows are KEPT. the search results live in
+    // their own field, and the component shows whichever one applies.
+    // clearing the list meant clearing the search box left an empty
+    // page until the list was fetched again.
     data = {
       ...(data ?? {
         token_list: { rows: [], has_more: false, fetched: 0 },
@@ -239,11 +226,8 @@ async function search_fun(query: string): Promise<void> {
   }
 }
 // ========================================
-// clear the search results, so the list rows show again.
-//
-// --- WHY --- the search results and the list rows are held side by
-// side, so clearing the search is just dropping the results. the list
-// itself was never touched, so it comes back instantly.
+// --- WHY --- the list itself was never touched, so clearing the search
+// brings it back instantly.
 function clear_search_fun(): void {
   if (data === null || data.search === null) return;
   data = { ...data, search: null };
@@ -252,7 +236,6 @@ function clear_search_fun(): void {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-// the loaded data, or null while it is still loading.
 function get_fun(): HUGGIES_APP_PAGE_DISCOVER_DATA | null {
   return data;
 }

@@ -1,10 +1,10 @@
 // ========================================
 // a card that says one piece of the page could not be loaded.
 //
-// the component that shows a source's data owns that source's failure:
-// it renders this card where the data would have been, so a reader is
-// never left looking at zeros and wondering whether the account is
-// empty or the contract could not be reached.
+// the component that shows a source's data owns that source's failure: it
+// renders this card where the data would have been, so a reader is never
+// left looking at zeros and wondering whether the account is empty or the
+// contract could not be reached.
 //
 // this component does NOT fetch. it renders nothing when there is no
 // error.
@@ -25,7 +25,6 @@ export interface HUGGIES_ERROR_CARD_PROPS {
 export function huggies_error_card_fun(
   props: HUGGIES_ERROR_CARD_PROPS,
 ): preact.JSX.Element {
-  // nothing failed — render nothing.
   if (props.error === null) return <></>;
 
   return (

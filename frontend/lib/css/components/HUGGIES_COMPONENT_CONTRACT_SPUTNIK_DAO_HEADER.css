@@ -1,10 +1,7 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER
-   the DAO's card: the name, the account id, the purpose, and the
-   stats.
-
-   the heading's rule comes from base/font.css — the h1 rule is
-   app-wide, not this file's. */
+   the DAO's card: the name, the account id, the purpose, and the stats.
+   the heading's rule comes from base/font.css. */
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER header {
   margin-top: 10px;
@@ -14,19 +11,15 @@
   border-top: 1px solid #474747;
 }
 /*==================================*/
-/* --- the heading --- */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER h1 {
   margin: 0;
   font-size: 24px;
   border-bottom: 0px;
 }
-/* the dao id sits next to the name, smaller and in the base code
-   style. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER h1 code {
   font-size: 12px;
   line-height: 1.3;
 }
-/* the dao's purpose, under the heading. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER p {
   margin: 0 0 12px;
   font-family: Arial, Helvetica, sans-serif;
@@ -35,7 +28,6 @@
   overflow-wrap: anywhere;
 }
 /*==================================*/
-/* --- the stats --- */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

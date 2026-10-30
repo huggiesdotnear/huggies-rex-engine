@@ -2,24 +2,20 @@
 // the DAO's proposals: one card per proposal — id, kind, what it does,
 // status, proposer, votes, date.
 //
-// the card shows the kind's real content, because that is the
-// proposal: a Transfer says how much of which token went to whom, and
-// a card reading only "Transfer" says nothing. the proposer's own note
-// is the description, and it sits in the expanded part of the card.
+// the card shows the kind's real content, because that is the proposal: a
+// Transfer says how much of which token went to whom, and a card reading
+// only "Transfer" says nothing.
 //
 // --- WHY --- the card expands in place rather than opening a second
-// panel: the note and the votes belong to their proposal, so they read
-// best directly under it.
+// panel: the note and the votes belong to their proposal.
 //
-// --- WHY --- the status filter is above the list: a dao can have
-// forty proposals and the reader usually wants the ones that are still
-// live, or the ones that were turned down. scrolling past thirty
-// approved cards to find the rejected one is not a way to read them.
+// --- WHY --- the status filter is above the list: a dao can have forty
+// proposals and the reader usually wants the live ones, or the turned-down
+// ones.
 //
-// --- WHY --- each kind gets its own detail block: nineteen function
-// calls can all call the same contract and still be nineteen different
-// proposals. the block says which method it is, what it passes, and
-// who it touches.
+// --- WHY --- each kind gets its own detail block: nineteen function calls
+// can all call the same contract and still be nineteen different
+// proposals.
 //
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
@@ -33,8 +29,7 @@ import type { HUGGIES_DAO_PROPOSAL } from "../ts/contract_page_sputnik_dao";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the status slug for a proposal's status, so each status reads at a
-// glance.
+// the status slug for a proposal's status, so each status reads at a glance.
 function status_slug_fun(status: string): string {
   switch (status) {
     case "Approved":
@@ -54,9 +49,9 @@ function status_slug_fun(status: string): string {
 // ========================================
 // the human date of a nanosecond timestamp.
 //
-// --- WHY --- the date is day and month and year, with no weekday and
-// no time: the card's date line is narrow, and "Mar 14, 2026" is as
-// much of a proposal's date as anyone reads.
+// --- WHY --- day, month and year, with no weekday and no time: the
+// card's date line is narrow, and "Mar 14, 2026" is as much of a
+// proposal's date as anyone reads.
 function format_time_fun(nanoseconds: string): string {
   if (nanoseconds.length === 0) return "—";
   const value = Number(nanoseconds);
@@ -70,25 +65,21 @@ function format_time_fun(nanoseconds: string): string {
 // ========================================
 // shorten a blob of json so a card can show it.
 //
-// --- WHY --- the args of a function call can be a few kilobytes of
-// base64 and json. the card shows the start of it, and the whole of it
-// is in the element's title so the reader can still get it.
+// --- WHY --- the args of a function call can be a few kilobytes of base64
+// and json. the card shows the start of it, and the whole of it is in the
+// element's title so the reader can still get it.
 function shorten_args_fun(args: string): string {
   const clean = args.trim();
   if (clean.length <= 220) return clean;
   return `${clean.slice(0, 220)}…`;
 }
 // ========================================
-// read a function call's args.
-//
-// --- WHY --- the contract hands the args over as base64: the args of
-// a near call are bytes, not text. showing them raw is a wall of
-// `eyJ...` that says nothing, so they are decoded and the json inside
-// is shown instead.
+// --- WHY --- the contract hands the args over as base64: the args of a
+// near call are bytes, not text. showing them raw is a wall of `eyJ...`
+// that says nothing, so they are decoded and the json inside is shown.
 function read_call_args_fun(args: string): string {
   const clean = args.trim();
   if (clean.length === 0) return "";
-  // the args are usually base64 of json.
   try {
     const decoded = atob(clean);
     const parsed: unknown = JSON.parse(decoded);
@@ -106,11 +97,9 @@ function read_call_args_fun(args: string): string {
 }
 // ========================================
 // --- DETAIL BLOCK ----------------------
-// the detail a proposal's own kind carries.
-//
-// --- WHY --- one block for every kind and not a branch in the card:
-// the card stays a card, and each kind's own facts sit in the same
-// place whatever the kind is.
+// --- WHY --- one block for every kind and not a branch in the card: the
+// card stays a card, and each kind's own facts sit in the same place
+// whatever the kind is.
 function proposal_detail_fun(
   proposal: HUGGIES_DAO_PROPOSAL,
   depth: number,
@@ -276,9 +265,9 @@ function proposal_detail_fun(
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
-  // the proposals the reader has opened.
+  // the proposals the reader has opened, and the status they are
+  // filtering by. "all" shows every one.
   const [open_ids, set_open_ids] = use_state<number[]>([]);
-  // the status the reader is looking at. "all" shows every one.
   const [filter, set_filter] = use_state<string>("all");
 
   const state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
@@ -306,9 +295,9 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
 
   // the statuses the dao actually has, most common first.
   //
-  // --- WHY --- the buttons are the dao\'s own statuses and not a fixed
-  // list: a dao with only approved proposals should not show a
-  // "REJECTED" button that leads nowhere.
+  // --- WHY --- the buttons are the dao's own statuses and not a fixed list:
+  // a dao with only approved proposals should not show a "REJECTED" button
+  // that leads nowhere.
   const status_counts = new Map<string, number>();
   for (const proposal of dao.proposals) {
     status_counts.set(

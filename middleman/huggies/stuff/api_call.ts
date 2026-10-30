@@ -4,36 +4,22 @@
 // goes through. the goal: one place to change if we ever want to add
 // retries, timeouts, tracing, or different log formatting.
 //
-// flow:
-//   1. resolve url = base_url + ENDPOINT_PATHS[key]
-//   2. if `query` is supplied, append ?key=value&...
-//   3. fetch with the supplied method/body/headers
-//   4. on non-2xx: parse_error() logs and throws
-//   5. on 2xx:    parse json, log the success block, return it
+// the url is base_url + ENDPOINT_PATHS[key], plus ?key=value&... when
+// `query` is supplied. `body`, when supplied, is JSON.stringified and
+// sent with content-type: application/json — omit for GET /
+// DELETE-with-no-body. `options` carries the session token.
 //
-// `query` (optional) appends extra key=value pairs as a query string.
-// `body`, when supplied, is JSON.stringified and sent with
-// content-type: application/json — omit for GET / DELETE-with-no-body.
-// `options` carries the session token, for the routes that need one.
+// --- WHY --- the base url is a parameter, not a constant. the frontend
+// passes the origin of the page it is served from; a bin passes
+// whatever backend it was told to talk to. a constant baked in would
+// be "" outside a browser, so a bin could never reach the backend.
 //
-// --- WHY --- the base url is a parameter, not a constant. the
-// frontend passes the origin of the page it is served from; a bin
-// passes whatever backend it was told to talk to. a constant baked
-// into this module would be "" outside a browser, so a bin could
-// never reach the backend at all.
+// --- WHY --- the query builder drops undefined/null/"" but keeps false
+// and 0. our routes read those two as real values, so dropping them
+// would silently change what the route does.
 //
-// --- WHY --- the query builder drops undefined/null/"" but keeps
-// false and 0. our routes read those two as real values, so
-// dropping them would silently change what the route does.
-//
-// `label` is the human-readable name that shows up in the success
-// log block (e.g. "TREZU TREASURIES GET"). `fallback` is the prefix
-// on the thrown error (e.g. "api_trezu_treasuries_get failed"). the
-// two are usually the same string.
-//
-// the `url` + `method` are passed through to parse_error() on
-// failure so the error log block can show exactly which request
-// blew up.
+// the `url` + `method` are passed through to parse_error() on failure
+// so the error log block can show exactly which request blew up.
 // ========================================
 
 import { ENDPOINT_PATHS, type EndpointKey } from "./endpoint_paths";
@@ -107,7 +93,6 @@ export async function api_call<T = unknown>({
 
   const json = (await res.json()) as T;
   // ========================================
-  // framed success log.
   console.log("=============================");
   console.log(` ${label} via ${method} on:`, url);
   console.log("RESPONSE STATUS:", `${res.status} - ${res.statusText}`);

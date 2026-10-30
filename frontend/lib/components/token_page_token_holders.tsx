@@ -1,9 +1,9 @@
 // ========================================
-// the indexed holders table on the token page: the rank, the account,
-// the balance and the usd value, paged by cursor.
+// the indexed holders table on the token page: the rank, the account, the
+// balance and the usd value, paged by cursor.
 //
-// it reads the loaded holders from the page's store. it fetches nothing
-// — the load more button asks the page's loader for the next page.
+// it reads the loaded holders from the page's store. it fetches nothing —
+// the load more button asks the page's loader for the next page.
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -93,8 +93,8 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
 // the token info the holder rows price their balances with.
 //
 // --- WHY --- the metadata record already carries the price and the
-// decimals, so the rows price themselves from it and no second request
-// is needed.
+// decimals, so the rows price themselves from it and no second request is
+// needed.
 function holder_info_fun(detail: HUGGIES_TOKEN_DETAIL): {
   id: string;
   symbol: string;

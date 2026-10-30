@@ -5,19 +5,15 @@
 
    the card shape follows the discover page's token rows — a bordered,
    rounded tile over the page — so the two lists read as the same kind
-   of thing on the page.
-
-   the section heading is styled by base/main.css — the h2 rule is
-   app-wide, not the page's own. */
+   of thing. the section heading is styled by base/main.css. */
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES > section {
   margin-top: 20px;
 }
 /*==================================*/
 /* --- the members list ---
-   the cards stack in one column. the scroll box caps the height, so a
-   dao with a hundred members does not push the proposals off the
-   page. */
+   the cards stack in one column. the scroll box caps the height, so a dao
+   with a hundred members does not push the proposals off the page. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .members-scroll {
   max-height: 460px;
   overflow-y: auto;
@@ -32,8 +28,8 @@
 }
 /*==================================*/
 /* --- one member card ---
-   the account id and the actions toggle share the head row; the roles
-   sit under them. */
+   the account id and the actions toggle share the head row; the roles sit
+   under them. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member {
   display: flex;
   flex-direction: column;
@@ -48,17 +44,14 @@
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.24);
 }
-/* the head row. the id takes the room it needs, the toggle keeps its
-   own. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-head {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
-/* the account id is the thing being scanned, so it is the one bold
-   line on the card. it breaks anywhere rather than pushing the toggle
-   off the card. */
+/* the account id is the thing being scanned, so it is the one bold line
+   on the card. it breaks anywhere rather than pushing the toggle off. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-account {
   flex: 1 1 auto;
   min-width: 0;
@@ -68,7 +61,6 @@
   overflow-wrap: anywhere;
   word-break: break-all;
 }
-/* the toggle that opens the permissions. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-toggle {
   display: inline-flex;
   flex: 0 0 auto;
@@ -95,8 +87,8 @@
   font-size: 7px;
   opacity: 0.75;
 }
-/* the roles an account is in, as chips. they wrap onto as many lines
-   as they need, so every role is visible and none is clipped. */
+/* the roles an account is in, as chips. they wrap onto as many lines as
+   they need, so every role is visible and none is clipped. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-roles {
   display: flex;
   flex-wrap: wrap;
@@ -120,13 +112,13 @@
 }
 /*==================================*/
 /* --- the permissions ---
-   they open under the card, on their own row. the full list with
-   every scope is in the row's title.
+   they open under the card, on their own row. the full list with every
+   scope is in the row's title.
 
    --- WHY --- the actions break on word boundaries and not anywhere:
-   `overflow-wrap: anywhere` broke `transfer` into `trans` / `fer`,
-   because a long action has no spaces to break at. the actions are
-   single words, so they stay whole and the list wraps between them. */
+   `overflow-wrap: anywhere` broke `transfer` into `trans` / `fer`. the
+   actions are single words, so they stay whole and the list wraps
+   between them. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-permissions {
   display: flex;
   flex-wrap: wrap;
@@ -155,12 +147,12 @@
 }
 /*==================================*/
 /* --- the roles that are open to everyone ---
-   they name no accounts, so there is no card for them. the note says
-   they exist and what they can do.
+   they name no accounts, so there is no card for them. the note says they
+   exist and what they can do.
 
-   --- WHY --- it is its own card and not a line of text: the note
-   belongs to the section, not to the member above it, and a plain
-   paragraph under a scrolling list reads as part of the last card. */
+   --- WHY --- it is its own card and not a line of text: the note belongs
+   to the section, not to the member above it, and a plain paragraph
+   under a scrolling list reads as part of the last card. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles {
   display: flex;
   flex-direction: column;
@@ -184,8 +176,8 @@
   gap: 4px;
   min-width: 0;
 }
-/* an open role is marked with a dashed edge, so it does not look like
-   a role some named account is in. */
+/* an open role is marked with a dashed edge, so it does not look like a
+   role some named account is in. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .role-chip.is-open {
   border: 1px dashed rgba(255, 255, 255, 0.5);
   background: rgba(255, 255, 255, 0.12);

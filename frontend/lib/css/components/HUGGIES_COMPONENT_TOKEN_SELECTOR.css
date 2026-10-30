@@ -1,9 +1,8 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_TOKEN_SELECTOR
-   the token id jump box on the token page.
-
-   the box itself is the shared id jump box (shared/id_jump_box.css),
-   so this file holds only the token wording's own spacing. */
+   the token id jump box on the token page. the box itself is the shared
+   id jump box (shared/id_jump_box.css); this file holds only the token
+   spacing. */
 @import url(./shared/id_jump_box.css);
 
 /*==================================*/

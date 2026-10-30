@@ -1,15 +1,13 @@
 // ========================================
-// the intear dex page's pool list: the search box, the sort row and the
-// pool rows.
+// the intear dex page's pool list: the search box, the sort row and the pool
+// rows.
 //
 // this component does NOT fetch. the intear dex page has one loader
-// (lib/ts/contract_page_intear_dex.ts) and this component reads its
-// result from the page store
+// (lib/ts/contract_page_intear_dex.ts); this reads its store
 // (lib/ts/contract_page_intear_dex_store.ts).
 //
 // the sort is ours: the dex api has no sort of its own, so the store
-// orders the rows the api already sent. picking a sort costs no
-// request.
+// orders the rows the api already sent. picking a sort costs no request.
 //
 // mounts into
 // <div id="HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS">.
@@ -25,8 +23,6 @@ import type { HUGGIES_INTEAR_DEX_POOL } from "../ts/contract_page_intear_dex";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// render a usd figure with thousands separators and no decimals.
-//
 // --- WHY --- no decimals on a tvl or a volume: the number says how big
 // the pool is, and $55,490 says that. the cents are noise.
 function usd_fun(value: number): string {
@@ -36,11 +32,9 @@ function usd_fun(value: number): string {
 // ========================================
 // ========================================
 // --- ROW -------------------------------
-// render one pool as a row.
-//
-// --- WHY --- the row is not a link: there is no pool detail page in
-// this app yet, so a row that looks clickable and does nothing is
-// worse than a row that plainly is not one.
+// --- WHY --- the row is not a link: there is no pool detail page in this
+// app yet, so a row that looks clickable and does nothing is worse than a
+// row that plainly is not one.
 function pool_row_fun(pool: HUGGIES_INTEAR_DEX_POOL): preact.JSX.Element {
   const symbols = pool.symbols.join(" / ");
   return (
@@ -77,18 +71,18 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
   const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE);
 
   // the sort and the direction live in the store, so the header and the
-  // list always agree on the order.
+  // list agree on the order.
   const sort = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_sort();
   const direction = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_direction();
   const loading = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.is_loading();
   const errors = page_data?.errors ?? [];
-  // true while the reader has typed something into the search box.
+  // true while the reader has typed into the search box.
   const searching = query.trim().length > 0;
 
-  // --- WHY --- the search filters the loaded pools and not the api.
-  // the dex api has no search endpoint and answers with every pool in
-  // one go — all 303 of them are already on screen — so there is
-  // nothing to ask it for. the filter runs over the rows we have.
+  // --- WHY --- the search filters the loaded pools and not the api. the
+  // dex api has no search endpoint and answers with every pool in one go —
+  // all 303 of them are already on screen — so there is nothing to ask it
+  // for. the filter runs over the rows we have.
   const pools = use_memo(() => {
     const all = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_pools();
     const needle = query.trim().toLowerCase();

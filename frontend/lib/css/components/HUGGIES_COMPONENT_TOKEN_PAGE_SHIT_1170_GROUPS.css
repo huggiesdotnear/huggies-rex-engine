@@ -1,10 +1,9 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS
-   the share of the supply each group of holders holds.
-
-   the rows are flat white cards — a white fill, an 8px radius and no
-   shadow — with a coloured stripe down the left edge for the type.
-   the row of the ACTIVE tab is the active one. */
+   the share of the supply each group of holders holds. the rows are flat
+   white cards — a white fill, an 8px radius and no shadow — with a
+   coloured stripe down the left edge for the type. the row of the
+   ACTIVE tab is the active one. */
 /*==================================*/
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS .groups {
   margin-bottom: 14px;
@@ -19,16 +18,14 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  /* three across, so six groups sit in two even rows */
-  display: grid;
+    display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS .group {
-  /* the name sits on its own line above the numbers. three across on
-     a 500px column leaves each card about 145px, which is not enough
-     for the icon, the name, the count and the percentage on one
-     line. */
+  /* the name sits on its own line above the numbers. three across on a
+     500px column leaves each card about 145px, which is not enough for
+     the icon, the name, the count and the percentage on one line. */
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -41,12 +38,8 @@
   border-radius: 8px;
   background-color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
-  /* an explicit list, not `transition: all`. `all` also transitions
-     `background-color`, and the active fill then animates in over
-     200ms — which reads as the fill not landing at all. */
   transition: border-color 0.2s ease;
 }
-/* the coloured stripe down the left of a group row */
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS .group.is-dev {
   border-left-color: #4caf50;
 }
@@ -67,8 +60,7 @@
 }
 /* the group of the ACTIVE tab is the one that is picked out. the tabs
    and the group list show the same thing from two sides, so the reader
-   can see at a glance which filter the list under them is filtered
-   by. */
+   can see at a glance which filter the list under them is filtered by. */
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS .group.is-active {
   border-color: var(--color-middle);
   background-color: var(--color-middle);

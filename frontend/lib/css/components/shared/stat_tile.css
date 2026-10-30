@@ -1,12 +1,9 @@
 /*==================================*/
 /* stat_tile
-   the stat tile: a label, a value, and an optional sub-label.
-
-   one tile shape, used by the pumpopoly page's six stat cards and its
-   nft count. the tile is shared; the page's own parts of it (the
-   label, value, sub and text styles) live in the page's css. */
+   the stat tile: a label, a value, and an optional sub-label. one tile
+   shape, used by the pumpopoly page's six stat cards and its nft count.
+   the page's own parts of it live in the page's css. */
 /*==================================*/
-/* the tile itself. */
 .stat-tile {
   display: flex;
   flex-direction: column;

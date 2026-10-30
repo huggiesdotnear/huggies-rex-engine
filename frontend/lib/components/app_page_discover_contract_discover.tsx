@@ -8,7 +8,6 @@ import {
   list_contract_cards_fun,
 } from "../ts/app_page_discover_contract_cards";
 // ========================================
-// shared smart-contract discover component.
 function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
   return (
     <div>

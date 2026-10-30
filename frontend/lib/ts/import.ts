@@ -5,12 +5,9 @@
 // matching id, so side-effect imports here are no-ops elsewhere.
 // ========================================
 
-// pin the network to mainnet before anything reads it.
-// --- WHY --- this app is mainnet-only. the pin has to happen before
-// the first near_connect_client() call, and some pages load
-// app_page_account_route.ts (which inits auth) ahead of this file.
-// the pages under app/contract/ and app/token/ do not load
-// hello.ts themselves, so it is imported here for them.
+// pin the network to mainnet before anything reads it. the pages under
+// app/contract/ and app/token/ do not load hello.ts themselves, so it
+// is imported here for them.
 import "./hello";
 import "../components/nav";
 import "../components/random_slogan_p";

@@ -8,7 +8,6 @@ import {
   type HUGGIES_TOKEN_SORT_DIRECTION,
 } from "../../ts/app_page_discover_token_sort";
 // ========================================
-// render the sort options as a row of buttons, plus a direction toggle.
 export function huggies_sort_control_fun(props: {
   sort: HUGGIES_TOKEN_SORT;
   direction: HUGGIES_TOKEN_SORT_DIRECTION;

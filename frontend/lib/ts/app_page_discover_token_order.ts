@@ -5,24 +5,18 @@
 // between them:
 //
 //   * `default` — our favourite tokens lead, then everything else by
-//     volume. this is the landing view: a reader who opens the page
-//     sees the tokens we care about, not a wall of bridge tokens.
+//     volume. the landing view: a reader who opens the page sees the
+//     tokens we care about, not a wall of bridge tokens.
 //   * `volume` / `market cap` — a STRICT sort over every token. no
 //     favourites block, no exceptions.
 //
 // the earlier versions each got one half of this wrong. pinning the
-// favourites unconditionally meant the strict sorts never really
-// applied; dropping the pin entirely meant the favourites were never
-// visible near the top. `default` is the third option that gives the
-// reader both: the default view has the favourites, and choosing a
-// sort gives them a sort that is actually a sort.
+// favourites unconditionally meant the strict sorts never applied; dropping
+// the pin entirely meant the favourites were never visible near the top.
+// `default` gives the reader both.
 //
-// --- WHY --- the sort is applied to ONE PAGE now, not to the whole
-// token set. the api sorts and paginates on its own, so the rows
-// arrive already ordered by the chosen field, and this function only
-// has to put the favourites on top for the `default` view. ordering
-// the whole set in javascript would need the whole set downloaded,
-// which is exactly what the server-side paging avoids.
+// --- WHY --- the sort is applied to ONE PAGE now. the api sorts and
+// paginates on its own, so the rows arrive already ordered.
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
@@ -30,7 +24,6 @@ import {
 } from "./app_page_discover_token_sort";
 import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
 // ========================================
-// the order the favourites take among themselves.
 function pinned_order_fun(): Map<string, number> {
   const order = new Map<string, number>();
   HUGGIES_PINNED_TOKENS.forEach((entry, index) => {
@@ -42,17 +35,16 @@ function pinned_order_fun(): Map<string, number> {
 // put the favourites on top of a page, in their own order.
 //
 // only the `default` view has a favourites block. every other sort is
-// strict: the rows arrive from the api already in the chosen order,
-// and they are returned untouched.
+// strict: the rows arrive from the api already in the chosen order.
 //
 // --- WHY --- there is no direction here. the api sorts the page by the
-// chosen field and direction, so the rows are already ordered when
-// they arrive. this function only has to lift the favourites to the
-// top for the `default` view, and that block has its own order.
+// chosen field and direction, so the rows arrive already ordered. this
+// function only has to lift the favourites to the top for the `default`
+// view, and that block has its own order.
 //
-// --- WHY --- a favourite that is not in this page is simply not
-// pinned here. the pinned rows are fetched on their own and passed in
-// separately, so this only has to order what it is given.
+// --- WHY --- a favourite that is not in this page is simply not pinned
+// here. the pinned rows are fetched on their own and passed in
+// separately.
 export function order_discover_tokens_fun(
   tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
   sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,

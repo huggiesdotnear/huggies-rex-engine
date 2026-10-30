@@ -1,8 +1,8 @@
 // ========================================
-// sign-in / account control. shows "LOGIN" when signed out and the
-// active account id when signed in; clicking a signed-in button
-// opens a dropdown listing every known account. all auth state
-// lives in frontend/lib/ts/auth_status.ts — this file is a view.
+// sign-in / account control. shows "LOGIN" when signed out and the active
+// account id when signed in; clicking a signed-in button opens a dropdown
+// listing every known account. all auth state lives in
+// frontend/lib/ts/auth_status.ts — this file is a view.
 // ========================================
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
@@ -18,8 +18,8 @@ import { HUGGIES_AUTH } from "../ts/auth_status";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// close the account id down for the button label — NEAR ids are
-// long and the button must stay readable.
+// close the account id down for the button label — NEAR ids are long and
+// the button must stay readable.
 function shorten_account_id_fun(account_id: string): string {
   if (account_id.length <= 18) return account_id;
   const head = account_id.slice(0, 8);
@@ -32,20 +32,19 @@ function shorten_account_id_fun(account_id: string): string {
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
   // ========================================
-  // --- WHY --- a revision counter forces a re-render on every
-  // auth_status notify; preact doesn't re-render from external
-  // state changes alone.
+  // --- WHY --- a revision counter forces a re-render on every auth_status
+  // notify; preact doesn't re-render from external state changes alone.
   const [, set_revision] = use_state(0);
-  // disabled while the wallet popup is open so a second click
-  // can't open a second popup.
+  // disabled while the wallet popup is open so a second click can't open
+  // a second popup.
   const [busy, set_busy] = use_state(false);
   // whether the account dropdown is open.
   const [open, set_open] = use_state(false);
   // the dropdown's own root, used to detect clicks outside it.
   const root_ref = use_ref<HTMLDivElement | null>(null);
 
-  // subscribe to auth changes; return the unsubscribe so the
-  // effect cleans up on unmount.
+  // subscribe to auth changes; return the unsubscribe so the effect cleans
+  // up on unmount.
   use_effect(() => {
     const unsubscribe = HUGGIES_AUTH.subscribe(() => {
       set_revision((revision) => revision + 1);
@@ -55,8 +54,8 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
 
   // close the dropdown when the user clicks anywhere else.
   // --- WHY --- the dropdown is a plain div with no portal, so a
-  // document-level listener is the only way to catch a click on
-  // the page behind it.
+  // document-level listener is the only way to catch a click on the page
+  // behind it.
   use_effect(() => {
     if (!open) return;
     const on_document_click_fun = (event: MouseEvent) => {

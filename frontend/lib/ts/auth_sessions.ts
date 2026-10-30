@@ -4,22 +4,18 @@
 // auth_status.ts owns the wallet handshake; this file owns the bytes
 // on disk.
 // ========================================
-// --- WHY --- the first version of this app kept a single
-// HUGGIES_AUTH_SESSION object, so signing in as a second account
-// overwrote the first one's signature. a map keyed by account id
-// lets every account keep its own signature, and the active id
-// says which one the UI is currently acting as.
+// --- WHY --- a map keyed by account id, not one session object: a
+// single object meant signing in as a second account overwrote the
+// first one's signature. the active id says which one the UI is
+// currently acting as.
 // --- WHY --- the keys are prefixed with HUGGIES_ so they cannot
-// collide with anything near-connect writes (it owns
-// "selected-wallet").
-// --- WHY --- the legacy single-session key is migrated on read
-// rather than deleted, so a signed-in user upgrading the app keeps
-// their session instead of being bounced to the wallet.
-// --- WHY --- the session still records its network even though the
-// app is mainnet-only. a signature is only meaningful against the
-// RPC it was made on, so the server-side verify needs to know which
-// network to check against — and a session left over from a
-// testnet-era build stays recognisable as such.
+// collide with anything near-connect writes (it owns "selected-wallet").
+// --- WHY --- the legacy single-session key is folded into the map on
+// read so a signed-in user upgrading the app keeps their session
+// instead of being bounced to the wallet.
+// --- WHY --- the session still records its network even though the app
+// is mainnet-only, so a session left over from a testnet-era build
+// stays recognisable as such.
 export interface HUGGIES_AUTH_SESSION {
   accountId: string;
   publicKey: string;
@@ -37,8 +33,8 @@ export interface HUGGIES_AUTH_SESSION {
 const HUGGIES_SESSIONS_STORAGE_KEY = "HUGGIES_AUTH_SESSIONS";
 // which account the UI is currently acting as.
 const HUGGIES_ACTIVE_STORAGE_KEY = "HUGGIES_AUTH_ACTIVE";
-// the pre-multi-account key. read once for migration, then left
-// alone — removing it would break a rollback to an older build.
+// the pre-multi-account key. read once for migration, then removed —
+// see load_sessions_fun for why it must not stay.
 const HUGGIES_LEGACY_STORAGE_KEY = "HUGGIES_AUTH_SESSION";
 // ========================================
 // ========================================
@@ -60,8 +56,8 @@ function is_valid_session_fun(value: unknown): value is HUGGIES_AUTH_SESSION {
 }
 // normalize one parsed entry, dropping anything malformed.
 // --- WHY --- localStorage is user-writable, so a hand-edited or
-// half-written entry must not be able to crash the app or be
-// handed to a verifier as if it were valid.
+// half-written entry must not be able to crash the app or be handed to
+// a verifier as if it were valid.
 function normalize_session_fun(value: unknown): HUGGIES_AUTH_SESSION | null {
   if (!is_valid_session_fun(value)) return null;
   return {
@@ -77,9 +73,6 @@ function normalize_session_fun(value: unknown): HUGGIES_AUTH_SESSION | null {
 }
 // ========================================
 // read the legacy single-session key, if it is still there.
-// --- WHY --- the old build wrote one session under
-// HUGGIES_AUTH_SESSION; on first read we fold it into the map so
-// an existing user stays signed in after the upgrade.
 function read_legacy_session_fun(): HUGGIES_AUTH_SESSION | null {
   if (typeof localStorage === "undefined") return null;
   const raw = localStorage.getItem(HUGGIES_LEGACY_STORAGE_KEY);
@@ -116,8 +109,8 @@ function load_sessions_fun(): Record<string, HUGGIES_AUTH_SESSION> {
     // the legacy key is now consumed — drop it so a later
     // remove_session() is not undone by the next read.
     // --- WHY --- the migration re-adds the legacy account on every
-    // read; leaving the key in place would resurrect it right
-    // after the user removed it from the account list.
+    // read; leaving the key in place would resurrect it right after
+    // the user removed it from the account list.
     if (typeof localStorage !== "undefined") {
       localStorage.removeItem(HUGGIES_LEGACY_STORAGE_KEY);
     }

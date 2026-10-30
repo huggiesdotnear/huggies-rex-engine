@@ -1,9 +1,8 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA
-   the token metadata block at the bottom of the $SHIT page.
-
-   the metadata grid itself is the shared one the token page uses, so
-   its rows are styled by shared/token_meta_grid.css. */
+   the token metadata block at the bottom of the $SHIT page. the grid
+   itself is the shared one the token page uses, so its rows are styled
+   by shared/token_meta_grid.css. */
 @import url(./shared/token_meta_grid.css);
 
 /*==================================*/

@@ -2,24 +2,23 @@
 // the NFTs a Pumpopoly player holds, from the nft contract.
 //
 // this component does NOT fetch. the Pumpopoly page has one loader
-// (lib/ts/contract_page_pumpopoly.ts) and this component reads its
-// result from the page store
+// (lib/ts/contract_page_pumpopoly.ts); this reads its store
 // (lib/ts/contract_page_pumpopoly_store.ts).
 //
-// renders nothing when there is no account id — the page falls back to
-// the signed-in account, and a signed-out visitor sees no nfts at all.
+// renders nothing when there is no account id — the page falls back to the
+// signed-in account, and a signed-out visitor sees no nfts.
 //
-// the nfts are a GALLERY: one tile per token, showing the token's
-// picture and its id. the pictures come from the same view call that
-// brings the ids — the nft contract answers with the whole token, media
-// included — so the gallery costs no extra request.
+// the nfts are a GALLERY: one tile per token, showing the token's picture
+// and its id. the pictures come from the same view call that brings the
+// ids — the contract answers with the whole token, media included — so the
+// gallery costs no extra request.
 //
-// the pictures are NOT square. a pumpopoly land is a tall slice of the
-// board (80x160 or 80x192) and a treasury bond is a wide 1920x1080
-// sheet, so the tiles are sized by the picture and never cropped.
+// the pictures are NOT square. a land is a tall slice of the board (80x160
+// or 80x192) and a bond is a wide 1920x1080 sheet, so the tiles are sized
+// by the picture and never cropped.
 //
-// the gallery is capped in height and scrolled, so a player with
-// hundreds of nfts does not push the rest of the page off screen.
+// the gallery is capped in height and scrolled, so a player with hundreds
+// of nfts does not push the rest of the page off screen.
 //
 // mounts into
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST">.
@@ -36,20 +35,15 @@ import type { HUGGIES_PUMPOPOLY_NFT } from "../ts/contract_page_pumpopoly_parse"
 // ========================================
 // ========================================
 // --- SORT ------------------------------
-// the sort direction of the nft gallery.
 type HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION = "asc" | "desc";
 // ========================================
-// the default direction: smallest id first, so the list reads the way
-// an id list normally does.
+// the default direction: smallest id first, the way an id list reads.
 const HUGGIES_DEFAULT_NFT_SORT_DIRECTION: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION =
   "asc";
 // ========================================
-// sort the nfts by their token id.
-//
 // --- WHY --- the ids are compared as plain strings and not as numbers.
-// a nft token id is a number, but it is carried as a string and can be
-// long enough to lose precision as a number. comparing them as strings
-// keeps the order stable and never rounds one away.
+// a nft token id is carried as a string and can be long enough to lose
+// precision as a number. strings keep the order stable.
 function sort_pumpopoly_nfts_fun(
   nfts: ReadonlyArray<HUGGIES_PUMPOPOLY_NFT>,
   direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION,
@@ -65,10 +59,9 @@ function sort_pumpopoly_nfts_fun(
 // the direction toggle. the nft gallery has one thing to sort by — the
 // token id — so it needs only a direction, not a row of sort keys.
 //
-// --- WHY --- this is its own control and not the shared
-// sort_control.tsx. that one is welded to the token list's sort keys
-// (volume, market cap) and its types, and the nft gallery sorts plain
-// strings by id, which is a different thing.
+// --- WHY --- this is its own control and not the shared sort_control.tsx.
+// that one is welded to the token list's sort keys and its types; the nft
+// gallery sorts plain strings by id.
 function nft_sort_control_fun(props: {
   direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION;
   on_direction: (direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION) => void;
@@ -96,13 +89,9 @@ function nft_sort_control_fun(props: {
 }
 // ========================================
 // --- TILE ------------------------------
-// one nft: its picture and its id.
-//
-// --- WHY --- the picture is loaded lazily: a pumpopoly bond is a 1MB
-// svg, so a player holding a few dozen of them would pull tens of
-// megabytes of images for a gallery most of which is below the fold.
-// lazy loading fetches the picture only when the tile is near the
-// screen.
+// --- WHY --- the picture is loaded lazily: a bond is a 1MB svg, so a
+// player holding a few dozen of them would pull tens of megabytes for a
+// gallery most of which is below the fold.
 function nft_tile_fun(props: {
   nft: HUGGIES_PUMPOPOLY_NFT;
 }): preact.JSX.Element {
@@ -131,8 +120,8 @@ function nft_tile_fun(props: {
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
-  // --- WHY --- a revision counter forces a re-render when the store
-  // lands; preact doesn't re-render from external state changes alone.
+  // --- WHY --- a revision counter forces a re-render when the store lands;
+  // preact doesn't re-render from external state changes alone.
   const [, set_revision] = use_state(0);
   const [direction, set_direction] =
     use_state<HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION>(
@@ -140,9 +129,8 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
     );
 
   const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE);
-  // --- WHY --- the id comes from the store: the store watches the id
-  // and re-loads when it changes, so the components read one place for
-  // both the id and the data, and they follow it.
+  // --- WHY --- the id comes from the store: it watches the id and
+  // re-loads when it changes, so the id and the data change together.
   const account_id = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
 
   // no account id and nobody signed in — there is no player to show.

@@ -1,9 +1,8 @@
 // ========================================
-// the holder-type filter tabs on the $SHIT page: one emoji per holder
-// type.
+// the holder-type filter tabs on the $SHIT page: one emoji per holder type.
 //
-// it reads the active filter from the page's store and writes the
-// reader's pick back to it. it fetches nothing.
+// it reads the active filter from the page's store and writes the reader's
+// pick back to it. it fetches nothing.
 //
 // the tooltip on each tab is what the legend used to say — hovering the
 // emoji explains what that group of holders is.

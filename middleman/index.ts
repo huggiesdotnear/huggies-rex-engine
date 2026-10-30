@@ -1,7 +1,7 @@
 // ========================================
 // MIDDLEMAN
 // one typed client per api huggies talks to. each sub folder owns a
-// single backend and nothing else talks to it directly:
+// single backend and nothing else talks to it directly.
 //
 //   huggies/  - our own backend routes.
 //
@@ -12,8 +12,7 @@
 //   @sleet-js/middleman-intear-dex-api the intear dex backend
 //   @sleet-js/middleman-rhea-api       the rhea indexer api
 //
-// frontend components import from here, never from an api sdk or
-// fetch() directly.
+// frontend components import from here, never from an api sdk.
 // ========================================
 
 export * from "./huggies/index";

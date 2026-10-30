@@ -3,7 +3,7 @@
 // ========================================
 
 export const ENDPOINT_PATHS = {
-  // --- /api/huggies/* — our own routes, nothing is proxied ---
+  // --- /api/huggies/* — our own routes ---
   api_huggies_ping: "/api/huggies/ping",
 
   // --- /api/trezu/* — our proxy for the trezu api ---

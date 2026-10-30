@@ -4,9 +4,9 @@
 // entirely, the rest of the fields can be missing, and
 // `isConfidential` is always present.
 //
-// --- WHY --- the field names are camelCase on purpose: the backend
-// forwards the trezu json untouched, so these are the exact keys that
-// arrive in the browser.
+// the field names are camelCase on purpose: the backend forwards the
+// trezu json untouched, so these are the exact keys that arrive in the
+// browser.
 // ========================================
 
 import type { TREZU_TREASURY_METADATA } from "./trezu_treasury_metadata";

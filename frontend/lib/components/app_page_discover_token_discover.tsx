@@ -2,13 +2,12 @@
 // searchable token list for the discover page.
 //
 // this component does NOT fetch. the discover page has one loader
-// (lib/ts/app_page_discover.ts) and this component reads its result
-// from the page store (lib/ts/app_page_discover_store.ts). read that
-// file to see what the discover page requests.
+// (lib/ts/app_page_discover.ts); this reads its store
+// (lib/ts/app_page_discover_store.ts).
 //
-// the list is paged: the api sorts and paginates on its own, so the
-// page asks for one page of rows at a time and asks for the next one
-// when the reader scrolls to the bottom. mounts into
+// the list is paged: the api sorts and paginates on its own, so the page
+// asks for one page of rows at a time and asks for the next one when the
+// reader scrolls to the bottom. mounts into
 // <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER">.
 import { render } from "preact";
 import {
@@ -34,17 +33,16 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// how long to wait after a keystroke before asking the api. long
-// enough that typing a word is one request, not one per letter.
+// how long to wait after a keystroke before asking the api. long enough
+// that typing a word is one request, not one per letter.
 const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
-// how close to the bottom of the list the reader has to scroll before
-// the next page is asked for. a little early, so the next page is
-// usually already there by the time they reach the end.
+// how close to the bottom of the list the reader has to scroll before the
+// next page is asked for. a little early, so the next page is usually there
+// by the time they reach the end.
 const HUGGIES_LOAD_MORE_THRESHOLD_PX = 600;
 // ========================================
 // ========================================
 // --- ROW -------------------------------
-// render one token result as a link to its detail page.
 function token_result_row_fun(
   token: HUGGIES_TOKEN_SEARCH_RESULT,
   marked: boolean,
@@ -82,29 +80,27 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   const [direction, set_direction] = use_state<HUGGIES_TOKEN_SORT_DIRECTION>(
     HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   );
-  // the scroll container, so the reader's position at the bottom can
-  // be detected.
+  // the scroll container, so the reader's position at the bottom is
+  // detectable.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
 
   const page_data = use_page_store_fun(HUGGIES_APP_PAGE_DISCOVER_STORE);
 
   // --- WHY --- the page's start script loads the list with the default
-  // sort. this effect is for the reader's OWN choices: when they pick
-  // a different sort, the list is loaded again with it. the store
-  // ignores a load for a sort that is already loaded, so the two do
-  // not fight.
+  // sort. this effect is for the reader's OWN choices: when they pick a
+  // different sort, the list is loaded again with it. the store ignores a
+  // load for a sort that is already loaded, so they do not fight.
   use_effect(() => {
     void HUGGIES_APP_PAGE_DISCOVER_STORE.load(sort, direction === "desc");
   }, [sort, direction]);
 
-  // --- WHY --- a search asks the api, not the loaded page. the api has
-  // a real search index behind it; filtering a loaded list in
-  // javascript only sees the tokens we happened to load, so a token
-  // outside that page was unfindable however the reader typed.
+  // --- WHY --- a search asks the api, not the loaded page. the api has a
+  // real search index behind it; filtering a loaded list in javascript only
+  // sees the tokens we happened to load, so a token outside that page was
+  // unfindable however the reader typed.
   //
-  // --- WHY --- clearing the box goes back to the list. the search
-  // results and the list rows are held side by side, so the list is
-  // still there to show the moment the reader stops typing.
+  // --- WHY --- clearing the box goes back to the list. the search results
+  // and the list rows are held side by side, so the list is still there.
   use_effect(() => {
     const needle = query.trim();
     if (needle.length === 0) {
@@ -123,8 +119,8 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   const searching_now = HUGGIES_APP_PAGE_DISCOVER_STORE.is_searching();
   const searching = query.trim().length > 0;
 
-  // the rows on screen: the search results when the reader is
-  // searching, the list pages otherwise.
+  // the rows on screen: the search results when searching, the list
+  // pages otherwise.
   const tokens = use_memo(() => {
     if (searching) return page_data?.search ?? [];
     const rows = page_data?.token_list.rows ?? [];
@@ -136,8 +132,7 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
 
   // --- WHY --- the next page is asked for when the reader nears the
   // bottom of the list, not when they reach it exactly: the request
-  // takes a moment, and asking early means the rows are usually
-  // already there by the time they scroll to them.
+  // takes a moment, so asking early means the rows are usually there.
   const has_more = page_data?.token_list.has_more ?? false;
   use_effect(() => {
     if (searching || !has_more || loading) return;

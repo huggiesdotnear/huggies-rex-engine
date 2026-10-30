@@ -1,29 +1,26 @@
 // ========================================
 // the burn page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the burn page requests. that is the
-// whole point of it.
+// read this file to know what the page requests.
 //
 // WHAT THE PAGE REQUESTS
-//   1. GET /balances   the direct + native balances of burn.sleet.near
-//   2. GET /balances   the direct + native balances of burn.huggies.near
-//   3. GET /tokens     the token metadata for every token the two
-//                       accounts hold: symbol, decimals, icon hash and
-//                       the total supply.
+//   1. GET /balances   the direct balances of burn.sleet.near
+//   2. GET /balances   the direct balances of burn.huggies.near
+//   3. GET /tokens     the token metadata for every token the two accounts
+//                       hold: symbol, decimals, icon hash, total supply.
 //
 // --- WHY --- two balance requests and not one: the api reads one
-// account per call, so there is no way to ask for both at once. they
-// run in parallel, so the page is as slow as its slowest one.
+// account per call. they run in parallel, so the page is as slow as its
+// slowest one.
 //
 // --- WHY --- the balances are COMBINED and not shown per account: the
-// page answers one question — "how much is burned in total". a
-// reader wants one number per token, not two numbers to add up
-// themselves.
+// page answers one question — "how much is burned in total". a reader
+// wants one number per token, not two to add up themselves.
 //
 // --- WHY --- the total supply comes from intear and not from a near
-// view: intear already indexes the supply of every token it knows, so
-// one /tokens call answers it for every token on the page at once. a
-// near view of ft_total_supply would be one contract call PER TOKEN.
+// view: intear already indexes the supply of every token it knows, so one
+// /tokens call answers it for every token at once. a near view of
+// ft_total_supply would be one contract call PER TOKEN.
 import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_BURN_ADDRESSES } from "./app_page_burn_addresses";
@@ -37,17 +34,13 @@ import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";
 //
 // --- WHY --- "direct" and NOT "native": the native source is the
 // chain's own NEAR balance, and a burn address is locked and empty of
-// everything but a little gas. the gas left on it is not burned
-// supply, it is the dust the account needs to exist — and on
-// burn.sleet.near it reads as 0.00. so the page asks for the tokens
-// that were actually sent to be burned, and not the gas.
+// everything but a little gas. that gas is not burned supply, it is the
+// dust the account needs to exist.
 const HUGGIES_BURN_BALANCE_SOURCES = ["direct"] as const;
-// the token fields the burn cards show.
-//
 // `icon_hash` and not `icon`: the icon field is a full inline svg data
 // uri and makes up almost the entire payload. the hash is 16
 // characters, and the icon itself is served from a content-addressed
-// url the browser caches for a year. see lib/ts/token_icon_url.ts.
+// url the browser caches for a year.
 //
 // `total_supply` is the supply in the token's smallest unit, so the
 // percent math stays exact on big numbers.
@@ -60,13 +53,10 @@ const HUGGIES_BURN_TOKEN_FIELDS = [
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// one token held by the burn accounts.
 export interface HUGGIES_APP_PAGE_BURN_TOKEN {
   // the token's account id, e.g. "usdc.near".
   id: string;
-  // the ticker.
   symbol: string;
-  // the token's decimals.
   decimals: number;
   // the icon url, or null when the token has no icon.
   icon: string | null;
@@ -99,7 +89,7 @@ function to_finite_number_fun(value: unknown): number {
 // read a decimal string the api reports, keeping it as a string so the
 // big-integer math downstream stays exact.
 // --- WHY --- a supply with 18 decimals does not fit in a double, and
-// the percent math needs every digit of it.
+// the percent math needs every digit.
 function to_decimal_string_fun(value: unknown, fallback: string): string {
   if (typeof value === "string" && value.trim().length > 0) return value.trim();
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
@@ -121,10 +111,8 @@ function add_decimal_strings_fun(a: string, b: string): string {
 }
 // ========================================
 // --- BALANCES --------------------------
-// the raw balances of one burn account, by token id.
-//
 // a failed account is an empty map and a message: the other account's
-// tokens still show, and the page says which account failed.
+// tokens still show.
 async function fetch_burn_balances_fun(
   account_id: string,
 ): Promise<{ balances: Map<string, string>; error: string | null }> {
@@ -150,11 +138,9 @@ async function fetch_burn_balances_fun(
 }
 // ========================================
 // --- METADATA --------------------------
-// the metadata for the tokens the burn accounts hold.
-//
-// --- WHY --- the durable fields are asked for once for the whole page:
-// the accounts hold the same tokens as each other far more often than
-// not, so one call covers every card.
+// --- WHY --- one call for the whole page: the accounts hold the same
+// tokens as each other far more often than not, so one call covers
+// every card.
 async function fetch_burn_metadata_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, HUGGIES_BURN_META>> {
@@ -190,7 +176,6 @@ async function fetch_burn_metadata_fun(
 }
 // ========================================
 // --- META ------------------------------
-// the metadata of one token, as the burn cards need it.
 interface HUGGIES_BURN_META {
   symbol: string;
   decimals: number;
@@ -199,11 +184,8 @@ interface HUGGIES_BURN_META {
 }
 // ========================================
 // --- LOAD -------------------------------
-// fetch everything the burn page shows.
-//
-// the two accounts are read in parallel: they are two different
-// accounts, so they are two requests, and running them together makes
-// the page as fast as its slowest one.
+// the two accounts are read in parallel, so the page is as slow as its
+// slowest one.
 async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
   const errors: Array<string> = [];
 
@@ -214,7 +196,6 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
     })),
   );
 
-  // the combined balance per token, across every burn account.
   const combined = new Map<string, string>();
   for (const { account_id, result } of per_account) {
     if (result.error !== null) {
@@ -268,8 +249,7 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
     });
   }
 
-  // the cards are ordered by the burned amount, biggest first, so the
-  // token that carries the most value is the first thing read.
+  // the cards are ordered by the burned amount, biggest first.
   //
   // --- WHY --- the comparison is on BigInt and not on the formatted
   // amount: the raw values are integers in the token's smallest unit,

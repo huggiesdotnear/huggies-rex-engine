@@ -2,8 +2,8 @@
 // eight-pair emoji memory match game component.
 //
 // the board and the score. the meme tokens it plays with live in
-// lib/ts/app_page_game_emoji_tokens.ts, and the icons it draws on the
-// cards come from the page's store.
+// lib/ts/app_page_game_emoji_tokens.ts, and the icons it draws on the cards
+// come from the page's store.
 //
 // this component does not fetch. it reads the store and renders.
 // ========================================
@@ -44,10 +44,9 @@ function new_emoji_cards_fun(): HUGGIES_EMOJI_CARD[] {
   return cards;
 }
 // ========================================
-// emoji memory match game component.
 function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
-  // the page's icons, by token id. the store owns the load, so this
-  // component only reads.
+  // the page's icons, by token id. the store owns the load, so this only
+  // reads.
   const page_data = use_page_store_fun(HUGGIES_APP_PAGE_GAME_STORE);
   const [cards, set_cards] =
     use_state<HUGGIES_EMOJI_CARD[]>(new_emoji_cards_fun);

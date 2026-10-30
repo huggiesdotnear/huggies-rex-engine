@@ -2,8 +2,8 @@
 // <div id="..."> values every frontend component self-mounts
 // into. ids are SCREAMING_SNAKE, mirroring the component file
 // (frontend/lib/components/nav.tsx → HUGGIES_COMPONENT_NAV).
-// `as const` keeps the consumer side from trimming/casing them
-// wrong.
+// `as const` keeps the values literal, so a consumer that mistypes
+// an id is a type error instead of a silent null mount.
 // ========================================
 export const HUGGIES_MOUNT_ID = {
   HUGGIES_COMPONENT_NAV: "HUGGIES_COMPONENT_NAV",

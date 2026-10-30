@@ -3,16 +3,16 @@
 // parameter — NOT from auth.
 //
 // this is page state rather than identity: a page can show any account
-// for anyone, signed in or not. the shared module owns that one rule so
-// two pages cannot drift apart on how they read the url.
+// for anyone, signed in or not. the signed-in account is only a
+// FALLBACK — a real `?id=` always wins, so shared profile links stay
+// viewable by guests. and when the url had no id at all, the page
+// keeps listening: signing in later fills it in.
 //
-// the signed-in account is only a FALLBACK. a real `?id=` always wins,
-// so shared profile links stay viewable by guests. and when the url had
-// no id at all, the page keeps listening: signing in later fills it in.
-//
-// the same shape as lib/ts/app_page_account_id.ts and
-// lib/ts/auth_status.ts: plain module state, a subscribe/unsubscribe
-// pair, and a notify that a throwing subscriber cannot break.
+// the shared module owns that one rule so two pages cannot drift apart
+// on how they read the url. the same shape as
+// lib/ts/app_page_account_id.ts and lib/ts/auth_status.ts: plain
+// module state, a subscribe/unsubscribe pair, and a notify that a
+// throwing subscriber cannot break.
 // ========================================
 import { HUGGIES_AUTH } from "./auth_status";
 import { HUGGIES_URL_ID } from "./url_id";
@@ -24,12 +24,11 @@ import { HUGGIES_URL_ID } from "./url_id";
 // render nothing in that case.
 let account_id: string | null = null;
 // true when the URL carried an `?id=` of its own.
-//
-// --- WHY --- this is separate from "do we have an id". a url id is
-// final: a sign-in must never replace the player the link points at.
-// but when the url had no id and nobody was signed in, the page is
-// still waiting for one, and a later sign-in SHOULD light it up. one
-// flag for both would freeze the second case.
+// --- WHY --- separate from "do we have an id". a url id is final: a
+// sign-in must never replace the player the link points at. but when
+// the url had no id and nobody was signed in, the page is still waiting
+// for one, and a later sign-in SHOULD light it up. one flag for both
+// would freeze the second case.
 let has_url_id = false;
 // plain array so subscribe/unsubscribe ordering is stable, matching
 // auth_status.ts.
@@ -62,7 +61,6 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // the `?id=` off the current url, or null when there is none.
-//
 // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
 // and the blank-means-absent rule live there, so this page and the
 // account page cannot drift apart on how the id is found.
@@ -73,18 +71,12 @@ function read_url_account_id_fun(): string | null {
 // --- INIT -------------------------------
 // resolve the id: the url first, then the signed-in account as a
 // fallback.
-//
-// --- WHY --- init() must run BEFORE get_account_id(): init is what
-// rehydrates the session from localStorage, so without it a fresh page
-// load always looks signed out even when a session sits in storage.
-//
 // --- WHY --- the url wins over the signed-in account. a link to
 // someone else's account must show them, not the reader.
-//
-// --- WHY --- init() must run AFTER HUGGIES_AUTH.init(). the auth
-// module clears and re-derives its own state on init, so asking it for
-// the account before that would read a stale value.
-//
+// --- WHY --- HUGGIES_AUTH.init() runs here, before we read the
+// account: init is what rehydrates the session from localStorage, so
+// without it a fresh page load always looks signed out even when a
+// session sits in storage.
 // safe to call more than once: a url id is kept once set, so a
 // re-render or a second import cannot blank an id we already have.
 function init_fun(): void {
@@ -93,8 +85,6 @@ function init_fun(): void {
   }
   const from_url = read_url_account_id_fun();
   if (from_url !== null) {
-    // the url names the player. this is final — a sign-in must not
-    // replace it.
     has_url_id = true;
     if (account_id !== from_url) {
       account_id = from_url;

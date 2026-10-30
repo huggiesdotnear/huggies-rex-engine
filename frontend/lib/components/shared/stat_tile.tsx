@@ -2,13 +2,13 @@
 // the stat tile: a label, a value, and an optional sub-label.
 //
 // the pumpopoly page shows six of these — land, board position, credit
-// score, invites, invited by, last move — and the nft section shows one
-// more for the count. they are all the same shape, so they are one
-// component and not six ad-hoc blocks of markup.
+// score, invites, invited by, last move — and the nft section shows one more
+// for the count. they are all the same shape, so they are one component and
+// not six ad-hoc blocks of markup.
 //
-// the tile carries a neutral class for its own look and a page prefix
-// for the parts, so a page can restyle a tile without restating the
-// whole shape.
+// the tile carries a neutral class for its own look and a page prefix for
+// the parts, so a page can restyle a tile without restating the whole
+// shape.
 //
 // this component does NOT fetch. it renders what it is given.
 // ========================================

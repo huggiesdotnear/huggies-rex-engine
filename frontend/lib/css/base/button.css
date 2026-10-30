@@ -1,26 +1,20 @@
 /*==================================*/
-/* BUTTON */
-/* general styling for every <button> in the app. components should */
-/* not need their own button css — if a control needs to look        */
-/* different, add a modifier class here rather than a new file.      */
-/*                                                                    */
-/* no positioning: buttons flow in normal document order. any         */
-/* control that must sit somewhere specific (fixed nav, toolbar,     */
-/* etc.) positions itself with its own layout rules, not from here.  */
-/*                                                                    */
+/* BUTTON */ /* general styling for every <button> in the app. a control that needs */
+/* to look different gets a modifier class here, not a new file.     */ /* */
+/* no positioning: buttons flow in normal document order. a control  */
+/* that must sit somewhere specific (fixed nav, toolbar) positions   */
+/* itself with its own layout rules.                                */ /* */
 /* the resting fill is a light tint of the page background rather    */
-/* than the saturated red, because the body itself is red — a red     */
-/* fill on a red page reads as no fill at all. hover swaps to the    */
-/* teal accent, which is far enough away in hue to register clearly. */
-/*                                                                    */
-/* width: buttons match the page column (500px / 90vw) rather than  */
-/* stretching to the viewport, so they line up with main and nav.    */
-/* the width sits on the button itself and not on whatever mount     */
-/* element wraps it: body is a flex column with align-items:center,  */
-/* so a wrapper div shrinks to fit its content and a nested           */
-/* `width:100%` would only fill that shrunken box. sizing the button */
-/* directly makes it independent of whatever it is mounted into.     */
+/* than the saturated red, because the body itself is red — a red    */
+/* fill on a red page reads as no fill at all. hover swaps to the   */
+/* teal accent, far enough away in hue to register clearly.          */ /* */
+/* width: buttons match the page column (500px / 90vw) so they line  */
+/* up with main and nav. the width sits on the button itself, not on */
+/* whatever mount element wraps it: body is a flex column with      */
+/* align-items:center, so a wrapper div shrinks to fit its content   */
+/* and a nested `width:100%` would only fill that shrunken box.     */
 /*==================================*/
+
 button {
   display: block;
   /*----------------------*/
@@ -63,8 +57,7 @@ button:focus-visible {
   outline-offset: 2px;
 }
 /*----------------------*/
-/* keyboard users get the same clear ring as hover, since hover */
-/* cannot apply to them.                                               */
+/* keyboard users get the same clear ring as hover, since hover cannot apply to them. */
 button:focus {
   outline: 3px solid var(--color-middle);
   outline-offset: 2px;
@@ -81,9 +74,9 @@ button:disabled {
   opacity: 0.55;
 }
 /*----------------------*/
-/* an error shown under a button — e.g. a rejected wallet popup. */
-/* kept here with the other button states since it only ever appears */
-/* as feedback for a button, rather than in a component css file.    */
+/* an error shown under a button — e.g. a rejected wallet popup. kept
+   here with the other button states since it only ever appears as
+   feedback for a button, rather than in a component css file. */
 [data-huggies-auth-error] {
   width: 500px;
   max-width: 90vw;

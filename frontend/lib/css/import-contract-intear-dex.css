@@ -1,6 +1,5 @@
 /*==================================*/
-/* the intear-dex contract page's css: the components it mounts. each one
-   brings the shared css it needs with its own @imports. */
+/* the intear-dex contract page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER.css);
 @import url(./components/HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS.css);
 /*==================================*/

@@ -1,9 +1,8 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR
-   the account id box on the pumpopoly page.
-
-   the box itself is the shared id jump box (shared/id_jump_box.css),
-   so this file holds only the pumpopoly wording's spacing. */
+   the account id box on the pumpopoly page. the box itself is the shared
+   id jump box (shared/id_jump_box.css); this file holds only the
+   pumpopoly spacing. */
 @import url(./shared/id_jump_box.css);
 
 /*==================================*/

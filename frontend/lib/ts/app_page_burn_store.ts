@@ -2,10 +2,8 @@
 // the burn page's shared state: the one load, held here, read by every
 // component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/app_page_burn.ts), so there is exactly one set of
-// requests.
+// the components on this page do not fetch. they read this store, so
+// there is exactly one loader (lib/ts/app_page_burn.ts).
 //
 // the store has the same shape as lib/ts/app_page_game_store.ts: plain
 // module state, a subscribe/unsubscribe pair, and a notify that a
@@ -13,8 +11,7 @@
 //
 // --- WHY --- the burn page has no id: there is nothing in the url to
 // read and no account to sign in. the burn addresses are a constant
-// (lib/ts/app_page_burn_addresses.ts), so the page's data is fixed and
-// the store only ever loads once.
+// (lib/ts/app_page_burn_addresses.ts), so the store loads once.
 import { HUGGIES_APP_PAGE_BURN } from "./app_page_burn";
 import type { HUGGIES_APP_PAGE_BURN_DATA } from "./app_page_burn";
 // ========================================
@@ -32,8 +29,7 @@ const listeners: Array<() => void> = [];
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// broadcast a change to every subscriber; one throwing cannot break the
-// flow that notified.
+// broadcast a change to every subscriber; one throwing cannot break the notify.
 function notify_fun(): void {
   for (const listener of [...listeners]) {
     try {
@@ -43,8 +39,7 @@ function notify_fun(): void {
     }
   }
 }
-// register a re-render callback; returns an unsubscribe so components
-// can clean up on unmount instead of leaking.
+// register a re-render callback; returns an unsubscribe to clean up on unmount.
 function subscribe_fun(listener: () => void): () => void {
   listeners.push(listener);
   return () => {
@@ -54,14 +49,11 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // --- LOAD -------------------------------
-// load the page's data.
-//
 // the load runs once. a second call while a load is running is ignored,
 // so the page cannot fetch twice because two components asked for it.
 //
 // --- WHY --- the load takes no argument: the page has no id and no
-// sort. the burn addresses are a constant, so there is nothing for a
-// caller to choose.
+// sort, so there is nothing for a caller to choose.
 async function app_page_burn_store_load_fun(): Promise<void> {
   if (loading || loaded) return;
   loading = true;
@@ -81,7 +73,6 @@ async function app_page_burn_store_load_fun(): Promise<void> {
 }
 // ========================================
 // --- READ ------------------------------
-// the loaded data, or null while it is still loading.
 function get_fun(): HUGGIES_APP_PAGE_BURN_DATA | null {
   return data;
 }

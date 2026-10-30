@@ -1,14 +1,14 @@
 // ========================================
-// the rhea page's pool list: the search box, the sort row, the pool
-// family filter and the pool rows.
+// the rhea page's pool list: the search box, the sort row, the pool family
+// filter and the pool rows.
 //
 // this component does NOT fetch. the rhea page has one loader
-// (lib/ts/contract_page_rhea.ts) and this component reads its result
-// from the page store (lib/ts/contract_page_rhea_store.ts).
+// (lib/ts/contract_page_rhea.ts); this reads its store
+// (lib/ts/contract_page_rhea_store.ts).
 //
-// the list is paged: the api sorts and paginates on its own, so the
-// page asks for one page of rows at a time and asks for the next one
-// when the reader scrolls to the bottom.
+// the list is paged: the api sorts and paginates on its own, so the page
+// asks for one page of rows at a time and asks for the next one when the
+// reader scrolls to the bottom.
 //
 // mounts into
 // <div id="HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS">.
@@ -35,15 +35,14 @@ import type { RHEA_POOL_SEARCH_TYPE } from "@sleet-js/middleman-rhea-api";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// how long to wait after a keystroke before asking the api. long
-// enough that typing a word is one request, not one per letter.
+// how long to wait after a keystroke before asking the api. long enough
+// that typing a word is one request, not one per letter.
 const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
-// how close to the bottom of the list the reader has to scroll before
-// the next page is asked for. a little early, so the next page is
-// usually already there by the time they reach the end.
+// how close to the bottom of the list the reader has to scroll before the
+// next page is asked for. a little early, so the next page is usually there
+// by the time they reach the end.
 const HUGGIES_LOAD_MORE_THRESHOLD_PX = 600;
-// the pool families the reader can pick between, with the labels they
-// are offered under.
+// the pool families the reader can pick between, with their labels.
 const HUGGIES_POOL_TYPE_OPTIONS: ReadonlyArray<{
   key: RHEA_POOL_SEARCH_TYPE;
   label: string;
@@ -55,10 +54,8 @@ const HUGGIES_POOL_TYPE_OPTIONS: ReadonlyArray<{
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// render a usd figure with thousands separators and no decimals.
-//
-// --- WHY --- no decimals on a tvl or a volume: the number says how
-// big the pool is, and $2,093,251 says that. the cents are noise.
+// --- WHY --- no decimals on a tvl or a volume: the number says how big
+// the pool is, and $2,093,251 says that. the cents are noise.
 function usd_fun(value: number): string {
   if (!Number.isFinite(value)) return "$0";
   return `$${Math.round(value).toLocaleString()}`;
@@ -66,11 +63,9 @@ function usd_fun(value: number): string {
 // ========================================
 // ========================================
 // --- ROW -------------------------------
-// render one pool as a row.
-//
-// --- WHY --- the row is not a link: rhea has no pool detail page in
-// this app yet, so a row that looks clickable and does nothing is
-// worse than a row that plainly is not one.
+// --- WHY --- the row is not a link: rhea has no pool detail page in this
+// app yet, so a row that looks clickable and does nothing is worse than a
+// row that plainly is not one.
 function pool_row_fun(pool: HUGGIES_RHEA_POOL): preact.JSX.Element {
   const symbols = pool.symbols.join(" / ");
   return (
@@ -120,16 +115,15 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
       HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
     );
   const [type, set_type] = use_state<RHEA_POOL_SEARCH_TYPE>("all");
-  // the scroll container, so the reader's position at the bottom can
-  // be detected.
+  // the scroll container, so the reader's position at the bottom is
+  // detectable.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
 
   const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_RHEA_STORE);
 
-  // --- WHY --- the page's start script loads the list with the
-  // default sort. this effect is for the reader's OWN choices: when
-  // they pick a different sort or family, the list is loaded again
-  // with it.
+  // --- WHY --- the page's start script loads the list with the default
+  // sort. this effect is for the reader's OWN choices: when they pick a
+  // different sort or family, the list is loaded again with it.
   use_effect(() => {
     void HUGGIES_CONTRACT_PAGE_RHEA_STORE.load(
       sort,
@@ -139,14 +133,12 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
     );
   }, [sort, direction, type]);
 
-  // --- WHY --- a search asks the api, not the loaded page. the api
-  // matches the token symbols and the token account ids, so a pool
-  // outside the loaded page is still findable however the reader
-  // typed. filtering a loaded list in javascript only sees the pools
-  // we happened to load.
+  // --- WHY --- a search asks the api, not the loaded page. the api matches
+  // the token symbols and the token account ids, so a pool outside the
+  // loaded page is still findable however the reader typed. filtering a
+  // loaded list in javascript only sees the pools we happened to load.
   //
-  // --- WHY --- the wait: typing a word is one request, not one per
-  // letter.
+  // --- WHY --- the wait: typing a word is one request, not one per letter.
   use_effect(() => {
     const needle = query.trim();
     if (needle.length === 0) return;
@@ -171,8 +163,7 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
 
   // --- WHY --- the next page is asked for when the reader nears the
   // bottom of the list, not when they reach it exactly: the request
-  // takes a moment, and asking early means the rows are usually
-  // already there by the time they scroll to them.
+  // takes a moment, so asking early means the rows are usually there.
   use_effect(() => {
     if (!has_more || loading) return;
     const element = scroll_ref.current;

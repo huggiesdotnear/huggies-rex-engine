@@ -1,14 +1,13 @@
 // ========================================
-// the player's Pumpopoly stats: the in-game balance and the six cards
-// from the world contract.
+// the player's Pumpopoly stats: the in-game balance and the six cards from
+// the world contract.
 //
 // this component does NOT fetch. the Pumpopoly page has one loader
-// (lib/ts/contract_page_pumpopoly.ts) and this component reads its
-// result from the page store
+// (lib/ts/contract_page_pumpopoly.ts); this reads its store
 // (lib/ts/contract_page_pumpopoly_store.ts).
 //
 // renders nothing when there is no account id — the page falls back to
-// the signed-in account, and a signed-out visitor sees no stats at all.
+// the signed-in account, and a signed-out visitor sees no stats.
 //
 // mounts into
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS">.
@@ -24,9 +23,8 @@ import { huggies_stat_tile_fun } from "./shared/stat_tile";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS_FUN() {
   const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE);
-  // --- WHY --- the id comes from the store: the store watches the id
-  // and re-loads when it changes, so the components read one place for
-  // both the id and the data, and they follow it.
+  // --- WHY --- the id comes from the store: it watches the id and
+  // re-loads when it changes, so the id and the data change together.
   const account_id = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
 
   // no account id and nobody signed in — there is no player to show.

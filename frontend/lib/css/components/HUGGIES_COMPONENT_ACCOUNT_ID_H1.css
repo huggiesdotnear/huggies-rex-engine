@@ -1,15 +1,13 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_ACCOUNT_ID_H1
-   the account id the page is about. it renders nothing when there is
-   no ?id= on the url. */
+   the account id the page is about. it renders nothing when there is no
+   ?id= on the url. */
 /*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
-  /* body centers text; the heading reads better flush left. */
-  text-align: left;
-  /* full width of main's box, so the border spans the content
-     rather than only the text. main's own rule gives every child the
-     column's width; this keeps the heading at that width even where
-     it is mounted outside main. */
+    text-align: left;
+  /* full width of main's box, so the border spans the content rather
+     than only the text. this keeps the heading at the column's width
+     even where it is mounted outside main. */
   width: 100%;
   max-width: 90vw;
   box-sizing: border-box;

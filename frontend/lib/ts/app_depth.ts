@@ -1,5 +1,8 @@
 // ========================================
-// resolve the current page's depth below frontend/app/.
+// how many directory levels deep the current page sits below /app/.
+// --- WHY --- a link from a nested page (app/contract/rhea.html) back
+// to a page directly under /app/ (app/account.html) needs one "../"
+// per level, so the href is built as "../".repeat(depth).
 // ========================================
 export function current_app_depth_fun(): number {
   if (typeof window === "undefined" || typeof window.location === "undefined") {

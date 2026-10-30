@@ -1,8 +1,6 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE
-   this component's own rules. the shared components it renders
-   bring their own css in with the @imports below.
-*/
+   the shared balance table brings its own css in with the @import below. */
 /*==================================*/
 @import url(./shared/balance_table.css);
 /*==================================*/

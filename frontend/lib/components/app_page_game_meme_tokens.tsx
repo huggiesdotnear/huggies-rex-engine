@@ -13,10 +13,9 @@ import { HUGGIES_APP_PAGE_GAME_STORE } from "../ts/app_page_game_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 // ========================================
-// the meme tokens the game page shows.
 function HUGGIES_COMPONENT_GAME_MEME_TOKENS_FUN() {
-  // the page's icons, by token id. the store owns the load, so this
-  // component only reads.
+  // the page's icons, by token id. the store owns the load, so this only
+  // reads.
   const page_data = use_page_store_fun(HUGGIES_APP_PAGE_GAME_STORE);
   const icons = page_data?.icons ?? {};
 

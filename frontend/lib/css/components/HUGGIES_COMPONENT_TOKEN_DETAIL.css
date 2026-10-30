@@ -1,7 +1,7 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_TOKEN_DETAIL
-   the token's card: the icon, the symbol, the name, the id, the
-   metadata grid, the description and the socials. */
+   the token's card: the icon, the symbol, the name, the id, the metadata
+   grid, the description and the socials. */
 @import url(./shared/token_meta_grid.css);
 
 /*==================================*/
@@ -12,10 +12,10 @@
   margin-bottom: 14px;
 }
 /* the text column takes the rest of the row. the header is a flex row,
-   so the column that holds the symbol, the name and the id is a flex
-   item and shrinks to its own content. `flex: 1` gives it the rest of
-   the row, and `min-width: 0` lets a long id wrap inside it instead
-   of pushing the row open. */
+   so the column holding the symbol, the name and the id shrinks to its
+   own content. `flex: 1` gives it the rest of the row, and
+   `min-width: 0` lets a long id wrap inside it instead of pushing the
+   row open. */
 #HUGGIES_COMPONENT_TOKEN_DETAIL header > div {
   flex: 1 1 auto;
   min-width: 0;
@@ -29,9 +29,6 @@
   font-size: 13px;
   opacity: 0.75;
 }
-/* the token id sits on its own line under the heading, so it is a
-   block. the breaking comes from the base code rule, and the color
-   is the text color — no dimming. */
 #HUGGIES_COMPONENT_TOKEN_DETAIL header code {
   display: block;
   font-size: 10px;
@@ -43,7 +40,6 @@
   object-fit: cover;
   flex: none;
 }
-/* --- about card --- */
 #HUGGIES_COMPONENT_TOKEN_DETAIL .description-card {
   margin: 1rem 0;
   padding: 0.85rem;
@@ -62,7 +58,6 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-/* --- socials --- */
 #HUGGIES_COMPONENT_TOKEN_DETAIL .socials {
   display: flex;
   flex-wrap: wrap;
@@ -70,9 +65,9 @@
   margin: 12px 0;
 }
 /* the social links are buttons that share the row's full width between
-   them: one link fills it on its own, two split it in half, three
-   split it three ways. `flex:1` with a `min-width:0` lets them shrink
-   rather than force the row wider than the page. */
+   them: one link fills it on its own, two split it in half, three split
+   it three ways. `flex:1` with a `min-width:0` lets them shrink rather
+   than force the row wider than the page. */
 #HUGGIES_COMPONENT_TOKEN_DETAIL .social-link {
   flex: 1 1 0;
   min-width: 0;

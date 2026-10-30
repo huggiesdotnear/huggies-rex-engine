@@ -3,10 +3,9 @@
    the meme tokens the game is played with, as rounded cards.
 
    cards and not a plain list of links: each token carries an emoji, a
-   label AND its token id, and a bare link can only show one line of
-   it. the grid, and not one card per row: the ids are long and the
-   labels are short, so the cards are equal width and the id truncates
-   inside its own card. */
+   label AND its token id, and a bare link shows only one line of it.
+   the grid, not one card per row: the ids are long and the labels
+   short, so the id truncates inside its own card. */
 /*==================================*/
 #HUGGIES_COMPONENT_GAME_MEME_TOKENS {
   margin-top: 1.5rem;
@@ -67,15 +66,12 @@
   font-size: 14px;
   line-height: 1.2;
 }
-/* the token id under the name. it is cut off with an ellipsis, and
-   it is the same color as the text — the size tells it apart. */
 #HUGGIES_COMPONENT_GAME_MEME_TOKENS .id {
   font-size: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* the live token icon sits in the corner of the card. */
 #HUGGIES_COMPONENT_GAME_MEME_TOKENS .icon {
   flex: 0 0 auto;
   width: 1.4rem;

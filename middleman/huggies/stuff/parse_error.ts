@@ -3,13 +3,13 @@
 // turn a non-2xx backend response into a thrown Error.
 //
 // our backend answers failures with `{ "error": { "code", "message" } }`,
-// so the code and the message are pulled out and put on the error
-// itself. the framed banner is the mirror of api_call's success log.
+// so the code and the message are pulled out and put on the error itself.
+// the framed banner is the mirror of api_call's success log.
 //
 // --- WHY --- the error carries the status and the code, not just a
 // message: the code is what the backend decided (invalid_account_id,
-// trezu_unreachable, not_found), and a caller that wants to branch on
-// it needs it as a field, not as text it has to parse.
+// trezu_unreachable, ...), and a caller branching on it needs it as a
+// field, not as text it has to parse.
 // ========================================
 
 import type { HUGGIES_ERROR_RESPONSE } from "../types/common";
@@ -94,9 +94,9 @@ export async function parse_error(
 }
 
 // ========================================
-// pull the error code out of the envelope. falls back to a code
-// derived from the status when the body carried no code, so the
-// field is never empty.
+// pull the error code out of the envelope. falls back to a code derived
+// from the status when the body carried no code, so the field is never
+// empty.
 function extract_code_fun(response_json: unknown, status: number): string {
   const envelope = (response_json as HUGGIES_ERROR_RESPONSE | null)?.error;
   if (

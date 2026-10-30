@@ -3,23 +3,18 @@
 // current page.
 //
 // several pages have one of these and they all do the same thing —
-// pumpopoly takes an account id, the token page takes a token id, the
-// DAO page takes a dao id. only the wording differs, so the wording
-// comes in as props.
-//
-// the url parameter it writes is a prop too, so a page can use `?id=`
-// or `?dao_id=` without a second component.
+// pumpopoly takes an account id, the token page takes a token id, the DAO
+// page takes a dao id. only the wording differs, so the wording and the url
+// parameter come in as props.
 //
 // the css is driven by a class_prefix prop: the component writes
 // `<prefix>-selector`, `<prefix>-input` and `<prefix>-open`, and the
 // page's css file carries those rules.
 //
 // --- WHY --- named `id_jump_box` and not `account_id_selector`: the
-// thing it opens is an id of some kind. an account id on the pumpopoly
-// page, a token id on the token page, a dao id on the DAO page. a
-// token id is an account id on NEAR, but calling it an account id on
-// a token page reads wrong, so the name says "id" and leaves the kind
-// to the page that uses it.
+// thing it opens is an id of some kind. a token id is an account id on
+// NEAR, but calling it an account id on a token page reads wrong, so
+// the name says "id" and leaves the kind to the page that uses it.
 // ========================================
 import { useState as use_state } from "preact/hooks";
 // ========================================
@@ -27,7 +22,7 @@ import { useState as use_state } from "preact/hooks";
 // --- PROPS ------------------------------
 export interface HUGGIES_ID_JUMP_BOX_PROPS {
   // the id the page is currently showing. it seeds the input, so the
-  // field starts out holding the id that is on screen.
+  // field starts out holding the id on screen.
   id: string | null;
   // the label above the field, e.g. "ACCOUNT ID".
   label: string;
@@ -50,8 +45,8 @@ export function huggies_id_jump_box_fun(
   const [input_id, set_input_id] = use_state<string>(props.id ?? "");
 
   // --- WHY --- the input is seeded from props on mount only. a later
-  // change of the page's id must not overwrite what the user is
-  // typing, but a fresh page load must start from the url's id.
+  // change of the page's id must not overwrite what the user is typing,
+  // but a fresh page load must start from the url's id.
   const open_fun = () => {
     const next_id = input_id.trim();
     if (next_id.length === 0) return;

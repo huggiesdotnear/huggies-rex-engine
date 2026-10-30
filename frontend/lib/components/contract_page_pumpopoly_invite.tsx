@@ -1,8 +1,8 @@
 // ========================================
 // the "new players start here" link on the Pumpopoly page.
 //
-// it sends a visitor to Pumpopoly with the Huggies invite code, so a
-// new player joins through this app's referral.
+// it sends a visitor to Pumpopoly with the Huggies invite code, so a new
+// player joins through this app's referral.
 //
 // this component does NOT fetch — the invite link is built from a
 // constant (lib/ts/contract_page_pumpopoly_link.ts).

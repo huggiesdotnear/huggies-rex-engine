@@ -2,13 +2,12 @@
 // the community burn addresses, as cards.
 //
 // one card per burn address. each card links to that address's account
-// page, so a reader can see the whole account — its transactions and
-// everything else the account page shows — and not just the burned
+// page, so a reader can see the whole account and not just the burned
 // tokens.
 //
 // this component does not fetch. the addresses are a constant
-// (lib/ts/app_page_burn_addresses.ts), and the page's loader is the one
-// that reads their balances.
+// (lib/ts/app_page_burn_addresses.ts), and the page's loader reads their
+// balances.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_BURN_ADDRESSES } from "../ts/app_page_burn_addresses";
@@ -16,8 +15,7 @@ import { current_app_depth_fun } from "../ts/app_depth";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the link to an account's page, relative to the page the link is
-// rendered on.
+// the link to an account's page, relative to the page the link is on.
 function account_href_fun(account_id: string): string {
   const depth = current_app_depth_fun();
   return `${"../".repeat(depth)}account.html?id=${encodeURIComponent(account_id)}`;

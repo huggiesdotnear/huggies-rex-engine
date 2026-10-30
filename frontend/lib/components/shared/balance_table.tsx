@@ -2,20 +2,18 @@
 // the shared balance table: every page that shows token balances shows
 // it through this.
 //
-// one table, so an account and a dao read the same way. the account
-// page and the dao page each have their own loader and their own
-// store, so this component takes the rows as a prop and fetches
-// nothing — it never reads a store.
+// one table, so an account and a dao read the same way. the account page
+// and the dao page each have their own loader and store, so this component
+// takes the rows as a prop and fetches nothing.
 //
-// what it owns, so no page has to copy it:
-//   - the nesting: the table block holds the scroll box, and the scroll
-//     box holds the table. the css only caps the scroll box under that
-//     nesting, so a page that hand-copies the markup wrong loses the
-//     height cap.
-//   - the pinned native NEAR row.
-//   - the total row.
-//   - the sort control.
-//   - the dust toggle.
+// what it owns, so no page has to copy it: the scroll-box nesting, the
+// pinned native NEAR row, the total row, the sort control and the dust
+// toggle.
+//
+// --- WHY --- the nesting matters: the table block holds the scroll box and
+// the scroll box holds the table. the css only caps the scroll box under
+// that nesting, so a page that hand-copies the markup wrong loses the
+// height cap.
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
 import { HUGGIES_AMOUNT_FORMAT } from "../../ts/token_amount_format";
@@ -27,14 +25,13 @@ import type { HUGGIES_BALANCE_SORT_BY } from "../../ts/balance_sort";
 import { HUGGIES_NEAR_ID } from "../../ts/token_near";
 // ========================================
 // --- CONFIG -----------------------------
-// the native NEAR row is pinned above the sorted list: it is the gas
-// balance an account cannot function without, so it is not competing
-// for rank with the rest.
+// the native NEAR row is pinned above the sorted list: it is the gas balance
+// an account cannot function without, so it does not compete for rank with
+// the rest.
 //
-// the id itself lives in lib/ts/token_near.ts, next to the other
-// facts about the chain's own token.
-// the default order: biggest position first, which is what a reader
-// opening an account wants to see.
+// the id itself lives in lib/ts/token_near.ts, next to the other facts
+// about the chain's own token.
+// the default order: biggest position first.
 const HUGGIES_DEFAULT_SORT_BY: HUGGIES_BALANCE_SORT_BY = "usd";
 const HUGGIES_DEFAULT_SORT_DESC = true;
 // ========================================
@@ -54,10 +51,8 @@ export interface HUGGIES_BALANCE_TABLE_PROPS {
 }
 // ========================================
 // --- SORT CONTROL ----------------------
-// the two sort keys as a toggle above the table, plus a direction
-// button. one control for both rather than clickable column headers,
-// because with a single stacked column there is no header row to hang
-// them on.
+// --- WHY --- one control for both rather than clickable column headers:
+// with a single stacked column there is no header row to hang them on.
 function sort_toggle_fun(
   sort_by: HUGGIES_BALANCE_SORT_BY,
   sort_desc: boolean,
@@ -97,18 +92,16 @@ function sort_toggle_fun(
 }
 // ========================================
 // --- DUST TOGGLE -----------------------
-// the reader's switch for the dust, below the table.
-//
 // --- WHY --- a control and not a fixed rule: whether a $0.04 holding
-// matters depends on who is asking. a busy account wants the table
-// short, a dao auditing its treasury wants the truth. both are one
-// click apart, and neither is the wrong answer.
+// matters depends on who is asking. a busy account wants the table short,
+// a dao auditing its treasury wants the truth. both are one click apart,
+// and neither is the wrong answer.
 //
 // --- WHY --- the count sits above the button, not beside it. the
 // button says what it does — SHOW DUST — and the count above it says
 // what the click will bring in, so the reader reads "12 low-value
-// holdings hidden" and then "SHOW DUST" and knows the button is the
-// thing that uncovers them.
+// holdings hidden" and then "SHOW DUST" and knows the button uncovers
+// them.
 function dust_toggle_fun(
   show_dust: boolean,
   hidden_count: number,
@@ -148,8 +141,8 @@ export function huggies_balance_table_fun(
   // the dust is hidden until the reader asks for it, on every page.
   const [show_dust, set_show_dust] = use_state(false);
 
-  // clicking the active key flips direction; clicking a new key
-  // switches to it and starts descending, the useful default for both.
+  // clicking the active key flips direction; clicking a new key switches to
+  // it and starts descending, the useful default for both.
   const on_sort_fun = (by: HUGGIES_BALANCE_SORT_BY) => {
     if (by === sort_by) {
       set_sort_desc(!sort_desc);
@@ -160,8 +153,8 @@ export function huggies_balance_table_fun(
   };
 
   const all_rows = props.rows;
-  // the native NEAR holding is pulled out of the sortable list and
-  // pinned above it; everything else competes on usd or ticker.
+  // the native NEAR holding is pulled out of the sortable list and pinned
+  // above it; everything else competes on usd or ticker.
   const near_entry = all_rows.find((entry) => entry.id === HUGGIES_NEAR_ID);
   const rest = all_rows.filter((entry) => entry.id !== HUGGIES_NEAR_ID);
   // the filter hides dust and spam. it runs here so the hidden count is

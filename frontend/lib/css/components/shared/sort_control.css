@@ -1,10 +1,14 @@
 /*==================================*/
 /* sort_control
-   the shared sort control: a row of small toggle buttons.
+   the shared sort control: a row of small toggle buttons. used by the
+   token list on the discover page and by the pumpopoly nft list. the
+   token list offers its sort keys as buttons; the nft list has one key
+   and uses the direction toggle alone.
 
-   used by the token list on the discover page and by the pumpopoly
-   nft list. the token list offers its sort keys as buttons; the nft
-   list has one key and uses the direction toggle alone. */
+   a page puts the control on its own full-width row and lets the
+   buttons share the width evenly, so the row reads as one bar and not
+   as little buttons in a wide gap. the direction button keeps its own
+   width: it is a small toggle, not another sort key. */
 /*==================================*/
 .sort-control {
   display: inline-flex;
@@ -18,7 +22,7 @@
 }
 /* the global `button` rule in button.css sizes every button to the
    full 500px page column. the sort buttons sit side by side, so they
-   must opt out of that width and size to their own content instead. */
+   opt out of that width and size to their own content. */
 .sort-button {
   width: auto;
   max-width: none;

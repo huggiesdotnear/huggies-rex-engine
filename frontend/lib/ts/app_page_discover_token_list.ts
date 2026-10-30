@@ -1,27 +1,10 @@
 // ========================================
 // one page of the discover token list, straight from the intear api.
 //
-// --- WHY --- the list used to be downloaded whole: every indexed token
-// (about 7,400) was fetched in one call and cached in indexeddb for
-// five minutes, and the sort was applied in javascript. that had three
-// problems:
-//
-//   1. STALENESS. the cached rows carry volume, market cap, price and
-//      holders, and all four move. a five minute old list showed
-//      numbers that disagreed with the token's own page.
-//   2. SIZE. the whole set without icons is ~733KB on every cold
-//      visit, to show a screenful.
-//   3. WASTE. sorting in javascript is why the whole set was needed,
-//      and the set was cached because it was expensive — a loop the
-//      api already breaks.
-//
-// the api sorts and paginates natively. this file asks for one page
-// at a time, so the list is always current and a visit costs one
-// small request instead of a large one.
-//
-// the pinned ("default") sort is the one thing the api cannot do, so
-// the favourites are fetched by id and pinned on top of the volume
-// page — see app_page_discover_token_order.ts.
+// the api sorts and paginates natively. this file asks for one page at
+// a time, so the list is always current. the pinned ("default") sort is
+// the one thing the api cannot do, so the favourites are fetched by id
+// and pinned on top — see app_page_discover.ts.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "./token_row_by_name";
@@ -31,11 +14,9 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_resu
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// the fields the discover list shows.
-//
-// `icon` is NOT in this list: it is a full base64 data uri, and
-// asking for it on every token costs ~21MB. icons are fetched
-// separately for the rows on screen, and cached durably — see
+// `icon` is NOT in this list: it is a full inline data uri, and asking
+// for it on every token costs megabytes. icons are fetched separately
+// for the rows on screen, and cached durably — see
 // app_page_discover_token_icons.ts.
 const HUGGIES_TOKEN_LIST_FIELDS = [
   "name",
@@ -62,9 +43,8 @@ function to_finite_number_fun(value: unknown): number {
 // map an API token row into the display record used by discover.
 // --- WHY --- the row is read by column NAME, not by index: the api
 // always returns `account_id` as the first column, even when it was
-// not requested, so a fixed index read is shifted by one — which is
-// what made every token render without its icon (the icon slot got
-// the price, which is not a string) and every symbol fall back to
+// not requested, so a fixed index read is shifted by one — which made
+// every token render without its icon and every symbol fall back to
 // the token id.
 function map_token_row_fun(
   columns: ReadonlyArray<string>,
@@ -91,12 +71,10 @@ function map_token_row_fun(
 // ========================================
 // ========================================
 // --- PAGE ------------------------------
-// one page of tokens, plus whether more pages follow.
-//
 // the api refuses `limit` without a `sort`, so every page request
 // carries one. the `default` sort is not a real field — it is the
-// favourites-first view — so it pages by volume and the favourites
-// are pinned on top afterwards.
+// favourites-first view — so it pages by volume and the favourites are
+// pinned on top afterwards.
 export interface HUGGIES_DISCOVER_TOKEN_LIST {
   rows: HUGGIES_TOKEN_SEARCH_RESULT[];
   // true when the api has more rows behind this one.
@@ -106,8 +84,6 @@ export interface HUGGIES_DISCOVER_TOKEN_LIST {
   fetched: number;
 }
 // ========================================
-// fetch one page of the token list, sorted by the chosen field.
-//
 // `offset` is the row count already served by the api, so page two
 // asks for the rows after the first page.
 async function fetch_token_list_fun(

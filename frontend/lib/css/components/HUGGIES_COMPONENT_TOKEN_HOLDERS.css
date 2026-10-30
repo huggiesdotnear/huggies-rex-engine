@@ -1,11 +1,9 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_TOKEN_HOLDERS
-   the indexed holders table: the rank, the account, the balance and
-   the usd value.
-
-   the row itself is a shared component (shared/token_holder_row.css),
-   so both the column widths and the row's own look live in their own
-   files. */
+   the indexed holders table: the rank, the account, the balance and the
+   usd value. the row itself is a shared component
+   (shared/token_holder_row.css), so both the column widths and the
+   row's own look live in their own files. */
 @import url(./shared/token_holder_row.css);
 
 /*==================================*/

@@ -1,11 +1,8 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES
-   the burned tokens, as cards.
-
-   a grid and not one card per row: there is one card per burned token
-   and there can be many of them. the two figures inside a card are
-   stacked and not side by side: both are long, and side by side they
-   would wrap in a narrow card. */
+   the burned tokens, as cards. a grid, not one card per row: there can
+   be many. the two figures inside a card are stacked, not side by
+   side: both are long and would wrap in a narrow card. */
 /*==================================*/
 #HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES {
   text-align: left;
@@ -85,8 +82,6 @@
   font-size: 15px;
   line-height: 1.2;
 }
-/* the token id under the ticker. it is cut off with an ellipsis, and
-   it is the same color as the text — the size tells it apart. */
 #HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES .token-id {
   font-size: 10px;
   overflow: hidden;

@@ -1,6 +1,5 @@
 /*==================================*/
-/* the token page's css: the components it mounts. each one brings the
-   shared css it needs with its own @imports. */
+/* the token page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_TOKEN_STATUS.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_DETAIL.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_SELECTOR.css);

@@ -18,7 +18,6 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER_FUN() {
   const dao = state.dao;
   if (dao === null) return null;
 
-  // the number of accounts in every role, counted once.
   const member_total = dao.members.length;
 
   return (

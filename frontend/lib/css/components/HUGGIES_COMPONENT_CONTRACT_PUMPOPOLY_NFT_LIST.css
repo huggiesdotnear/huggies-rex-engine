@@ -1,18 +1,16 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
    the player's nfts: the count, the sort control, and the gallery of
-   nft tiles.
-
-   a grid of picture tiles, capped in height and scrolled, so a player
-   with hundreds of nfts does not push the rest of the page off screen. */
+   nft tiles. a grid of picture tiles, capped in height and scrolled, so
+   a player with hundreds of nfts does not push the page off. */
 @import url(./shared/error_card.css);
 @import url(./shared/stat_tile.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-scroll {
   /* --- WHY --- taller than the old table's 420px: the tiles are now
-     pictures, and a land is twice as tall as it is wide, so two rows of
-     them need more room before the scroll starts. */
+     pictures, and a land is twice as tall as it is wide, so two rows
+     need more room before the scroll starts. */
   max-height: 620px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -24,9 +22,8 @@
    two tiles across.
    --- WHY --- two and not auto-fill: a pumpopoly land is a tall, narrow
    picture (80x160 and 80x192 — a 1:2 and a 1:2.4 slice of a board
-   square), so a third column would squeeze them down to nothing and a
-   fifth would make the picture unreadable. two across gives each tile
-   room for the picture to be seen. */
+   square), so a third column would squeeze them to nothing and a fifth
+   would make the picture unreadable. */
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-gallery {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -51,7 +48,7 @@
    a treasury bond is 1920x1080 (16:9). `cover` would crop the tall
    land to a square and cut the bond's top and bottom off, so the
    picture would not be the picture. `contain` shows all of it, and the
-   letterbox is the page background, so the tile keeps its own box.
+   letterbox is the page background.
    --- WHY --- the height is not fixed: the tile grows to whatever the
    picture is, so a tall land and a wide bond both sit whole. */
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-media {
@@ -63,14 +60,12 @@
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.18);
 }
-/* a token with no picture gets a placeholder box of the same shape as
-   a land, so the gallery keeps its rhythm. */
+/* a token with no picture gets a placeholder box of the same shape as a
+   land, so the gallery keeps its rhythm. */
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-media.is-empty {
   aspect-ratio: 1 / 2;
   border: 1px dashed rgba(255, 255, 255, 0.28);
 }
-/* the token id under the picture gets its size, its breaking and its
-   color from the base code rule. */
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-tile figcaption {
   max-width: 100%;
   overflow: hidden;

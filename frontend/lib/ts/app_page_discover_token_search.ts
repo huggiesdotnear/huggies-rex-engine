@@ -15,9 +15,8 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_resu
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// the fields a search result shows. `icon` is not among them — it is
-// a full base64 data uri, and the icons are fetched separately for
-// the rows on screen.
+// `icon` is not among them — it is a full inline data uri, and the
+// icons are fetched separately for the rows on screen.
 const HUGGIES_TOKEN_SEARCH_FIELDS = [
   "name",
   "symbol",
@@ -39,7 +38,6 @@ function to_finite_number_fun(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 // ========================================
-// map an API token row into the display record used by discover.
 // --- WHY --- the row is read by column NAME, not by index: the api
 // always returns `account_id` as the first column, even when it was
 // not requested, so a fixed index read is shifted by one.
@@ -68,7 +66,6 @@ function map_token_search_row_fun(
 // ========================================
 // ========================================
 // --- FETCH -----------------------------
-// fetch the tokens matching a query.
 export async function search_tokens_fun(
   query: string,
   limit: number = HUGGIES_TOKEN_SEARCH_LIMIT,

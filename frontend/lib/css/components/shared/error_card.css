@@ -1,9 +1,8 @@
 /*==================================*/
 /* error_card
-   one card for the whole page, listing whatever could not be loaded.
-
-   it sits at the top of the page, above the data, because a card of
-   zeros with the reason at the bottom is easy to miss. */
+   one card for the whole page, listing whatever could not be loaded. it
+   sits at the top, above the data, because a card of zeros with the
+   reason at the bottom is easy to miss. */
 /*==================================*/
 [class$="-error-card"] {
   display: flex;

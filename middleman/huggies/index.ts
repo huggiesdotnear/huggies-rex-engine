@@ -1,24 +1,17 @@
 // ========================================
 // HUGGIES
-// typed client for our own backend routes.
+// typed client for our own backend routes. every call is same-origin
+// against the backend we serve, so the browser never talks to a third
+// party api directly.
 //
-// every call is same-origin against the backend we serve, so the
-// browser never talks to a third party api directly.
-//
-// the naming rule (see DOCS/ROUTES.md): a route is named after the
-// api it fronts, not after us.
-//   * `api_huggies_*` — our OWN routes, under /api/huggies/*. nothing
-//     is proxied through them.
+// the naming rule (see DOCS/ROUTES.md): a route is named after the api
+// it fronts, not after us.
+//   * `api_huggies_*` — our OWN routes, under /api/huggies/*.
 //   * `api_trezu_*` — the trezu routes we proxy, under /api/trezu/*.
-//     the name says which api is on the other end.
 //
-// the shared plumbing keeps the app name: `api_call` is the one
-// fetch+log+error helper every wrapper goes through, and
-// `parse_error` parses the error envelope OUR backend answers with.
-//
-// the base url is a parameter on every call, not a constant: the
-// frontend passes the origin of the page it is served from, and a bin
-// passes whatever backend it was told to talk to.
+// the base url is a parameter on every call: the frontend passes the
+// origin of the page it is served from, a bin whatever backend it was
+// told to talk to.
 // ========================================
 
 export * from "./fun/api_huggies_ping_get";

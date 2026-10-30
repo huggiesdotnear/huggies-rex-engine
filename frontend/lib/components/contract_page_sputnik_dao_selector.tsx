@@ -2,13 +2,13 @@
 // the DAO selector: the id jump box, plus a dropdown of the daos the
 // signed-in account is a member of.
 //
-// the dropdown only appears when the reader has more than one dao to
-// pick from. with one dao the box alone is enough, and with none
-// there is nothing to pick.
+// the dropdown only appears when the reader has more than one dao to pick
+// from. with one dao the box alone is enough, and with none there is
+// nothing to pick.
 //
-// the box itself is shared — frontend/lib/components/id_jump_box.tsx
-// — because the token page and the pumpopoly page have the same box
-// with different wording.
+// the box itself is shared — frontend/lib/components/shared/id_jump_box.tsx
+// — because the token page and the pumpopoly page have the same box with
+// different wording.
 //
 // mounts into <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR">.
 // ========================================
@@ -36,14 +36,13 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
   const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
 
   const state = page_state;
-  // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim
-  // and the blank-means-absent rule live there, so this box and the
-  // page's own loader cannot drift apart on which dao is shown.
+  // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim and
+  // the blank-means-absent rule live there, so this box and the page's own
+  // loader cannot drift apart on which dao is shown.
   const dao_id = HUGGIES_URL_ID.read();
 
   // --- WHY --- the dropdown only shows when there is a real choice to
-  // make. one dao and the box is enough; none and there is nothing to
-  // pick.
+  // make. one dao and the box is enough; none and there is nothing.
   const has_choice = state.treasuries.length > 1;
 
   const open_dao_fun = (next_id: string) => {

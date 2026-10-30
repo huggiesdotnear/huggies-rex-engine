@@ -1,7 +1,7 @@
 // PING_ROUTE
 // GET /api/huggies/ping — basic liveness/ping endpoint. returns
-// { "ok": true, "app": "huggies-rex-engine" } so a future health
-// checker can verify the axum program is up and which app it is.
+// { "ok": true, "app": "huggies-rex-engine" } so a health checker can
+// verify the axum program is up and which app it is.
 // ====================================
 use axum::{Json, response::IntoResponse};
 // ====================================

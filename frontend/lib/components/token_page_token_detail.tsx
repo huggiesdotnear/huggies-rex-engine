@@ -1,6 +1,6 @@
 // ========================================
-// the token's own card on the token page: the icon, the symbol, the
-// name, the id, the metadata grid, the description and the socials.
+// the token's own card on the token page: the icon, the symbol, the name, the
+// id, the metadata grid, the description and the socials.
 //
 // it reads the loaded token from the page's store. it fetches nothing.
 // ========================================

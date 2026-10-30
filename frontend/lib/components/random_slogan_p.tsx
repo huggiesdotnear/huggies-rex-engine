@@ -2,8 +2,8 @@
 // <p> that renders one random HUGGIES_SLOGANS entry per load.
 // re-renders pick a fresh slogan (no module-load caching).
 // --- WHY --- Math.random over crypto.getRandomValues: this is
-// decoration, not security, and Math.random is available in every
-// runtime including SSR/node.
+// decoration, not security, and Math.random works in every runtime
+// including SSR/node.
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -12,8 +12,8 @@ import { HUGGIES_SLOGANS } from "../ts/slogans";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// uniform pick: null when the list is empty so the component can
-// bail out cleanly rather than rendering undefined.
+// uniform pick: null when the list is empty, so the component bails out
+// cleanly rather than rendering undefined.
 function pick_random_slogan_fun(): string | null {
   const COUNT = HUGGIES_SLOGANS.length;
   if (COUNT === 0) return null;
@@ -25,7 +25,6 @@ function pick_random_slogan_fun(): string | null {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-// renders the chosen slogan; nothing at all when the list is empty.
 function HUGGIES_COMPONENT_RANDOM_SLOGAN_P_FUN() {
   // ========================================
   const slogan = pick_random_slogan_fun();

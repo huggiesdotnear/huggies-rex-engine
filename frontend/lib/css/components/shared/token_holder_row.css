@@ -1,11 +1,9 @@
 /*==================================*/
 /* token_holder_row
-   one row of the holders table: the rank, the account, the balance
-   and the usd value.
-
-   the table has four columns, so it cannot use the account table's
-   single stacked column. the account cell stays wide and the two
-   amount columns share what is left. */
+   one row of the holders table: the rank, the account, the balance and
+   the usd value. the table has four columns, so it cannot use the
+   account table's single stacked column: the account cell stays wide
+   and the two amount columns share what is left. */
 /*==================================*/
 .token-holders th.holder-rank,
 .token-holders td.holder-rank {
@@ -42,8 +40,6 @@
   font-variant-numeric: tabular-nums;
   opacity: 0.85;
 }
-/* the holder column headers stay in the small uppercase label style
-   the rest of the token page uses. */
 .token-holders th {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;

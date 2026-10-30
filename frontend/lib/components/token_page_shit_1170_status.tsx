@@ -2,8 +2,8 @@
 // the $SHIT page's status line: what the page says while the load is
 // running and when it failed.
 //
-// it reads the page's store through the shared hook. it fetches
-// nothing — the page's start script runs the load.
+// it reads the page's store through the shared hook. it fetches nothing
+// — the page's start script runs the load.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";

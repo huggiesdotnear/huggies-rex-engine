@@ -1,24 +1,21 @@
 // ========================================
 // the tokens we mark on the discover list.
 // ========================================
-// the tokens we want a reader to recognise when they appear. this is a
-// deliberate product list — NOT the old behaviour where every token
-// the emojifi project happened to list was pinned. that list included
-// test tokens, and pinning them meant the list never actually
-// followed the chosen sort.
+// a deliberate product list — NOT the old behaviour where every token the
+// emojifi project happened to list was pinned. that list included test
+// tokens, and pinning them meant the list never followed the chosen sort.
 //
-// these tokens are MARKED, not pinned: they are styled so they stand
-// out wherever the sort puts them, but they never override the order.
-// a reader who picks a sort wants that sort.
+// these tokens are MARKED, not pinned: they are styled so they stand out
+// wherever the sort puts them, but they never override the order.
 //
-// each entry keeps a reason, so the list stays a decision instead of
-// becoming a pile of ids nobody can explain later.
+// each entry keeps a reason, so the list stays a decision instead of a
+// pile of ids nobody can explain later.
 // ========================================
 
 // ========================================
 // --- SHAPE ------------------------------
-// one marked token. `weight` orders the marked block among itself,
-// lowest first — so our own token reads as the lead one.
+// `weight` orders the marked block among itself, lowest first — so our
+// own token reads as the lead one.
 export interface HUGGIES_PINNED_TOKEN {
   id: string;
   reason: string;
@@ -26,7 +23,6 @@ export interface HUGGIES_PINNED_TOKEN {
 }
 // ========================================
 // --- LIST -------------------------------
-// the marked tokens, in the order they should appear among themselves.
 export const HUGGIES_PINNED_TOKENS: ReadonlyArray<HUGGIES_PINNED_TOKEN> = [
   {
     id: "shit-1170.meme-cooking.near",
@@ -61,7 +57,6 @@ export const HUGGIES_PINNED_TOKENS: ReadonlyArray<HUGGIES_PINNED_TOKEN> = [
 ];
 // ========================================
 // --- GET -------------------------------
-// the marked token ids, as a set for a fast lookup while rendering.
 export function pinned_token_ids_fun(): Set<string> {
   return new Set(HUGGIES_PINNED_TOKENS.map((entry) => entry.id));
 }

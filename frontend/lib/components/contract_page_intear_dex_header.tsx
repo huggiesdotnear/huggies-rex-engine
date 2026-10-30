@@ -5,8 +5,7 @@
 // the card is the one contract the page covers: `dex.intear.near`.
 //
 // this component does NOT fetch. the intear dex page has one loader
-// (lib/ts/contract_page_intear_dex.ts) and this component reads its
-// result from the page store
+// (lib/ts/contract_page_intear_dex.ts); this reads its store
 // (lib/ts/contract_page_intear_dex_store.ts).
 // ========================================
 import { render } from "preact";
@@ -17,8 +16,6 @@ import { compact_usd_fun } from "../ts/compact_usd";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
-// the one contract the page covers.
-//
 // --- WHY --- this id is a constant and not a fetched value: it is the
 // contract the page is ABOUT, not something the api reports.
 const HUGGIES_INTEAR_DEX_CONTRACT_ID = "dex.intear.near";

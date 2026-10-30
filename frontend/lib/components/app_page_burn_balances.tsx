@@ -1,9 +1,9 @@
 // ========================================
 // the tokens the burn accounts hold, as cards.
 //
-// one card per token. the card carries the token's icon, its ticker,
-// its id, the COMBINED balance of both burn accounts, and the share of
-// the token's total supply that is burned.
+// one card per token. the card carries the token's icon, its ticker, its
+// id, the COMBINED balance of both burn accounts, and the share of the
+// token's total supply that is burned.
 //
 // --- WHY --- cards and not a table: the burned amount is the point of
 // the page, and a card says "this much of this token is gone" better
@@ -11,8 +11,8 @@
 // own space, which a narrow table column cannot.
 //
 // --- WHY --- the balance is combined and not per account: the page
-// answers one question — "how much is burned in total". the loader
-// adds the two accounts up, so the card carries one number.
+// answers one question — "how much is burned in total". the loader adds
+// the two accounts up, so the card carries one number.
 //
 // this component does not fetch. it reads the page's store and renders.
 import { render } from "preact";

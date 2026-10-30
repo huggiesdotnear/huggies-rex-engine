@@ -1,9 +1,7 @@
 /*==================================*/
 /* token_meta_grid
    the metadata grid — the rows of LABEL and VALUE that a token's page
-   shows.
-
-   it is shared: the token page and the $SHIT page both show one, so
+   shows. shared: the token page and the $SHIT page both show one, so
    the grid's rules live here and both pages import this file. */
 /*==================================*/
 .token-meta {

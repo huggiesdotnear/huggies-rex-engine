@@ -1,6 +1,5 @@
 /*==================================*/
-/* the $SHIT page's css: the components it mounts. each one brings the
-   shared css it needs with its own @imports. */
+/* the $SHIT page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_STATUS.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER.css);
 @import url(./components/HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_GROUPS.css);

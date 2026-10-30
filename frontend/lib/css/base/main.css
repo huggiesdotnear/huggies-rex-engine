@@ -5,7 +5,7 @@
    horizontally, and main centres its own content vertically.
 
    `main > *` below keeps every page block the full width of the
-   column — see the note on that rule for why it is needed.
+   column.
 
    the fixed bottom nav is cleared by body's 100px padding-bottom,
    which sits below this 100vh box. */
@@ -26,7 +26,6 @@ main {
   /*border: 1px solid purple;*/
 }
 /*==================================*/
-/* every child of the column fills it. */
 main > * {
   width: 100%;
   min-width: 0;

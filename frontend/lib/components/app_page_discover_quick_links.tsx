@@ -1,11 +1,9 @@
 // ========================================
-// the quiet links under the auth button: the emoji game and the burn
-// page.
+// the quiet links under the auth button: the emoji game and the burn page.
 //
 // --- WHY --- both links live in ONE component and sit in ONE row: they
 // are the same kind of thing — a quiet shortcut to a hidden page — and
-// two separate blocks under the auth button would stack them and push
-// the page around.
+// two separate blocks under the auth button would stack them.
 //
 // the links stay quiet on purpose: they are meant to be found, so they
 // are small, low contrast, and only a little brighter on hover.

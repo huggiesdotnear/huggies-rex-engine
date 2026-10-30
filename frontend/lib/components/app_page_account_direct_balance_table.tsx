@@ -2,15 +2,14 @@
 // the account's direct and native token balances.
 //
 // this component does NOT fetch. the account page has one loader
-// (lib/ts/app_page_account.ts) and this component reads its result from the
-// page store (lib/ts/app_page_account_store.ts). read that file to see what
-// the account page requests.
+// (lib/ts/app_page_account.ts); this reads its store
+// (lib/ts/app_page_account_store.ts).
 //
-// reads the `?id=` url parameter through lib/ts/app_page_account_id.ts and
-// hands the rows to the shared balance table (lib/components/balance_table.tsx),
-// which the dao page uses too. amounts are rendered human-readable via
-// token_amount_format.ts. one row per token, each field stacked in a single
-// column so the table never needs horizontal scrolling. mounts into
+// the rows go to the shared balance table
+// (lib/components/shared/balance_table.tsx), which the dao page uses too.
+// amounts are rendered human-readable via token_amount_format.ts. one row
+// per token, each field stacked in a single column so the table never needs
+// horizontal scrolling. mounts into
 // <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE">.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -22,9 +21,8 @@ import { huggies_balance_table_fun } from "./shared/balance_table";
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
   // ========================================
-  // --- WHY --- the id comes from the store: the store watches the id
-  // and re-loads when it changes, so the components read one place
-  // for both the id and the data, and they follow it.
+  // --- WHY --- the id comes from the store: it watches the id and
+  // re-loads when it changes, so the id and the data change together.
   const account_id = HUGGIES_APP_PAGE_ACCOUNT_STORE.get_account_id();
   const page_data = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_STORE);
 

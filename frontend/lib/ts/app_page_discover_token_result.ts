@@ -1,16 +1,12 @@
 // ========================================
-// the shape of one token row in the discover list.
-//
 // it lives on its own because three files need it: the list fetch, the
-// search fetch and the order. a type shared through an import cycle
-// is worse than a type with a home.
+// search fetch and the order. a type shared through an import cycle is
+// worse than a type with a home.
 // ========================================
 
 // ========================================
 // --- SHAPE ------------------------------
-// one token as the discover list shows it.
-//
-// `icon` is filled in separately — it is a full base64 data uri and is
+// `icon` is filled in separately — it is a full inline data uri and is
 // fetched only for the rows on screen, then cached durably.
 export interface HUGGIES_TOKEN_SEARCH_RESULT {
   id: string;

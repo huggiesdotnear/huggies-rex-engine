@@ -2,6 +2,10 @@
 code {
   font-family: monospace;
   /*----------------------*/
+  /* the chip keeps the text color — never dimmed with opacity.
+     opacity blends the chip with whatever sits behind it, so on the
+     red background it turns muddy. the font and the size tell the
+     chip apart, not a faded color. */
   color: inherit;
   /*----------------------*/
   /* ids have no spaces and no breaks of their own, so the chip

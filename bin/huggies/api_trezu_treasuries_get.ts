@@ -1,19 +1,12 @@
 // ========================================
 // API_TREZU_TREASURIES_GET
-// runnable bin for GET /api/trezu/user/treasuries via
-// middleman/huggies. the middleman logs the framed request +
-// response, so this bin only adds a summary.
+// runnable bin for GET /api/trezu/user/treasuries via middleman/huggies.
+// the middleman logs the framed request + response, so this bin only
+// adds a summary.
 //
 // argv:
 //   bun bin/huggies/api_trezu_treasuries_get.ts <account_id> \
 //       [--include-hidden] [--base-url <url>]
-//
-// examples:
-//   bun bin/huggies/api_trezu_treasuries_get.ts sleet.near
-//   bun bin/huggies/api_trezu_treasuries_get.ts sleet.near \
-//     --include-hidden
-//   bun bin/huggies/api_trezu_treasuries_get.ts sleet.near \
-//     --base-url http://my-host:54733
 // ========================================
 
 import { api_trezu_treasuries_get } from "../../middleman/huggies";
@@ -44,20 +37,16 @@ if (account_id === undefined) {
 }
 
 // --- WHY --- the base url is resolved from the raw argv rather than
-// the split result: split_argv treats every flag as value-taking
-// except the ones in its BOOLEAN_FLAGS set, and --base-url has a
-// value, so it would land in the flags map. reading the raw argv
-// keeps one rule for the url: it is never a positional.
+// the split result: split_argv would put --base-url in the flags map,
+// and reading the raw argv keeps one rule for the url: it is never a
+// positional.
 const base_url = resolve_base_url(process.argv.slice(2), DEFAULT_BASE_URL);
-
-// --- run -----------------------------------------------------------
 
 const treasuries = await api_trezu_treasuries_get(base_url, {
   accountId: account_id,
   includeHidden: seen.has("--include-hidden") ? true : undefined,
 });
 
-// --- summary -------------------------------------------------------
 console.log("TREASURIES", `${treasuries.length} for ${account_id}`);
 for (const treasury of treasuries) {
   const name = treasury.config?.name ?? "(no name)";

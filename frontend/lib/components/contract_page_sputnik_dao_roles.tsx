@@ -5,18 +5,18 @@
 // --- WHY --- one card per account and not one tab per role: an account
 // can be in several roles, and a list that repeats the account for each of
 // them makes the reader count the duplicates by hand. the roles the
-// account is in become a row inside its card instead.//
+// account is in become a row inside its card instead.
+//
 // --- WHY --- the roles that are open to everyone are not cards. the
-// contract answers `"kind": "Everyone"` for them, with no member list
-// at all, so there is nothing to put in one. they are a note under the
-// cards.
+// contract answers `"kind": "Everyone"` for them, with no member list at
+// all, so there is nothing to put in one. they are a note under the cards.
 //
 // --- WHY --- the permissions sit behind a toggle: a real member holds
 // fifteen or more of them (`policy_update_parameters`,
-// `factory_info_update`, `upgrade_self` and the rest), and listing
-// them all turned every card into a wall of small grey words. the roles
-// say what the member IS, so they lead; the permissions are the detail
-// the reader asks for.
+// `factory_info_update`, `upgrade_self` and the rest), and listing them all
+// turned every card into a wall of small grey words. the roles say what
+// the member IS, so they lead; the permissions are the detail the reader
+// asks for.
 //
 // it reads the loaded dao from the page's store. it fetches nothing.
 // ========================================
@@ -29,13 +29,11 @@ import { current_app_depth_fun } from "../ts/app_depth";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the actions a set of permissions allows.
-//
 // --- WHY --- the raw permissions are a wall of text: `call:VoteRemove`,
-// `transfer:VoteRemove`, `policy_update_parameters:*` and a dozen
-// more. the part before the colon is what is acted on — the action —
-// and the part after is the scope. so the card lists the actions, and
-// the full list with every scope is in the card's title.
+// `transfer:VoteRemove`, `policy_update_parameters:*` and a dozen more.
+// the part before the colon is what is acted on — the action — and the
+// part after is the scope. the card lists the actions; the full list with
+// every scope is in the card's title.
 function permission_actions_fun(permissions: ReadonlyArray<string>): string[] {
   const actions = new Set<string>();
   for (const permission of permissions) {
@@ -50,7 +48,6 @@ function permission_actions_fun(permissions: ReadonlyArray<string>): string[] {
 function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
   const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
 
-  // the members whose permissions the reader has opened.
   const [open_ids, set_open_ids] = use_state<string[]>([]);
 
   const state = page_state;
