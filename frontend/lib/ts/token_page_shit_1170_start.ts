@@ -16,7 +16,8 @@
 // page's request list is still knowable by reading one file.
 //
 // --- WHY --- the page is for ONE token: the token id is a constant
-// (lib/ts/token_page_shit_1170_token.ts), so the start file needs no id from the url.
+// (lib/ts/token_page_shit_1170_token.ts), so the start file needs no id
+// from the url.
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "./token_page_shit_1170_state";
 // ========================================
 // ========================================

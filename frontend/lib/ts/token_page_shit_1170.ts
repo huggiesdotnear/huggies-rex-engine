@@ -1,9 +1,6 @@
 // ========================================
 // the $SHIT page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the $SHIT page requests. that is the
-// whole point of it.
-//
 // WHAT THE PAGE REQUESTS
 //   1. GET /tokens     the token's summary: the price, the decimals,
 //                      the total supply, and the metadata the page
@@ -11,19 +8,15 @@
 //   2. GET /holders    one page of the token's holders, 100 rows at a
 //                      time, paged by cursor.
 //
-// --- WHY --- the summary loads FIRST and alone. it carries the token's
-// price, its decimals and its total supply, and the holder rows need
-// all three. nothing about the token is hardcoded, so the holder math
-// cannot start before the api has answered.
+// --- WHY --- the summary loads FIRST and alone. it carries the price,
+// the decimals and the total supply, and the holder rows need all
+// three. a row priced with a price of zero reads as "$0.00" — a lie
+// rather than a missing number. nothing about the token is hardcoded,
+// so the holder math cannot start before the api has answered.
 //
-// --- WHY --- there is no separate price request. the summary asks for
-// `price_usd` and gets it, so asking for the price again would fetch
-// the same number twice over the wire.
-//
-// --- WHY --- the holders wait for the summary. the holder rows carry a
-// usd column, and a row priced with a price of zero reads as "$0.00",
-// which is a lie rather than a missing number. so the price is known
-// before the first holder page is asked for.
+// --- WHY --- there is no separate price request: the summary asks for
+// `price_usd` and gets it, so asking again would fetch the same number
+// twice over the wire.
 import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
 import { fetch_shit_summary_fun } from "./token_page_shit_1170_summary";
 import { fetch_shit_holders_fun } from "./token_page_shit_1170_holders";

@@ -12,15 +12,12 @@ import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";
 // ========================================
 // the share of the total supply one group of holders holds.
 export interface HUGGIES_SHIT_HOLDER_GROUP {
-  // the holder type this group is made of.
   type: HUGGIES_SHIT_HOLDER_ROW_TYPE;
   // how many holders of this type are in the list.
   count: number;
   // the group's raw balance, summed over its holders.
   raw_total: bigint;
-  // the group's share of the total supply, as a percent number.
   percent: number;
-  // the group's share of the total supply, formatted for display.
   percent_formatted: string;
 }
 // ========================================
@@ -29,9 +26,7 @@ const HUGGIES_SHIT_HOLDER_GROUP_ORDER: ReadonlyArray<HUGGIES_SHIT_HOLDER_ROW_TYP
   ["dev", "dex", "vault", "nft", "burn", "regular"];
 // ========================================
 // --- HELPERS ----------------------------
-// format the share of the total supply the same way the holder rows
-// do: two decimals above 0.01%, three above 0.001%, and "<0.001%"
-// below that.
+// format the share of the total supply the same way the holder rows do.
 function format_group_percent_fun(percent: number): string {
   return HUGGIES_SUPPLY_PERCENT.format(percent);
 }

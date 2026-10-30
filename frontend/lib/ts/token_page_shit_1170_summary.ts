@@ -6,9 +6,10 @@ import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
 // ========================================
 // the metadata fields the summary shows.
 //
-// only the fields the page actually renders are requested — the icon,
-// the socials, the description and the main pool are not shown on the
-// $SHIT page, so asking for them only makes the response bigger.
+// --- WHY --- only the fields the page renders are requested — the
+// icon, the socials, the description and the main pool are not shown
+// on the $SHIT page, so asking for them only makes the response
+// bigger.
 const HUGGIES_SHIT_SUMMARY_FIELDS = [
   "name",
   "symbol",
@@ -49,6 +50,7 @@ function to_finite_number_fun(value: unknown): number {
 // ========================================
 // read a decimal string the api reports, keeping it as a string so the
 // big-integer math downstream stays exact.
+//
 // --- WHY --- the supply does not fit in a double once it carries 18
 // decimals, and the percent math needs every digit.
 function to_decimal_string_fun(value: unknown, fallback: string): string {

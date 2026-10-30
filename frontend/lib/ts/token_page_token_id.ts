@@ -10,9 +10,9 @@ import { HUGGIES_URL_ID } from "./url_id";
 // --- READ ------------------------------
 // the `?id=` off the current url, or null when there is none.
 //
-// --- WHY --- blank is treated as absent: a trailing `?id=` link points
-// at nothing, and rendering the empty token would be worse than
-// saying the id is missing.
+// --- WHY --- blank is treated as absent: a trailing `?id=` link points at
+// nothing, and rendering the empty token would be worse than saying the
+// id is missing.
 function token_id_from_url_fun(): string | null {
   return HUGGIES_URL_ID.read();
 }

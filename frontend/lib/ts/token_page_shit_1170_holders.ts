@@ -18,19 +18,12 @@ export interface HUGGIES_SHIT_HOLDER {
   account_id: string;
   // the raw balance, in the token's smallest unit (18 decimals).
   balance: string;
-  // the human-readable amount.
   amount: number;
-  // the amount, formatted for display.
   amount_formatted: string;
-  // the usd worth of the holding.
   usd_value: number;
-  // the usd worth, formatted for display.
   usd_formatted: string;
-  // the share of the total supply, as a percentage number.
   percent: number;
-  // the share of the total supply, formatted for display.
   percent_formatted: string;
-  // dev | dex | vault | nft | burn | regular
   type: HUGGIES_SHIT_HOLDER_TYPE;
 }
 // ========================================
@@ -52,8 +45,8 @@ function raw_to_human_fun(raw: string, decimals: number): number {
   return scaled / 10 ** decimals;
 }
 // ========================================
-// format a token amount the way the SHIT info page does: big amounts
-// get a K/M/B suffix, small ones keep two decimals.
+// format a token amount: big amounts get a K/M/B suffix, small ones
+// keep two decimals.
 function format_amount_fun(value: number): string {
   const abs = Math.abs(value);
   if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
@@ -72,8 +65,7 @@ function format_usd_fun(value: number): string {
   return `$${value.toFixed(4)}`;
 }
 // ========================================
-// format the share of the total supply: two decimals above 0.01%,
-// three above 0.001%, and "<0.001%" for the dust below that.
+// format the share of the total supply.
 function format_percent_fun(percent: number): string {
   return HUGGIES_SUPPLY_PERCENT.format(percent);
 }
@@ -89,8 +81,8 @@ function balance_percent_fun(
 // --- PUBLIC -----------------------------
 // fetch one cursor page of SHIT holders, classified and formatted.
 //
-// the token's decimals and total supply come from the intear api (via
-// the summary), not from a local constant, so the page's numbers are
+// --- WHY --- the decimals and the total supply come from the intear api
+// (via the summary), not from a local constant, so the page's numbers are
 // always the ones the api reports.
 export async function fetch_shit_holders_fun(
   cursor: string | null,
@@ -155,8 +147,6 @@ export function shit_holder_type_label_fun(
 }
 // ========================================
 // the human-readable total supply, for the summary block.
-// --- WHY --- the supply comes from the intear api, so the number shown
-// is the one the api reports rather than a local constant.
 export function shit_total_supply_formatted_fun(total_supply: string): string {
   const value = Number(total_supply);
   if (!Number.isFinite(value)) return total_supply;

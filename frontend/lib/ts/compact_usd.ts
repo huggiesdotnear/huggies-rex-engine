@@ -3,11 +3,11 @@
 //
 // --- WHY --- the header shows the size of a whole dex. the exact
 // figure is $33,556,142 — nine characters and a sign — and on a 500px
-// phone column that wraps onto two lines and reads as a mistake. a
-// dex size does not need cents either.
+// phone column that wraps onto two lines and reads as a mistake. a dex
+// size does not need cents either.
 //
-// so a figure over a million is shortened to $33.6M, over a thousand
-// to $12.3K, and under a thousand is shown in full with no decimals.
+// so a figure over a million is shortened to $33.6M, over a thousand to
+// $12.3K, and under a thousand is shown in full with no decimals.
 //
 // it lives on its own because BOTH dex pages show the same numbers and
 // neither of them owns the rule.

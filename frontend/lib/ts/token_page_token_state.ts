@@ -1,22 +1,21 @@
 // ========================================
 // the token page's state: the loaded token, its holders, and the error.
 //
-// one store, because the page is split into three components — the
-// jump box, the metadata, and the holders table — and they all read
-// the same load. the loader writes here and the components subscribe,
-// so no component fetches anything itself.
+// one store, because the page is split into three components — the jump
+// box, the metadata, and the holders table — and they all read the same
+// load. the loader writes here and the components subscribe, so no
+// component fetches anything itself.
 //
-// the shape is the same as lib/ts/page_account_id.ts: plain module
-// state, a subscribe/unsubscribe pair, and a notify that a throwing
-// subscriber cannot break.
+// plain module state, a subscribe/unsubscribe pair, and a notify that a
+// throwing subscriber cannot break — the same shape as
+// lib/ts/page_account_id.ts.
 // ========================================
 import { HUGGIES_TOKEN_PAGE_TOKEN } from "./token_page_token";
 import { HUGGIES_TOKEN_PAGE_TOKEN_ID } from "./token_page_token_id";
 import type { HUGGIES_TOKEN_PAGE_STATE } from "./token_page_token_detail";
 // ========================================
 // --- STATE ------------------------------
-// the page's state. the empty state is what the page holds before the
-// first load answers.
+// the empty state the page holds before the first load answers.
 let state: HUGGIES_TOKEN_PAGE_STATE = {
   detail: null,
   holders: [],
@@ -28,11 +27,11 @@ let state: HUGGIES_TOKEN_PAGE_STATE = {
 // the token id the page is about.
 //
 // --- WHY --- it lives here as well as in the id module: the components
-// need it to build their links and to know whether there is a token at
-// all, and the store is what they already read.
+// need it to build their links and to know whether there is a token at all,
+// and the store is what they already read.
 let token_id: string | null = null;
-// the token id the current load was for, so a second load for the same
-// id does not start over.
+// the token id the current load was for, so a second load for the same id
+// does not start over.
 let loaded_token_id: string | null = null;
 // true while a load is running.
 let loading = false;
@@ -53,21 +52,19 @@ function notify_fun(): void {
 }
 // ========================================
 // --- WRITE ------------------------------
-// replace the page's state and tell the subscribers.
 function set_state_fun(next: HUGGIES_TOKEN_PAGE_STATE): void {
   state = next;
   notify_fun();
 }
 // ========================================
 // --- READ ------------------------------
-// the page's state, as it is right now.
 function get_state_fun(): HUGGIES_TOKEN_PAGE_STATE {
   return state;
 }
 // ========================================
 // --- SUBSCRIBE -------------------------
-// register a re-render callback; returns an unsubscribe so components
-// can clean up on unmount instead of leaking.
+// returns an unsubscribe so components can clean up on unmount instead of
+// leaking.
 function subscribe_fun(listener: () => void): () => void {
   listeners.push(listener);
   return () => {
@@ -77,13 +74,11 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // --- RESET -----------------------------
-// put the page back to its empty state.
-//
-// --- WHY --- the page reloads on a new token id (the jump box writes
-// the id to the url and the browser navigates), so the store starts
-// empty on every load. the reset is still here so a re-mount inside
-// the same document — a bfcache restore, a test — cannot show the
-// previous token's holders under the new token's name.
+// --- WHY --- the page reloads on a new token id (the jump box writes the id
+// to the url and the browser navigates), so the store starts empty on every
+// load. the reset is still here so a re-mount inside the same document — a
+// bfcache restore, a test — cannot show the previous token's holders under
+// the new token's name.
 function reset_fun(): void {
   set_state_fun({
     detail: null,
@@ -98,20 +93,20 @@ function reset_fun(): void {
 // --- LOAD -------------------------------
 // load the page's data for one token.
 //
-// the load runs once per token id. a second call for the same id while
-// a load is running is ignored, so the page cannot fetch twice because
-// two components asked for it.
+// the load runs once per token id. a second call for the same id while a
+// load is running is ignored, so the page cannot fetch twice because two
+// components asked for it.
 //
 // --- WHY --- the metadata and the holders are asked for together: the
-// holders table prices each balance with the token's price and scales
-// it by the token's decimals, and both come from the metadata
-// response. but the holders request does not need them — it returns
-// raw balances — so there is nothing to wait for.
+// holders table prices each balance with the token's price and scales it by
+// the token's decimals, and both come from the metadata response. but the
+// holders request does not need them — it returns raw balances — so there
+// is nothing to wait for.
 async function token_page_token_state_load_fun(): Promise<void> {
   const next_token_id = HUGGIES_TOKEN_PAGE_TOKEN_ID.get();
-  // --- WHY --- the id is stored even when there is none: the
-  // components read it to know there is nothing to show, and they read
-  // it through the store so they follow it when it changes.
+  // --- WHY --- the id is stored even when there is none: the components read
+  // it to know there is nothing to show, and they read it through the store
+  // so they follow it when it changes.
   if (token_id !== next_token_id) {
     token_id = next_token_id;
     notify_fun();
@@ -158,9 +153,9 @@ async function token_page_token_state_load_fun(): Promise<void> {
 // ========================================
 // the token id the page is about, or null when there is none.
 //
-// --- WHY --- it is read through the store so the components have one
-// place to read from: the id and the data always change together, and
-// the store is what tells the components to re-render.
+// --- WHY --- it is read through the store so the components have one place
+// to read from: the id and the data always change together, and the store
+// is what tells them to re-render.
 function get_token_id_fun(): string | null {
   return token_id;
 }

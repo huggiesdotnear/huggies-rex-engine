@@ -13,21 +13,21 @@ import type { HUGGIES_TOKEN_INFO } from "./token_info";
 // hundreds of near-worthless tokens a busy account holds swamp the
 // table.
 const HUGGIES_MIN_USD_BALANCE = 0.1;
-// reputation values intear reports, worst first. only "Spam" is hidden
-// outright; "Unknown" tokens still pass if they clear the usd floor,
-// because a low-reputation token can still be worth holding.
+// the one reputation intear reports that is hidden outright. "Unknown"
+// tokens still pass if they clear the usd floor, because a
+// low-reputation token can still be worth holding.
 const HUGGIES_SPAM_REPUTATION = "Spam";
 // the chain's own token. never hidden: it is the balance an account is
 // most likely to care about, and its usd price is derived rather than
 // reported, so the floor below could hide a real holding.
 //
-// the id itself lives in lib/ts/token_near.ts, next to the other
-// facts about the chain's own token.
+// the id itself lives in lib/ts/token_near.ts, next to the other facts
+// about the chain's own token.
 import { HUGGIES_NEAR_ID } from "./token_near";
 // ========================================
 // --- TYPES ------------------------------
-// one row ready to render: the raw balance plus the info needed to
-// show it.
+// one row ready to render: the raw balance plus the info needed to show
+// it.
 export interface HUGGIES_BALANCE_ENTRY {
   id: string;
   raw: string;
@@ -37,16 +37,16 @@ export interface HUGGIES_BALANCE_ENTRY {
 // ========================================
 // --- FILTER ----------------------------
 // keep only entries worth showing: not spam, and above the usd floor.
-// --- WHY --- spam is judged by the api's own reputation label, but the
-// usd floor is applied to everything including Reputable tokens: live
-// data shows Reputable tokens priced at 1e-8, so reputation alone would
-// leave pure dust in the table.
 //
-// --- WHY --- spam is hidden even when the reader asks to see the dust.
-// a spam token is a scam by the api's own reckoning; showing it as a
-// holding a reader asked for would be showing them a liability they
-// asked to see. the dust toggle is about worthlessness, not about
-// scams.
+// --- WHY --- spam is judged by the api's own reputation label, but the usd
+// floor applies to everything including Reputable tokens: live data shows
+// Reputable tokens priced at 1e-8, so reputation alone would leave pure
+// dust in the table.
+//
+// --- WHY --- spam is hidden even when the reader asks to see the dust. a spam
+// token is a scam by the api's own reckoning; showing it as a holding a
+// reader asked for would be showing them a liability they asked to see. the
+// dust toggle is about worthlessness, not scams.
 function keep_entry_fun(entry: HUGGIES_BALANCE_ENTRY): boolean {
   if (entry.info.reputation === HUGGIES_SPAM_REPUTATION) return false;
   if (entry.id === HUGGIES_NEAR_ID) return true;

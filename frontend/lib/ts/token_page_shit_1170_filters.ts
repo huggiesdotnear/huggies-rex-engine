@@ -12,7 +12,6 @@ export interface HUGGIES_SHIT_FILTER {
   key: HUGGIES_SHIT_HOLDER_ROW_TYPE | "all";
   label: string;
   icon: string;
-  // what the tab's tooltip says when the reader hovers it.
   description: string;
 }
 // ========================================

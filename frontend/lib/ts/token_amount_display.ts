@@ -9,8 +9,8 @@ import type { HUGGIES_TOKEN_INFO } from "./token_info";
 
 // ========================================
 // --- SHAPE ------------------------------
-// the two amounts a token row shows, both already formatted for
-// display. `usd` is the em dash string when the price is unknown.
+// the two amounts a token row shows, both already formatted for display.
+// `usd` is the em dash string when the price is unknown.
 export interface HUGGIES_TOKEN_AMOUNT_DISPLAY {
   decimal: string;
   usd: string;

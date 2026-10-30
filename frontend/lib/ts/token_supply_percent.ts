@@ -1,11 +1,10 @@
 // ========================================
 // the share of a token's total supply that a raw balance holds.
 //
-// --- WHY --- this lives in its own file and not in the pages that use
-// it: the $SHIT page worked this out in TWO places already — once for
-// the holder rows and once for the holder groups — and the burn page
-// worked it out a third time. three copies of the same arithmetic is
-// three places to fix a bug in, so there is one now.
+// --- WHY --- this lives in its own file: the $SHIT page worked this out
+// in TWO places already — once for the holder rows and once for the
+// holder groups — and the burn page worked it out a third time. three
+// copies of the same arithmetic is three places to fix a bug in.
 //
 // the api reports the total supply as a decimal string in the token's
 // smallest unit, and a raw balance is the same kind of number, so both
@@ -15,14 +14,14 @@
 // --- HELPERS ----------------------------
 // the share of the total supply a raw balance holds, in percent.
 //
-// --- WHY --- the math runs on BigInt: the raw balance and the raw
-// supply are both 18-decimal integers, so the ratio is computed on
-// BigInt and only then scaled to a percent. doing it in floating point
-// loses the sub-0.001% rows the pages still have to show.
+// --- WHY --- the math runs on BigInt: the raw balance and the raw supply
+// are both 18-decimal integers, so the ratio is computed on BigInt and only
+// then scaled to a percent. doing it in floating point loses the
+// sub-0.001% rows the pages still have to show.
 //
-// --- WHY --- a malformed value reads as zero rather than throwing: a
-// token with a broken supply must not take a page down, and a zero
-// share is the honest answer for a number we cannot read.
+// --- WHY --- a malformed value reads as zero rather than throwing: a token
+// with a broken supply must not take a page down, and a zero share is the
+// honest answer for a number we cannot read.
 function supply_percent_fun(raw: string, total_supply_raw: string): number {
   let raw_big = 0n;
   let supply_big = 0n;

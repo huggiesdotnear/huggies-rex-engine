@@ -2,13 +2,12 @@
 // the $SHIT page's shared state: the one load, held here, read by every
 // component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/token_page_shit_1170.ts), so there is exactly one set
-// of requests.
+// the components do not fetch. they read this store. there is exactly
+// one loader (lib/ts/token_page_shit_1170.ts), so the page's request
+// list is knowable.
 //
-// the store has the same shape as lib/ts/token_page_token_state.ts:
-// plain module state, a subscribe/unsubscribe pair, and a notify that a
+// the shape is the same as lib/ts/token_page_token_state.ts: plain
+// module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "./token_page_shit_1170";
 import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
@@ -28,17 +27,13 @@ export interface HUGGIES_SHIT_1170_STATE {
   summary: HUGGIES_SHIT_SUMMARY | null;
   // the holder rows loaded so far.
   holders: HUGGIES_SHIT_HOLDER[];
-  // how many holders the api says there are in total.
   holder_total: number;
   // the cursor for the next holder page, or null when there is none.
   next_cursor: string | null;
-  // true while a further holder page is loading.
   loading_more: boolean;
   // the filter the reader picked.
   active_filter: HUGGIES_SHIT_ACTIVE_FILTER;
-  // true while the first load is running.
   loading: boolean;
-  // why the load failed, when it did.
   error: string | null;
 }
 // ========================================
@@ -73,14 +68,12 @@ function notify_fun(): void {
 }
 // ========================================
 // --- WRITE ------------------------------
-// replace the page's state and tell the subscribers.
 function set_state_fun(next: HUGGIES_SHIT_1170_STATE): void {
   state = next;
   notify_fun();
 }
 // ========================================
 // --- READ ------------------------------
-// the page's state, as it is right now.
 function get_state_fun(): HUGGIES_SHIT_1170_STATE {
   return state;
 }
@@ -97,7 +90,6 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // --- RESET -----------------------------
-// put the page back to its empty state.
 function reset_fun(): void {
   set_state_fun({
     summary: null,
@@ -112,33 +104,22 @@ function reset_fun(): void {
 }
 // ========================================
 // --- FILTER ----------------------------
-// set the filter the holder list is filtered by.
-//
 // --- WHY --- the filter lives in the store rather than in the filters
-// component's own state: the groups breakdown highlights the group of
-// the ACTIVE filter, so both components have to read the same filter.
+// component's own state: the groups breakdown highlights the group of the
+// ACTIVE filter, so both components have to read the same filter.
 function set_active_filter_fun(filter: HUGGIES_SHIT_ACTIVE_FILTER): void {
   if (state.active_filter === filter) return;
   set_state_fun({ ...state, active_filter: filter });
 }
 // ========================================
 // --- LOAD -------------------------------
-// load the page's data.
+// the load runs once. a second call while a load is running is ignored,
+// so the page cannot fetch twice because two components asked for it.
 //
-// the load runs once. a second call while a load is running is
-// ignored, so the page cannot fetch twice because two components asked
-// for it.
-//
-// --- WHY --- the two steps run in order, not together: the summary
-// carries the price, the decimals and the total supply, and the holder
-// rows need all three. the holder rows also need the price, because a
-// row priced with a price of zero reads as "$0.00" — a lie rather than
-// a missing number.
-//
-// --- WHY --- there is NO separate price request. the summary request
-// asks for `price_usd` and gets it, so a second call for the same
-// number would only fetch it twice over the wire. this is the same
-// reasoning the regular token page uses (see token_page_token.ts).
+// --- WHY --- the summary loads before the holders, and there is no
+// separate price request: the summary carries the price, the decimals
+// and the total supply, and the holder rows need all three. see
+// token_page_shit_1170.ts.
 async function token_page_shit_1170_state_load_fun(): Promise<void> {
   if (loading) return;
   loading = true;

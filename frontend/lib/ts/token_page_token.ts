@@ -1,9 +1,6 @@
 // ========================================
 // the token page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the token page requests. that is the
-// whole point of it.
-//
 // WHAT THE PAGE REQUESTS
 //   1. GET /tokens    the token's metadata: name, symbol, decimals,
 //                     icon, price, reputation, holders, liquidity,

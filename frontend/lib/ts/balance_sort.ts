@@ -12,10 +12,10 @@ export type HUGGIES_BALANCE_SORT_BY = "symbol" | "usd";
 // ========================================
 // --- SORT ------------------------------
 // order entries by one of the two supported keys.
-// --- WHY --- ticker comparison is case-insensitive with a numeric
-// fallback inside compare_fun: raw string order puts "10" before "9"
-// and sorts lowercase before uppercase, both of which look broken in a
-// ticker column.
+//
+// --- WHY --- the ticker comparison is case-insensitive and numeric:
+// raw string order puts "10" before "9" and sorts lowercase before
+// uppercase, both of which look broken in a ticker column.
 function sort_entries_fun(
   entries: ReadonlyArray<HUGGIES_BALANCE_ENTRY>,
   by: HUGGIES_BALANCE_SORT_BY,

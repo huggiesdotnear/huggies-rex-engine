@@ -33,13 +33,10 @@ export interface HUGGIES_TOKEN_PAGE_STATE {
   detail: HUGGIES_TOKEN_DETAIL | null;
   // the holder rows loaded so far.
   holders: HUGGIES_TOKEN_HOLDER[];
-  // how many holders the api holds for this token.
   holder_total: number;
   // the cursor for the next holder page, or null when there is none.
   next_cursor: string | null;
-  // true while a further holder page is being fetched.
   loading_more: boolean;
-  // one message per thing that failed.
   error: string | null;
 }
 // ========================================

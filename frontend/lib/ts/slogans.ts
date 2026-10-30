@@ -5,7 +5,7 @@
 // `readonly` so a consumer can't reorder in place; copy first.
 // ========================================
 export const HUGGIES_SLOGANS: readonly string[] = [
-  "DIAPER HANDS ONLY", // index 0
+  "DIAPER HANDS ONLY",
   "$SHIT - The world is full of it.",
   "$SHIT - it's everywhere",
   "#HUGGIES the number 1 $SHIT factory!!!",

@@ -1,9 +1,9 @@
 // ========================================
 // read-through token info: the one place the app asks "what do I know
-// about this token?". checks the durable cache for immutable metadata
-// (symbol, decimals, icon) and always refetches the volatile half
-// (price_usd, reputation) from intear. callers get a single flat
-// record per token and never touch the cache or the api directly.
+// about this token?". the durable cache holds the immutable metadata
+// (symbol, decimals, icon); the volatile half (price_usd, reputation)
+// is always refetched from intear. callers get one flat record per token
+// and never touch the cache or the api directly.
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
@@ -24,11 +24,9 @@ import {
 const HUGGIES_VOLATILE_FIELDS = ["price_usd", "reputation", "holders"] as const;
 // durable: fixed for a token's life, cached in indexeddb forever.
 //
-// `icon_hash` and not `icon`: the icon field is a full inline svg data
-// uri and makes up almost the entire payload — 336KB for ~100 tokens
-// with the icons, ~10KB without. the hash is 16 characters, and the
-// icon itself is served from a content-addressed url the browser
-// caches for a year. see lib/ts/token_icon_url.ts.
+// --- WHY --- `icon_hash` and not `icon`: the icon field is a full inline
+// svg data uri and makes up almost the entire payload — 336KB for ~100
+// tokens with the icons, ~10KB without. see lib/ts/token_icon_url.ts.
 const HUGGIES_DURABLE_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
 // ========================================
 // ========================================
@@ -57,11 +55,10 @@ function to_number_fun(value: unknown): number {
 // --- NEAR ------------------------------
 // describe the chain's own token, which the token registry does not
 // carry. its usd price is borrowed from wNEAR, which tracks NEAR 1:1.
-// --- WHY --- wNEAR is a 1:1 redeemable wrapper of NEAR, so its
-// price_usd is the same number to the precision this table shows.
-// fetching it costs nothing extra: the native balance only ever appears
-// on an account that may well already hold wNEAR, and when it does not
-// the price simply reads as unknown rather than being invented.
+//
+// --- WHY --- fetching wNEAR costs nothing extra: the native balance only
+// ever appears on an account that may well already hold wNEAR, and when
+// it does not the price reads as unknown rather than being invented.
 function near_info_fun(wnear: {
   price_usd: number;
   icon: string | null;
@@ -71,8 +68,8 @@ function near_info_fun(wnear: {
     symbol: HUGGIES_NEAR_SYMBOL,
     decimals: HUGGIES_NEAR_DECIMALS,
     // the chain token has no registry entry of its own, so it borrows
-    // wNEAR's icon — which IS the NEAR logo (the green #00EC97 "N"),
-    // not a lookalike.
+    // wNEAR's icon — which IS the NEAR logo (the green #00EC97 "N"), not
+    // a lookalike.
     icon: wnear.icon,
     price_usd: wnear.price_usd,
     reputation: "Reputable",
@@ -82,13 +79,14 @@ function near_info_fun(wnear: {
 // ========================================
 // ========================================
 // --- FETCH -----------------------------
-// fetch the volatile half for every id on every load, and the durable
-// half only for ids not already cached, then merge into flat records.
-// --- WHY --- two requests with different field sets, not one with all
-// of them. `icon` is a full inline svg data uri, so asking for it on
-// ids already cached costs ~326KB of the ~336KB response and buys
-// nothing — those bytes are already in indexeddb. splitting it means a
-// revisit fetches ~10KB of price/reputation instead.
+// fetch the volatile half for every id on every load, and the durable half
+// only for ids not already cached, then merge into flat records.
+//
+// --- WHY --- two requests with different field sets, not one with all of
+// them. `icon` is a full inline svg data uri, so asking for it on ids
+// already cached costs ~326KB of the ~336KB response and buys nothing —
+// those bytes are already in indexeddb. splitting it means a revisit
+// fetches ~10KB of price/reputation instead.
 async function fetch_and_merge_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, HUGGIES_TOKEN_INFO>> {
@@ -104,26 +102,25 @@ async function fetch_and_merge_fun(
   // the ids whose symbol/decimals/icon we have never stored. on a warm
   // cache this is empty, so no durable request is made at all.
   //
-  // `near` is EXCLUDED on purpose. intear has no `near` entry in
-  // /tokens — it comes back in the response's `missing` list — so it
-  // can never be written to the cache by the api. which used to mean it
-  // was "uncached" on every single load, and every caller that wanted
-  // it fired its own durable request for it. `near` is described
-  // locally and cached explicitly below instead.
+  // --- WHY --- `near` is EXCLUDED on purpose. intear has no `near` entry
+  // in /tokens — it comes back in the response's `missing` list — so the
+  // api can never cache it. which used to mean it was "uncached" on every
+  // load, and every caller that wanted it fired its own durable request.
+  // `near` is described locally and cached explicitly below.
   const uncached = asked.filter(
     (id) => id !== HUGGIES_NEAR_ID && !cached.has(id),
   );
 
   // 1. durable fields, only for ids we have never stored. empty list
   // means a warm cache, and the request is skipped entirely.
-  // --- WHY --- `fetched` is kept and used as the source of truth for
-  // these rows, rather than reading them back out of the cache right
-  // after writing them. the cache write can legitimately fail (no
-  // indexeddb in this runtime, storage blocked in private mode), and
-  // reading it back would then hand back nothing — leaving every token
-  // with decimals 0 and the contract id as its symbol, which renders
-  // balances like 1.23e+35. using the values we just received makes the
-  // render correct whether or not the cache took the write.
+  //
+  // --- WHY --- `fetched` is the source of truth for these rows, rather
+  // than reading them back out of the cache right after writing them. the
+  // cache write can legitimately fail (no indexeddb in this runtime,
+  // storage blocked in private mode), and reading it back would then hand
+  // back nothing — leaving every token with decimals 0 and the contract id
+  // as its symbol, which renders balances like 1.23e+35. using the values
+  // we just received makes the render correct either way.
   const fetched = new Map<string, HUGGIES_CACHED_TOKEN>();
   if (uncached.length > 0) {
     const fresh = await api_intear_tokens_get({
@@ -131,8 +128,8 @@ async function fetch_and_merge_fun(
       ids: uncached,
     });
     // --- WHY --- the row is read by column NAME, not by index: the api
-    // always returns `account_id` as the first column, even when it was
-    // not requested, so a fixed index read is shifted by one.
+    // always returns `account_id` as the first column, even when it was not
+    // requested, so a fixed index read is shifted by one.
     const columns = fresh.columns;
     const id_at = columns.indexOf("account_id");
     const symbol_at = columns.indexOf("symbol");
@@ -160,12 +157,12 @@ async function fetch_and_merge_fun(
     fields: HUGGIES_VOLATILE_FIELDS,
     ids: asked,
   });
-  // durable values: what we just fetched wins over the stored copy, so
-  // a failed cache write cannot strip decimals off a token.
+  // durable values: what we just fetched wins over the stored copy, so a
+  // failed cache write cannot strip decimals off a token.
   const durable = new Map(cached);
   for (const [id, record] of fetched) durable.set(id, record);
-  // `near` is described locally, so it never needs a durable request.
-  // it goes into the durable map so the render below has its symbol and
+  // `near` is described locally, so it never needs a durable request. it
+  // goes into the durable map so the render below has its symbol and
   // decimals.
   if (asked.includes(HUGGIES_NEAR_ID)) {
     durable.set(HUGGIES_NEAR_ID, {
@@ -223,13 +220,8 @@ async function fetch_and_merge_fun(
   }
 
   // `near` is written to the cache so later loads treat it as known.
-  //
-  // --- WHY --- the api has no `near` row, so the loop above never
-  // stores it. without this it stayed uncached forever, and every
-  // caller that wanted it made its own durable request for it. writing
-  // it here closes that hole for good. `wrap.near` is a real token and
-  // is stored by the api response, but it is written here too so the
-  // pair is kept together.
+  // `wrap.near` is a real token and the api response stores it too, but it
+  // is written here too so the pair is kept together.
   const to_store: Array<HUGGIES_CACHED_TOKEN> = [];
   for (const id of [HUGGIES_NEAR_ID, HUGGIES_WRAP_ID]) {
     const record = durable.get(id);
@@ -242,12 +234,13 @@ async function fetch_and_merge_fun(
 // ========================================
 // ========================================
 // --- GET -------------------------------
-// the public read-through call. returns a map of id -> info for every
-// id the api knows about; ids it does not know are absent from the map.
+// the public read-through call. returns a map of id -> info for every id the
+// api knows about; ids it does not know are absent from the map.
+//
 // --- WHY --- one request covers every id, cached or not: price and
-// reputation go stale within minutes, so they are refetched for ALL ids
-// on every call anyway. fetching only the uncached ones and merging
-// would save nothing and cost a second round trip.
+// reputation go stale within minutes, so they are refetched for ALL ids on
+// every call anyway. fetching only the uncached ones would save nothing
+// and cost a second round trip.
 async function get_token_info_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, HUGGIES_TOKEN_INFO>> {
