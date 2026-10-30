@@ -1,9 +1,6 @@
 // ========================================
 // the rhea page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the rhea page requests. that is the
-// whole point of it.
-//
 // WHAT THE PAGE REQUESTS
 //   1. GET /pool/search   the pools, sorted and paged by the api.
 //   2. GET /pool/search   the same pools again, when the reader picks
@@ -12,32 +9,31 @@
 //      header.
 //
 // WHY ONE ENDPOINT FOR THE POOLS
-// --- /pool/search is the only rhea endpoint that answers with a
-// total, a sort and a page of rows in one go. /list-pools has no
-// total and no apy, so the page count would be a guess. /fetchAllPools
-// answers with every pool at once — about 10,000 rows, several
-// megabytes, and no volume or apy at all.
+// --- /pool/search is the only rhea endpoint that answers with a total, a
+// sort and a page of rows in one go. /list-pools has no total and no apy,
+// so the page count would be a guess. /fetchAllPools answers with every
+// pool at once — thousands of rows, megabytes of json, and no volume or
+// apy at all.
 //
 // WHY THE HEADER'S NUMBERS ARE NOT THE SUM OF THE ROWS
-// --- the rows on screen are one page of one sort. adding them up
-// gives the tvl of THAT page, not of the dex. /all-pool-data is the
-// api's own total over every pool it indexes, so it is the number the
-// header shows.
+// --- the rows on screen are one page of one sort. adding them up gives
+// the tvl of THAT page, not of the dex. /all-pool-data is the api's own
+// total over every pool it indexes, so it is the number the header shows.
 //
 // WHY THE POOL TYPE IS A FILTER, NOT A SEPARATE PAGE
 // --- the api's `type` narrows one request to one pool family:
 //   `all`     - every pool, classic and dcl
 //   `classic` - the ref finance v2 amm pools
 //   `dcl`     - the ref labs dcl v2 pools
-// the page keeps all three on one request so the reader can switch
-// between the two rhea contracts without leaving the list.
+// the page keeps all three on one request so the reader can switch between
+// the two rhea contracts without leaving the list.
 //
 // WHY THE SEARCH IS THE API'S, NOT OURS
-// --- the api takes a `token_list` filter and matches it against the
-// token symbols and the token account ids, so a reader who types
-// "wNEAR" finds every pool that holds it. filtering the loaded page
-// in javascript would only find the pools that happened to be on the
-// page, which is a pool out of ten thousand.
+// --- the api takes a `token_list` filter and matches it against the token
+// symbols and the token account ids, so a reader who types "wNEAR" finds
+// every pool that holds it. filtering the loaded page in javascript would
+// only find the pools that happened to be on the page, which is a pool out
+// of ten thousand.
 // ========================================
 import {
   api_rhea_all_pool_data,
@@ -65,10 +61,11 @@ const HUGGIES_RHEA_POOL_TYPES: ReadonlyArray<RHEA_POOL_SEARCH_TYPE> = [
 // --- TYPES ------------------------------
 // one pool as the page shows it.
 export interface HUGGIES_RHEA_POOL {
-  // the pool's own id. it is a string: a classic pool is numbered and
-  // a dcl pool is named after its two tokens and its fee.
+  // the pool's own id. it is a string: a classic pool is numbered and a
+  // dcl pool is named after its two tokens and its fee.
   id: string;
-  // the family the pool belongs to: `classic` or `dcl`.
+  // the api's own pool kind: DCL, SIMPLE_POOL, RATED_SWAP, STABLE_SWAP
+  // or DEGEN_SWAP. shown as it comes.
   kind: string;
   // the pool's token symbols, e.g. ["USDC", "wNEAR"].
   symbols: ReadonlyArray<string>;
@@ -77,17 +74,13 @@ export interface HUGGIES_RHEA_POOL {
   // the icons of those tokens, in the same order as `token_ids`. a null
   // is a token with no icon.
   icons: ReadonlyArray<string | null>;
-  // the value locked in the pool, in usd.
   tvl_usd: number;
-  // the 24 hour volume, in usd.
   volume_24h_usd: number;
   // the pool's apy, as a percentage.
   apy: number;
   // the pool's fee, as a fraction of the swap (0.003 = 0.3%).
   fee: number;
-  // true when the pool is a farming pool.
   is_farm: boolean;
-  // true when the pool holds a meme token.
   is_meme: boolean;
   // true when the pool's tokens are not certified by rhea.
   is_uncertified: boolean;
@@ -95,21 +88,17 @@ export interface HUGGIES_RHEA_POOL {
 // ========================================
 // everything the rhea page has loaded.
 export interface HUGGIES_RHEA_PAGE_DATA {
-  // the pools on screen.
   pools: ReadonlyArray<HUGGIES_RHEA_POOL>;
-  // how many pools the api matched for the CURRENT view — the family
-  // and the search together. this is the count the list pages on.
+  // how many pools the api matched for the CURRENT view — the family and
+  // the search together. this is the count the list pages on.
   total: number;
   // how many pools the dex has in the chosen family, with no search.
   // this is the count the header shows.
   pool_count: number;
   // true when the api has more pools behind this one.
   has_more: boolean;
-  // the dex's own total value locked, in usd.
   tvl_usd: number;
-  // the dex's own 24 hour volume, in usd.
   volume_24h_usd: number;
-  // one message per thing that failed.
   errors: ReadonlyArray<string>;
 }
 // ========================================
@@ -117,10 +106,9 @@ export interface HUGGIES_RHEA_PAGE_DATA {
 // --- HELPERS ----------------------------
 // parse a numeric API value without rendering NaN or Infinity.
 //
-// --- WHY --- rhea answers every number as a decimal STRING, and a
-// pool with no tvl answers with a negative sliver rather than a zero.
-// a negative tvl is real data (a dcl pool that emptied out), so it is
-// kept and shown as it is.
+// --- WHY --- rhea answers every number as a decimal STRING, and a pool
+// with no tvl answers with a negative sliver rather than a zero. a negative
+// tvl is real data (a dcl pool that emptied out), so it is kept as it is.
 function to_finite_number_fun(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number(String(value));
   return Number.isFinite(parsed) ? parsed : 0;
@@ -152,13 +140,13 @@ function map_pool_fun(pool: RHEA_POOL_SEARCH_ITEM): HUGGIES_RHEA_POOL {
 // --- TOTALS ----------------------------
 // the dex's own tvl and 24h volume, over every pool the indexer knows.
 //
-// --- WHY --- this is a separate request and not the sum of the rows
-// on screen: the rows are one page of one sort, so their sum is the
-// tvl of THAT page. the header wants the size of the whole dex.
+// --- WHY --- this is a separate request and not the sum of the rows on
+// screen: the rows are one page of one sort, so their sum is the tvl of THAT
+// page. the header wants the size of the whole dex.
 //
-// --- WHY --- a failure here does not take the pools down: the pools
-// are the page, the two numbers are the headline. so it is caught on
-// its own and the header falls back to zeros.
+// --- WHY --- a failure here does not take the pools down: the pools are the
+// page, the two numbers are the headline. so it is caught on its own and the
+// header falls back to zeros.
 async function fetch_totals_fun(): Promise<{
   tvl_usd: number;
   volume_24h_usd: number;
@@ -183,11 +171,11 @@ async function fetch_totals_fun(): Promise<{
 // ========================================
 // the number of pools in the dex's chosen family, with no search.
 //
-// --- WHY --- a request of its own and not the count from the list:
-// the api's `total` follows the search filter, so a search for "NEARLY"
-// would make the header say the dex has 3,982 pools when it has
-// 10,017. the header's tiles are the size of the DEX, so the count
-// has to come from a request that is not filtered.
+// --- WHY --- a request of its own and not the count from the list: the
+// api's `total` follows the search filter, so a search for "NEARLY" would
+// make the header say the dex has 3,982 pools when it has 10,017. the
+// header's tiles are the size of the DEX, so the count has to come from an
+// unfiltered request.
 //
 // --- WHY --- the family still counts: the reader picked AMM, so the
 // number of AMM pools is the number they want.
@@ -216,23 +204,22 @@ async function fetch_family_count_fun(
 // fetch one page of pools for a sort, a direction and a pool family,
 // plus the dex's own totals.
 //
-// --- WHY --- the api does the sorting and the paging, so the page
-// never downloads the whole list. one request is one page.
+// --- WHY --- the api does the sorting and the paging, so the page never
+// downloads the whole list.
 //
-// --- WHY --- `order_by` carries the direction and not the sort: the
-// api takes the FIELD in `sort` (tvl | 24h | apy) and the DIRECTION
-// in `order_by` (asc | desc). a `sort` of `volume_24h` is rejected by
-// the api — the field is called `24h` — and `order_by=desc` needs a
-// `sort` beside it or the api answers "sort error".
+// --- WHY --- `order_by` carries the direction and not the sort: the api
+// takes the FIELD in `sort` (tvl | 24h | apy) and the DIRECTION in `order_by`
+// (asc | desc). a `sort` of `volume_24h` is rejected by the api — the field
+// is called `24h` — and `order_by=desc` needs a `sort` beside it or the api
+// answers "sort error".
 //
-// --- WHY --- the search goes in the url and not in javascript: the
-// api matches the token symbols and the token account ids, so a
-// reader who types "wNEAR" finds every pool holding it, not only the
-// ones on the page that happened to be loaded.
+// --- WHY --- the search goes in the url and not in javascript: the api
+// matches the token symbols and the token account ids, so a reader who types
+// "wNEAR" finds every pool holding it, not only the ones on the page that
+// happened to be loaded.
 //
-// --- WHY --- the two requests run together: they are two different
-// endpoints, so the page is as slow as its slowest one rather than
-// the sum of the two.
+// --- WHY --- the three requests run together: they are three different
+// endpoints, so the page is as slow as its slowest one.
 async function load_pools_fun(
   sort: string,
   desc: boolean,
@@ -262,15 +249,14 @@ async function load_pools_fun(
   if (totals.error !== null) errors.push(`totals: ${totals.error}`);
   if (family.error !== null) errors.push(`count: ${family.error}`);
 
-  // --- WHY --- the icons come last: they are needed for every pool
-  // at once, so one request covers the whole list. asking for them
-  // first would only delay the pools.
+  // --- WHY --- the icons come last: one request covers the whole list, so
+  // asking for them first would only delay the pools.
   //
-  // --- WHY --- the intear api and not rhea's own /list-token: rhea's
-  // pool rows carry the token ACCOUNT IDS — wrap.near,
-  // token.rhealab.near — which are the same ids the intear token
-  // indexer knows. so both dex pages ask the SAME api for their
-  // icons, and the app's durable token cache holds them for both.
+  // --- WHY --- the intear api and not rhea's own /list-token: rhea's pool
+  // rows carry the token ACCOUNT IDS — wrap.near, token.rhealab.near — which
+  // are the same ids the intear token indexer knows. so both dex pages ask the
+  // SAME api for their icons, and the app's durable token cache holds them
+  // for both.
   const token_ids = pools.flatMap((pool) => pool.token_ids);
   const tokens = await HUGGIES_POOL_TOKENS.fetch(token_ids);
   for (const pool of pools) {

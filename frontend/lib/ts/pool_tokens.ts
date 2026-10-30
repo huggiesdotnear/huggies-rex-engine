@@ -1,16 +1,16 @@
 // ========================================
 // the symbols and icons of the tokens on a dex pool list.
 //
-// the dex apis name their tokens by id only — `nep141:token.x.near` —
-// and the symbols live in the intear token indexer, which is a
-// different api. this module asks that api once for the whole list and
-// hands back a symbol and an icon per token id.
+// the dex apis name their tokens by id only — `nep141:token.x.near` — and
+// the symbols live in the intear token indexer, which is a different api.
+// this module asks that api once for the whole list and hands back a symbol
+// and an icon per token id.
 //
 // it uses the app's durable token cache first, so a token the app has
 // already seen costs nothing.
 //
-// it is its own module because BOTH dex pages need it and it is
-// neither of theirs: a shared file keeps its own plain name.
+// it is its own module because BOTH dex pages need it and it is neither of
+// theirs: a shared file keeps its own plain name.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
@@ -28,8 +28,8 @@ import {
 // pointing at a content-addressed url the browser caches for a year.
 // see lib/ts/token_icon_url.ts.
 const HUGGIES_SYMBOL_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
-// how many ids one request may ask for. the api's url is limited, so
-// the ids go in chunks.
+// how many ids one request may ask for. the ids travel in the query
+// string, which the api limits, so they go in chunks.
 const HUGGIES_SYMBOL_BATCH_SIZE = 100;
 // ========================================
 // ========================================
@@ -54,14 +54,13 @@ function to_finite_number_fun(value: unknown): number {
 // --- FETCH -----------------------------
 // the symbols and icons of a set of token ids.
 //
-// --- WHY --- the cache is read FIRST, and only the misses are
-// fetched: a token the app has already seen costs no network at all,
-// and a token the api answered for with no icon is a token with no
-// icon — asking for it again every load would be a wasted request
-// forever.
+// --- WHY --- the cache is read FIRST, and only the misses are fetched: a
+// token the app has already seen costs no network at all, and a token the
+// api answered for with no icon is a token with no icon — asking for it again
+// every load would be a wasted request forever.
 //
-// --- WHY --- the misses go over POST: a token id list does not fit in
-// the api's ~8KB url limit, and the POST body limit is 64KB.
+// --- WHY --- the ids go in the query string and are chunked: the api's url
+// limit is ~8KB, so a long token id list does not fit in one GET.
 async function fetch_pool_tokens_fun(
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, HUGGIES_POOL_TOKEN>> {
@@ -69,12 +68,11 @@ async function fetch_pool_tokens_fun(
   const wanted = [...new Set(ids)];
   if (wanted.length === 0) return out;
 
-  // --- WHY --- the chain's own token is asked for with wNEAR: the
-  // registry has no `near` entry — it comes back in the response's
-  // `missing` list — so it can never be fetched and never cached. the
-  // 1:1 wrapper stands in for it, exactly as it does everywhere else
-  // in the app (see token_info.ts): wNEAR's icon IS the NEAR logo, not
-  // a lookalike.
+  // --- WHY --- the chain's own token is asked for with wNEAR: the registry
+  // has no `near` entry — it comes back in the response's `missing` list — so
+  // it can never be fetched and never cached. the 1:1 wrapper stands in for
+  // it, exactly as it does everywhere else in the app (see token_info.ts):
+  // wNEAR's icon IS the NEAR logo, not a lookalike.
   const wants_near = wanted.includes(HUGGIES_NEAR_ID);
   const asked = wants_near
     ? [...new Set([...wanted, HUGGIES_WRAP_ID])]
@@ -88,9 +86,9 @@ async function fetch_pool_tokens_fun(
     });
   }
 
-  // the ids the cache has never stored. a cached record with a null
-  // icon hash IS known — the api answered for it and it has no icon —
-  // so it is not a miss.
+  // the ids the cache has never stored. a cached record with a null icon
+  // hash IS known — the api answered for it and it has no icon — so it is
+  // not a miss.
   const missing = asked.filter(
     (id) => id !== HUGGIES_NEAR_ID && !cached.has(id),
   );
@@ -132,14 +130,14 @@ async function fetch_pool_tokens_fun(
         }
         await HUGGIES_TOKEN_CACHE.put_many(records);
       } catch {
-        // a failed symbol request costs the labels, not the page: the
-        // rows fall back to the token id.
+        // a failed symbol request costs the labels, not the page: the rows
+        // fall back to the token id.
       }
     }
   }
 
-  // the chain's own token borrows wNEAR's icon, the same way it does
-  // in the balance tables and the token pages.
+  // the chain's own token borrows wNEAR's icon, the same way it does in
+  // the balance tables and the token pages.
   if (wants_near) {
     const wrap = out.get(HUGGIES_WRAP_ID);
     out.set(HUGGIES_NEAR_ID, {

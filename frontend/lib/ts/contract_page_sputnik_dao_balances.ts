@@ -1,26 +1,25 @@
 // ========================================
 // the DAO page's balances: the dao's own token holdings.
 //
-// the read is the same one the account page makes — GET /balances
-// with the direct and native sources — so the same look and the same
-// token metadata apply.
+// the read is the same one the account page makes — GET /balances with
+// the direct and native sources — so the same look and the same token
+// metadata apply.
 //
 // the loader is here rather than in the account page's loader because
-// the two pages are separate: the account page shows an account and
-// the dao page shows a dao, and each has its own store.
+// the two pages are separate: the account page shows an account and the
+// dao page shows a dao, and each has its own store.
 // ========================================
 import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "./token_info";
 // ========================================
-// "direct" is what the dao holds itself; "native" is the chain's own
-// NEAR balance, which intear reports as its own source. both come
-// from the SAME /balances request.
+// "direct" is what the dao holds itself; "native" is the chain's own NEAR
+// balance, which intear reports as its own source. both come from the
+// SAME /balances request.
 const HUGGIES_DAO_BALANCE_SOURCES = ["direct", "native"] as const;
 // ========================================
 // --- TYPES ------------------------------
-// one token holding.
 export interface HUGGIES_DAO_BALANCE {
   id: string;
   raw: string;
@@ -32,7 +31,6 @@ export interface HUGGIES_DAO_BALANCE {
 export interface HUGGIES_DAO_BALANCES {
   // the holdings, direct and native.
   rows: ReadonlyArray<HUGGIES_DAO_BALANCE>;
-  // one message per thing that failed.
   errors: ReadonlyArray<string>;
 }
 // ========================================
@@ -49,8 +47,8 @@ async function load_dao_balances_fun(
       sources: HUGGIES_DAO_BALANCE_SOURCES,
     });
     for (const row of response.balances.rows) {
-      // a 0 balance means the dao merely touched the token once; it is
-      // not a holding and must not reach the table.
+      // a 0 balance means the dao merely touched the token once; it is not
+      // a holding and must not reach the table.
       if (row[2] === "0") continue;
       balances.set(row[0], row[2]);
     }

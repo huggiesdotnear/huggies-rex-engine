@@ -2,15 +2,10 @@
 // the intear dex page's shared state: the one load, held here, read by
 // every component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/contract_page_intear_dex.ts), so there is exactly one
-// set of requests.
-//
 // --- WHY --- the sort lives HERE and not in the component: the dex api
 // has no sort of its own, so the rows are ordered here, over the rows
-// the loader already fetched. the component then reads the ordered
-// list from the store, so the header and the list agree on the order.
+// the loader already fetched. the component reads the ordered list from
+// the store, so the header and the list agree on the order.
 //
 // the store has the same shape as lib/ts/contract_page_rhea_store.ts:
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
@@ -30,14 +25,11 @@ import type {
 // ========================================
 // ========================================
 // --- STATE ------------------------------
-// the loaded data, or null while it is still loading.
 let data: HUGGIES_INTEAR_DEX_PAGE_DATA | null = null;
-// the sort the reader has chosen. the dex api does not sort, so this
-// is ours.
+// the sort the reader has chosen. the dex api does not sort.
 let sort: HUGGIES_INTEAR_DEX_POOL_SORT = HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT;
 let direction: HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION =
   HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION;
-// true while a load is running.
 let loading = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
@@ -68,7 +60,6 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // ========================================
 // --- ORDER -----------------------------
-// the numeric field a sort key orders by.
 function pool_sort_value_fun(
   pool: HUGGIES_INTEAR_DEX_POOL,
   key: HUGGIES_INTEAR_DEX_POOL_SORT,
@@ -81,9 +72,9 @@ function pool_sort_value_fun(
 // ========================================
 // order the pools by the chosen sort and direction.
 //
-// --- WHY --- the sort is a stable one and not a plain reverse: two
-// pools with the same tvl must keep the order the api sent them in,
-// so flipping the direction does not shuffle them.
+// --- WHY --- the sort is a stable one and not a plain reverse: two pools
+// with the same tvl must keep the order the api sent them in, so
+// flipping the direction does not shuffle them.
 function order_pools_fun(
   pools: ReadonlyArray<HUGGIES_INTEAR_DEX_POOL>,
   key: HUGGIES_INTEAR_DEX_POOL_SORT,
@@ -103,14 +94,13 @@ function order_pools_fun(
 // --- LOAD -------------------------------
 // load the page's data.
 //
-// the load runs once. a second call while a load is running is
-// ignored, so the page cannot fetch twice because two components asked
-// for it.
+// the load runs once. a second call while a load is running is ignored,
+// so the page cannot fetch twice because two components asked for it.
 //
-// --- WHY --- the previous rows are NOT cleared here. the api takes a
-// moment to answer, and wiping the list made the page flash "LOADING
-// POOLS..." and show nothing, which reads as broken. the old rows stay
-// on screen under the loading note until the new ones arrive.
+// --- WHY --- the previous rows are NOT cleared here. wiping the list made
+// the page flash "LOADING POOLS..." and show nothing, which reads as
+// broken. the old rows stay on screen under the loading note until the
+// new ones arrive.
 async function load_fun(): Promise<void> {
   if (loading) return;
   loading = true;
@@ -152,7 +142,6 @@ function get_fun(): HUGGIES_INTEAR_DEX_PAGE_DATA | null {
   return data;
 }
 // ========================================
-// true while a load is running.
 function is_loading_fun(): boolean {
   return loading;
 }

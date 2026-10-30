@@ -2,11 +2,6 @@
 // the rhea page's shared state: the one load, held here, read by every
 // component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/contract_page_rhea.ts), so there is exactly one set of
-// requests.
-//
 // the store has the same shape as lib/ts/app_page_discover_store.ts:
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
@@ -26,16 +21,14 @@ import type { RHEA_POOL_SEARCH_TYPE } from "@sleet-js/middleman-rhea-api";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
-// the loaded data, or null while it is still loading.
 let data: HUGGIES_RHEA_PAGE_DATA | null = null;
 // the view the current load was for: the sort, the direction, the pool
-// family and the search. they are one view — a load for one of them
-// must not overwrite the rows of another.
+// family and the search. they are one view — a load for one of them must
+// not overwrite the rows of another.
 let loaded_sort: HUGGIES_RHEA_POOL_SORT = HUGGIES_DEFAULT_RHEA_POOL_SORT;
 let loaded_desc = HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION === "desc";
 let loaded_type: RHEA_POOL_SEARCH_TYPE = "all";
 let loaded_search = "";
-// true while a load is running.
 let loading = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
@@ -69,14 +62,13 @@ function subscribe_fun(listener: () => void): () => void {
 // load the first page of pools for a view.
 //
 // the load runs once per view. a second call for the same view while a
-// load is running is ignored, so the page cannot fetch twice because
-// two components asked for it.
+// load is running is ignored, so the page cannot fetch twice because two
+// components asked for it.
 //
-// --- WHY --- the previous rows are NOT cleared here. the api takes a
-// moment to answer, and wiping the list on every sort change made the
-// page flash "LOADING POOLS..." and show nothing, which reads as
-// broken. the old rows stay on screen under the loading note until the
-// new ones arrive.
+// --- WHY --- the previous rows are NOT cleared here. wiping the list on
+// every sort change made the page flash "LOADING POOLS..." and show
+// nothing, which reads as broken. the old rows stay on screen under the
+// loading note until the new ones arrive.
 async function load_fun(
   sort: HUGGIES_RHEA_POOL_SORT,
   desc: boolean,
@@ -150,8 +142,8 @@ async function load_fun(
 // load the NEXT page of pools and append it to the rows on screen.
 //
 // the page is appended rather than replacing, so the reader keeps what
-// they scrolled to. a load that fails leaves the rows already on
-// screen alone and records the error.
+// they scrolled to. a load that fails leaves the rows already on screen
+// alone and records the error.
 async function load_more_fun(): Promise<void> {
   if (loading || data === null) return;
   // there is nothing more to ask for.
@@ -199,7 +191,6 @@ function get_fun(): HUGGIES_RHEA_PAGE_DATA | null {
   return data;
 }
 // ========================================
-// true while a load is running.
 function is_loading_fun(): boolean {
   return loading;
 }

@@ -2,19 +2,14 @@
 // the Pumpopoly page's shared state: the one load, held here, read by
 // every component on the page.
 //
-// the components on this page do not fetch. they read this store. that
-// is what makes the page's request list knowable — there is exactly one
-// loader (lib/ts/contract_page_pumpopoly.ts), so there is exactly one
-// set of requests.
-//
 // the store has the same shape as lib/ts/app_page_account_store.ts:
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 //
 // --- WHY --- the store subscribes to the page's account id: the id can
 // change under the page — the reader signs in, signs out, or the id in
-// the url changes. the store loads the new id by itself, so no
-// component has to watch for it and no component has to call load().
+// the url changes. the store loads the new id by itself, so no component
+// has to watch for it and no component has to call load().
 import { load_pumpopoly_page_fun } from "./contract_page_pumpopoly";
 import { HUGGIES_PAGE_ACCOUNT_ID } from "./page_account_id";
 import type { HUGGIES_PUMPOPOLY_DATA } from "./contract_page_pumpopoly_parse";
@@ -23,19 +18,16 @@ import type { HUGGIES_PUMPOPOLY_DATA } from "./contract_page_pumpopoly_parse";
 // --- STATE ------------------------------
 // null until the load finishes. components render nothing until then.
 let data: HUGGIES_PUMPOPOLY_DATA | null = null;
-// the account id the page is about, and the one the current load was
-// for.
+// the account id the page is about.
 //
-// --- WHY --- the id lives here as well as in the id module: the
-// components need it to build their links and to know whether there is
-// a player at all, and the store is what they already read. when the
-// id changes, the store re-loads and this is updated with it, so the
-// components follow.
+// --- WHY --- the id lives here as well as in the id module: the components
+// need it to build their links and to know whether there is a player at
+// all, and the store is what they already read. when the id changes, the
+// store re-loads and this is updated with it, so the components follow.
 let account_id: string | null = null;
 // the account id the current load was for, so a new account id starts a
 // new load and clears the old data.
 let loaded_account_id: string | null = null;
-// true while a load is running.
 let loading = false;
 // true once the page's id is being watched, so watch() is set up once.
 let watching = false;
@@ -73,13 +65,14 @@ function subscribe_fun(listener: () => void): () => void {
 // the load runs once per account id. a second call for the same id
 // while a load is running is ignored, so the page cannot fetch twice
 // because two components asked for it.
+//
 // --- WHY --- the components used to each trigger their own fetch, so
 // "the page loaded" was really "several loads happened, at several
 // different times". one loader, one load, one request list.
 //
-// --- WHY --- the load takes no argument: the store reads the page's
-// account id itself and watches it, so the page loads whatever the id
-// says at that moment and re-loads when the id changes.
+// --- WHY --- the load takes no argument: the store reads the page's account
+// id itself and watches it, so the page loads whatever the id says at that
+// moment and re-loads when the id changes.
 async function contract_page_pumpopoly_store_load_fun(): Promise<void> {
   const next_account_id = HUGGIES_PAGE_ACCOUNT_ID.get_account_id();
   // --- WHY --- the id is stored even when there is no player: the
@@ -124,19 +117,18 @@ async function contract_page_pumpopoly_store_load_fun(): Promise<void> {
 // --- WATCH -----------------------------
 // watch the page's account id and re-load when it changes.
 //
-// --- WHY --- the id can change under the page: the reader signs in,
-// signs out, or the id in the url changes. the store re-loads by
-// itself, so no component has to watch for it.
+// --- WHY --- the id can change under the page: the reader signs in, signs
+// out, or the id in the url changes. the store re-loads by itself, so no
+// component watches for it.
 function contract_page_pumpopoly_store_watch_fun(): void {
-  // --- WHY --- the subscription is set up once: a second watch() would
-  // add a second listener, and the id would then load twice for every
-  // change.
+  // --- WHY --- the subscription is set up once: a second watch() would add
+  // a second listener, and the id would then load twice for every change.
   if (watching) return;
   watching = true;
   const unsubscribe = HUGGIES_PAGE_ACCOUNT_ID.subscribe(() => {
-    // --- WHY --- the public load and not the internal one: the public
-    // one is what the page and the tests go through, so it is the one
-    // that must be called.
+    // --- WHY --- the public load and not the internal one: the public one is
+    // what the page and the tests go through, so it is the one that must be
+    // called.
     void HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.load();
   });
   // the subscription lives as long as the page does, so it is never
@@ -152,9 +144,9 @@ function get_fun(): HUGGIES_PUMPOPOLY_DATA | null {
 // ========================================
 // the account id the page is about, or null when there is none.
 //
-// --- WHY --- it is read through the store so the components have one
-// place to read from: the id and the data always change together, and
-// the store is what tells the components to re-render.
+// --- WHY --- it is read through the store so the components have one place
+// to read from: the id and the data always change together, and the store
+// is what tells the components to re-render.
 function get_account_id_fun(): string | null {
   return account_id;
 }

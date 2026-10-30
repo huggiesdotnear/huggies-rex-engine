@@ -2,12 +2,12 @@
 // the Pumpopoly contract's shapes, and how a raw contract view turns
 // into them.
 //
-// the contract is not ours, so every field is read defensively: a
-// missing or oddly typed field becomes a zero or an empty string
-// rather than an exception that blanks the page.
+// the contract is not ours, so every field is read defensively: a missing
+// or oddly typed field becomes a zero or an empty string rather than an
+// exception that blanks the page.
 //
-// these live apart from the loader so the page's request list is
-// knowable by reading one file (lib/ts/contract_page_pumpopoly.ts).
+// these live apart from the loader so the page's request list is knowable by
+// reading one file (lib/ts/contract_page_pumpopoly.ts).
 // ========================================
 // ========================================
 // --- WHY --- the Pumpopoly token has 24 decimals, so one unit is
@@ -32,14 +32,14 @@ export interface HUGGIES_PUMPOPOLY_PLAYER {
 // ========================================
 // one nft, as the gallery shows it.
 //
-// --- WHY --- the nft contract's `nft_tokens_for_owner` view answers
-// with the WHOLE token, metadata and all, so there is no second call to
-// make for the image. the metadata is read here and the media url is
-// kept, because the gallery needs the picture and not only the id.
+// --- WHY --- the nft contract's `nft_tokens_for_owner` view answers with
+// the WHOLE token, metadata and all, so there is no second call to make for
+// the image. the media url is kept, because the gallery needs the picture
+// and not only the id.
 //
-// --- WHY --- `media` is nullable: the contract makes it optional, and a
-// token with no media has to render as a tile without a picture, not as
-// a broken image.
+// --- WHY --- `media` is nullable: the contract makes it optional, and a token
+// with no media has to render as a tile without a picture, not as a broken
+// image.
 export interface HUGGIES_PUMPOPOLY_NFT {
   token_id: string;
   title: string;
@@ -60,12 +60,12 @@ export interface HUGGIES_PUMPOPOLY_DATA {
 // ========================================
 // the errors, one per source.
 //
-// --- WHY --- keyed by source rather than one flat list: each part of
-// the page depends on exactly one source, and a component that shows a
-// source's data says so right there when that source failed. a flat
-// list of strings could not be told apart that way — the reader
-// would see zeros and not know whether the player has no land or the
-// contract could not be reached.
+// --- WHY --- keyed by source rather than one flat list: each part of the
+// page depends on exactly one source, and a component that shows a source's
+// data says so right there when that source failed. a flat list of strings
+// could not be told apart that way — the reader would see zeros and not
+// know whether the player has no land or the contract could not be
+// reached.
 export interface HUGGIES_PUMPOPOLY_ERRORS {
   // the world contract call failed.
   player: string | null;
@@ -133,8 +133,8 @@ export function parse_pumpopoly_player_fun(
 //
 // --- WHY --- the shape is read field by field and never trusted: the
 // contract is not ours, and one odd token must not blank the whole
-// gallery. a token with no usable id is dropped; a token with no media
-// is kept, because the id alone is still worth showing.
+// gallery. a token with no usable id is dropped; a token with no media is
+// kept, because the id alone is still worth showing.
 export function parse_pumpopoly_nfts_fun(
   value: unknown,
 ): HUGGIES_PUMPOPOLY_NFT[] {

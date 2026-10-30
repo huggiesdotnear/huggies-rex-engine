@@ -4,8 +4,7 @@
 // this is the page's ONLY loader. every fetch the Pumpopoly page makes
 // happens in this file, and no component fetches anything — the
 // components read the loaded data from
-// lib/ts/contract_page_pumpopoly_store.ts. read this file and you know
-// the page's requests.
+// lib/ts/contract_page_pumpopoly_store.ts.
 //
 // the shapes are parsed in lib/ts/contract_page_pumpopoly_parse.ts.
 // ========================================
@@ -32,8 +31,8 @@ import type {
 // merged. they run in parallel, so the page is as slow as its slowest
 // source, not the sum of both.
 //
-// a failing source is caught on its own and leaves the other one
-// intact; the message lands in data.errors.
+// a failing source is caught on its own and leaves the other one intact;
+// the message lands in data.errors.
 // ========================================
 // ========================================
 // --- LOAD ------------------------------

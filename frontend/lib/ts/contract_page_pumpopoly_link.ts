@@ -6,7 +6,9 @@
 // ========================================
 
 // ========================================
-// the Pumpopoly contract this app signs players up through.
+// the invite code this app signs players up with. it is this app's own
+// account, not a Pumpopoly contract: pumpopoly reads it as the account
+// that gets the referral.
 export const HUGGIES_PUMPOPOLY_INVITE_ACCOUNT = "huggies.near";
 // ========================================
 // the Pumpopoly play url, carrying an invite code for an account.

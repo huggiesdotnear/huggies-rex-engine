@@ -1,13 +1,10 @@
 // ========================================
 // the DAO page's ONE load: every fetch the page makes happens here.
 //
-// read this file to know what the DAO page requests. that is the
-// whole point of it.
-//
 // WHAT THE PAGE REQUESTS
-//   1. GET /api/trezu/user/treasuries   the DAOs the signed-in
-//      account is a member of. the page's selector lists them, and
-//      the page picks one to show.
+//   1. GET /api/trezu/user/treasuries   the DAOs the signed-in account
+//      is a member of. the page's selector lists them, and the page picks
+//      one to show.
 //   2. GET /balances                    the DAO's own token balances,
 //      the same read the account page does.
 //   3. near view get_config              the DAO's name and purpose.
@@ -18,13 +15,13 @@
 //   7. near view get_locked_storage_amount  the NEAR it holds for
 //      storage.
 //
-// --- WHY --- the contract is sputnikdao2 v2.3.1. it answers JSON,
-// not borsh, so `near.view()` reads it directly.
+// --- WHY --- the contract answers JSON, not borsh, so `near.view()` reads
+// it directly.
 //
-// --- WHY --- the contract's `get_proposals` returns NOTHING for an
-// empty list: the rpc answers with `result.error` and no `result`
-// field. that is not a failure, it is "this dao has no proposals" —
-// the typed helper reads both shapes as an empty list.
+// --- WHY --- the contract's `get_proposals` returns NOTHING for an empty
+// list: the rpc answers with `result.error` and no `result` field. that is
+// not a failure, it is "this dao has no proposals" — the typed helper reads
+// both shapes as an empty list.
 // ========================================
 import { near_kit_client } from "@near-kit-tool-box/web";
 import {
@@ -35,10 +32,8 @@ import {
   sputnik_dao_get_locked_storage_amount_fun_json,
 } from "@near-kit-tool-box/fun";
 // --- WHY --- the toolbox's own types, not local copies: the toolbox
-// already models the contract's proposal kinds as a discriminated
-// union and validates the reply with zod. a local copy of the same
-// shape would drift from it, and the copy is what threw the kinds'
-// own fields away.
+// already models the contract's proposal kinds as a discriminated union
+// and validates the reply with zod. a local copy would drift from it.
 import type {
   SPUTNIK_DAO_LAST_ACTION_TYPE,
   SPUTNIK_DAO_POLICY_TYPE,
@@ -58,7 +53,6 @@ export type HUGGIES_DAO_ROLE_KIND = "group" | "everyone";
 // one role in the policy.
 export interface HUGGIES_DAO_ROLE {
   name: string;
-  // how the role is open.
   kind: HUGGIES_DAO_ROLE_KIND;
   // the accounts in the role. empty for an `everyone` role.
   members: string[];
@@ -89,16 +83,15 @@ export interface HUGGIES_DAO_PROPOSAL {
   vote_counts: Record<string, [number, number, number]>;
   // who voted, and how.
   votes: Array<{ account_id: string; vote: string }>;
-  // how many votes there were in total.
   votes_count: number;
   // when it was submitted, as a unix timestamp in nanoseconds.
   submission_time: string;
-  // the details of the kind, for the kinds that carry their own
-  // content: a Transfer's token, amount and receiver; a ChangeConfig's
-  // new name and purpose.
+  // the details of the kind, for the kinds that carry their own content:
+  // a Transfer's token, amount and receiver; a ChangeConfig's new name and
+  // purpose.
   detail: HUGGIES_DAO_PROPOSAL_DETAIL;
-  // the block heights the proposal's actions landed in, when the
-  // contract logged them.
+  // the block heights the proposal's actions landed in, when the contract
+  // logged them.
   block_heights: string[];
 }
 // ========================================
@@ -121,9 +114,8 @@ export interface HUGGIES_DAO_PROPOSAL_DETAIL {
   receiver_id: string;
   // the message a Transfer carries.
   msg: string;
-  // the new name a ChangeConfig sets.
+  // the new name and purpose a ChangeConfig sets.
   config_name: string;
-  // the new purpose a ChangeConfig sets.
   config_purpose: string;
   // the theme a ChangeConfig sets, read out of its base64 metadata.
   config_color: string;
@@ -148,19 +140,16 @@ export interface HUGGIES_DAO_INFO {
   name: string;
   // the dao's purpose, from the contract.
   purpose: string;
-  // the roles in the policy.
   roles: HUGGIES_DAO_ROLE[];
   // every account the policy names, with the roles it is in.
   members: HUGGIES_DAO_MEMBER[];
   // the roles that are open to everyone.
   open_roles: HUGGIES_DAO_ROLE[];
-  // the proposals on the dao.
   proposals: HUGGIES_DAO_PROPOSAL[];
   // the NEAR the dao can spend, in yoctoNEAR.
   available_amount: string;
   // the NEAR it holds for storage, in yoctoNEAR.
   locked_amount: string;
-  // one message per thing that failed.
   errors: string[];
 }
 // ========================================
@@ -175,25 +164,20 @@ function to_finite_number_fun(value: unknown): number {
 // with.
 //
 // --- WHY --- the contract's `Transfer` amount is in the token's own
-// smallest unit, and the contract does not say how many decimals that
-// is. the token registry does, so the decimals are asked for once and
-// every amount in the page is read with them.
+// smallest unit, and the contract does not say how many decimals that is.
+// the token registry does, so the decimals are asked for once.
 //
 // --- WHY --- NEAR is 24 decimals and most other tokens are 18, so
-// guessing would read a $SHIT amount as twenty million times too
-// small.
+// guessing would read a $SHIT amount as twenty million times too small.
 interface HUGGIES_DAO_TOKEN_SCALES {
-  // the decimals for each token id, for the tokens the proposals move.
+  // the decimals and the display symbol, per token id.
   decimals: Map<string, number>;
-  // the display symbol for each token id.
   symbols: Map<string, string>;
 }
 // ========================================
 // NEAR is the chain's own token and has no registry entry, so it is
-// described here. 24 decimals is the NEAR protocol constant.
-//
-// the id, the symbol and the decimals live in lib/ts/token_near.ts,
-// next to the other facts about the chain's own token.
+// described here. the id, the symbol and the decimals live in
+// lib/ts/token_near.ts.
 import {
   HUGGIES_NEAR_DECIMALS as HUGGIES_DAO_NEAR_DECIMALS,
   HUGGIES_NEAR_ID,
@@ -219,10 +203,10 @@ function treasury_name_fun(treasury: TREZU_TREASURY): string {
 // the daos an account is a member of.
 //
 // --- WHY --- `isMember` and the hidden check are applied even though
-// trezu already filters: the endpoint's contract may widen, and a dao
-// the reader is not a member of is not one they can act in. a hidden
-// treasury is one the account chose to hide, so it stays out of the
-// list too.
+// trezu already filters: the endpoint's contract may widen, and a dao the
+// reader is not a member of is not one they can act in. a hidden treasury is
+// one the account chose to hide, a confidential one is one trezu keeps
+// private.
 function member_treasuries_fun(
   treasuries: ReadonlyArray<TREZU_TREASURY>,
 ): TREZU_TREASURY[] {
@@ -238,10 +222,9 @@ function member_treasuries_fun(
 // read the roles out of the policy.
 //
 // --- WHY --- the policy is the toolbox's own type and not `unknown`:
-// `SPUTNIK_DAO_POLICY_TYPE` says the roles are a list of
-// `SPUTNIK_DAO_ROLE_TYPE`, and that a role's `kind` is either a
-// `Group` of accounts or the bare string `"Everyone"`. so the members
-// are read with their real types and there is no cast.
+// `SPUTNIK_DAO_POLICY_TYPE` says a role's `kind` is either a `Group` of
+// accounts or the bare string `"Everyone"`. so the members are read with
+// their real types and there is no cast.
 function parse_roles_fun(
   policy: SPUTNIK_DAO_POLICY_TYPE | null,
 ): HUGGIES_DAO_ROLE[] {
@@ -253,8 +236,8 @@ function parse_roles_fun(
     // account can act in the role, so it has no member list at all.
     //
     // --- WHY --- the check is inline and not a boolean above it:
-    // typescript narrows `role.kind` from the check itself, and a
-    // boolean would lose that.
+    // typescript narrows `role.kind` from the check itself, and a boolean
+    // would lose that.
     const group = typeof role.kind === "string" ? null : role.kind.Group;
     parsed.push({
       name: role.name.length > 0 ? role.name : "unknown",
@@ -270,13 +253,13 @@ function parse_roles_fun(
 // fold the roles into one row per account.
 //
 // --- WHY --- one row per account, not one row per role: an account can
-// be in several roles, and a table that repeats the account for each of
-// them makes the reader count the duplicates by hand. the roles the
-// account is in become a column.
+// be in several roles, and a table that repeats the account for each of them
+// makes the reader count the duplicates by hand. the roles the account is in
+// become a column.
 //
-// --- WHY --- the roles that are open to everyone are not rows: they
-// name no accounts, so there is nothing to put in one. they are kept
-// apart so the page can say they exist.
+// --- WHY --- the roles that are open to everyone are not rows: they name no
+// accounts, so there is nothing to put in one. they are kept apart so the
+// page can say they exist.
 function fold_members_fun(roles: ReadonlyArray<HUGGIES_DAO_ROLE>): {
   members: HUGGIES_DAO_MEMBER[];
   open_roles: HUGGIES_DAO_ROLE[];
@@ -313,14 +296,13 @@ function fold_members_fun(roles: ReadonlyArray<HUGGIES_DAO_ROLE>): {
 //
 // --- WHY --- the `kind` is the proposal's real content and it is
 // structured: a Transfer says how much of which token went to whom, a
-// FunctionCall says which contract was called. a row that shows only
-// the kind's name says nothing, so the kind is read and summarised.
+// FunctionCall says which contract was called. a row showing only the
+// kind's name says nothing, so the kind is read and summarised.
 //
 // --- WHY --- the kind is the toolbox's own union and not `unknown`:
-// `SPUTNIK_DAO_PROPOSAL_KIND_TYPE` is a discriminated union over every
-// kind the contract can answer with, so `if ("Transfer" in kind)`
-// narrows it and the fields are read with their real types. there is
-// no `Object.keys()` guesswork and no cast.
+// `SPUTNIK_DAO_PROPOSAL_KIND_TYPE` is a discriminated union over every kind
+// the contract can answer with, so `if ("Transfer" in kind)` narrows it and
+// the fields are read with their real types. no guesswork and no cast.
 function kind_summary_fun(
   kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
   scales: HUGGIES_DAO_TOKEN_SCALES,
@@ -328,8 +310,8 @@ function kind_summary_fun(
   if (!is_object_kind_fun(kind)) return "signal vote";
   if ("Transfer" in kind) {
     const body = kind.Transfer;
-    // --- WHY --- an empty token id means NEAR. the contract uses ""
-    // for the chain's own token.
+    // --- WHY --- an empty token id means NEAR. the contract uses "" for the
+    // chain's own token.
     const token = body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
     const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
     const symbol =
@@ -343,9 +325,9 @@ function kind_summary_fun(
   if ("FunctionCall" in kind) {
     const body = kind.FunctionCall;
     const count = body.actions.length;
-    // --- WHY --- the method is in the summary: a dao can have
-    // nineteen proposals that all call the same contract, and without
-    // the method their cards all read the same.
+    // --- WHY --- the method is in the summary: a dao can have nineteen
+    // proposals that all call the same contract, and without the method
+    // their cards all read the same.
     const method = count > 0 ? body.actions[0].method_name : "";
     return `${method}() on ${body.receiver_id}${count > 1 ? ` (${count} actions)` : ""}`;
   }
@@ -424,9 +406,8 @@ function empty_detail_fun(): HUGGIES_DAO_PROPOSAL_DETAIL {
 // read the theme out of a config's base64 metadata.
 //
 // --- WHY --- the metadata is base64 JSON, not plain text: it holds the
-// dao's primary colour and its logo, which are the parts of a
-// ChangeConfig the reader actually wants to see. a base64 blob in the
-// card tells them nothing.
+// dao's primary colour and its logo, the parts of a ChangeConfig the reader
+// wants to see. a base64 blob in the card tells them nothing.
 function read_config_theme_fun(metadata: unknown): {
   color: string;
   logo: string;
@@ -445,9 +426,8 @@ function read_config_theme_fun(metadata: unknown): {
       logo: typeof logo === "string" ? logo : "",
     };
   } catch {
-    // --- WHY --- a metadata blob the page cannot read is not an
-    // error: the proposal is still a proposal, and the rest of it
-    // still shows.
+    // --- WHY --- a metadata blob the page cannot read is not an error: the
+    // proposal is still a proposal, and the rest of it still shows.
     return empty;
   }
 }
@@ -455,13 +435,12 @@ function read_config_theme_fun(metadata: unknown): {
 // read the details a kind carries into their own fields.
 //
 // --- WHY --- the summary is a sentence and this is the data behind it.
-// the summary reads "20.1M SHIT → sleet.near", which loses the token
-// id and the exact amount. the page shows both: the sentence to read
-// and the fields to check.
+// the summary reads "20.1M SHIT → sleet.near", which loses the token id and
+// the exact amount. the page shows both: the sentence and the fields.
 //
-// --- WHY --- the kind is the toolbox's union: the fields are read
-// with their real types, and a kind the page does not know about
-// simply leaves the detail empty.
+// --- WHY --- the kind is the toolbox's union: the fields are read with their
+// real types, and a kind the page does not know about simply leaves the
+// detail empty.
 function kind_detail_fun(
   kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
   scales: HUGGIES_DAO_TOKEN_SCALES,
@@ -471,8 +450,8 @@ function kind_detail_fun(
 
   if ("Transfer" in kind) {
     const body = kind.Transfer;
-    // --- WHY --- an empty token id means NEAR. the contract uses ""
-    // for the chain's own token.
+    // --- WHY --- an empty token id means NEAR. the contract uses "" for the
+    // chain's own token.
     const token = body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
     const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
     const symbol =
@@ -491,10 +470,10 @@ function kind_detail_fun(
   if ("FunctionCall" in kind) {
     const body = kind.FunctionCall;
     detail.receiver_id = body.receiver_id;
-    // --- WHY --- the method and the args are the whole point of a
-    // function call: nineteen of them can all call the same contract
-    // and still be nineteen different proposals. the method says which
-    // one it is and the args say what it does.
+    // --- WHY --- the method and the args are the whole point of a function
+    // call: nineteen of them can all call the same contract and still be
+    // nineteen different proposals. the method says which one it is and the
+    // args say what it does.
     detail.call_method =
       body.actions.length > 0 ? body.actions[0].method_name : "";
     detail.call_args = body.actions.map((action) => action.args);
@@ -540,8 +519,8 @@ function kind_detail_fun(
 // ========================================
 // how many accounts a role holds.
 //
-// --- WHY --- the role's `kind` is either a `Group` of accounts or the
-// bare string `"Everyone"`, and an everyone-role has no list to count.
+// --- WHY --- the role's `kind` is either a `Group` of accounts or the bare
+// string `"Everyone"`, and an everyone-role has no list to count.
 function read_role_member_count_fun(kind: SPUTNIK_DAO_ROLE_KIND_TYPE): number {
   return typeof kind === "string" ? 0 : kind.Group.length;
 }
@@ -549,7 +528,7 @@ function read_role_member_count_fun(kind: SPUTNIK_DAO_ROLE_KIND_TYPE): number {
 // the roles a policy carries, with how many accounts each holds.
 //
 // --- WHY --- a policy change IS the role list, so "policy change" as a
-// summary says nothing. the roles are what the reader came to see.
+// summary says nothing. the roles are what the reader came for.
 function read_policy_roles_fun(
   policy: SPUTNIK_DAO_POLICY_TYPE,
 ): Array<{ name: string; members: number }> {
@@ -579,19 +558,17 @@ function parse_block_heights_fun(
 // read the proposals out of the contract's reply.
 //
 // --- WHY --- the reply is already typed and already validated: the
-// toolbox's getter parses it with zod against
-// `SPUTNIK_DAO_PROPOSAL_TYPE`. so this only reads the toolbox's own
-// fields and adds the two the page computes — the summary and the
-// detail. there is nothing to re-derive and nothing to cast.
+// toolbox's getter parses it with zod against `SPUTNIK_DAO_PROPOSAL_TYPE`.
+// so this only reads the toolbox's own fields and adds the two the page
+// computes — the summary and the detail. nothing to re-derive, no cast.
 function parse_proposals_fun(
   proposals: ReadonlyArray<SPUTNIK_DAO_PROPOSAL_TYPE>,
   scales: HUGGIES_DAO_TOKEN_SCALES,
 ): HUGGIES_DAO_PROPOSAL[] {
   const parsed: HUGGIES_DAO_PROPOSAL[] = [];
   for (const proposal of proposals) {
-    // the vote counts are `[yes, no, spam]` per role. the contract
-    // sends them as strings, so they are read as numbers here and the
-    // page can count them.
+    // the vote counts are `[yes, no, spam]` per role. the contract sends
+    // them as strings, so they are read as numbers here.
     const counts: Record<string, [number, number, number]> = {};
     for (const [role, value] of Object.entries(proposal.vote_counts)) {
       counts[role] = [
@@ -626,12 +603,11 @@ function parse_proposals_fun(
 //
 // --- WHY --- one member of the union is a bare string (`"Vote"`), so
 // `"Transfer" in kind` leaves the string in the false branch and
-// typescript cannot read a field off it. this guard takes the string
-// out first, and every field read after it is on an object kind.
+// typescript cannot read a field off it. this guard takes the string out
+// first, and every field read after it is on an object kind.
 //
-// --- WHY --- the guard is not a cast: it checks the one thing that
-// tells the two apart, and the fields it returns are the toolbox's
-// own types.
+// --- WHY --- the guard is not a cast: it checks the one thing that tells the
+// two apart, and the fields it returns are the toolbox's own types.
 function is_object_kind_fun(
   kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
 ): kind is Exclude<SPUTNIK_DAO_PROPOSAL_KIND_TYPE, string> {
@@ -640,9 +616,8 @@ function is_object_kind_fun(
 // ========================================
 // the name of a proposal's kind.
 //
-// --- WHY --- the union's members are named by their keys, and one of
-// them is a bare string (`"Vote"`). this reads the name without
-// casting the whole union away.
+// --- WHY --- the union's members are named by their keys, and one of them
+// is a bare string (`"Vote"`). this reads the name without casting it.
 function proposal_kind_name_fun(kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE): string {
   if (typeof kind === "string") return kind;
   return Object.keys(kind)[0] ?? "unknown";
@@ -655,12 +630,12 @@ async function load_dao_fun(dao_id: string): Promise<HUGGIES_DAO_INFO> {
   const near = near_kit_client();
 
   // the contract reads run together, so the page is as slow as its
-  // slowest one rather than the sum of the four.
+  // slowest one rather than the sum of the five.
   //
-  // --- WHY --- the typed helpers are used here, not the generic
-  // view helper: each one names the fields it reads and validates
-  // the answer. `get_proposals` also reads a DAO with no proposals
-  // as an empty list, so it never lands in `errors`.
+  // --- WHY --- the typed helpers are used here, not the generic view
+  // helper: each one names the fields it reads and validates the answer.
+  // `get_proposals` also reads a DAO with no proposals as an empty list, so
+  // it never lands in `errors`.
   const [config, policy, proposals, available, locked] = await Promise.all([
     sputnik_dao_get_config_fun_json(near, dao_id).catch((err: unknown) => {
       errors.push(
@@ -729,10 +704,9 @@ async function load_dao_fun(dao_id: string): Promise<HUGGIES_DAO_INFO> {
 // --- TOKEN SCALES ----------------------
 // the decimals and symbols of the tokens the proposals move.
 //
-// --- WHY --- a Transfer's amount is in the token's own smallest unit
-// and the contract does not say how many decimals that is. the token
-// registry does, so it is asked once for every token the proposals
-// touch and every amount in the page is read with it.
+// --- WHY --- a Transfer's amount is in the token's own smallest unit and
+// the contract does not say how many decimals that is. the token registry
+// does, so it is asked once for every token the proposals touch.
 async function load_token_scales_fun(
   proposals: ReadonlyArray<SPUTNIK_DAO_PROPOSAL_TYPE>,
 ): Promise<HUGGIES_DAO_TOKEN_SCALES> {
@@ -760,8 +734,8 @@ async function load_token_scales_fun(
       symbols.set(id, info.symbol);
     }
   } catch {
-    // --- WHY --- the amounts are shown with a guess if the registry
-    // cannot be read. a wrong scale is better than no proposals.
+    // --- WHY --- the amounts are shown with a guess if the registry cannot
+    // be read. a wrong scale is better than no proposals.
     for (const id of token_ids) {
       decimals.set(id, HUGGIES_DAO_NEAR_DECIMALS);
       symbols.set(id, id.split(".")[0]);
@@ -771,7 +745,6 @@ async function load_token_scales_fun(
 }
 // ========================================
 // --- PUBLIC ---------------------------
-// the page's load surface. one call per thing the page loads.
 export const HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE = {
   load_dao: load_dao_fun,
   list_dao_treasuries: async (account_id: string): Promise<TREZU_TREASURY[]> =>
