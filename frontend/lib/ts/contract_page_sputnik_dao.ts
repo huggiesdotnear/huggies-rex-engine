@@ -34,6 +34,17 @@ import {
   sputnik_dao_get_available_amount_fun_json,
   sputnik_dao_get_locked_storage_amount_fun_json,
 } from "@near-kit-tool-box/fun";
+// --- WHY --- the toolbox's own types, not local copies: the toolbox
+// already models the contract's proposal kinds as a discriminated
+// union and validates the reply with zod. a local copy of the same
+// shape would drift from it, and the copy is what threw the kinds'
+// own fields away.
+import type {
+  SPUTNIK_DAO_LAST_ACTION_TYPE,
+  SPUTNIK_DAO_POLICY_TYPE,
+  SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
+  SPUTNIK_DAO_PROPOSAL_TYPE,
+} from "@near-kit-tool-box/fun";
 import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import type { TREZU_TREASURY } from "../../../middleman/huggies";
@@ -81,6 +92,41 @@ export interface HUGGIES_DAO_PROPOSAL {
   votes_count: number;
   // when it was submitted, as a unix timestamp in nanoseconds.
   submission_time: string;
+  // the details of the kind, for the kinds that carry their own
+  // content: a Transfer's token, amount and receiver; a ChangeConfig's
+  // new name and purpose.
+  detail: HUGGIES_DAO_PROPOSAL_DETAIL;
+  // the block heights the proposal's actions landed in, when the
+  // contract logged them.
+  block_heights: string[];
+}
+// ========================================
+// the parts of a proposal that only some kinds carry.
+//
+// --- WHY --- one shape for every kind and not one per kind: the page
+// shows the detail the proposal has, and a proposal of a kind the page
+// does not know about shows nothing rather than breaking. each field is
+// empty when the kind does not have it.
+export interface HUGGIES_DAO_PROPOSAL_DETAIL {
+  // the token a Transfer moves. empty for every other kind.
+  token_id: string;
+  // the token's display symbol, when the registry knows it.
+  token_symbol: string;
+  // the raw amount, in the token's own smallest unit.
+  amount: string;
+  // the amount read with the token's decimals, as a human figure.
+  amount_text: string;
+  // who a Transfer sends to, or who a FunctionCall calls.
+  receiver_id: string;
+  // the message a Transfer carries.
+  msg: string;
+  // the new name a ChangeConfig sets.
+  config_name: string;
+  // the new purpose a ChangeConfig sets.
+  config_purpose: string;
+  // the theme a ChangeConfig sets, read out of its base64 metadata.
+  config_color: string;
+  config_logo: string;
 }
 // ========================================
 // the page's DAO record: what it is called and what it holds.
@@ -113,26 +159,6 @@ function to_finite_number_fun(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number(String(value));
   return Number.isFinite(parsed) ? parsed : 0;
 }
-// ========================================
-// the kinds a proposal can be, and the parts of them the page reads.
-type HUGGIES_DAO_PROPOSAL_KIND =
-  | "ChangeConfig"
-  | "ChangePolicy"
-  | "AddMemberToRole"
-  | "RemoveMemberFromRole"
-  | "FunctionCall"
-  | "UpgradeSelf"
-  | "UpgradeRemote"
-  | "Transfer"
-  | "SetStakingContract"
-  | "AddBounty"
-  | "BountyDone"
-  | "Vote"
-  | "FactoryInfoUpdate"
-  | "ChangePolicyAddOrUpdateRole"
-  | "ChangePolicyRemoveRole"
-  | "ChangePolicyUpdateDefaultVotePolicy"
-  | "ChangePolicyUpdateParameters";
 // ========================================
 // the token amounts in the proposals, and the decimals to read them
 // with.
@@ -199,36 +225,31 @@ function member_treasuries_fun(
 // ========================================
 // --- POLICY -----------------------------
 // read the roles out of the policy.
-function parse_roles_fun(value: unknown): HUGGIES_DAO_ROLE[] {
-  if (typeof value !== "object" || value === null) return [];
-  const roles = (value as { roles?: unknown }).roles;
-  if (!Array.isArray(roles)) return [];
+//
+// --- WHY --- the policy is the toolbox's own type and not `unknown`:
+// `SPUTNIK_DAO_POLICY_TYPE` says the roles are a list of
+// `SPUTNIK_DAO_ROLE_TYPE`, and that a role's `kind` is either a
+// `Group` of accounts or the bare string `"Everyone"`. so the members
+// are read with their real types and there is no cast.
+function parse_roles_fun(
+  policy: SPUTNIK_DAO_POLICY_TYPE | null,
+): HUGGIES_DAO_ROLE[] {
+  if (policy === null) return [];
   const parsed: HUGGIES_DAO_ROLE[] = [];
-  for (const role of roles) {
-    if (typeof role !== "object" || role === null) continue;
-    const name = (role as { name?: unknown }).name;
-    const kind = (role as { kind?: unknown }).kind;
-    const permissions = (role as { permissions?: unknown }).permissions;
+  for (const role of policy.roles) {
     // the role's members live under `kind`, which is an enum. `Group`
     // holds the accounts; `Everyone` is a bare string and means any
     // account can act in the role, so it has no member list at all.
-    const group =
-      typeof kind === "object" && kind !== null
-        ? (kind as { Group?: unknown }).Group
-        : undefined;
-    const members = Array.isArray(group)
-      ? group.filter((member): member is string => typeof member === "string")
-      : [];
+    //
+    // --- WHY --- the check is inline and not a boolean above it:
+    // typescript narrows `role.kind` from the check itself, and a
+    // boolean would lose that.
+    const group = typeof role.kind === "string" ? null : role.kind.Group;
     parsed.push({
-      name: typeof name === "string" ? name : "unknown",
-      kind: Array.isArray(group) ? "group" : "everyone",
-      members,
-      permissions: Array.isArray(permissions)
-        ? permissions.filter(
-            (permission): permission is string =>
-              typeof permission === "string",
-          )
-        : [],
+      name: role.name.length > 0 ? role.name : "unknown",
+      kind: group === null ? "everyone" : "group",
+      members: group ?? [],
+      permissions: role.permissions,
     });
   }
   return parsed;
@@ -283,157 +304,285 @@ function fold_members_fun(roles: ReadonlyArray<HUGGIES_DAO_ROLE>): {
 // structured: a Transfer says how much of which token went to whom, a
 // FunctionCall says which contract was called. a row that shows only
 // the kind's name says nothing, so the kind is read and summarised.
+//
+// --- WHY --- the kind is the toolbox's own union and not `unknown`:
+// `SPUTNIK_DAO_PROPOSAL_KIND_TYPE` is a discriminated union over every
+// kind the contract can answer with, so `if ("Transfer" in kind)`
+// narrows it and the fields are read with their real types. there is
+// no `Object.keys()` guesswork and no cast.
 function kind_summary_fun(
-  kind: unknown,
+  kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
   scales: HUGGIES_DAO_TOKEN_SCALES,
 ): string {
-  if (typeof kind !== "object" || kind === null) return "";
-  const name = Object.keys(kind)[0] ?? "";
-  const body = (kind as Record<string, unknown>)[name];
-  if (typeof body !== "object" || body === null) return name;
-
-  switch (name) {
-    case "Transfer": {
-      const token_id = (body as { token_id?: unknown }).token_id;
-      const receiver_id = (body as { receiver_id?: unknown }).receiver_id;
-      const amount = (body as { amount?: unknown }).amount;
-      // --- WHY --- an empty token id means NEAR. the contract uses ""
-      // for the chain's own token.
-      const token =
-        typeof token_id === "string" && token_id.length > 0
-          ? token_id
-          : HUGGIES_NEAR_ID;
-      const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
-      const symbol =
-        scales.symbols.get(token) ??
-        (token === HUGGIES_NEAR_ID
-          ? HUGGIES_DAO_NEAR_SYMBOL
-          : token.split(".")[0]);
-      const amount_text =
-        typeof amount === "string" ? format_amount_fun(amount, decimals) : "—";
-      const receiver =
-        typeof receiver_id === "string" ? receiver_id : "unknown";
-      return `${amount_text} ${symbol} → ${receiver}`;
-    }
-    case "FunctionCall": {
-      const receiver_id = (body as { receiver_id?: unknown }).receiver_id;
-      const actions = (body as { actions?: unknown }).actions;
-      const count = Array.isArray(actions) ? actions.length : 0;
-      const receiver =
-        typeof receiver_id === "string" ? receiver_id : "unknown";
-      return `call ${receiver}${count > 1 ? ` (${count} actions)` : ""}`;
-    }
-    case "AddMemberToRole":
-    case "RemoveMemberFromRole": {
-      const member_id = (body as { member_id?: unknown }).member_id;
-      const role = (body as { role?: unknown }).role;
-      return `${member_id ?? "?"} → ${role ?? "?"}`;
-    }
-    case "ChangeConfig": {
-      const config = (body as { config?: unknown }).config;
-      const config_name =
-        typeof config === "object" && config !== null
-          ? (config as { name?: unknown }).name
-          : null;
-      return typeof config_name === "string" ? config_name : "new config";
-    }
-    case "ChangePolicy":
-    case "ChangePolicyAddOrUpdateRole":
-    case "ChangePolicyRemoveRole":
-    case "ChangePolicyUpdateDefaultVotePolicy":
-    case "ChangePolicyUpdateParameters":
-      return "policy change";
-    case "AddBounty": {
-      const bounty = (body as { bounty?: unknown }).bounty;
-      const description =
-        typeof bounty === "object" && bounty !== null
-          ? (bounty as { description?: unknown }).description
-          : null;
-      return typeof description === "string" ? description : "bounty";
-    }
-    case "UpgradeSelf":
-    case "UpgradeRemote":
-      return "upgrade";
-    case "BountyDone": {
-      const bounty_id = (body as { bounty_id?: unknown }).bounty_id;
-      return `bounty ${bounty_id ?? "?"} done`;
-    }
-    case "Vote":
-      return "signal vote";
-    default:
-      return name;
+  if (!is_object_kind_fun(kind)) return "signal vote";
+  if ("Transfer" in kind) {
+    const body = kind.Transfer;
+    // --- WHY --- an empty token id means NEAR. the contract uses ""
+    // for the chain's own token.
+    const token =
+      body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
+    const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
+    const symbol =
+      scales.symbols.get(token) ??
+      (token === HUGGIES_NEAR_ID
+        ? HUGGIES_DAO_NEAR_SYMBOL
+        : token.split(".")[0]);
+    const amount_text = format_amount_fun(body.amount, decimals);
+    return `${amount_text} ${symbol} → ${body.receiver_id}`;
+  }
+  if ("FunctionCall" in kind) {
+    const body = kind.FunctionCall;
+    const count = body.actions.length;
+    return `call ${body.receiver_id}${count > 1 ? ` (${count} actions)` : ""}`;
+  }
+  if ("AddMemberToRole" in kind) {
+    const body = kind.AddMemberToRole;
+    return `${body.member_id} → ${body.role}`;
+  }
+  if ("RemoveMemberFromRole" in kind) {
+    const body = kind.RemoveMemberFromRole;
+    return `${body.member_id} → ${body.role}`;
+  }
+  if ("ChangeConfig" in kind) {
+    const name = kind.ChangeConfig.config.name;
+    return name.length > 0 ? name : "new config";
+  }
+  if ("ChangePolicy" in kind) {
+    return "policy change";
+  }
+  if ("ChangePolicyAddOrUpdateRole" in kind) {
+    return `role ${kind.ChangePolicyAddOrUpdateRole.role.name}`;
+  }
+  if ("ChangePolicyRemoveRole" in kind) {
+    return `role ${kind.ChangePolicyRemoveRole.role}`;
+  }
+  if ("ChangePolicyUpdateDefaultVotePolicy" in kind) {
+    return "policy change";
+  }
+  if ("ChangePolicyUpdateParameters" in kind) {
+    return "policy change";
+  }
+  if ("AddBounty" in kind) {
+    const description = kind.AddBounty.bounty.description;
+    return description.length > 0 ? description : "bounty";
+  }
+  if ("UpgradeSelf" in kind) {
+    return "upgrade";
+  }
+  if ("UpgradeRemote" in kind) {
+    return "upgrade";
+  }
+  if ("BountyDone" in kind) {
+    return `bounty ${kind.BountyDone.bounty_id} done`;
+  }
+  if ("SetStakingContract" in kind) {
+    return `staking → ${kind.SetStakingContract.staking_id}`;
+  }
+  if ("FactoryInfoUpdate" in kind) {
+    return `factory → ${kind.FactoryInfoUpdate.factory_info.factory_id}`;
+  }
+  return "proposal";
+}
+// ========================================
+// --- DETAIL ----------------------------
+// an empty detail, for the kinds that carry nothing of their own.
+function empty_detail_fun(): HUGGIES_DAO_PROPOSAL_DETAIL {
+  return {
+    token_id: "",
+    token_symbol: "",
+    amount: "",
+    amount_text: "",
+    receiver_id: "",
+    msg: "",
+    config_name: "",
+    config_purpose: "",
+    config_color: "",
+    config_logo: "",
+  };
+}
+// ========================================
+// read the theme out of a config's base64 metadata.
+//
+// --- WHY --- the metadata is base64 JSON, not plain text: it holds the
+// dao's primary colour and its logo, which are the parts of a
+// ChangeConfig the reader actually wants to see. a base64 blob in the
+// card tells them nothing.
+function read_config_theme_fun(metadata: unknown): {
+  color: string;
+  logo: string;
+} {
+  const empty = { color: "", logo: "" };
+  if (typeof metadata !== "string" || metadata.length === 0) return empty;
+  try {
+    const decoded = atob(metadata);
+    const parsed: unknown = JSON.parse(decoded);
+    if (typeof parsed !== "object" || parsed === null) return empty;
+    const record = parsed as Record<string, unknown>;
+    const color = record.primaryColor;
+    const logo = record.flagLogo;
+    return {
+      color: typeof color === "string" ? color : "",
+      logo: typeof logo === "string" ? logo : "",
+    };
+  } catch {
+    // --- WHY --- a metadata blob the page cannot read is not an
+    // error: the proposal is still a proposal, and the rest of it
+    // still shows.
+    return empty;
   }
 }
 // ========================================
+// read the details a kind carries into their own fields.
+//
+// --- WHY --- the summary is a sentence and this is the data behind it.
+// the summary reads "20.1M SHIT → sleet.near", which loses the token
+// id and the exact amount. the page shows both: the sentence to read
+// and the fields to check.
+//
+// --- WHY --- the kind is the toolbox's union: the fields are read
+// with their real types, and a kind the page does not know about
+// simply leaves the detail empty.
+function kind_detail_fun(
+  kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
+  scales: HUGGIES_DAO_TOKEN_SCALES,
+): HUGGIES_DAO_PROPOSAL_DETAIL {
+  const detail = empty_detail_fun();
+  if (!is_object_kind_fun(kind)) return detail;
+
+  if ("Transfer" in kind) {
+    const body = kind.Transfer;
+    // --- WHY --- an empty token id means NEAR. the contract uses ""
+    // for the chain's own token.
+    const token = body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
+    const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
+    const symbol =
+      scales.symbols.get(token) ??
+      (token === HUGGIES_NEAR_ID
+        ? HUGGIES_DAO_NEAR_SYMBOL
+        : token.split(".")[0]);
+    detail.token_id = body.token_id;
+    detail.token_symbol = symbol;
+    detail.amount = body.amount;
+    detail.amount_text = format_amount_fun(body.amount, decimals);
+    detail.receiver_id = body.receiver_id;
+    detail.msg = body.msg ?? "";
+    return detail;
+  }
+  if ("FunctionCall" in kind) {
+    detail.receiver_id = kind.FunctionCall.receiver_id;
+    return detail;
+  }
+  if ("AddMemberToRole" in kind) {
+    detail.receiver_id = kind.AddMemberToRole.member_id;
+    detail.msg = kind.AddMemberToRole.role;
+    return detail;
+  }
+  if ("RemoveMemberFromRole" in kind) {
+    detail.receiver_id = kind.RemoveMemberFromRole.member_id;
+    detail.msg = kind.RemoveMemberFromRole.role;
+    return detail;
+  }
+  if ("ChangeConfig" in kind) {
+    const config = kind.ChangeConfig.config;
+    detail.config_name = config.name;
+    detail.config_purpose = config.purpose;
+    const theme = read_config_theme_fun(config.metadata);
+    detail.config_color = theme.color;
+    detail.config_logo = theme.logo;
+    return detail;
+  }
+  return detail;
+}
+// ========================================
+// read the block heights the contract logged for a proposal.
+//
+// --- WHY --- these are the blocks the proposal's actions landed in, so
+// they say WHEN it really happened — which can be long after it was
+// submitted.
+function parse_block_heights_fun(
+  log: ReadonlyArray<SPUTNIK_DAO_LAST_ACTION_TYPE> | undefined,
+): string[] {
+  if (!Array.isArray(log)) return [];
+  const heights: string[] = [];
+  for (const entry of log) {
+    if (typeof entry.block_height === "string" && entry.block_height.length > 0)
+      heights.push(entry.block_height);
+  }
+  return heights;
+}
+// ========================================
 // read the proposals out of the contract's reply.
+//
+// --- WHY --- the reply is already typed and already validated: the
+// toolbox's getter parses it with zod against
+// `SPUTNIK_DAO_PROPOSAL_TYPE`. so this only reads the toolbox's own
+// fields and adds the two the page computes — the summary and the
+// detail. there is nothing to re-derive and nothing to cast.
 function parse_proposals_fun(
-  value: unknown,
+  proposals: ReadonlyArray<SPUTNIK_DAO_PROPOSAL_TYPE>,
   scales: HUGGIES_DAO_TOKEN_SCALES,
 ): HUGGIES_DAO_PROPOSAL[] {
-  if (!Array.isArray(value)) return [];
   const parsed: HUGGIES_DAO_PROPOSAL[] = [];
-  for (const proposal of value) {
-    if (typeof proposal !== "object" || proposal === null) continue;
-    const id = (proposal as { id?: unknown }).id;
-    if (typeof id !== "number") continue;
-    const kind = (proposal as { kind?: unknown }).kind;
-    const kind_name =
-      typeof kind === "object" && kind !== null
-        ? (Object.keys(kind)[0] ?? "unknown")
-        : "unknown";
-    const vote_counts = (proposal as { vote_counts?: unknown }).vote_counts;
-    const votes = (proposal as { votes?: unknown }).votes;
+  for (const proposal of proposals) {
+    // the vote counts are `[yes, no, spam]` per role. the contract
+    // sends them as strings, so they are read as numbers here and the
+    // page can count them.
     const counts: Record<string, [number, number, number]> = {};
-    if (typeof vote_counts === "object" && vote_counts !== null) {
-      for (const [role, value] of Object.entries(
-        vote_counts as Record<string, unknown>,
-      )) {
-        if (!Array.isArray(value)) continue;
-        counts[role] = [
-          to_finite_number_fun(value[0]),
-          to_finite_number_fun(value[1]),
-          to_finite_number_fun(value[2]),
-        ];
-      }
+    for (const [role, value] of Object.entries(proposal.vote_counts)) {
+      counts[role] = [
+        to_finite_number_fun(value[0]),
+        to_finite_number_fun(value[1]),
+        to_finite_number_fun(value[2]),
+      ];
     }
     const vote_list: Array<{ account_id: string; vote: string }> = [];
-    if (typeof votes === "object" && votes !== null) {
-      for (const [account_id, vote] of Object.entries(
-        votes as Record<string, unknown>,
-      )) {
-        vote_list.push({
-          account_id,
-          vote: typeof vote === "string" ? vote : "Unknown",
-        });
-      }
+    for (const [account_id, vote] of Object.entries(proposal.votes)) {
+      vote_list.push({ account_id, vote });
     }
     parsed.push({
-      id,
-      proposer:
-        typeof (proposal as { proposer?: unknown }).proposer === "string"
-          ? (proposal as { proposer: string }).proposer
-          : "",
-      description:
-        typeof (proposal as { description?: unknown }).description === "string"
-          ? (proposal as { description: string }).description
-          : "",
-      kind: kind_name,
-      kind_summary: kind_summary_fun(kind, scales),
-      status:
-        typeof (proposal as { status?: unknown }).status === "string"
-          ? (proposal as { status: string }).status
-          : "unknown",
+      id: proposal.id,
+      proposer: proposal.proposer,
+      description: proposal.description,
+      kind: proposal_kind_name_fun(proposal.kind),
+      kind_summary: kind_summary_fun(proposal.kind, scales),
+      status: proposal.status,
       vote_counts: counts,
       votes: vote_list,
       votes_count: vote_list.length,
-      submission_time:
-        typeof (proposal as { submission_time?: unknown }).submission_time ===
-        "string"
-          ? (proposal as { submission_time: string }).submission_time
-          : "",
+      submission_time: proposal.submission_time,
+      detail: kind_detail_fun(proposal.kind, scales),
+      block_heights: parse_block_heights_fun(proposal.last_actions_log),
     });
   }
   return parsed;
+}
+// ========================================
+// a proposal kind that carries an object body.
+//
+// --- WHY --- one member of the union is a bare string (`"Vote"`), so
+// `"Transfer" in kind` leaves the string in the false branch and
+// typescript cannot read a field off it. this guard takes the string
+// out first, and every field read after it is on an object kind.
+//
+// --- WHY --- the guard is not a cast: it checks the one thing that
+// tells the two apart, and the fields it returns are the toolbox's
+// own types.
+function is_object_kind_fun(
+  kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
+): kind is Exclude<SPUTNIK_DAO_PROPOSAL_KIND_TYPE, string> {
+  return typeof kind === "object" && kind !== null;
+}
+// ========================================
+// the name of a proposal's kind.
+//
+// --- WHY --- the union's members are named by their keys, and one of
+// them is a bare string (`"Vote"`). this reads the name without
+// casting the whole union away.
+function proposal_kind_name_fun(
+  kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
+): string {
+  if (typeof kind === "string") return kind;
+  return Object.keys(kind)[0] ?? "unknown";
 }
 // ========================================
 // --- LOAD -------------------------------
@@ -522,24 +671,20 @@ async function load_dao_fun(dao_id: string): Promise<HUGGIES_DAO_INFO> {
 // registry does, so it is asked once for every token the proposals
 // touch and every amount in the page is read with it.
 async function load_token_scales_fun(
-  proposals: unknown,
+  proposals: ReadonlyArray<SPUTNIK_DAO_PROPOSAL_TYPE>,
 ): Promise<HUGGIES_DAO_TOKEN_SCALES> {
   const decimals = new Map<string, number>();
   const symbols = new Map<string, string>();
-  if (!Array.isArray(proposals)) return { decimals, symbols };
 
   const token_ids = new Set<string>();
   for (const proposal of proposals) {
-    if (typeof proposal !== "object" || proposal === null) continue;
-    const kind = (proposal as { kind?: unknown }).kind;
-    if (typeof kind !== "object" || kind === null) continue;
-    const transfer = (kind as Record<string, unknown>).Transfer;
-    if (typeof transfer !== "object" || transfer === null) continue;
-    const token_id = (transfer as { token_id?: unknown }).token_id;
+    const kind = proposal.kind;
+    if (!is_object_kind_fun(kind)) continue;
+    if (!("Transfer" in kind)) continue;
     // --- WHY --- an empty token id means NEAR, the chain's own token.
     const token =
-      typeof token_id === "string" && token_id.length > 0
-        ? token_id
+      kind.Transfer.token_id.length > 0
+        ? kind.Transfer.token_id
         : HUGGIES_NEAR_ID;
     token_ids.add(token);
   }
