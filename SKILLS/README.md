@@ -9,6 +9,8 @@ thnik of SKILLS/huggies-rex-engine as a baseilc skill for using the app
 can add other skills for specific smart conatcts.
 <br/>
 each skill should show example curl commands to do specif tracnastion types via our api.
+<br/>
+the skill should refference the live site at "https://shit-1170.com/"
 
 skills
 - [SKILLS/huggies-rex-engine](./huggies-rex-engine/SKILL.md)
