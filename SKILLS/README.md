@@ -7,6 +7,8 @@ follow https://github.com/sleetplayground/near-kit-tool-box-skills as a guide fo
 thnik of SKILLS/huggies-rex-engine as a baseilc skill for using the app
 <br/>
 can add other skills for specific smart conatcts.
+<br/>
+each skill should show example curl commands to do specif tracnastion types via our api.
 
 skills
 - [SKILLS/huggies-rex-engine](./huggies-rex-engine/SKILL.md)
