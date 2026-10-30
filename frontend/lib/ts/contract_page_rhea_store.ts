@@ -128,6 +128,7 @@ async function load_fun(
     data = {
       pools: [],
       total: 0,
+      pool_count: 0,
       has_more: false,
       tvl_usd: 0,
       volume_24h_usd: 0,
@@ -170,6 +171,7 @@ async function load_more_fun(): Promise<void> {
     data = {
       pools: [...data.pools, ...result.pools],
       total: result.total,
+      pool_count: result.pool_count,
       has_more: result.has_more,
       tvl_usd: result.tvl_usd,
       volume_24h_usd: result.volume_24h_usd,

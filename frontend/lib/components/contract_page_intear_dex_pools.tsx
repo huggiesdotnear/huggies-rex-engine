@@ -45,6 +45,17 @@ function pool_row_fun(pool: HUGGIES_INTEAR_DEX_POOL): preact.JSX.Element {
   const symbols = pool.symbols.join(" / ");
   return (
     <div class="pool">
+      <span class="pool-icons">
+        {pool.icons.map((icon) =>
+          icon !== null ? (
+            <img class="pool-icon" src={icon} alt="" loading="lazy" />
+          ) : (
+            // a token with no icon gets a placeholder, so the row keeps
+            // its shape instead of showing a broken image.
+            <span class="pool-icon is-empty" />
+          ),
+        )}
+      </span>
       <span class="pool-pair">
         <strong>{symbols.length > 0 ? symbols : pool.id}</strong>
         <span class="pool-kind">{pool.kind}</span>
@@ -71,6 +82,8 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
   const direction = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_direction();
   const loading = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.is_loading();
   const errors = page_data?.errors ?? [];
+  // true while the reader has typed something into the search box.
+  const searching = query.trim().length > 0;
 
   // --- WHY --- the search filters the loaded pools and not the api.
   // the dex api has no search endpoint and answers with every pool in
@@ -117,6 +130,15 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
       {errors.map((message) => (
         <p class="error">{message}</p>
       ))}
+      {/* --- WHY --- the count of the pools on screen: the header shows
+          the size of the dex, so the list has to say how many pools
+          the reader is actually looking at. */}
+      {!loading && (page_data?.pools.length ?? 0) > 0 && (
+        <p class="count">
+          {page_data?.pools.length.toLocaleString()}{" "}
+          {searching ? "POOLS MATCHED" : "POOLS"}
+        </p>
+      )}
       <div class="results-scroll">
         {pools.length === 0 && !loading ? (
           <p>NO POOLS FOUND</p>

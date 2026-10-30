@@ -38,7 +38,6 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN() {
     <>
       <header>
         <h1>INTEAR DEX</h1>
-        <p>the intear dex engine on near</p>
       </header>
       <section class="contracts">
         <article>

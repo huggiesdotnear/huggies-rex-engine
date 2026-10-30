@@ -47,6 +47,7 @@ import type {
   RHEA_POOL_SEARCH_ITEM,
   RHEA_POOL_SEARCH_TYPE,
 } from "@sleet-js/middleman-rhea-api";
+import { HUGGIES_POOL_TOKENS } from "./pool_tokens";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -73,6 +74,9 @@ export interface HUGGIES_RHEA_POOL {
   symbols: ReadonlyArray<string>;
   // the token account ids behind those symbols.
   token_ids: ReadonlyArray<string>;
+  // the icons of those tokens, in the same order as `token_ids`. a null
+  // is a token with no icon.
+  icons: ReadonlyArray<string | null>;
   // the value locked in the pool, in usd.
   tvl_usd: number;
   // the 24 hour volume, in usd.
@@ -93,8 +97,12 @@ export interface HUGGIES_RHEA_POOL {
 export interface HUGGIES_RHEA_PAGE_DATA {
   // the pools on screen.
   pools: ReadonlyArray<HUGGIES_RHEA_POOL>;
-  // how many pools the api says there are, for the whole list.
+  // how many pools the api matched for the CURRENT view — the family
+  // and the search together. this is the count the list pages on.
   total: number;
+  // how many pools the dex has in the chosen family, with no search.
+  // this is the count the header shows.
+  pool_count: number;
   // true when the api has more pools behind this one.
   has_more: boolean;
   // the dex's own total value locked, in usd.
@@ -127,6 +135,7 @@ function map_pool_fun(pool: RHEA_POOL_SEARCH_ITEM): HUGGIES_RHEA_POOL {
     token_ids: Array.isArray(pool.token_account_ids)
       ? pool.token_account_ids
       : [],
+    icons: [],
     tvl_usd: to_finite_number_fun(pool.tvl),
     volume_24h_usd: to_finite_number_fun(pool.volume_24h),
     apy: to_finite_number_fun(pool.apy),
@@ -172,6 +181,36 @@ async function fetch_totals_fun(): Promise<{
   }
 }
 // ========================================
+// the number of pools in the dex's chosen family, with no search.
+//
+// --- WHY --- a request of its own and not the count from the list:
+// the api's `total` follows the search filter, so a search for "NEARLY"
+// would make the header say the dex has 3,982 pools when it has
+// 10,017. the header's tiles are the size of the DEX, so the count
+// has to come from a request that is not filtered.
+//
+// --- WHY --- the family still counts: the reader picked AMM, so the
+// number of AMM pools is the number they want.
+async function fetch_family_count_fun(
+  type: RHEA_POOL_SEARCH_TYPE,
+): Promise<{ count: number; error: string | null }> {
+  try {
+    const response = await api_rhea_pool_search({
+      type,
+      sort: "tvl",
+      order_by: "desc",
+      limit: 1,
+      offset: 0,
+    });
+    return { count: response.data?.total ?? 0, error: null };
+  } catch (err) {
+    return {
+      count: 0,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+// ========================================
 // ========================================
 // --- LOAD -------------------------------
 // fetch one page of pools for a sort, a direction and a pool family,
@@ -202,7 +241,7 @@ async function load_pools_fun(
   search: string,
 ): Promise<HUGGIES_RHEA_PAGE_DATA> {
   const needle = search.trim();
-  const [rows_result, totals] = await Promise.all([
+  const [rows_result, totals, family] = await Promise.all([
     api_rhea_pool_search({
       type,
       sort,
@@ -212,6 +251,7 @@ async function load_pools_fun(
       ...(needle.length > 0 ? { token_list: needle } : {}),
     }),
     fetch_totals_fun(),
+    fetch_family_count_fun(type),
   ]);
 
   const data = rows_result.data;
@@ -220,12 +260,30 @@ async function load_pools_fun(
   const pools = rows.map((pool) => map_pool_fun(pool));
   const errors: string[] = [];
   if (totals.error !== null) errors.push(`totals: ${totals.error}`);
+  if (family.error !== null) errors.push(`count: ${family.error}`);
+
+  // --- WHY --- the icons come last: they are needed for every pool
+  // at once, so one request covers the whole list. asking for them
+  // first would only delay the pools.
+  //
+  // --- WHY --- the intear api and not rhea's own /list-token: rhea's
+  // pool rows carry the token ACCOUNT IDS — wrap.near,
+  // token.rhealab.near — which are the same ids the intear token
+  // indexer knows. so both dex pages ask the SAME api for their
+  // icons, and the app's durable token cache holds them for both.
+  const token_ids = pools.flatMap((pool) => pool.token_ids);
+  const tokens = await HUGGIES_POOL_TOKENS.fetch(token_ids);
+  for (const pool of pools) {
+    pool.icons = pool.token_ids.map((id) => tokens.get(id)?.icon ?? null);
+  }
+
   return {
     pools,
     total,
     has_more: offset + pools.length < total,
     tvl_usd: totals.tvl_usd,
     volume_24h_usd: totals.volume_24h_usd,
+    pool_count: family.count,
     errors,
   };
 }

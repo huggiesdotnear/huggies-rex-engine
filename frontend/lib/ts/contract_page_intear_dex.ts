@@ -54,6 +54,9 @@ export interface HUGGIES_INTEAR_DEX_POOL {
   token_ids: ReadonlyArray<string>;
   // the token symbols, when the token indexer knows them.
   symbols: ReadonlyArray<string>;
+  // the icons of those tokens, in the same order as `token_ids`. a null
+  // is a token with no icon.
+  icons: ReadonlyArray<string | null>;
   // the value locked in the pool, in usd.
   tvl_usd: number;
   // the 24 hour volume, in usd.
@@ -153,6 +156,7 @@ function map_pool_fun(pool: INTEAR_DEX_POOL): HUGGIES_INTEAR_DEX_POOL {
     kind,
     token_ids: tokens.token_ids,
     symbols: [],
+    icons: [],
     tvl_usd: to_finite_number_fun(pool.liquidity_usd),
     volume_24h_usd: to_finite_number_fun(pool.volume_24h_usd),
     volume_7d_usd: to_finite_number_fun(pool.volume_7d_usd),
@@ -245,6 +249,7 @@ async function load_pools_fun(): Promise<HUGGIES_INTEAR_DEX_PAGE_DATA> {
       const token = tokens.get(id);
       return token === undefined ? id : token.symbol;
     });
+    pool.icons = pool.token_ids.map((id) => tokens.get(id)?.icon ?? null);
   }
 
   return {

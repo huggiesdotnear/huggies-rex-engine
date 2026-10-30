@@ -75,6 +75,17 @@ function pool_row_fun(pool: HUGGIES_RHEA_POOL): preact.JSX.Element {
   const symbols = pool.symbols.join(" / ");
   return (
     <div class="pool">
+      <span class="pool-icons">
+        {pool.icons.map((icon, index) =>
+          icon !== null ? (
+            <img class="pool-icon" src={icon} alt="" loading="lazy" />
+          ) : (
+            // a token with no icon gets a placeholder, so the row keeps
+            // its shape instead of showing a broken image.
+            <span class="pool-icon is-empty" />
+          ),
+        )}
+      </span>
       <span class="pool-pair">
         <strong>{symbols.length > 0 ? symbols : pool.id}</strong>
         <span class="pool-kind">{pool.kind}</span>
@@ -218,6 +229,15 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
       {errors.map((message) => (
         <p class="error">{message}</p>
       ))}
+      {/* --- WHY --- the count of the CURRENT view: the header shows
+          the size of the dex, so the list has to say how many pools
+          the reader is actually looking at. */}
+      {!loading && (page_data?.total ?? 0) > 0 && (
+        <p class="count">
+          {page_data?.total.toLocaleString()}{" "}
+          {searching ? "POOLS MATCHED" : "POOLS"}
+        </p>
+      )}
       <div class="results-scroll" ref={scroll_ref}>
         {pools.length === 0 && !loading ? (
           <p>{searching ? "NO POOLS FOUND" : "NO POOLS"}</p>

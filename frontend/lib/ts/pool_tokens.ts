@@ -15,7 +15,11 @@
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
-import { HUGGIES_NEAR_ID, HUGGIES_NEAR_SYMBOL } from "./token_near";
+import {
+  HUGGIES_NEAR_ID,
+  HUGGIES_NEAR_SYMBOL,
+  HUGGIES_WRAP_ID,
+} from "./token_near";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -65,13 +69,18 @@ async function fetch_pool_tokens_fun(
   const wanted = [...new Set(ids)];
   if (wanted.length === 0) return out;
 
-  // the chain's own token is not in the registry, so it is described
-  // here rather than asked for.
-  if (wanted.includes(HUGGIES_NEAR_ID)) {
-    out.set(HUGGIES_NEAR_ID, { symbol: HUGGIES_NEAR_SYMBOL, icon: null });
-  }
+  // --- WHY --- the chain's own token is asked for with wNEAR: the
+  // registry has no `near` entry — it comes back in the response's
+  // `missing` list — so it can never be fetched and never cached. the
+  // 1:1 wrapper stands in for it, exactly as it does everywhere else
+  // in the app (see token_info.ts): wNEAR's icon IS the NEAR logo, not
+  // a lookalike.
+  const wants_near = wanted.includes(HUGGIES_NEAR_ID);
+  const asked = wants_near
+    ? [...new Set([...wanted, HUGGIES_WRAP_ID])]
+    : wanted;
 
-  const cached = await HUGGIES_TOKEN_CACHE.get_many(wanted);
+  const cached = await HUGGIES_TOKEN_CACHE.get_many(asked);
   for (const [id, record] of cached) {
     out.set(id, {
       symbol: record.symbol,
@@ -82,50 +91,61 @@ async function fetch_pool_tokens_fun(
   // the ids the cache has never stored. a cached record with a null
   // icon hash IS known — the api answered for it and it has no icon —
   // so it is not a miss.
-  const missing = wanted.filter(
+  const missing = asked.filter(
     (id) => id !== HUGGIES_NEAR_ID && !cached.has(id),
   );
-  if (missing.length === 0) return out;
-
-  for (
-    let start = 0;
-    start < missing.length;
-    start += HUGGIES_SYMBOL_BATCH_SIZE
-  ) {
-    const batch = missing.slice(start, start + HUGGIES_SYMBOL_BATCH_SIZE);
-    try {
-      const response = await api_intear_tokens_get({
-        fields: HUGGIES_SYMBOL_FIELDS,
-        ids: batch,
-      });
-      const columns = response.columns;
-      const id_at = columns.indexOf("account_id");
-      const symbol_at = columns.indexOf("symbol");
-      const decimals_at = columns.indexOf("decimals");
-      const hash_at = columns.indexOf("icon_hash");
-      const records = [];
-      for (const row of response.rows) {
-        const id = String(id_at >= 0 ? row[id_at] : row[0]);
-        const symbol = symbol_at >= 0 ? row[symbol_at] : row[1];
-        const decimals = decimals_at >= 0 ? row[decimals_at] : row[2];
-        const hash = hash_at >= 0 ? row[hash_at] : row[3];
-        const record = {
-          id,
-          symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
-          decimals: to_finite_number_fun(decimals),
-          icon_hash: icon_hash_of_fun(hash),
-        };
-        records.push(record);
-        out.set(id, {
-          symbol: record.symbol,
-          icon: token_icon_for_fun(id, record.icon_hash),
+  if (missing.length > 0) {
+    for (
+      let start = 0;
+      start < missing.length;
+      start += HUGGIES_SYMBOL_BATCH_SIZE
+    ) {
+      const batch = missing.slice(start, start + HUGGIES_SYMBOL_BATCH_SIZE);
+      try {
+        const response = await api_intear_tokens_get({
+          fields: HUGGIES_SYMBOL_FIELDS,
+          ids: batch,
         });
+        const columns = response.columns;
+        const id_at = columns.indexOf("account_id");
+        const symbol_at = columns.indexOf("symbol");
+        const decimals_at = columns.indexOf("decimals");
+        const hash_at = columns.indexOf("icon_hash");
+        const records = [];
+        for (const row of response.rows) {
+          const id = String(id_at >= 0 ? row[id_at] : row[0]);
+          const symbol = symbol_at >= 0 ? row[symbol_at] : row[1];
+          const decimals = decimals_at >= 0 ? row[decimals_at] : row[2];
+          const hash = hash_at >= 0 ? row[hash_at] : row[3];
+          const record = {
+            id,
+            symbol:
+              typeof symbol === "string" && symbol.length > 0 ? symbol : id,
+            decimals: to_finite_number_fun(decimals),
+            icon_hash: icon_hash_of_fun(hash),
+          };
+          records.push(record);
+          out.set(id, {
+            symbol: record.symbol,
+            icon: token_icon_for_fun(id, record.icon_hash),
+          });
+        }
+        await HUGGIES_TOKEN_CACHE.put_many(records);
+      } catch {
+        // a failed symbol request costs the labels, not the page: the
+        // rows fall back to the token id.
       }
-      await HUGGIES_TOKEN_CACHE.put_many(records);
-    } catch {
-      // a failed symbol request costs the labels, not the page: the
-      // rows fall back to the token id.
     }
+  }
+
+  // the chain's own token borrows wNEAR's icon, the same way it does
+  // in the balance tables and the token pages.
+  if (wants_near) {
+    const wrap = out.get(HUGGIES_WRAP_ID);
+    out.set(HUGGIES_NEAR_ID, {
+      symbol: HUGGIES_NEAR_SYMBOL,
+      icon: wrap?.icon ?? null,
+    });
   }
   return out;
 }

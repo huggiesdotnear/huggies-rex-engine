@@ -53,10 +53,11 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER_FUN() {
   const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_RHEA_STORE);
   const loading = HUGGIES_CONTRACT_PAGE_RHEA_STORE.is_loading();
 
-  // the numbers the header shows. the tvl and the volume are the dex's
-  // own totals, over every pool the indexer knows — not the sum of the
-  // rows on screen, which is one page of one sort.
-  const pool_count = page_data?.total ?? 0;
+  // the numbers the header shows. they are the size of the DEX, not of
+  // the list on screen: the tvl and the volume are over every pool the
+  // indexer knows, and the count is the chosen family's pool count with
+  // no search on it.
+  const pool_count = page_data?.pool_count ?? 0;
   const tvl_usd = page_data?.tvl_usd ?? 0;
   const volume_24h_usd = page_data?.volume_24h_usd ?? 0;
 
@@ -64,7 +65,6 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER_FUN() {
     <>
       <header>
         <h1>Rhea</h1>
-        <p>the rhea dexes on near — the amm and the dcl</p>
       </header>
       <section class="contracts">
         {HUGGIES_RHEA_CONTRACTS.map((contract) => (
