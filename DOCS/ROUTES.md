@@ -3,13 +3,13 @@
 routes and pages
 
 - `/` - serve the static folder
+- `/skills` - serve the SKILLS folder
 
 every route under `/api/` is prefixed with the api it fronts, so the
 url alone says which backend the route belongs to:
 
 - `/api/huggies/*` - our own routes, nothing is proxied
 - `/api/trezu/*` - our proxy for the trezu api
-- `/api/near/*` - near blockchain interaction
 
 a route with more than one bullet point gets its own file in
 [`ROUTES/`](./ROUTES/).
@@ -30,10 +30,6 @@ user info and session managmnets
 
   see [`ROUTES/trezu-treasuries.md`](./ROUTES/trezu-treasuries.md)
 
-### `/api/near/` near blockchain interaction
-
-- 👀 `/api/near/contract/{contract_id}/{method}`
-- 👀 `/api/near/token/`
 
 ### intear
 
