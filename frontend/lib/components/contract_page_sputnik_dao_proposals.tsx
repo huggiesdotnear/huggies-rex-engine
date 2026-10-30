@@ -107,7 +107,10 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
                     <span class="proposal-status">
                       <span class="status">{proposal.status}</span>
                     </span>
-                    <span class="proposal-votes">{proposal.votes_count} VOTES</span>
+                    <span class="proposal-votes">
+                      {proposal.votes_count} VOTE
+                      {proposal.votes_count === 1 ? "" : "S"}
+                    </span>
                   </span>
                 </div>
                 <div class="proposal-foot">

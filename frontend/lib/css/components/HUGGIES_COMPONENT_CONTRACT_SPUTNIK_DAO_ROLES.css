@@ -28,21 +28,18 @@
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  gap: 6px;
+  gap: 8px;
 }
 /*==================================*/
 /* --- one member card ---
-   the rank, then the account and its roles, then the permissions. the
-   permissions sit on the right, so the eye can run down the accounts
-   and read who can do what without the two lists running into each
-   other. */
+   the rank, the account id and the actions toggle share the head row;
+   the roles sit under them. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) minmax(0, 40%);
-  align-items: start;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   text-align: left;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.14);
@@ -51,46 +48,78 @@
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.24);
 }
-/* the rank is a quiet number in the corner. it says which order the
+/* the head row. the id takes the room it needs, the toggle keeps its
+   own. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* the rank is a quiet number at the left. it says which order the
    policy names the members in. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-rank {
+  flex: 0 0 auto;
+  width: 16px;
+  text-align: right;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
-  text-align: right;
   opacity: 0.6;
   font-variant-numeric: tabular-nums;
 }
-/* the account and its roles, stacked. */
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-/* the account id is the thing being scanned, so it gets its own line
-   and breaks anywhere rather than pushing the roles off the card. */
+/* the account id is the thing being scanned, so it is the one bold
+   line on the card. it breaks anywhere rather than pushing the toggle
+   off the card. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-account {
-  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.3;
   overflow-wrap: anywhere;
   word-break: break-all;
-  line-height: 1.3;
-  font-family: monospace;
+}
+/* the toggle that opens the permissions. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 4px 8px;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
+  letter-spacing: 0.06em;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .caret {
+  font-size: 7px;
+  opacity: 0.75;
 }
 /* the roles an account is in, as chips. they wrap onto as many lines
    as they need, so every role is visible and none is clipped. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-roles {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .role-chip {
   display: inline-block;
   margin: 0;
-  padding: 2px 7px;
+  padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(0, 198, 215, 0.24);
+  background: rgba(0, 198, 215, 0.28);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   letter-spacing: 0.05em;
@@ -100,29 +129,40 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* what the roles grant: a wrapped inline list, not one per line. the
-   full list with every scope is in the card's title.
+/*==================================*/
+/* --- the permissions ---
+   they open under the card, on their own row. the full list with
+   every scope is in the row's title.
 
    --- WHY --- the actions break on word boundaries and not anywhere:
    `overflow-wrap: anywhere` broke `transfer` into `trans` / `fer`,
-   because the column is narrow and a long action has no spaces to
-   break at. the actions are single words, so they stay whole and the
-   list wraps between them instead. */
+   because a long action has no spaces to break at. the actions are
+   single words, so they stay whole and the list wraps between them. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-permissions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 2px 6px;
+  gap: 4px;
   min-width: 0;
-  font-size: 10px;
-  line-height: 1.6;
-  opacity: 0.75;
-  overflow-wrap: break-word;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .permission {
   display: inline-block;
   margin: 0;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1.5;
   white-space: nowrap;
+  overflow-wrap: break-word;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .note {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.7;
 }
 /*==================================*/
 /* --- the roles that are open to everyone ---
