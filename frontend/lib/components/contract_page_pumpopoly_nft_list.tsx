@@ -9,9 +9,13 @@
 // renders nothing when there is no account id — the page falls back to
 // the signed-in account, and a signed-out visitor sees no nfts at all.
 //
-// the list is one column of token ids in a table, capped in height and
-// scrolled, so a player with hundreds of nfts does not push the rest of
-// the page off screen.
+// the nfts are a GALLERY: one tile per token, showing the token's
+// picture and its id. the pictures come from the same view call that
+// brings the ids — the nft contract answers with the whole token, media
+// included — so the gallery costs no extra request.
+//
+// the gallery is capped in height and scrolled, so a player with
+// hundreds of nfts does not push the rest of the page off screen.
 //
 // mounts into
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST">.
@@ -24,10 +28,11 @@ import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpo
 import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_error_card_fun } from "./shared/error_card";
 import { huggies_stat_tile_fun } from "./shared/stat_tile";
+import type { HUGGIES_PUMPOPOLY_NFT } from "../ts/contract_page_pumpopoly_parse";
 // ========================================
 // ========================================
 // --- SORT ------------------------------
-// the sort direction of the nft list.
+// the sort direction of the nft gallery.
 type HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION = "asc" | "desc";
 // ========================================
 // the default direction: smallest id first, so the list reads the way
@@ -35,31 +40,30 @@ type HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION = "asc" | "desc";
 const HUGGIES_DEFAULT_NFT_SORT_DIRECTION: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION =
   "asc";
 // ========================================
-// sort the token ids by their id.
+// sort the nfts by their token id.
 //
 // --- WHY --- the ids are compared as plain strings and not as numbers.
 // a nft token id is a number, but it is carried as a string and can be
 // long enough to lose precision as a number. comparing them as strings
 // keeps the order stable and never rounds one away.
-function sort_nft_token_ids_fun(
-  token_ids: ReadonlyArray<string>,
+function sort_pumpopoly_nfts_fun(
+  nfts: ReadonlyArray<HUGGIES_PUMPOPOLY_NFT>,
   direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION,
-): string[] {
-  const sorted = [...token_ids].sort((a, b) => {
-    if (a === b) return 0;
-    return a < b ? -1 : 1;
+): HUGGIES_PUMPOPOLY_NFT[] {
+  const sorted = [...nfts].sort((a, b) => {
+    if (a.token_id === b.token_id) return 0;
+    return a.token_id < b.token_id ? -1 : 1;
   });
   return direction === "desc" ? sorted.reverse() : sorted;
 }
 // ========================================
-// ========================================
 // --- SORT CONTROL ----------------------
-// the direction toggle. the nft list has one thing to sort by — the
+// the direction toggle. the nft gallery has one thing to sort by — the
 // token id — so it needs only a direction, not a row of sort keys.
 //
 // --- WHY --- this is its own control and not the shared
 // sort_control.tsx. that one is welded to the token list's sort keys
-// (volume, market cap) and its types, and the nft list sorts plain
+// (volume, market cap) and its types, and the nft gallery sorts plain
 // strings by id, which is a different thing.
 function nft_sort_control_fun(props: {
   direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION;
@@ -87,6 +91,39 @@ function nft_sort_control_fun(props: {
   );
 }
 // ========================================
+// --- TILE ------------------------------
+// one nft: its picture and its id.
+//
+// --- WHY --- the picture is loaded lazily: a pumpopoly bond is a 1MB
+// svg, so a player holding a few dozen of them would pull tens of
+// megabytes of images for a gallery most of which is below the fold.
+// lazy loading fetches the picture only when the tile is near the
+// screen.
+function nft_tile_fun(props: {
+  nft: HUGGIES_PUMPOPOLY_NFT;
+}): preact.JSX.Element {
+  const nft = props.nft;
+  return (
+    <figure class="nft-tile" title={nft.title}>
+      {nft.media !== null ? (
+        <img
+          class="nft-media"
+          src={nft.media}
+          alt={nft.title}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        // a token with no picture gets a placeholder, so the gallery
+        // keeps its shape instead of showing a broken image.
+        <span class="nft-media is-empty" aria-hidden="true" />
+      )}
+      <figcaption>
+        <code>{nft.token_id}</code>
+      </figcaption>
+    </figure>
+  );
+}
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
@@ -107,8 +144,8 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
   // no account id and nobody signed in — there is no player to show.
   if (account_id === null) return <></>;
 
-  const token_ids = page_data?.nft.token_ids ?? [];
-  const sorted = sort_nft_token_ids_fun(token_ids, direction);
+  const nfts = page_data?.nft.nfts ?? [];
+  const sorted = sort_pumpopoly_nfts_fun(nfts, direction);
 
   return (
     <>
@@ -126,7 +163,7 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
           class_prefix: "pumpopoly",
         })}
       </div>
-      {token_ids.length === 0 ? (
+      {nfts.length === 0 ? (
         <p>NO NFTS</p>
       ) : (
         <>
@@ -135,29 +172,15 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
             on_direction: (next) => set_direction(next),
           })}
           <div class="nft-scroll">
-            <table class="nft-table">
-              <thead>
-                <tr>
-                  <th scope="col">TOKEN ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sorted.map((token_id) => (
-                  <tr>
-                    <td>
-                      <code>{token_id}</code>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div class="nft-gallery">
+              {sorted.map((nft) => nft_tile_fun({ nft }))}
+            </div>
           </div>
         </>
       )}
     </>
   );
 }
-// ========================================
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.

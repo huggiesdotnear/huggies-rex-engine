@@ -30,9 +30,25 @@ export interface HUGGIES_PUMPOPOLY_PLAYER {
   last_move: string;
 }
 // ========================================
+// one nft, as the gallery shows it.
+//
+// --- WHY --- the nft contract's `nft_tokens_for_owner` view answers
+// with the WHOLE token, metadata and all, so there is no second call to
+// make for the image. the metadata is read here and the media url is
+// kept, because the gallery needs the picture and not only the id.
+//
+// --- WHY --- `media` is nullable: the contract makes it optional, and a
+// token with no media has to render as a tile without a picture, not as
+// a broken image.
+export interface HUGGIES_PUMPOPOLY_NFT {
+  token_id: string;
+  title: string;
+  description: string;
+  media: string | null;
+}
 export interface HUGGIES_PUMPOPOLY_NFT_DATA {
   count: number;
-  token_ids: string[];
+  nfts: HUGGIES_PUMPOPOLY_NFT[];
 }
 // ========================================
 export interface HUGGIES_PUMPOPOLY_DATA {
@@ -110,6 +126,47 @@ export function parse_pumpopoly_player_fun(
     invited_by: typeof player.invited_by === "string" ? player.invited_by : "",
     last_move: typeof player.last_move === "string" ? player.last_move : "",
   };
+}
+// ========================================
+// --- NFT PARSE --------------------------
+// parse the nft contract's token list defensively.
+//
+// --- WHY --- the shape is read field by field and never trusted: the
+// contract is not ours, and one odd token must not blank the whole
+// gallery. a token with no usable id is dropped; a token with no media
+// is kept, because the id alone is still worth showing.
+export function parse_pumpopoly_nfts_fun(
+  value: unknown,
+): HUGGIES_PUMPOPOLY_NFT[] {
+  if (!Array.isArray(value)) return [];
+  const nfts: HUGGIES_PUMPOPOLY_NFT[] = [];
+  for (const raw of value) {
+    if (typeof raw !== "object" || raw === null) continue;
+    const token = raw as {
+      token_id?: unknown;
+      metadata?: { title?: unknown; description?: unknown; media?: unknown };
+    };
+    // --- WHY --- the id is required and everything else is not: a token
+    // without an id cannot be named, sorted or linked, so it is nothing.
+    if (typeof token.token_id !== "string" || token.token_id.length === 0) {
+      continue;
+    }
+    const metadata = token.metadata ?? {};
+    nfts.push({
+      token_id: token.token_id,
+      title:
+        typeof metadata.title === "string" && metadata.title.length > 0
+          ? metadata.title
+          : token.token_id,
+      description:
+        typeof metadata.description === "string" ? metadata.description : "",
+      media:
+        typeof metadata.media === "string" && metadata.media.length > 0
+          ? metadata.media
+          : null,
+    });
+  }
+  return nfts;
 }
 // ========================================
 // the credit score: land is worth 10 and an invite is worth 30. it is

@@ -105,7 +105,7 @@ async function contract_page_pumpopoly_store_load_fun(): Promise<void> {
     if (loaded_account_id !== load_account_id) return;
     data = {
       player: null,
-      nft: { count: 0, token_ids: [] },
+      nft: { count: 0, nfts: [] },
       credit_score: 0,
       errors: {
         player: err instanceof Error ? err.message : String(err),

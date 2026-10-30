@@ -1,9 +1,9 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
-   the player's nfts: the count, the sort control, and the table of
-   token ids.
+   the player's nfts: the count, the sort control, and the gallery of
+   nft tiles.
 
-   one column of token ids, capped in height and scrolled, so a player
+   a grid of picture tiles, capped in height and scrolled, so a player
    with hundreds of nfts does not push the rest of the page off screen. */
 @import url(./shared/error_card.css);
 @import url(./shared/stat_tile.css);
@@ -13,37 +13,58 @@
   max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
-  /* the sort control sits above the table, so it needs a little space
+  /* the sort control sits above the gallery, so it needs a little space
      between itself and the heading above it. */
   margin-top: 0.5rem;
 }
-#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table {
+/* --- the gallery ---
+   the tiles sit in a grid that fits as many as the column allows.
+   --- WHY --- auto-fill and not a fixed column count: the page's column
+   is 500px wide on desktop and narrower on a phone, so a fixed count
+   would leave a phone with three wide tiles or a desktop with a gap. */
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 8px;
+  padding: 2px;
+}
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-tile {
+  margin: 0;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+/* --- the picture ---
+   the picture fills its tile and keeps its own shape.
+   --- WHY --- object-fit: cover and not contain: a pumpopoly land is a
+   square webp and a bond is a wide 1920x1080 svg, and `contain` would
+   letterbox the bond into a tall empty box while `cover` fills the
+   tile for both. */
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-media {
   width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  font-size: 12px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.18);
 }
-#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table th {
-  position: sticky;
-  top: 0;
-  text-align: left;
-  padding: 6px 8px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  opacity: 0.7;
-  /* a sticky header needs an opaque background, or the rows scrolling
-     under it show through. this is the page background. */
-  background: var(--color-backend);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+/* a token with no picture gets a placeholder box of the same shape,
+   so the gallery keeps its rhythm. */
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-media.is-empty {
+  border: 1px dashed rgba(255, 255, 255, 0.28);
 }
-#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-table td {
-  text-align: left;
-  padding: 6px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+/* the token id under the picture gets its size, its breaking and its
+   color from the base code rule. */
+#HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-tile figcaption {
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
 }
-/* the token id in a cell gets its size, its breaking and its color
-   from the base code rule. */
 /*==================================*/
 /* --- the nft sort control ---
    the nft list sorts by one thing, so its control is a single
