@@ -90,6 +90,13 @@ async function load_fun(
     if (loaded_sort !== sort || loaded_desc !== desc) return;
     // the icons for the rows on screen. the cache is read first, so
     // on a warm cache this costs no network at all.
+    //
+    // --- WHY --- the sort is passed because these rows ARE the top of
+    // it: this is the first page of the list, and a descending list
+    // starts at the top. so the api can serve the icons as one sorted
+    // page with no ids in the url. the later pages and the search
+    // results are not the top of a sort, and their icons are asked for
+    // by id.
     const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
       token_list.rows,
       sort,
@@ -134,9 +141,9 @@ async function load_more_fun(
   notify_fun();
   try {
     // the offset is the api's own count, not the length of the rows on
-    // screen: the favourites are pinned on top of the first page and
-    // were never part of the api's paging, so counting them would
-    // skip rows at the start of the next page.
+    // screen: the favourites are added to the rows and were never part
+    // of the api's paging, so counting them would skip rows at the
+    // start of the next page.
     const offset = data.token_list.fetched;
     const next = await HUGGIES_APP_PAGE_DISCOVER.load_token_list(
       sort,
@@ -146,11 +153,11 @@ async function load_more_fun(
     // a sort change while this page was in flight means these rows
     // belong to a view that is no longer on screen.
     if (loaded_sort !== sort || loaded_desc !== desc) return;
-    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
-      next.rows,
-      sort,
-      desc,
-    );
+    // --- WHY --- no sort is passed here. these rows are the NEXT page
+    // of the list, so they start where the top of the sort ended and
+    // the api's sorted page would cover none of them. their icons are
+    // asked for by id.
+    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(next.rows);
     if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
       ...data,
@@ -187,11 +194,11 @@ async function search_fun(query: string): Promise<void> {
   notify_fun();
   try {
     const rows = await HUGGIES_APP_PAGE_DISCOVER.search(query);
-    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
-      rows,
-      "volume_usd_24h",
-      true,
-    );
+    // --- WHY --- no sort is passed here. the search results are a
+    // handful of arbitrary tokens — they are NOT the top of any sort,
+    // so the api's sorted page would cover none of them and would cost
+    // a page of icons for nothing. their icons are asked for by id.
+    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(rows);
     // --- WHY --- the list rows are KEPT. the search results live in
     // their own field, and the component shows whichever one applies.
     // clearing the list meant clearing the search box left an empty

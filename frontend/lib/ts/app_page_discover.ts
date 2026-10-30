@@ -18,7 +18,10 @@
 //   2. GET /tokens   the favourites, by id, so they can be pinned on top
 //                    of the `default` view.
 //   3. GET/POST      the icons for the rows on screen, and only the ones
-//                    the durable cache does not already hold.
+//                    the durable cache does not already hold. the first
+//                    page of a descending list is served by a sorted page
+//                    with no ids in the url; anything else is asked for
+//                    by id.
 //   4. GET           /tokens/search — the search results, when the reader
 //                    has typed something.
 //
@@ -43,9 +46,9 @@ export interface HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST {
   // true when the api has more rows behind this one.
   has_more: boolean;
   // how many rows the API has served so far. this is NOT the length of
-  // `rows`: the favourites are pinned on top of the first page and
-  // were never part of the api's own paging, so the next page has to
-  // start after the api's count, not after the rows on screen.
+  // `rows`: the favourites are added to the rows and were never part of
+  // the api's own paging, so the next page has to start after the api's
+  // count, not after the rows on screen.
   fetched: number;
 }
 // ========================================
@@ -132,11 +135,11 @@ async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
 // ========================================
 // ========================================
 // --- LOAD -------------------------------
-// fetch one page of the token list, plus the icons for its rows.
+// fetch one page of the token list, plus the rows of the favourites.
 //
-// --- WHY --- the favourites ride along with the FIRST page only. the
-// `default` view leads with them. on the later pages they would be a
-// duplicate of rows already shown.
+// --- WHY --- the favourites ride along with the FIRST page only. they
+// are extra rows for the `default` view, and on the later pages they
+// would be a duplicate of rows already shown.
 //
 // --- WHY --- the favourites and the page are fetched together, so the
 // page is as slow as its slowest request, not the sum of the two.
@@ -151,12 +154,17 @@ async function load_token_list_fun(
       ? fetch_favourites_fun()
       : Promise.resolve([]),
   ]);
-  // the favourites are pinned on top of the first page. a favourite
-  // that is also in the page itself is not shown twice.
+  // the favourite rows are ADDED to the api's page. where they sit is
+  // NOT decided here: the order module (app_page_discover_token_order.ts)
+  // lifts them to the top of the `default` view, on every page, and it
+  // is the only place that does it.
+  //
+  // --- WHY --- a favourite that is also in this page is not added
+  // twice.
   const page_ids = new Set(page.rows.map((row) => row.id));
-  const pinned = favourites.filter((row) => !page_ids.has(row.id));
+  const extra = favourites.filter((row) => !page_ids.has(row.id));
   return {
-    rows: [...pinned, ...page.rows],
+    rows: [...page.rows, ...extra],
     has_more: page.has_more,
     // the api's own count, without the favourites we added.
     fetched: page.fetched,
@@ -164,16 +172,25 @@ async function load_token_list_fun(
 }
 // ========================================
 // fetch the icons for a set of rows, using the durable cache first.
+//
+// --- WHY --- `sort` says the rows ARE the top of that sort, so the api
+// can serve them as one sorted page with no ids in the url at all. it
+// is given only for the FIRST page of a descending list, where that is
+// true. a later page of the list starts where the top ended, and a
+// search result is a handful of arbitrary tokens — neither is the top
+// of the sort, so the sorted page would cover none of them and their
+// icons are asked for by id instead.
 async function load_icons_fun(
   rows: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
-  sort: HUGGIES_TOKEN_SORT,
-  desc: boolean,
+  sort?: HUGGIES_TOKEN_SORT,
+  desc?: boolean,
 ): Promise<Record<string, string>> {
   const ids = rows.map((row) => row.id);
-  const found = await fetch_token_icons_fun(ids, {
-    by: token_sort_field_fun(sort),
-    desc,
-  });
+  const source =
+    sort === undefined
+      ? undefined
+      : { by: token_sort_field_fun(sort), desc: desc === true };
+  const found = await fetch_token_icons_fun(ids, source);
   const out: Record<string, string> = {};
   for (const [id, icon] of found) out[id] = icon;
   return out;

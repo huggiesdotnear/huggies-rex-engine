@@ -10,9 +10,6 @@ import {
 } from "./token_page_shit_1170_known_holders";
 import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";
 // ========================================
-// the type of a holder row, after known-holder classification.
-export type HUGGIES_SHIT_HOLDER_TYPE = HUGGIES_SHIT_HOLDER_ROW_TYPE;
-// ========================================
 // one holder row, ready for display.
 export interface HUGGIES_SHIT_HOLDER {
   account_id: string;
@@ -24,7 +21,8 @@ export interface HUGGIES_SHIT_HOLDER {
   usd_formatted: string;
   percent: number;
   percent_formatted: string;
-  type: HUGGIES_SHIT_HOLDER_TYPE;
+  // the classified type of the row — a known type, or "regular".
+  type: HUGGIES_SHIT_HOLDER_ROW_TYPE;
 }
 // ========================================
 // one page of holders.
@@ -121,7 +119,9 @@ export async function fetch_shit_holders_fun(
 }
 // ========================================
 // the icon each holder type is tagged with.
-export function shit_holder_icon_fun(type: HUGGIES_SHIT_HOLDER_TYPE): string {
+export function shit_holder_icon_fun(
+  type: HUGGIES_SHIT_HOLDER_ROW_TYPE,
+): string {
   switch (type) {
     case "dev":
       return "👨‍💻";
@@ -140,7 +140,7 @@ export function shit_holder_icon_fun(type: HUGGIES_SHIT_HOLDER_TYPE): string {
 // ========================================
 // the human-readable label of one holder type.
 export function shit_holder_type_label_fun(
-  type: HUGGIES_SHIT_HOLDER_TYPE,
+  type: HUGGIES_SHIT_HOLDER_ROW_TYPE,
 ): string {
   if (type === HUGGIES_SHIT_HOLDER_TYPE_REGULAR) return "HOLDERS";
   return type.toUpperCase();

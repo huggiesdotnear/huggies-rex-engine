@@ -12,12 +12,13 @@
 import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "./token_page_shit_1170";
 import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
 import type { HUGGIES_SHIT_HOLDER } from "./token_page_shit_1170_holders";
-import type { HUGGIES_SHIT_HOLDER_TYPE } from "./token_page_shit_1170_known_holders";
+import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./token_page_shit_1170_known_holders";
 // ========================================
 // ========================================
 // --- TYPES -----------------------------
-// the filter currently applied to the holder list.
-export type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_TYPE | "all";
+// the filter currently applied to the holder list. it is a holder ROW
+// type ("dev"|"dex"|"vault"|"nft"|"burn"|"regular") or "all".
+export type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_ROW_TYPE | "all";
 // ========================================
 // the page's state. the empty state is what the page holds before the
 // first load answers.

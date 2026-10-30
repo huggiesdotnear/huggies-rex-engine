@@ -24,6 +24,13 @@
 //      own, and it covers the tokens that are on screen.
 //   2. whatever that page did not cover, by id, over POST (whose body
 //      limit is 64KB rather than a url limit).
+//
+// --- WHY --- step 1 is used ONLY when the ids asked for ARE the top of
+// that sort. the caller promises it, and this file checks it. a search
+// result is a handful of arbitrary tokens and a later page of the list
+// starts where the top ended — neither is the top of the sort, so the
+// sorted page would cover NONE of them and would cost a page of icons
+// for nothing. those sets are asked for by id, over POST.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { api_intear_tokens_post } from "@sleet-js/middleman-intear-api";
@@ -35,12 +42,63 @@ import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 // --- CONFIG -----------------------------
 // how many icons one request may ask for.
 const HUGGIES_ICON_BATCH_SIZE = 300;
+// the POST body's limit is 64KB, and the ids are chunked so one request
+// stays well under it.
+//
+// --- WHY --- a near account id is 64 hex characters and a token id adds
+// a label on top, so a page of ids can be a long way from the limit.
+// the budget is half of it, so a normal page of 300 ids is still ONE
+// request and only a very long id list is split.
+const HUGGIES_ICON_POST_BODY_LIMIT = 32 * 1024;
 // the fields the icon request needs. the symbol and decimals come
 // along so the cached record is complete.
 //
 // `icon_hash` and not `icon`: the hash is 16 characters, the icon is
 // a couple of kilobytes.
 const HUGGIES_ICON_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
+// ========================================
+// ========================================
+// --- SOURCE -----------------------------
+// the ids asked for ARE the top of a sorted list.
+//
+// --- WHY --- this is a promise about the ids, not about the page the
+// reader is looking at. it is what lets the api serve them as one
+// sorted page with no ids in the url at all. a caller that cannot
+// promise it — a search result, a later page of the list — leaves it
+// out and the ids are asked for by id.
+export interface HUGGIES_TOKEN_ICON_SOURCE {
+  // the sort field the ids are the top of.
+  by: string;
+  // true when the ids are the top of that sort. an ascending list
+  // starts at the BOTTOM of the sort, so the api's page would cover
+  // none of its rows.
+  desc: boolean;
+}
+// ========================================
+// ========================================
+// --- CHUNK ------------------------------
+// split the ids into groups whose json body stays under the limit.
+//
+// --- WHY --- the size of an id in the body is its length plus two
+// quotes and a comma. the budget is generous, so a normal page of ids
+// is one request and only a very long id list is split.
+function chunk_ids_fun(ids: ReadonlyArray<string>): string[][] {
+  const chunks: string[][] = [];
+  let chunk: string[] = [];
+  let size = 0;
+  for (const id of ids) {
+    const cost = id.length + 3;
+    if (chunk.length > 0 && size + cost > HUGGIES_ICON_POST_BODY_LIMIT) {
+      chunks.push(chunk);
+      chunk = [];
+      size = 0;
+    }
+    chunk.push(id);
+    size += cost;
+  }
+  if (chunk.length > 0) chunks.push(chunk);
+  return chunks;
+}
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -84,22 +142,24 @@ function rows_to_records_fun(
 // ========================================
 // ========================================
 // --- FETCH -----------------------------
-// `sort` is the sort the visible list is using. it lets the api serve
-// the icons as a sorted page with no ids in the url at all, far cheaper
-// than carrying a list of ids.
+// `source` is the promise that the ids ARE the top of that sort. it
+// lets the api serve the icons as a sorted page with no ids in the url
+// at all, far cheaper than carrying a list of ids.
 //
 // --- WHY --- the sorted page is only used when it can actually answer
 // for the tokens we want. it holds 300 tokens taken from the TOP of the
-// sort, so it is the right set only for a descending list. an ascending
-// list starts at the bottom of the sort, and a search is a handful of
-// arbitrary tokens — for both, the page covers none of them, so asking
-// for it fetched ~800KB of icons for nothing.
+// sort, so it is the right set only for a descending list whose rows
+// start at the top. an ascending list starts at the bottom of the sort,
+// and a search is a handful of arbitrary tokens — for both, the page
+// covers none of them, so asking for it fetched ~800KB of icons for
+// nothing.
 //
-// so the page is fetched only for a descending list of a page's worth of
-// tokens. otherwise the ids are asked for directly.
+// so the page is fetched only when the caller says the ids are the top
+// of a descending sort AND there are enough of them to be worth a page
+// of its own. otherwise the ids are asked for directly.
 export async function fetch_token_icons_fun(
   ids: ReadonlyArray<string>,
-  sort?: { by: string; desc: boolean },
+  source?: HUGGIES_TOKEN_ICON_SOURCE,
 ): Promise<Map<string, string>> {
   const wanted = [...new Set(ids)];
   const out = new Map<string, string>();
@@ -133,16 +193,16 @@ export async function fetch_token_icons_fun(
   // 1. the sorted page — no ids in the url at all.
   //
   // --- WHY --- the count has to match too. the list page carries the
-  // marked tokens on top, so it asks for 306 icons while the page
-  // holds 300; the extra 6 are asked for by id below.
+  // marked tokens with it, so it asks for more icons than the api page
+  // holds; the extra ones are asked for by id below.
   const page_matches =
-    sort !== undefined &&
-    sort.desc === true &&
+    source !== undefined &&
+    source.desc === true &&
     wanted.length >= HUGGIES_ICON_BATCH_SIZE;
-  if (page_matches && sort !== undefined) {
+  if (page_matches && source !== undefined) {
     const response = await api_intear_tokens_get({
       fields: HUGGIES_ICON_FIELDS,
-      sort: { by: sort.by as "volume_usd_24h", desc: sort.desc },
+      sort: { by: source.by as "volume_usd_24h", desc: source.desc },
       limit: HUGGIES_ICON_BATCH_SIZE,
     });
     const { records, icons } = rows_to_records_fun(
@@ -154,12 +214,13 @@ export async function fetch_token_icons_fun(
     await HUGGIES_TOKEN_CACHE.put_many(records);
   }
 
-  // 2. whatever the page did not cover — by id, over POST.
+  // 2. whatever the page did not cover — by id, over POST, in chunks
+  // that fit the body's 64KB limit.
   const still_missing = missing.filter((id) => !covered.has(id));
-  if (still_missing.length > 0) {
+  for (const chunk of chunk_ids_fun(still_missing)) {
     const response = await api_intear_tokens_post({
       fields: HUGGIES_ICON_FIELDS,
-      ids: still_missing,
+      ids: chunk,
     });
     const { records, icons } = rows_to_records_fun(
       response.columns,

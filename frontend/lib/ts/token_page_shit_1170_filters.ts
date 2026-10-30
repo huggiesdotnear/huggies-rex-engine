@@ -5,11 +5,14 @@ import {
   HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
   type HUGGIES_SHIT_HOLDER_ROW_TYPE,
 } from "./token_page_shit_1170_known_holders";
+import type { HUGGIES_SHIT_ACTIVE_FILTER } from "./token_page_shit_1170_state";
 // ========================================
 // one filter: a key, a label, an icon, and the tooltip that explains
 // what the type is.
 export interface HUGGIES_SHIT_FILTER {
-  key: HUGGIES_SHIT_HOLDER_ROW_TYPE | "all";
+  // the key is the ACTIVE FILTER it applies — one type, so a tab key
+  // can be handed to the store without a cast.
+  key: HUGGIES_SHIT_ACTIVE_FILTER;
   label: string;
   icon: string;
   description: string;

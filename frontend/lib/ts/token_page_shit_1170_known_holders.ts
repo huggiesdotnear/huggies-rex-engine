@@ -7,12 +7,19 @@
 //
 // --- SYNC SOURCE ---
 // /home/sleet-dev/SLEET_AI_WORKING_DIRECTORY/shit-bin/src/const/mainnet/HOLDERS.ts
-// keep this file exactly in sync with that source.
+// keep the ACCOUNT MAP below exactly in sync with that source — the
+// account ids and their holder-type VALUES ("dev"|"dex"|"vault"|"nft"|
+// "burn"). the source inlines that union in its Record type and exports
+// no type of its own, so the exported type NAMES below are this repo's
+// own choice and are NOT part of the sync.
 // ========================================
+// the holder types a KNOWN account can carry — the same five values the
+// source map uses.
 export type HUGGIES_SHIT_HOLDER_TYPE = "dev" | "dex" | "vault" | "nft" | "burn";
 
 // the type shown for a holder that is not in the map below.
 export const HUGGIES_SHIT_HOLDER_TYPE_REGULAR = "regular" as const;
+// the type of a holder ROW: a known type, or the regular fallback.
 export type HUGGIES_SHIT_HOLDER_ROW_TYPE =
   HUGGIES_SHIT_HOLDER_TYPE | typeof HUGGIES_SHIT_HOLDER_TYPE_REGULAR;
 // ========================================

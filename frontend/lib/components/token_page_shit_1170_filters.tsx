@@ -11,7 +11,6 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
 import { HUGGIES_SHIT_FILTERS } from "../ts/token_page_shit_1170_filters";
 import { use_page_store_fun } from "../ts/use_page_store";
-import type { HUGGIES_SHIT_ACTIVE_FILTER } from "../ts/token_page_shit_1170_state";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -30,9 +29,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
           aria-label={filter.label}
           title={`${filter.label} — ${filter.description}`}
           onClick={() =>
-            HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set_active_filter(
-              filter.key as HUGGIES_SHIT_ACTIVE_FILTER,
-            )
+            HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set_active_filter(filter.key)
           }
         >
           {filter.icon !== "" ? filter.icon : "💩"}
