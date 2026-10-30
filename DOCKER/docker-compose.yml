@@ -97,30 +97,4 @@ services:
 # https:// hostname, so the browser gets a secure context from any
 # device, anywhere.
 # ========================================
-
-# ----------------------------------------
-# FUTURE: postgres. when the backend starts
-# persisting rows, add a `postgres:` service here and a volume, then
-# add `depends_on: [postgres]` plus a `DATABASE_URL` env var to the
-# backend above (the DATABASE_URL string the compose file will hand
-# the backend should look like:
-#   postgres://huggies:huggies@postgres:5432/huggies
-# ). the backend image needs no change for this — it's just an env
-# var the app reads at startup.
-# ----------------------------------------
-# postgres:
-#   image: postgres:17-alpine
-#   container_name: huggies-rex-engine-postgres
-#   restart: unless-stopped
-#   environment:
-#     POSTGRES_USER: huggies
-#     POSTGRES_PASSWORD: huggies
-#     POSTGRES_DB: huggies
-#   volumes:
-#     - huggies-pgdata:/var/lib/postgresql/data
-#   # not published to the host by default — only the backend needs
-#   # to reach it, over the compose network.
-#
-# volumes:
-#   huggies-pgdata:
 # ========================================

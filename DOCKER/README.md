@@ -80,15 +80,6 @@ secure context).
   recompiles the bun bundle. if it's already running, `--build` is enough;
   no need to `down` first.
 
-## future: postgres
-
-there is no postgres service yet. when the backend starts persisting
-rows, add a `postgres:` service + volume to `docker-compose.yml` (a
-commented-out template is already in that file), add
-`depends_on: [postgres]` and a `DATABASE_URL` env var to the backend
-service, and add the `sqlx`/`tokio-postgres` dependency in `Cargo.toml`.
-the image needs no change for this beyond carrying the env var.
-
 ========================================
 <br/>
 copyright 2026 by sleet.near

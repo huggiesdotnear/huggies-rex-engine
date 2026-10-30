@@ -12,8 +12,7 @@
 #
 # NOTE: no vault / no persistent state here yet. the backend keeps nothing
 # on disk — `static/` is baked into the image and the frontend calls the
-# intear api directly from the browser. when postgres lands, add a service
-# to `docker-compose.yml` and a DATABASE_URL env var here.
+# intear api directly from the browser.
 # ========================================
 # syntax=docker/dockerfile:1.7
 
