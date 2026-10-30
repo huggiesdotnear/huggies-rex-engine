@@ -9,7 +9,7 @@
 // the two pages are separate: the account page shows an account and
 // the dao page shows a dao, and each has its own store.
 // ========================================
-import { api_intear_balances_get } from "../../../middleman";
+import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "./token_info";

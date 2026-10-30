@@ -27,7 +27,7 @@
 import {
   api_intear_holders_get,
   api_intear_tokens_get,
-} from "../../../middleman";
+} from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "./token_row_by_name";
 import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 import type {

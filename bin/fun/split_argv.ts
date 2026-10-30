@@ -11,9 +11,9 @@
 // holds "true" or an empty string.
 //
 // --- WHY --- the boolean flags are per-bin, not one global set. the
-// intear bins use --desc, the huggies bins use --include-hidden, and
-// a shared set would make one bin's flag swallow the next positional
-// in another bin's argv. the caller passes the ones it owns.
+// huggies bins use --include-hidden, and a shared set would make one
+// bin's flag swallow the next positional in another bin's argv. the
+// caller passes the ones it owns.
 // ========================================
 
 export interface SPLIT_ARGV_OPTIONS {

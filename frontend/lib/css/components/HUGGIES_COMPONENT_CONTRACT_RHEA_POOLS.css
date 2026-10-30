@@ -1,0 +1,223 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS
+   the rhea page's pool list: the search box, the pool family filter,
+   the sort row and the pool rows.
+
+   the shared sort control brings its own css in with the @import
+   below. */
+/*==================================*/
+@import url(./shared/sort_control.css);
+/*==================================*/
+/* the search box sits on its own row above the filter and the sort
+   buttons. the page column is 500px wide and the filter and the sort
+   row already need most of it. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  margin-bottom: 12px;
+  width: 100%;
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .search {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+/* --- the search box --- */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .search input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  padding: 10px 12px;
+  font: inherit;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .search input:focus {
+  outline: 2px solid var(--color-middle);
+  outline-offset: 1px;
+}
+/*==================================*/
+/* --- the pool family filter --- */
+/* the family buttons are their own bar: ALL, AMM and DCL. they are
+   small toggle buttons like the sort ones, so they opt out of the
+   global button width. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .types {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .type-button {
+  width: auto;
+  max-width: none;
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .type-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .type-button.is-active,
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .type-button.is-active:hover {
+  opacity: 1;
+  background: var(--color-middle);
+  color: var(--color-fontend);
+}
+/*==================================*/
+/* --- the sort row --- */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .sort {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+/* the control itself fills that row, and its buttons share the width
+   evenly — so the sort row reads as one bar, not three small buttons
+   floating in a wide empty space. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .sort .sort-control {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .sort .sort-button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+/* the direction button keeps its own width: it is a small toggle, not
+   a third sort key, so it does not share the row evenly with them. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .sort .sort-direction {
+  flex: 0 0 auto;
+}
+/*==================================*/
+/* --- the list --- */
+/* the scroll box is a WRAPPER around the rows, so the page can listen
+   to it for the scroll event that asks for the next page. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .results-scroll {
+  max-height: 460px;
+  overflow-y: auto;
+  width: 100%;
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .results {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  gap: 6px;
+}
+/* the loading / scroll-for-more notes sit INSIDE the scroll box, below
+   the rows, so they are the last thing in the list. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .loading {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  text-align: center;
+  margin: 8px 0 0;
+}
+/* --- a failed request --- */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .error {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #ff8a80;
+  margin: 0 0 8px;
+}
+/*==================================*/
+/* --- one pool row --- */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+  /* the page column is centred, but a list of rows reads from the
+     left. */
+  text-align: left;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+/* the pair of symbols. it is cut off with an ellipsis instead of
+   wrapping, so one long pair cannot push the row's numbers off. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-pair strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the pool family: SIMPLE_POOL or DCL. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-kind {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  text-align: right;
+}
+/* the tags row: FARM, MEME, UNCERTIFIED. it sits under the row's
+   numbers, on its own line. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-tags {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-tag {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 6px;
+  opacity: 0.8;
+}
+/* an uncertified pool holds a token rhea does not vouch for, so it
+   says so in a colour the reader can pick out. */
+#HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .pool-tag.is-uncertified {
+  color: #ff8a80;
+  border-color: rgba(255, 138, 128, 0.5);
+}
+/*==================================*/

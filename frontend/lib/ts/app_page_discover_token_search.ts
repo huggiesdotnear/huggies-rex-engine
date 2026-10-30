@@ -9,7 +9,7 @@
 //
 // --- WHY --- the search does not page. it asks for a bounded number
 // of hits and shows them; a reader who wants more can type more.
-import { api_intear_tokens_search } from "../../../middleman";
+import { api_intear_tokens_search } from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "./token_row_by_name";
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
 // ========================================

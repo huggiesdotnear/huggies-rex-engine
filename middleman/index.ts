@@ -3,15 +3,19 @@
 // one typed client per api huggies talks to. each sub folder owns a
 // single backend and nothing else talks to it directly:
 //
-//   intear/   - the intear api at api.intea.rs, called from the
-//               browser so our backend is never rate limited by it.
 //   huggies/  - our own backend routes.
+//
+// the third-party apis are typed clients published on npm, so they are
+// imported from their package and not copied in here:
+//
+//   @sleet-js/middleman-intear-api     the intear api at api.intea.rs
+//   @sleet-js/middleman-intear-dex-api the intear dex backend
+//   @sleet-js/middleman-rhea-api       the rhea indexer api
 //
 // frontend components import from here, never from an api sdk or
 // fetch() directly.
 // ========================================
 
-export * from "./intear/index";
 export * from "./huggies/index";
 // ========================================
 // copyright 2026 by sleet.near

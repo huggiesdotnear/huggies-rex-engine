@@ -23,7 +23,7 @@
 // the favourites are fetched by id and pinned on top of the volume
 // page — see app_page_discover_token_order.ts.
 // ========================================
-import { api_intear_tokens_get } from "../../../middleman";
+import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "./token_row_by_name";
 import { token_sort_field_fun } from "./app_page_discover_token_sort";
 import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort";

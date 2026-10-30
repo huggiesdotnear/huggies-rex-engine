@@ -316,9 +316,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
       (status_counts.get(proposal.status) ?? 0) + 1,
     );
   }
-  const statuses = [...status_counts.entries()].sort(
-    (a, b) => b[1] - a[1],
-  );
+  const statuses = [...status_counts.entries()].sort((a, b) => b[1] - a[1]);
 
   const shown =
     filter === "all"
@@ -342,7 +340,9 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
             type="button"
             key={status}
             class={
-              filter === status ? "filter is-active" : "filter is-" + status_slug_fun(status)
+              filter === status
+                ? "filter is-active"
+                : "filter is-" + status_slug_fun(status)
             }
             aria-pressed={filter === status}
             onClick={() => set_filter(status)}

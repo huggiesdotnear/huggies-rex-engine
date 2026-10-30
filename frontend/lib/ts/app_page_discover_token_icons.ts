@@ -27,8 +27,8 @@
 //   2. whatever that page did not cover, by id, over POST (whose body
 //      limit is 64KB rather than a url limit).
 // ========================================
-import { api_intear_tokens_get } from "../../../middleman";
-import { api_intear_tokens_post } from "../../../middleman";
+import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
+import { api_intear_tokens_post } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_CACHE } from "./token_cache";
 import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
 import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";

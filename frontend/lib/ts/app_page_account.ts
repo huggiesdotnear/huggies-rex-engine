@@ -39,7 +39,7 @@ import {
   intear_dex_asset_token_id,
   intear_dex_engine_contractid,
 } from "@near-kit-tool-box/fun";
-import { api_intear_balances_get } from "../../../middleman";
+import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "./token_amount_format";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "./token_info";

@@ -1,0 +1,150 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS
+   the intear dex page's pool list: the search box, the sort row and
+   the pool rows.
+
+   the shared sort control brings its own css in with the @import
+   below. */
+/*==================================*/
+@import url(./shared/sort_control.css);
+/*==================================*/
+/* the search box sits on its own row above the sort buttons. the page
+   column is 500px wide and the sort row already needs most of it. */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  margin-bottom: 12px;
+  width: 100%;
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .search {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+/* --- the search box --- */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .search input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  padding: 10px 12px;
+  font: inherit;
+}
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .search input:focus {
+  outline: 2px solid var(--color-middle);
+  outline-offset: 1px;
+}
+/*==================================*/
+/* --- the sort row --- */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .sort {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+/* the control itself fills that row, and its buttons share the width
+   evenly — so the sort row reads as one bar, not four small buttons
+   floating in a wide empty space. */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .sort .sort-control {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .sort .sort-button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+/* the direction button keeps its own width: it is a small toggle, not
+   a fourth sort key, so it does not share the row evenly with them. */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .sort .sort-direction {
+  flex: 0 0 auto;
+}
+/*==================================*/
+/* --- the list --- */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .results-scroll {
+  max-height: 460px;
+  overflow-y: auto;
+  width: 100%;
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .results {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  gap: 6px;
+}
+/* the loading note sits INSIDE the scroll box, below the rows, so it is
+   the last thing in the list. */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .loading {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  text-align: center;
+  margin: 8px 0 0;
+}
+/* --- a failed request --- */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .error {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #ff8a80;
+  margin: 0 0 8px;
+}
+/*==================================*/
+/* --- one pool row --- */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .pool {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+  /* the page column is centred, but a list of rows reads from the
+     left. */
+  text-align: left;
+}
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .pool-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+/* the pair of symbols. it is cut off with an ellipsis instead of
+   wrapping, so one long pair cannot push the row's numbers off. */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .pool-pair strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the pool kind: Public, Private, Launch or LaunchV2. */
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .pool-kind {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .pool-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  text-align: right;
+}
+/*==================================*/

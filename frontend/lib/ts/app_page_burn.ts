@@ -24,8 +24,8 @@
 // view: intear already indexes the supply of every token it knows, so
 // one /tokens call answers it for every token on the page at once. a
 // near view of ft_total_supply would be one contract call PER TOKEN.
-import { api_intear_balances_get } from "../../../middleman";
-import { api_intear_tokens_get } from "../../../middleman";
+import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
+import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_BURN_ADDRESSES } from "./app_page_burn_addresses";
 import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 import { HUGGIES_SUPPLY_PERCENT } from "./token_supply_percent";

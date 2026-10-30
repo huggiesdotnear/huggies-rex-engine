@@ -37,10 +37,18 @@ user info and session managmnets
 
 ### intear
 
-the intear api is NOT proxied through our backend. `middleman/intear/`
-calls `https://api.intea.rs` directly from the browser, so there are
-no `/api/intear/*` routes here and our backend is never rate limited
-by intear.
+the intear api is NOT proxied through our backend. the
+`@sleet-js/middleman-intear-api` package calls `https://api.intea.rs`
+directly from the browser, so there are no `/api/intear/*` routes here
+and our backend is never rate limited by intear.
+
+the same goes for the two other public apis the app talks to — the
+intear dex backend and the rhea indexer — each with its own published
+middleman package:
+
+- `@sleet-js/middleman-intear-api` — `https://api.intea.rs`
+- `@sleet-js/middleman-intear-dex-api` — `https://dex-backend.intear.tech`
+- `@sleet-js/middleman-rhea-api` — `https://api.rhea.finance`
 
 =====================
 <br/>

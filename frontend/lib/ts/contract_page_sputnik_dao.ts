@@ -330,8 +330,7 @@ function kind_summary_fun(
     const body = kind.Transfer;
     // --- WHY --- an empty token id means NEAR. the contract uses ""
     // for the chain's own token.
-    const token =
-      body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
+    const token = body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
     const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
     const symbol =
       scales.symbols.get(token) ??
@@ -349,7 +348,8 @@ function kind_summary_fun(
     // the method their cards all read the same.
     const method = count > 0 ? body.actions[0].method_name : "";
     return `${method}() on ${body.receiver_id}${count > 1 ? ` (${count} actions)` : ""}`;
-  }  if ("AddMemberToRole" in kind) {
+  }
+  if ("AddMemberToRole" in kind) {
     const body = kind.AddMemberToRole;
     return `${body.member_id} → ${body.role}`;
   }
@@ -542,9 +542,7 @@ function kind_detail_fun(
 //
 // --- WHY --- the role's `kind` is either a `Group` of accounts or the
 // bare string `"Everyone"`, and an everyone-role has no list to count.
-function read_role_member_count_fun(
-  kind: SPUTNIK_DAO_ROLE_KIND_TYPE,
-): number {
+function read_role_member_count_fun(kind: SPUTNIK_DAO_ROLE_KIND_TYPE): number {
   return typeof kind === "string" ? 0 : kind.Group.length;
 }
 // ========================================
@@ -645,9 +643,7 @@ function is_object_kind_fun(
 // --- WHY --- the union's members are named by their keys, and one of
 // them is a bare string (`"Vote"`). this reads the name without
 // casting the whole union away.
-function proposal_kind_name_fun(
-  kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
-): string {
+function proposal_kind_name_fun(kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE): string {
   if (typeof kind === "string") return kind;
   return Object.keys(kind)[0] ?? "unknown";
 }
