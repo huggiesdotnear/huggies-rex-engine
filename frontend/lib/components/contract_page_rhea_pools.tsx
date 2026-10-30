@@ -62,6 +62,43 @@ function usd_fun(value: number): string {
 }
 // ========================================
 // ========================================
+// --- POOL TYPE LABEL --------------------
+// the readable name of a pool family, for the chip under the token pair.
+//
+// --- WHY --- the api sends the family in `Type` (classic, dcl, stable,
+// degen) and the shape in `pool_kind` (DCL, SIMPLE_POOL, RATED_SWAP,
+// STABLE_SWAP, DEGEN_SWAP). the shape names are the api's internals —
+// a reader does not know what a SIMPLE_POOL is — so the chip shows the
+// family.
+//
+// --- WHY --- the labels keep the two rhea contracts apart: CLASSIC is
+// the ref finance v2 amm and DCL is the ref labs dcl v2, and this page
+// covers both. the family names ARE the split, so it stays visible.
+//
+// --- WHY --- a family the api has not told us about is shown as it
+// comes, uppercased, rather than dropped: an unknown name is still
+// information, and an empty chip is not.
+//
+// --- WHY --- a pool with no family at all falls back to its pool kind,
+// so the chip is never blank.
+const HUGGIES_POOL_TYPE_LABELS: Readonly<Record<string, string>> = {
+  classic: "CLASSIC",
+  dcl: "DCL",
+  stable: "STABLE",
+  degen: "DEGEN",
+};
+// ========================================
+function pool_type_label_fun(pool: HUGGIES_RHEA_POOL): string {
+  const type = pool.type.trim();
+  if (type.length > 0) {
+    const label = HUGGIES_POOL_TYPE_LABELS[type.toLowerCase()];
+    return label ?? type.toUpperCase();
+  }
+  const kind = pool.kind.trim();
+  return kind.length > 0 ? kind.replace(/_/g, " ") : "POOL";
+}
+// ========================================
+// ========================================
 // --- ROW -------------------------------
 // --- WHY --- the row is not a link: rhea has no pool detail page in this
 // app yet, so a row that looks clickable and does nothing is worse than a
@@ -83,7 +120,11 @@ function pool_row_fun(pool: HUGGIES_RHEA_POOL): preact.JSX.Element {
       </span>
       <span class="pool-pair">
         <strong>{symbols.length > 0 ? symbols : pool.id}</strong>
-        <span class="pool-kind">{pool.kind}</span>
+        {/* --- WHY --- the chip is the pool's FAMILY (CLASSIC, DCL,
+            STABLE, DEGEN) and not its shape. the shape names are the
+            api's internals; the family names are the two contracts this
+            page is about, so the chip keeps the split visible. */}
+        <span class="pool-kind">{pool_type_label_fun(pool)}</span>
       </span>
       <span class="pool-values">
         <span>{usd_fun(pool.tvl_usd)} TVL</span>

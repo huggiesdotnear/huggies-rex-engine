@@ -28,6 +28,14 @@
 // the page keeps all three on one request so the reader can switch between
 // the two rhea contracts without leaving the list.
 //
+// WHY THE ROW SHOWS THE API'S `Type` AND NOT ITS `pool_kind`
+// --- the api sends two names for every pool. `pool_kind` is the SHAPE of
+// the pool (DCL, SIMPLE_POOL, RATED_SWAP, STABLE_SWAP, DEGEN_SWAP) and
+// `Type` is the FAMILY it belongs to (classic, dcl, stable, degen). the
+// shape names are the api's internals and mean nothing to a reader; the
+// family names are exactly the two contracts this page is about, so the
+// row shows the family and keeps the classic/dcl split visible.
+//
 // WHY THE SEARCH IS THE API'S, NOT OURS
 // --- the api takes a `token_list` filter and matches it against the token
 // symbols and the token account ids, so a reader who types "wNEAR" finds
@@ -65,8 +73,19 @@ export interface HUGGIES_RHEA_POOL {
   // dcl pool is named after its two tokens and its fee.
   id: string;
   // the api's own pool kind: DCL, SIMPLE_POOL, RATED_SWAP, STABLE_SWAP
-  // or DEGEN_SWAP. shown as it comes.
+  // or DEGEN_SWAP. kept for the fallback label, never shown raw.
   kind: string;
+  // the api's own pool TYPE, as it sends it: classic, dcl, stable or
+  // degen. this is the readable one and the one the row shows.
+  //
+  // --- WHY --- `Type` is the family of the pool and not the shape of
+  // it. `pool_kind` is the shape (SIMPLE_POOL, RATED_SWAP, DCL, ...), and
+  // those names are the api's internals. `Type` is the family a reader
+  // can act on: classic is the ref finance v2 amm, dcl is the ref labs
+  // dcl v2 — the two contracts this page is about — and stable and degen
+  // are the other two families rhea runs. so `Type` is what the row
+  // shows, and the classic/dcl split stays visible.
+  type: string;
   // the pool's token symbols, e.g. ["USDC", "wNEAR"].
   symbols: ReadonlyArray<string>;
   // the token account ids behind those symbols.
@@ -119,6 +138,11 @@ function map_pool_fun(pool: RHEA_POOL_SEARCH_ITEM): HUGGIES_RHEA_POOL {
   return {
     id: String(pool.id),
     kind: pool.pool_kind,
+    // --- WHY --- the api sends `Type` on every pool row, but it is a
+    // plain string and nothing stops an older row from leaving it out.
+    // an empty type falls back to the pool kind, so the row always has
+    // something to say.
+    type: typeof pool.Type === "string" ? pool.Type : "",
     symbols: Array.isArray(pool.token_symbols) ? pool.token_symbols : [],
     token_ids: Array.isArray(pool.token_account_ids)
       ? pool.token_account_ids
