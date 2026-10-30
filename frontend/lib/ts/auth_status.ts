@@ -53,6 +53,16 @@ let account_id: string | null = null;
 let last_error: string | null = null;
 // plain array, not Set, so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
+// the connectors we have already attached our wallet listeners to.
+// --- WHY --- a Set of connector INSTANCES, not a boolean: the wallet
+// listeners are attached per connector, and @near-kit-tool-box/web keeps
+// a SEPARATE NearConnector per network (mainnet / testnet) and picks
+// between them from the stored network id. a boolean flag would skip
+// the attachment for the second network's connector and that network
+// would go deaf to wallet:signIn / wallet:signOut. keying on the
+// instance means every connector gets exactly one listener set, and
+// the same connector never gets a second one.
+const attached_connectors: Set<NearConnector> = new Set();
 // ========================================
 // ========================================
 // ========================================
@@ -95,15 +105,6 @@ function bytes_to_base64_fun(bytes: Uint8Array): string {
     binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
-}
-// ========================================
-// base64 -> Uint8Array, for a server that round-trips the nonce
-// through JSON. UNUSED today — the server gets the nonce base64.
-function base64_to_bytes_fun(value: string): Uint8Array {
-  const binary = atob(value);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
 }
 // ========================================
 // build the 32-byte NEP-413 nonce via near-kit's helper.
@@ -428,6 +429,13 @@ function remove_account_fun(target_account_id: string): void {
 // MUST run before any connect() — autoConnect defaults to true and an
 // injected wallet can emit wallet:signIn during construction, so a
 // listener attached afterwards would miss the very first event.
+//
+// init() is IDEMPOTENT in two separate ways, on purpose:
+//   - the STATE is re-derived on every call (see below): a second run
+//     must rebuild from storage, not keep what the first run decided.
+//   - the wallet LISTENERS are attached at most once per connector (see
+//     below): init() is called from several places and can run more than
+//     once on the same page.
 function init_fun(): void {
   // --- WHY --- the state is cleared first. init() can run more than
   // once (the redirect pages and the button component both call it),
@@ -452,23 +460,37 @@ function init_fun(): void {
   }
 
   const connector = near_connect_client();
-  // --- WHY --- autoConnect's wallet:signIn outside our own sign_in_fun
-  // carries no signed message — that session is connected but not
-  // authenticated, so only adopt it when there's no stored session
-  // (which carries a signature this event knows nothing about).
-  connector.on("wallet:signIn", (payload) => {
-    if (account_id === null && payload.source === "signIn") {
-      account_id = payload.accounts[0]?.accountId ?? null;
-      notify_fun();
-    }
-  });
 
-  // mirror external sign-out (from the wallet UI itself).
-  connector.on("wallet:signOut", () => {
-    clear_session_fun();
-    account_id = null;
-    notify_fun();
-  });
+  // --- WHY --- the listeners are attached AT MOST ONCE per connector.
+  // init() runs from several places (the redirect pages, the button
+  // component, the dao selector) and can run more than once on the same
+  // page; attaching on every run would register the same handler twice
+  // and every wallet event would be handled twice. the guard is keyed on
+  // the connector INSTANCE because near-kit-tool-box/web keeps one
+  // connector per network: a new network means a new instance and a new
+  // listener set, the same network means the same instance and no second
+  // registration.
+  if (!attached_connectors.has(connector)) {
+    attached_connectors.add(connector);
+
+    // --- WHY --- autoConnect's wallet:signIn outside our own sign_in_fun
+    // carries no signed message — that session is connected but not
+    // authenticated, so only adopt it when there's no stored session
+    // (which carries a signature this event knows nothing about).
+    connector.on("wallet:signIn", (payload) => {
+      if (account_id === null && payload.source === "signIn") {
+        account_id = payload.accounts[0]?.accountId ?? null;
+        notify_fun();
+      }
+    });
+
+    // mirror external sign-out (from the wallet UI itself).
+    connector.on("wallet:signOut", () => {
+      clear_session_fun();
+      account_id = null;
+      notify_fun();
+    });
+  }
 
   notify_fun();
 }

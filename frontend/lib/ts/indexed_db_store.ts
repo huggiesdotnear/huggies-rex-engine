@@ -1,5 +1,5 @@
 // ========================================
-// one indexeddb store, used by every durable cache in the app.
+// one indexeddb store helper, used by every durable cache in the app.
 //
 // --- WHY --- the token cache and the (now removed) discover
 // token-list cache each carried their own copy of the same four
@@ -31,14 +31,16 @@ export interface HUGGIES_INDEXED_DB_STORE_CONFIG {
 // ========================================
 // ========================================
 // --- CONNECTION ------------------------
-// the open connection, cached on the promise so concurrent callers
+// the open connections, cached on the promise so concurrent callers
 // share one open request.
-// --- WHY --- ONE connection for the whole app: the promise is a
-// module-level singleton, so the first caller's db_name wins and a
-// later cache with a DIFFERENT db_name would silently reuse the first
-// database. every cache must therefore live in the same database and
-// differ only by store_name.
-let db_promise: Promise<IDBDatabase> | null = null;
+// --- WHY --- ONE connection PER DATABASE NAME, keyed by db_name in a
+// Map: a single module-level promise would let the first caller's
+// db_name win, and a later cache with a DIFFERENT db_name would
+// silently reuse the first database — a silent data trap. keying by
+// db_name gives every distinct database its own connection, while the
+// SAME db_name still reuses the one connection it already opened (two
+// caches over one database share it and differ only by store_name).
+const db_promises: Map<string, Promise<IDBDatabase>> = new Map();
 // ========================================
 // ========================================
 // --- OPEN ------------------------------
@@ -50,8 +52,9 @@ let db_promise: Promise<IDBDatabase> | null = null;
 function open_db_fun(
   config: HUGGIES_INDEXED_DB_STORE_CONFIG,
 ): Promise<IDBDatabase> {
-  if (db_promise !== null) return db_promise;
-  db_promise = new Promise<IDBDatabase>((resolve, reject) => {
+  const existing = db_promises.get(config.db_name);
+  if (existing !== undefined) return existing;
+  const promise = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(config.db_name, config.db_version);
     request.onupgradeneeded = () => {
       const db = request.result;
@@ -62,7 +65,11 @@ function open_db_fun(
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
-  return db_promise;
+  // cache the promise BEFORE awaiting, so a second caller arriving
+  // while the open is still in flight reuses this one request instead
+  // of opening the database twice.
+  db_promises.set(config.db_name, promise);
+  return promise;
 }
 // ========================================
 // ========================================
