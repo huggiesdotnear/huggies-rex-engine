@@ -81,13 +81,12 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
       <h2>MEMBERS ({dao.members.length})</h2>
       <div class="members-scroll">
         <div class="members">
-          {dao.members.map((member, index) => {
+          {dao.members.map((member) => {
             const is_open = open_ids.includes(member.account_id);
             const actions = permission_actions_fun(member.permissions);
             return (
               <div class="member" key={member.account_id}>
                 <div class="member-head">
-                  <span class="member-rank">{index + 1}</span>
                   <a
                     class="member-account"
                     href={`${"../".repeat(depth)}account.html?id=${encodeURIComponent(member.account_id)}`}

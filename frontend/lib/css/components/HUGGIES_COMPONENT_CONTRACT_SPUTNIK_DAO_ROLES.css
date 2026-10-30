@@ -32,8 +32,8 @@
 }
 /*==================================*/
 /* --- one member card ---
-   the rank, the account id and the actions toggle share the head row;
-   the roles sit under them. */
+   the account id and the actions toggle share the head row; the roles
+   sit under them. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member {
   display: flex;
   flex-direction: column;
@@ -55,17 +55,6 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
-}
-/* the rank is a quiet number at the left. it says which order the
-   policy names the members in. */
-#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .member-rank {
-  flex: 0 0 auto;
-  width: 16px;
-  text-align: right;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
 }
 /* the account id is the thing being scanned, so it is the one bold
    line on the card. it breaks anywhere rather than pushing the toggle

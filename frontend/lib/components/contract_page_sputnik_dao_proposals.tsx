@@ -98,9 +98,11 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
                 class={`proposal is-${status_slug_fun(proposal.status)}`}
               >
                 <div class="proposal-head">
-                  <span class="proposal-id">{proposal.id}</span>
                   <span class="proposal-copy">
-                    <span class="proposal-kind">{proposal.kind}</span>
+                    <span class="proposal-kind">
+                      <span class="proposal-id">#{proposal.id}</span>
+                      {proposal.kind}
+                    </span>
                     <span class="proposal-what">{proposal.kind_summary}</span>
                   </span>
                   <span class="proposal-meta">
