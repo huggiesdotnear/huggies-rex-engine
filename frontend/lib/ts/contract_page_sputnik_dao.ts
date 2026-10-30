@@ -44,6 +44,7 @@ import type {
   SPUTNIK_DAO_POLICY_TYPE,
   SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
   SPUTNIK_DAO_PROPOSAL_TYPE,
+  SPUTNIK_DAO_ROLE_KIND_TYPE,
 } from "@near-kit-tool-box/fun";
 import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
@@ -127,6 +128,16 @@ export interface HUGGIES_DAO_PROPOSAL_DETAIL {
   // the theme a ChangeConfig sets, read out of its base64 metadata.
   config_color: string;
   config_logo: string;
+  // the method a FunctionCall calls, e.g. `set`.
+  call_method: string;
+  // the args a FunctionCall passes, one per action.
+  call_args: string[];
+  // the roles a policy change touches: the role's name and how many
+  // accounts it holds.
+  policy_roles: Array<{ name: string; members: number }>;
+  // the members a role change names: the account and the role.
+  member_id: string;
+  role_name: string;
 }
 // ========================================
 // the page's DAO record: what it is called and what it holds.
@@ -333,9 +344,12 @@ function kind_summary_fun(
   if ("FunctionCall" in kind) {
     const body = kind.FunctionCall;
     const count = body.actions.length;
-    return `call ${body.receiver_id}${count > 1 ? ` (${count} actions)` : ""}`;
-  }
-  if ("AddMemberToRole" in kind) {
+    // --- WHY --- the method is in the summary: a dao can have
+    // nineteen proposals that all call the same contract, and without
+    // the method their cards all read the same.
+    const method = count > 0 ? body.actions[0].method_name : "";
+    return `${method}() on ${body.receiver_id}${count > 1 ? ` (${count} actions)` : ""}`;
+  }  if ("AddMemberToRole" in kind) {
     const body = kind.AddMemberToRole;
     return `${body.member_id} → ${body.role}`;
   }
@@ -348,7 +362,8 @@ function kind_summary_fun(
     return name.length > 0 ? name : "new config";
   }
   if ("ChangePolicy" in kind) {
-    return "policy change";
+    const roles = kind.ChangePolicy.policy.roles;
+    return `${roles.length} role${roles.length === 1 ? "" : "s"}`;
   }
   if ("ChangePolicyAddOrUpdateRole" in kind) {
     return `role ${kind.ChangePolicyAddOrUpdateRole.role.name}`;
@@ -398,6 +413,11 @@ function empty_detail_fun(): HUGGIES_DAO_PROPOSAL_DETAIL {
     config_purpose: "",
     config_color: "",
     config_logo: "",
+    call_method: "",
+    call_args: [],
+    policy_roles: [],
+    member_id: "",
+    role_name: "",
   };
 }
 // ========================================
@@ -469,17 +489,25 @@ function kind_detail_fun(
     return detail;
   }
   if ("FunctionCall" in kind) {
-    detail.receiver_id = kind.FunctionCall.receiver_id;
+    const body = kind.FunctionCall;
+    detail.receiver_id = body.receiver_id;
+    // --- WHY --- the method and the args are the whole point of a
+    // function call: nineteen of them can all call the same contract
+    // and still be nineteen different proposals. the method says which
+    // one it is and the args say what it does.
+    detail.call_method =
+      body.actions.length > 0 ? body.actions[0].method_name : "";
+    detail.call_args = body.actions.map((action) => action.args);
     return detail;
   }
   if ("AddMemberToRole" in kind) {
-    detail.receiver_id = kind.AddMemberToRole.member_id;
-    detail.msg = kind.AddMemberToRole.role;
+    detail.member_id = kind.AddMemberToRole.member_id;
+    detail.role_name = kind.AddMemberToRole.role;
     return detail;
   }
   if ("RemoveMemberFromRole" in kind) {
-    detail.receiver_id = kind.RemoveMemberFromRole.member_id;
-    detail.msg = kind.RemoveMemberFromRole.role;
+    detail.member_id = kind.RemoveMemberFromRole.member_id;
+    detail.role_name = kind.RemoveMemberFromRole.role;
     return detail;
   }
   if ("ChangeConfig" in kind) {
@@ -491,7 +519,46 @@ function kind_detail_fun(
     detail.config_logo = theme.logo;
     return detail;
   }
+  if ("ChangePolicy" in kind) {
+    detail.policy_roles = read_policy_roles_fun(kind.ChangePolicy.policy);
+    return detail;
+  }
+  if ("ChangePolicyAddOrUpdateRole" in kind) {
+    const role = kind.ChangePolicyAddOrUpdateRole.role;
+    detail.policy_roles = [
+      { name: role.name, members: read_role_member_count_fun(role.kind) },
+    ];
+    detail.role_name = role.name;
+    return detail;
+  }
+  if ("ChangePolicyRemoveRole" in kind) {
+    detail.role_name = kind.ChangePolicyRemoveRole.role;
+    return detail;
+  }
   return detail;
+}
+// ========================================
+// how many accounts a role holds.
+//
+// --- WHY --- the role's `kind` is either a `Group` of accounts or the
+// bare string `"Everyone"`, and an everyone-role has no list to count.
+function read_role_member_count_fun(
+  kind: SPUTNIK_DAO_ROLE_KIND_TYPE,
+): number {
+  return typeof kind === "string" ? 0 : kind.Group.length;
+}
+// ========================================
+// the roles a policy carries, with how many accounts each holds.
+//
+// --- WHY --- a policy change IS the role list, so "policy change" as a
+// summary says nothing. the roles are what the reader came to see.
+function read_policy_roles_fun(
+  policy: SPUTNIK_DAO_POLICY_TYPE,
+): Array<{ name: string; members: number }> {
+  return policy.roles.map((role) => ({
+    name: role.name,
+    members: read_role_member_count_fun(role.kind),
+  }));
 }
 // ========================================
 // read the block heights the contract logged for a proposal.

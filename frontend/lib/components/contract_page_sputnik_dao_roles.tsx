@@ -128,11 +128,20 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES_FUN() {
         </div>
       </div>
       {dao.open_roles.length > 0 && (
-        <p class="open-roles">
-          ALSO OPEN TO EVERYONE:{" "}
-          {dao.open_roles.map((role) => role.name).join(", ")} — any account can
-          act in {dao.open_roles.length === 1 ? "that role" : "those roles"}.
-        </p>
+        <div class="open-roles">
+          <span class="open-roles-label">OPEN TO EVERYONE</span>
+          <span class="open-roles-roles">
+            {dao.open_roles.map((role) => (
+              <span class="role-chip is-open" key={role.name}>
+                {role.name}
+              </span>
+            ))}
+          </span>
+          <span class="open-roles-note">
+            any account can act in{" "}
+            {dao.open_roles.length === 1 ? "this role" : "these roles"}
+          </span>
+        </div>
       )}
     </section>
   );

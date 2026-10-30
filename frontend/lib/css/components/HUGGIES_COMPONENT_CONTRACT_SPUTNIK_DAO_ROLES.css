@@ -156,9 +156,41 @@
 /*==================================*/
 /* --- the roles that are open to everyone ---
    they name no accounts, so there is no card for them. the note says
-   they exist and what they can do. */
+   they exist and what they can do.
+
+   --- WHY --- it is its own card and not a line of text: the note
+   belongs to the section, not to the member above it, and a plain
+   paragraph under a scrolling list reads as part of the last card. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles {
-  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.65;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+/* an open role is marked with a dashed edge, so it does not look like
+   a role some named account is in. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .role-chip.is-open {
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES .open-roles-note {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   line-height: 1.5;

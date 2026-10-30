@@ -26,16 +26,72 @@
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  gap: 6px;
+  gap: 8px;
+}
+/*==================================*/
+/* --- the filters ---
+   the statuses the dao actually has, as a row of buttons. a dao with
+   forty proposals needs a way to pick the ones the reader wants. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+  min-width: 0;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 6px 11px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter.is-active {
+  opacity: 1;
+  background: var(--color-middle);
+  border-color: var(--color-middle);
+  color: var(--color-fontend);
+}
+/* an inactive filter still carries its status colour, so the reader
+   can see what a button will show before pressing it. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter.is-approved {
+  border-color: rgba(142, 240, 160, 0.55);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter.is-rejected {
+  border-color: rgba(255, 152, 0, 0.55);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter.is-expired {
+  border-color: rgba(218, 41, 28, 0.65);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .filter.is-in-progress {
+  border-color: rgba(0, 198, 215, 0.55);
 }
 /*==================================*/
 /* --- one proposal card --- */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .proposal {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   text-align: left;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.14);
@@ -83,9 +139,23 @@
 /* what the proposal does — the kind's real content. this is the line
    the reader came for, so it wraps rather than being cut off. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .proposal-what {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 7px;
   font-size: 11px;
   line-height: 1.4;
   opacity: 0.85;
+  overflow-wrap: anywhere;
+}
+/* the proposer's own words for the proposal. it is the one line that
+   tells two proposals of the same kind apart, so it goes in the
+   headline and not only in the expanded card. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .proposal-note-line {
+  font-size: 10px;
+  line-height: 1.4;
+  opacity: 0.65;
+  font-style: italic;
   overflow-wrap: anywhere;
 }
 /* the status and the vote count, stacked on the right. */
@@ -182,8 +252,108 @@
 /* --- the expanded detail ---
    it sits under its proposal, inside the same card. */
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .proposal-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
-  padding-top: 8px;
+  padding-top: 10px;
+}
+/* the kind's own facts: the labels down the left, the values down the
+   right. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-row {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+/* the small uppercase label down the left. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-value {
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+}
+/* the args of a call are json, so they read as code: monospace, small,
+   and on their own tinted block so they do not look like prose. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-value.is-code {
+  display: block;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  font-family: monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  opacity: 0.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/* the roles a policy change carries, as chips with their counts. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 198, 215, 0.2);
+  font-family: monospace;
+  font-size: 10px;
+  white-space: nowrap;
+}
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-chip-count {
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+/* the colour swatch beside a config's colour. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  vertical-align: -1px;
+}
+/* the logo a config sets. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .detail-logo {
+  max-width: 100%;
+  max-height: 42px;
+  border-radius: 6px;
+}
+/*==================================*/
+/* --- the votes and the blocks ---
+   they sit under the kind's own facts. */
+#HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .vote-block {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
 }
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .note {
   margin: 0;
@@ -193,10 +363,10 @@
   overflow-wrap: anywhere;
 }
 #HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS .vote-list {
-  margin: 4px 0 0;
   font-family: monospace;
   font-size: 10px;
   opacity: 0.7;
   overflow-wrap: anywhere;
+  min-width: 0;
 }
 /*==================================*/
