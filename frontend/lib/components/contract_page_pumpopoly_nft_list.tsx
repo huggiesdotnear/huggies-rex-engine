@@ -14,6 +14,10 @@
 // brings the ids — the nft contract answers with the whole token, media
 // included — so the gallery costs no extra request.
 //
+// the pictures are NOT square. a pumpopoly land is a tall slice of the
+// board (80x160 or 80x192) and a treasury bond is a wide 1920x1080
+// sheet, so the tiles are sized by the picture and never cropped.
+//
 // the gallery is capped in height and scrolled, so a player with
 // hundreds of nfts does not push the rest of the page off screen.
 //
