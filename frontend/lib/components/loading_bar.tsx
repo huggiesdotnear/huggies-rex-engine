@@ -38,8 +38,9 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
   const [progress, set_progress] = use_state(
     HUGGIES_LOADING_BAR.get_progress(),
   );
-  // the bar's state: idle, loading or done. the component needs it to
-  // know whether to show the bar at all.
+  // the bar's state: idle, loading or done. it is on the element as
+  // data-state, so the css and the browser's dev tools can tell the
+  // three apart — the track looks the same in all of them.
   const [state, set_state] = use_state(HUGGIES_LOADING_BAR.get_state());
 
   // --- WHY THE PATCH IS NOT INSTALLED HERE: the module installs

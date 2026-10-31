@@ -36,19 +36,18 @@
 // ========================================
 // ========================================
 // --- STATE ------------------------------
-// the bar's state. it is one of three things and the component needs
-// all three to draw itself.
+// the bar's state. it is one of three things.
 //
-// - IDLE: nothing is loading. the bar is hidden.
-// - LOADING: work is on its way. the bar shows the progress.
-// - DONE: the work just finished. the bar shows a full sweep once
-//   and then fades out.
+// - IDLE: nothing is happening. the bar shows its dark track alone.
+// - LOADING: work is on its way. the bar sweeps.
+// - DONE: the work just finished. the bar rests with the fill at the
+//   end.
 //
-// --- WHY DONE IS ITS OWN STATE: a bar that rests at 100% forever
-// reads as "still loading" to anyone glancing at it, and it covers
-// the top of the page permanently. a bar that snaps back to empty
-// instantly looks like it flickered. DONE is the small gap between
-// the two: the sweep is visible for a moment, then the bar goes away.
+// --- WHY DONE IS ITS OWN STATE: the bar's TRACK is always visible —
+// it is a constant line across the top of every page — so "idle" and
+// "done" look the same on screen. the state is what tells them apart
+// for the code: idle means nothing has been asked for yet, and done
+// means the work finished and the bar is resting at the end.
 export type HUGGIES_LOADING_BAR_STATE = "idle" | "loading" | "done";
 // the bar's state right now.
 let state: HUGGIES_LOADING_BAR_STATE = "idle";
@@ -113,21 +112,27 @@ function get_progress_fun(): number {
   return high_water;
 }
 // ========================================
-// where the bar is GOING: the share of the work that is finished,
-// held short of the end so there is always a sliver left for whatever
-// is still running.
+// where the bar is GOING: how far along the CURRENT batch it should be.
 //
 // --- WHY THE TARGET COUNTS THE WORK IN FLIGHT AS ALMOST DONE: the
 // bar cannot know how long a request will take. if the target were
 // only the finished share, it would sit at zero until the first answer
 // landed and the bar would not move for the whole of the wait. the
-// work in flight counts as almost done, so the target is always
-// somewhere ahead of the bar and the bar always has somewhere to
-// creep to.
+// reader would see nothing happen.
+//
+// so the work that is in flight counts as ALMOST done. the bar creeps
+// toward that and waits there, so the reader always sees it moving.
+//
+// --- WHY THE NUMBERS MOVE BUT THE SCREEN DOES NOT JUMP: a follow-up
+// action starts a new batch and the signal's number goes back to zero.
+// the css eases the WIDTH, so what the reader sees is the bar gliding
+// back a little and then sweeping forward to completion — not a slam
+// back to empty. the easing is what makes that read well.
 function get_target_fun(): number {
   if (total === 0) return 0;
   if (in_flight === 0) return 1;
-  // the finished share, plus most of the share that is still running.
+  // the finished share of this batch, plus most of the share that is
+  // still running.
   const finished = done / total;
   const running = (in_flight / total) * 0.9;
   return Math.min(finished + running, 0.95);
@@ -158,9 +163,18 @@ let creep_timer: ReturnType<typeof setInterval> | null = null;
 // the share of the work that is finished, and the bar always stays a
 // little behind it, so the reader sees the bar move the whole time
 // and the movement slows down as the work finishes.
+//
+// --- WHY THE CREEP STOPS WHEN IT REACHES ITS TARGET: once the bar is
+// at its target there is nothing for the timer to do, and a timer that
+// wakes up sixteen times a second to do nothing is waste. the bar
+// starts creeping again when the target moves.
 function creep_fun(): void {
   const target = get_target_fun();
-  if (target <= high_water) return;
+  if (target <= high_water) {
+    // the bar has caught up. it waits here until the target moves.
+    stop_creep_fun();
+    return;
+  }
   // the bar moves a share of the way to its target.
   const step = (target - high_water) * CATCH_UP_RATE;
   high_water += step;
@@ -216,10 +230,10 @@ function update_progress_fun(): void {
 // batch.
 //
 // --- WHY A NEW BATCH IS NOT "THE QUEUE WAS EMPTY": the queue goes
-// empty between two loads all the time — between the page's first
-// load and the icons that follow it, for instance. treating every
-// empty queue as a new batch made the bar restart from the left in the
-// middle of one page load.
+// empty between two loads all the time. a page's load often has a
+// second wave — the token metadata is asked for once the balances have
+// come back — and treating that empty moment as a new batch made the
+// bar restart from the left in the middle of one page load.
 //
 // --- WHY THE BATCH CLOSES ON A TIMER INSTEAD: the last request of a
 // load and the first request of the next one are often only
@@ -227,16 +241,16 @@ function update_progress_fun(): void {
 // while after the page goes quiet tells them apart: a real new batch
 // arrives after the gap, and a continuation arrives before it.
 //
-// --- WHY THE GAP IS 400MS: the icons of a page load arrive after the
-// page's data has been rendered, which is a beat after the last
-// request answered. a shorter gap closed the batch in between and the
-// bar started over from the left as the icons came in — full, then
-// empty, then full. 400ms is long enough to hold the whole of a page
-// load together and short enough that a search feels instant.
+// --- WHY THE GAP IS 400MS: it has to be longer than the pause
+// BETWEEN the parts of one page load, and shorter than the pause a
+// reader takes before they do the next thing. a page's second wave —
+// the metadata after the balances — comes within a few milliseconds,
+// so the gap only has to clear that. a search or a LOAD MORE comes
+// seconds later, so it opens a new batch and the bar sweeps again.
 const BATCH_GAP_MS = 400;
-// how long the finished sweep stays on screen before the bar goes
-// away. it is long enough to be seen and short enough that it is not
-// in the reader's way.
+// how long the finished sweep stays on screen before the bar rests.
+// it is long enough to be seen and short enough that it is not in the
+// reader's way.
 const DONE_HOLD_MS = 500;
 // the timer that closes the batch, if nothing else comes in.
 let batch_timer: ReturnType<typeof setTimeout> | null = null;
@@ -247,7 +261,15 @@ let done_timer: ReturnType<typeof setTimeout> | null = null;
 let batch_closed = false;
 // ========================================
 // start a new batch: the counts go back to zero and the bar starts
-// from the left.
+// sweeping again.
+//
+// --- WHY THE BAR GOES BACK TO THE LEFT: the bar is a timeline of the
+// work happening NOW. a LOAD MORE or a search is a new piece of work,
+// and the reader needs to see it happen, so the bar starts over.
+//
+// --- WHY IT DOES NOT LOOK LIKE A SLAM: the css eases the width, so
+// the bar glides back to the left and then sweeps forward again. the
+// movement is the css's, not the signal's.
 function begin_batch_fun(): void {
   done = 0;
   total = 0;
@@ -318,9 +340,10 @@ function push_batch_timer_fun(): void {
 // never know the request existed.
 //
 // --- WHY A REQUEST JOINS THE CURRENT BATCH WHEN THE PAGE IS STILL
-// BUSY: the icons arrive right after the page's data and the reader is
-// waiting for both. if the icons started a new batch, the bar would go
-// 100% → 0% → 100% as they came in.
+// BUSY: a page's load often has a second wave — the token metadata is
+// asked for once the balances have come back. if that opened a new
+// batch, the bar would restart from the left in the middle of one
+// page load.
 //
 // --- WHY A REQUEST STARTS A NEW BATCH ONLY AFTER THE GAP: the gap
 // timer is what tells "still the same page load" apart from "a new
@@ -368,13 +391,7 @@ function get_state_fun(): HUGGIES_LOADING_BAR_STATE {
   return state;
 }
 // ========================================
-// how many requests are in flight right now.
-function get_in_flight_fun(): number {
-  return in_flight;
-}
-// ========================================
-// --- PATCH ------------------------------
-// wrap the global fetch so every request is counted.
+// --- PATCH ------------------------------// wrap the global fetch so every request is counted.
 //
 // --- WHY the count is bumped AROUND the await and not inside it: the
 // request is in flight from the moment fetch is called until its body
@@ -434,9 +451,11 @@ install_fun();
 // the signal's whole surface. it is small on purpose: the bar needs
 // the state and the progress, and that is all.
 //
-// --- WHY get_in_flight IS HERE: it is what tells "the page is busy"
-// apart from "the page is waiting on one slow request", and it is the
-// number a caller would want if it ever needed to explain the bar.
+// --- WHY is_loading IS HERE AND NOT JUST get_state: every page store
+// in the app exposes an is_loading(), and a page that asks the signal
+// whether it is busy should ask it the same way it asks its store.
+// is_loading() is that one question, and get_state() is the fuller
+// answer for the code that needs to tell "idle" from "done".
 //
 // --- WHY install IS HERE: the module installs itself when it is
 // imported, so the call is a no-op. it is on the surface because every
@@ -448,7 +467,6 @@ export const HUGGIES_LOADING_BAR = {
   subscribe: subscribe_fun,
   get_state: get_state_fun,
   get_progress: get_progress_fun,
-  get_in_flight: get_in_flight_fun,
   is_loading: is_loading_fun,
 };
 // ========================================

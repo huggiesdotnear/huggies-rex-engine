@@ -104,9 +104,15 @@ left on each new batch.
 
 ### the rules are checked
 
-`lib/ts/loading_bar.test.ts` holds the rules as checks. it needs a
+`lib/ts/loading_bar.test.ts` holds the signal's rules as checks. it needs a
 slow server so a request can be seen in flight — see the top of that
-file. the checks that need it are skipped when it is not running.
+file. the checks that need it are skipped when the server is not
+running.
+
+--- the file is a local check and not part of the app. the repo's
+`.gitignore` keeps every `*.test.ts` out of the bundle and out of the
+repository, the same as the other checks in `lib/ts/`. run it with
+`bun run frontend/lib/ts/loading_bar.test.ts`.
 
 
 
