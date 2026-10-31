@@ -18,9 +18,12 @@ import {
   HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
 } from "./contract_page_rhea_pool_sort";
 import { HUGGIES_CONTRACT_PAGE_RHEA_STORE } from "./contract_page_rhea_store";
+import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
+// the loading bar's patch goes in before the page's first request.
+huggies_loading_bar_start_fun();
 // begin the page's load with the default sort and the whole list.
 void HUGGIES_CONTRACT_PAGE_RHEA_STORE.load(
   HUGGIES_DEFAULT_RHEA_POOL_SORT,

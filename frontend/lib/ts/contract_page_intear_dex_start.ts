@@ -14,9 +14,12 @@
 // the fetching itself lives in lib/ts/contract_page_intear_dex.ts, so
 // the page's request list is still knowable by reading one file.
 import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "./contract_page_intear_dex_store";
+import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
+// the loading bar's patch goes in before the page's first request.
+huggies_loading_bar_start_fun();
 // begin the page's load.
 void HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.load();
 // ========================================

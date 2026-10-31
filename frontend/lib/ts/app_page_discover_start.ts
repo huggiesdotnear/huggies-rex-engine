@@ -20,9 +20,12 @@ import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
 } from "./app_page_discover_token_sort";
+import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
+// the loading bar's patch goes in before the page's first request.
+huggies_loading_bar_start_fun();
 void HUGGIES_APP_PAGE_DISCOVER_STORE.load(
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION === "desc",

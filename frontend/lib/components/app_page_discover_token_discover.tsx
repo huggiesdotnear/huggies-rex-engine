@@ -30,6 +30,7 @@ import { use_page_store_fun } from "../ts/use_page_store";
 import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
 import { huggies_sort_control_fun } from "./shared/sort_control";
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_result";
+import { HUGGIES_COUNTED_IMAGE } from "./shared/counted_image";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -53,7 +54,7 @@ function token_result_row_fun(
       href={token_detail_href_fun(token.id)}
     >
       {token.icon !== null ? (
-        <img class="result-icon" src={token.icon} alt="" />
+        <HUGGIES_COUNTED_IMAGE class="result-icon" src={token.icon} alt="" />
       ) : (
         <span class="result-icon is-empty" />
       )}

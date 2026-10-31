@@ -4,8 +4,10 @@
 //
 // it reads the app-wide loading signal (lib/ts/loading_bar.ts) and
 // paints it. it fetches nothing itself — the signal is fed by the
-// global fetch, so every request the page makes counts, whether it
-// comes from the page's loader, the token cache or a LOAD MORE.
+// global fetch and by the counted icon component, so every request
+// and every image the page makes counts, whether it comes from the
+// page's loader, the token metadata cache, the icon loader or a LOAD
+// MORE.
 //
 // --- WHY IT IS NOT A PER-PAGE COMPONENT: the bar belongs to the
 // browser window, not to a page. it is the same on every page and it
@@ -29,17 +31,21 @@ import { HUGGIES_LOADING_BAR } from "../ts/loading_bar";
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
-  const [progress, set_progress] = use_state(0);
+  // --- WHY THE INITIAL VALUE IS READ RIGHT AWAY: the page's start
+  // script fires the first request BEFORE this component mounts, so
+  // the bar may already have moved by the time the component first
+  // paints. starting at zero would show a dark bar for one frame and
+  // then jump, which reads as a glitch.
+  const [progress, set_progress] = use_state(
+    HUGGIES_LOADING_BAR.get_progress(),
+  );
 
-  // --- WHY the signal is installed here and not at import time: the
-  // component's effect runs when it mounts, which is before the page's
-  // own load starts (the page's start script runs on the html parse,
-  // the components mount after it). so nothing is missed.
+  // --- WHY THE PATCH IS NOT INSTALLED HERE: the module installs
+  // itself when it is imported, and the page's start script calls it
+  // before the page fires its first request. installing it in this
+  // effect would be too late — the first request would already be
+  // flying and would never be counted.
   use_effect(() => {
-    HUGGIES_LOADING_BAR.install();
-    // read the current value right away, so a page that was already
-    // fetching when the bar mounted does not start at zero.
-    set_progress(HUGGIES_LOADING_BAR.get_progress());
     return HUGGIES_LOADING_BAR.subscribe(() => {
       set_progress(HUGGIES_LOADING_BAR.get_progress());
     });

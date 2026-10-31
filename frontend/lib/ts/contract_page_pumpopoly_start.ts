@@ -23,9 +23,12 @@
 // itself.
 import { HUGGIES_PAGE_ACCOUNT_ID } from "./page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "./contract_page_pumpopoly_store";
+import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
+// the loading bar's patch goes in before the page's first request.
+huggies_loading_bar_start_fun();
 // begin the page's load for the player the page is about, and watch the
 // id so a later change reloads the page by itself.
 HUGGIES_PAGE_ACCOUNT_ID.init();

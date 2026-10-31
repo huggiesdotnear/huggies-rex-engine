@@ -14,12 +14,20 @@ lib/ts/<page>_start.ts    the START. the page's first load. the page's
                           html loads it as a <script>.
 lib/ts/use_page_store.ts  the shared HOOK. one line per component.
 lib/ts/loading_bar.ts     the app-wide LOADING SIGNAL. how much of the
-                           page is still waiting. every page uses it.
+                          page is still waiting. every page uses it.
+lib/ts/page_loading_bar_start.ts
+                          the one line every start script calls first,
+                          so the loading signal is in place before the
+                          page fires its first request.
 
 lib/components/<page>_*.tsx   the DISPLAY. each one reads the store
                               through the hook and renders jsx.
 lib/components/loading_bar.tsx the loading PROGRESS BAR. it is on every
                               page and it reads the loading signal.
+lib/components/shared/counted_image.tsx
+                              an <img> that tells the loading signal it
+                              is loading. every token icon goes through
+                              it, so the bar waits for the icons too.
 ```
 
 ## the loading signal
@@ -28,16 +36,48 @@ the bar at the top of the screen is not a per-page thing. it is fed by
 one module, `lib/ts/loading_bar.ts`, and every page gets it for free.
 
 the module patches the one global `fetch`, so it counts EVERY request
-the page makes — the page's own loader, the token metadata cache, the
-icon loader, a LOAD MORE, a search, a sort. that is why a page does
-not have to tell the bar anything: the bar watches the network.
+the page makes — the page's own loader, the token metadata cache, a
+LOAD MORE, a search, a sort. that is why a page does not have to tell
+the bar anything: the bar watches the network.
 
-the bar fills as the answers land. it shows the share of the requests
-that are DONE, so it creeps forward while the work is running and
-reaches the end only when the last answer is in.
+the token icons are NOT fetched with fetch. they are `<img>` tags and
+the browser loads them itself, so they go through
+`shared/counted_image.tsx`, which reports them to the same signal.
+without that the bar sat at 100% while a couple of hundred icons were
+still arriving.
+
+the bar fills as the answers land. it shows the share of the work that
+is DONE, so it creeps forward while the work is running and reaches the
+end only when the last answer is in. it is a HIGH-WATER MARK: it only
+moves forward, so a request that joins late can never drag it back.
 
 a page that wants to know whether something is running asks the signal
 (`HUGGIES_LOADING_BAR.is_loading()`); it never counts requests itself.
+
+### the order of the scripts
+
+a page's html loads its start script BEFORE the shared import:
+
+```html
+<script src="../lib/ts/app_page_discover_start.ts"></script>
+<script src="../lib/ts/import.ts"></script>
+```
+
+so the start script fires the page's first request before the bar's
+component has even mounted. every start script therefore calls
+`huggies_loading_bar_start_fun()` as its first line, which puts the
+patch on the global fetch in place before the page's load runs. without
+that line the page's FIRST load was never counted and the bar sat dark
+through it.
+
+### the batch
+
+the bar runs once per BATCH of work. a batch is the page's load, or a
+later action of the reader's — a search, a sort, a LOAD MORE. a batch
+opens when a request arrives after the page has been quiet for a moment,
+and it closes when the page goes quiet again. the bar rests at the end
+after a batch and starts over from the left on the next one.
+
 
 ## the rules
 

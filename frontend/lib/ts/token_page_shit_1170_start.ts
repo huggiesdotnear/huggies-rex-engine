@@ -19,9 +19,12 @@
 // (lib/ts/token_page_shit_1170_token.ts), so the start file needs no id
 // from the url.
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "./token_page_shit_1170_state";
+import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
+// the loading bar's patch goes in before the page's first request.
+huggies_loading_bar_start_fun();
 // begin the page's load.
 void HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.load();
 // ========================================

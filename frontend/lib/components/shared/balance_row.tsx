@@ -11,6 +11,7 @@ import { HUGGIES_AMOUNT_FORMAT } from "../../ts/token_amount_format";
 import { token_amount_display_fun } from "../../ts/token_amount_display";
 import { token_detail_href_fun } from "../../ts/token_link";
 import { current_app_depth_fun } from "../../ts/app_depth";
+import { HUGGIES_COUNTED_IMAGE } from "./counted_image";
 // ========================================
 // ========================================
 // --- ICON ------------------------------
@@ -18,6 +19,8 @@ import { current_app_depth_fun } from "../../ts/app_depth";
 // the same alignment.
 // --- WHY --- the api's data uri is used directly: it is already
 // self-contained, so no extra request and no origin problem.
+// --- WHY --- the counted image: the bar counts the icons too, so it does
+// not sit at 100% while they are still arriving.
 function huggies_token_icon_fun(
   icon: string | null,
   symbol: string,
@@ -26,7 +29,7 @@ function huggies_token_icon_fun(
     return <span class="token-icon is-empty" aria-hidden="true" />;
   }
   return (
-    <img
+    <HUGGIES_COUNTED_IMAGE
       class="token-icon"
       src={icon}
       alt=""

@@ -17,9 +17,12 @@
 // named by `?id=`, and the components read it from the same place.
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "./app_page_account_store";
+import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
+// the loading bar's patch goes in before the page's first request.
+huggies_loading_bar_start_fun();
 // begin the page's load for the account the url names, and watch the
 // id so a later change reloads the page by itself.
 HUGGIES_APP_PAGE_ACCOUNT_ID.init();
