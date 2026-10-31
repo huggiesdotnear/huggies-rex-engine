@@ -56,16 +56,6 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
 
   const percent = `${Math.round(progress * 100)}%`;
 
-  // --- WHY THE BAR IS HIDDEN WHEN IDLE: a bar that rests at 100%
-  // forever reads as "still loading" to anyone glancing at it, and it
-  // covers the top of the page permanently. the bar comes and goes
-  // with the work.
-  //
-  // --- WHY THE "done" STATE STILL SHOWS: the sweep is visible for a
-  // moment after the last answer lands, so the reader sees the bar
-  // FINISH rather than have it vanish mid-stride.
-  const visible = state !== "idle";
-
   return (
     // --- WHY THE FILL IS THE ROOT AND NOT WRAPPED: the mount div
     // (#HUGGIES_COMPONENT_LOADING_BAR) IS the track. the css gives IT
@@ -75,6 +65,14 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
     // "height: 100%" resolved against a zero-height parent and the
     // fill was invisible. the fill must be a direct child of the
     // track.
+    //
+    // --- WHY THE BAR IS ALWAYS THERE: the dark track is a constant
+    // line across the top of every page, so the app looks the same on
+    // every page and the reader always knows where the progress will
+    // appear. a page that fetches nothing shows the dark track and
+    // nothing else. a page that has finished shows the track with the
+    // blue fill at the end. a page that is loading shows the fill
+    // sweeping across it.
     <div
       class="loading-bar-fill"
       role="progressbar"
@@ -83,7 +81,6 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
       data-state={state}
-      data-visible={visible ? "yes" : "no"}
       style={{ width: percent }}
     />
   );

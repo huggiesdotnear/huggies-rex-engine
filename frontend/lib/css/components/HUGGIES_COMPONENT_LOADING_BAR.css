@@ -26,12 +26,15 @@
    pixel value says exactly how tall the lit part is and cannot
    collapse.
 
-   --- WHY THE BAR HIDES ITSELF WHEN THERE IS NO WORK: a bar that
-   rests at 100% forever reads as "still loading" to anyone glancing
-   at it, and it covers the top of the page permanently. the bar comes
-   and goes with the work: it is invisible when the page is idle, it
-   sweeps while the page loads, and it fades out once the work is
-   done. */
+   --- WHY THE BAR IS ALWAYS VISIBLE: the dark track is a constant
+   line across the top of every page, so the app looks the same on
+   every page and the reader always knows where the progress appears.
+   a page that fetches nothing shows the dark track alone. a page that
+   has finished shows the track with the blue fill at the end. a page
+   that is loading shows the fill sweeping across it.
+
+   the bar is never hidden, so it never has to fade in or out and it
+   never leaves a gap at the top of the page. */
 /*==================================*/
 #HUGGIES_COMPONENT_LOADING_BAR {
   position: fixed;
@@ -46,17 +49,6 @@
   /* the track: a flat dark grey. fully opaque, so nothing shows
      through it and it never reads as a washed-out bright colour. */
   background-color: #474747;
-  /* the bar is hidden when the page is idle. the opacity is what
-     takes it away, and the transition is what makes it come and go
-     smoothly rather than blink. */
-  opacity: 0;
-  transition: opacity 0.25s ease-in-out;
-}
-/*==================================*/
-/* the bar is on screen while there is work, and it stays for a moment
-   after the work is done so the reader sees the sweep FINISH. */
-#HUGGIES_COMPONENT_LOADING_BAR[data-visible="yes"] {
-  opacity: 1;
 }
 /*==================================*/
 /* the filled part. the width is set inline from the progress.

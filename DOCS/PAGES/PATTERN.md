@@ -47,14 +47,19 @@ bar measure the pictures instead of the page's work.
 
 the bar has three states:
 
-- **idle** — nothing is happening. the bar is hidden.
+- **idle** — nothing is happening. the bar is dark.
 - **loading** — work is on its way. the bar sweeps.
 - **done** — the work just finished. the sweep is shown for a moment
-  and then the bar goes away.
+  and then the bar rests with the fill at the end.
 
-a bar that rested at 100% forever would read as "still loading" to
-anyone glancing at it, and it would cover the top of the page
-permanently. so the bar comes and goes with the work.
+the bar's TRACK is always there — a constant dark line across the top
+of every page, so the app looks the same everywhere and the reader
+always knows where the progress appears. only the blue FILL comes and
+goes with the work:
+
+- a page that fetches nothing shows the dark track alone
+- a page that is loading shows the fill sweeping across the track
+- a page that has loaded shows the track with the blue fill at the end
 
 ### the bar moves while it waits
 
