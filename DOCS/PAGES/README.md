@@ -56,6 +56,7 @@ everything for that page. no component fetches anything.
 - [`frontend.app.discover.md`](./frontend.app.discover.md) - `frontend/app/discover.html`
 - [`frontend.app.burn.md`](./frontend.app.burn.md) - `frontend/app/burn.html` - BURN
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
+- [`frontend.app.swap.md`](./frontend.app.swap.md) - `frontend/app/swap.html` - SWAP
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
 - [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id=
 - [`frontend.app.token.index.md`](./frontend.app.token.index.md) - `frontend/app/token/index.html` - ?id= - TOKEN
@@ -69,8 +70,8 @@ everything for that page. no component fetches anything.
 
 - index.html - FEED
 - account.html - PROFILE
+- swap.html - SWAP
 - discover.html - DISCOVER
-- skill.html - SKILL
 
 =====================
 <br/>

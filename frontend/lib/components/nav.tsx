@@ -7,7 +7,7 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { Home, LayoutGrid, User, GraduationCap } from "lucide-preact";
+import { Home, ArrowLeftRight, User, LayoutGrid } from "lucide-preact";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -22,9 +22,9 @@ interface HUGGIES_NAV_LINK {
 // user lands on auth.html instead of a blank account.html with no ?id=.
 const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
-  { href: "discover.html", label: "DISCOVER", Icon: LayoutGrid },
+  { href: "swap.html", label: "SWAP", Icon: ArrowLeftRight },
   { href: "account.html", label: "PROFILE", Icon: User },
-  { href: "skill.html", label: "SKILL", Icon: GraduationCap },
+  { href: "discover.html", label: "DISCOVER", Icon: LayoutGrid },
 ];
 // ========================================
 // ========================================

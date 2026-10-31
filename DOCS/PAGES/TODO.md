@@ -26,6 +26,7 @@ remov items as you complete
 
 OUT OF SCOPE FOR NOW, BASIC COMING SOON
 
+- [ ] `frontend/app/swap.html` — SWAP
 - [ ] `frontend/app/contract/rhea.html` — RHEA
 - [ ] `frontend/app/contract/intear-dex.html` — INTEAR DEX
 

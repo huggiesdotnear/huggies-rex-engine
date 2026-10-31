@@ -43,6 +43,7 @@ import "../components/token_page_token_status";
 import "../components/app_page_game_emoji_match_game";
 import "../components/app_page_game_meme_tokens";
 import "../components/app_page_discover_quick_links";
+import "../components/app_page_discover_page_links";
 import "../components/app_page_burn_addresses";
 import "../components/app_page_burn_balances";
 import "../components/app_page_burn_info";

@@ -1,6 +1,6 @@
 # frontend/app/discover.html
 
-the page lists the supported contracts and a searchable, sortable list of tokens, paged from the intear api.
+the page lists the supported contracts and a searchable, sortable list of tokens, paged from the intear api. the PAGES section links to the app pages the nav does not show.
 
 ```html
 <main>
@@ -15,6 +15,11 @@ the page lists the supported contracts and a searchable, sortable list of tokens
   <section>
     <h2>TOKENS</h2>
     <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER"></div>
+  </section>
+  <!--==========================================-->
+  <section>
+    <h2>PAGES</h2>
+    <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS"></div>
   </section>
   <!--==========================================-->
 </main>
