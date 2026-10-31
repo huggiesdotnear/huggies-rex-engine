@@ -29,6 +29,7 @@ COPY package.json bun.lock ./
 COPY tsconfig.json ./
 COPY middleman ./middleman
 COPY frontend ./frontend
+COPY build.ts ./build.ts
 
 # install only what's needed for the frontend build. the middleman/
 # and frontend trees import `preact` indirectly (components that call
@@ -97,22 +98,11 @@ RUN bun install
 # the css keeps its hash — that comes from --chunk-naming, and hashed
 # css names are what let two pages with identical css coexist.
 #
-# --- WHY: build from INSIDE frontend/ ---
-# bun derives the entry path from the current working directory, so
-# building here makes `frontend/app/account.html` land at
-# `static/app/account.html` — the same layout the local build in the
-# README produces (`cd frontend && bun build ./**/*.html --outdir=../static`).
-# building from the repo root instead would add a `frontend/` prefix to
-# every path and serve the app under /frontend/app/... instead of /app/...
-WORKDIR /src/frontend
-RUN mkdir -p ../static \
-    && bun build \
-        --entry-naming='[dir]/[name].[ext]' \
-        --chunk-naming='[dir]/[name]-[hash].[ext]' \
-        --asset-naming='[dir]/[name].[ext]' \
-        --outdir=../static \
-        --minify \
-        $(find . -type f -name '*.html') sw.js
+# the shared build script discovers every frontend HTML entry point,
+# includes sw.js as a standalone entry point, and writes the production
+# bundle to /src/static.
+RUN cd /src \
+    && bun run build.ts
 
 # ========================================
 # Stage 2: rust builder.
