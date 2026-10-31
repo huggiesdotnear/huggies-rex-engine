@@ -6,8 +6,9 @@
    viewport, so it reads as a page-wide line rather than a piece of
    the app's column.
 
-   the fill is the app's middle colour with a soft glow around it, so
-   it is visible on the red background without shouting. */
+   the bar is the app's middle colour (#00c6d7) — the bright cyan. the
+   track is the dimmer version of it and the fill is the bright one, so
+   the filled part stands out clearly against the red background. */
 /*==================================*/
 #HUGGIES_COMPONENT_LOADING_BAR {
   position: fixed;
@@ -15,12 +16,13 @@
   left: 0px;
   right: 0px;
   width: 100vw;
-  height: 4px;
+  height: 5px;
   /* the bar sits above everything else, including the bottom nav. */
   z-index: 9999;
   pointer-events: none;
-  /* the track itself is nearly invisible — only the fill reads. */
-  background-color: rgba(0, 198, 215, 0.15);
+  /* the track is the middle colour at half strength — dim enough to
+     read as "not yet filled", bright enough to be seen on the red. */
+  background-color: var(--color-middle-dark);
 }
 /*==================================*/
 /* the filled part. the width is set inline from the progress, and the
@@ -28,9 +30,11 @@
 #HUGGIES_COMPONENT_LOADING_BAR .loading-bar-fill {
   height: 100%;
   width: 0%;
+  /* the bright cyan, at full strength. */
   background-color: var(--color-middle);
-  border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 6px 2px var(--color-middle);
+  border-radius: 0 5px 5px 0;
+  /* the soft glow: the same cyan spread out around the fill. */
+  box-shadow: 0 0 8px 3px var(--color-middle);
   transition: width 0.25s ease-out;
 }
 /*==================================*/
