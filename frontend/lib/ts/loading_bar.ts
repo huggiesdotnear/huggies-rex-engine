@@ -25,6 +25,11 @@
 // the bar shows the share of the work that is DONE, so it is a count of
 // the requests in flight against the total that was asked for.
 //
+// --- WHY THE COUNTS RESET ON A NEW BATCH: a page's load is one batch
+// of requests, and it ends when the queue empties. the NEXT batch — a
+// search, a sort, a LOAD MORE — is a fresh run, so the bar starts over
+// from the left instead of being stuck at the end.
+//
 // the module is plain ts and holds no dom: the component in
 // lib/components/loading_bar.tsx reads it and paints the bar.
 //
@@ -33,8 +38,13 @@
 // --- STATE ------------------------------
 // how many requests are in flight right now.
 let in_flight = 0;
-// how many requests have been started in total, since the last reset.
-let started = 0;
+// how many requests have ANSWERED in this batch.
+let done = 0;
+// how many requests have been asked for in this batch.
+let total = 0;
+// the furthest the bar has ever reached in this batch. the bar is a
+// high-water mark, so it only ever moves forward.
+let high_water = 0;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // true once the global fetch has been wrapped.
@@ -65,21 +75,48 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // --- PROGRESS --------------------------
-// the share of the work that is done, from 0 to 1.
+// how far along the bar is, from 0 to 1.
 //
-// --- WHY the finished requests are counted and not the pending ones:
-// a bar that fills as requests START would sit at 100% for as long as
-// the slowest request runs, which is the opposite of what the reader
-// wants to know. counting the finished ones means the bar creeps
-// forward as each answer lands and only reaches the end when the last
-// one has.
+// --- WHY IT IS THE SHARE OF THE WORK THAT IS FINISHED: the bar fills
+// as the answers land. counting the finished ones means it creeps
+// forward as each answer comes in, instead of sitting at 100% for as
+// long as the slowest request runs.
+//
+// --- WHY IT IS A HIGH-WATER MARK AND NOT A LIVE RATIO: a page's load
+// is not one fixed batch. the account page asks four contracts in
+// parallel, and THEN asks for the token metadata once all four have
+// answered. a live "done / total" ratio hit 100% when the four sources
+// landed and then dropped back to 80% when the metadata request joined
+// the batch — a bar that went 0 → 100 → 80 → 100.
+//
+// the bar only ever moves forward during a run, so the reader sees one
+// smooth sweep and never a bar that fights itself.
+//
+// --- WHY THE BAR IS CAPPED SHORT OF THE END WHILE WORK IS RUNNING:
+// the reader has to be able to see that there is more to wait for, so
+// the last stretch of the bar is only covered when the queue empties.
 function get_progress_fun(): number {
-  if (started === 0) return 0;
-  const done = started - in_flight;
-  if (done <= 0) return 0;
-  const ratio = done / started;
-  if (ratio >= 1) return 1;
-  return ratio;
+  return high_water;
+}
+// ========================================
+// work out the bar's new position and move it there.
+//
+// --- WHY THE SHARE IS SCALED TO 90%: while a request is still running
+// the bar stops short of the end. the last tenth is only covered when
+// the queue empties, so the reader always has a visible sign that
+// something is still on its way.
+function update_progress_fun(): void {
+  if (total === 0) return;
+  // the queue is empty: every request that was asked for has answered,
+  // so the work is done and the bar may reach the end.
+  if (in_flight === 0) {
+    high_water = 1;
+    return;
+  }
+  // the share of the work that is finished, held short of the end.
+  const share = (done / total) * 0.9;
+  // the bar never goes backwards.
+  if (share > high_water) high_water = share;
 }
 // ========================================
 // true while at least one request is in flight.
@@ -103,8 +140,19 @@ async function counted_fetch_fun(
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<Response> {
+  // --- WHY A NEW BATCH STARTS THE COUNTS OVER: the page's load is one
+  // batch of requests and it ends when the queue empties. the NEXT
+  // batch — a search, a sort, a LOAD MORE — is a fresh run of the
+  // bar, so the counts start over and the bar starts from the left
+  // again instead of being stuck at the end.
+  if (in_flight === 0) {
+    done = 0;
+    total = 0;
+    high_water = 0;
+  }
   in_flight += 1;
-  started += 1;
+  total += 1;
+  update_progress_fun();
   notify_fun();
   try {
     // --- WHY the response is read here: the reader only counts the
@@ -114,6 +162,8 @@ async function counted_fetch_fun(
     return response;
   } finally {
     in_flight -= 1;
+    done += 1;
+    update_progress_fun();
     notify_fun();
   }
 }
@@ -133,7 +183,9 @@ function install_fun(): void {
 // the bar restarts from zero for the new work.
 function reset_fun(): void {
   in_flight = 0;
-  started = 0;
+  done = 0;
+  total = 0;
+  high_water = 0;
   notify_fun();
 }
 // ========================================
