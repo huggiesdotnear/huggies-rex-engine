@@ -16,6 +16,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_balance_table_fun } from "./shared/balance_table";
+import { huggies_account_tab_view_fun } from "./shared/account_tab_view";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -29,14 +30,20 @@ function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
   // no `?id=` on this url — render nothing.
   if (account_id === null) return <></>;
 
+  // --- WHY --- the table belongs to the balances tab: the account
+  // page's tab decides what the page shows, and the balances and the
+  // transactions are two views of the same account.
   return (
     <>
-      {huggies_balance_table_fun({
-        rows: page_data?.direct ?? [],
-        title: null,
-        loading: page_data === null,
-        empty_text: "NO BALANCES",
-        account_id,
+      {huggies_account_tab_view_fun({
+        tab: "balances",
+        children: huggies_balance_table_fun({
+          rows: page_data?.direct ?? [],
+          title: null,
+          loading: page_data === null,
+          empty_text: "NO BALANCES",
+          account_id,
+        }),
       })}
     </>
   );

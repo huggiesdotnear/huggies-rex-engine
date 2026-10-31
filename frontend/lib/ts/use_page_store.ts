@@ -39,6 +39,14 @@ export interface HUGGIES_PAGE_STORE<STATE> {
 // when its own state changes. so the component keeps a counter and
 // bumps it whenever the store announces something. the value is not
 // used — only the bump matters.
+//
+// --- WHY --- THE COUNTER IS BUMPED RIGHT AFTER THE SUBSCRIPTION: the
+// subscription is set up in an effect, and an effect runs AFTER the
+// component's first render. a store that changed in that window
+// announced it to nobody, and the component would sit on a stale view
+// until the next change. bumping the counter once the subscription is
+// in place asks for a fresh render, and the fresh render reads the
+// store's current state.
 export function use_page_store_fun<STATE>(
   store: HUGGIES_PAGE_STORE<STATE>,
 ): STATE {
@@ -48,6 +56,10 @@ export function use_page_store_fun<STATE>(
     const unsubscribe = store.subscribe(() => {
       set_revision((revision) => revision + 1);
     });
+    // the store may have changed between the first render and this
+    // effect, so the component asks for a fresh render now that it is
+    // listening.
+    set_revision((revision) => revision + 1);
     return unsubscribe;
   }, [store]);
 

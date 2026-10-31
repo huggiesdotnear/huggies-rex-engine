@@ -1,0 +1,62 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_TX_ACTIONS
+   the transaction's actions: what the transaction actually did.
+
+   one card per action, with the action's kind and the details it
+   carries. the arguments viewer is a shared component
+   (shared/args_viewer.css), so its own look lives in its own file. */
+/*==================================*/
+@import url(./shared/args_viewer.css);
+
+/*==================================*/
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-actions {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-actions h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/*==================================*/
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-action {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+}
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-action-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-action-type {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-action-gas,
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-action-deposit {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.75;
+}
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-action-extra {
+  font-size: 11px;
+  opacity: 0.85;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/

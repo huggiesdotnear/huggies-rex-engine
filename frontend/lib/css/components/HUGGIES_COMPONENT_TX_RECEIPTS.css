@@ -1,0 +1,136 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_TX_RECEIPTS
+   the transaction's receipts: the work the transaction caused and what
+   came of it.
+
+   one card per receipt: its facts, what it returned and what it
+   logged. the json viewer is a shared component
+   (shared/json_viewer.css), so its own look lives in its own file. */
+/*==================================*/
+@import url(./shared/json_viewer.css);
+
+/*==================================*/
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/*==================================*/
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-id {
+  font-size: 10px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* the result of the receipt — what it returned, or why it failed. */
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-result {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-result.is-failed {
+  border-color: rgba(255, 90, 90, 0.5);
+  background: rgba(255, 90, 90, 0.12);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-result-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-result-value {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* the logs of the receipt. */
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-log-text {
+  margin: 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+  font-family: monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-event {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-event-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-event-standard {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-event-name {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.8;
+}
+/*==================================*/

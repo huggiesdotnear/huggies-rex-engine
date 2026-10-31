@@ -1,0 +1,65 @@
+/*==================================*/
+/* account_tx_row
+   one row of the account transactions table: the transaction, when it
+   happened, the block, the involvement and the status. the table has
+   five columns, so the hash takes what it needs and the rest share
+   what is left. */
+/*==================================*/
+.account-transactions th.tx-hash,
+.account-transactions td.tx-hash {
+  width: 46%;
+}
+.account-transactions td.tx-hash a {
+  display: block;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+  font-family: monospace;
+  font-size: 10px;
+}
+.account-transactions th.tx-time,
+.account-transactions td.tx-time {
+  width: 15%;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+.account-transactions th.tx-height,
+.account-transactions td.tx-height {
+  width: 13%;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+.account-transactions th.tx-involvement,
+.account-transactions td.tx-involvement {
+  width: 16%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+.account-transactions th.tx-status,
+.account-transactions td.tx-status {
+  width: 10%;
+  text-align: right;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+/* a failed transaction is the one thing on the row the reader must not
+   miss. */
+.account-transactions td.tx-status.is-failed {
+  color: var(--color-backend-light);
+  opacity: 1;
+  font-weight: 700;
+}
+.account-transactions th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/

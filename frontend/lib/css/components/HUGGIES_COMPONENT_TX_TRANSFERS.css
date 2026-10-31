@@ -1,0 +1,75 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_TX_TRANSFERS
+   the transaction's transfers: what moved and where.
+
+   one row per transfer: the two ends with an arrow between them, the
+   amount, and the contract it came from. */
+/*==================================*/
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfers {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfers h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/*==================================*/
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: monospace;
+  font-size: 12px;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-account {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-arrow {
+  opacity: 0.6;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-mint {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-contract {
+  font-size: 10px;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-memo {
+  font-size: 11px;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+/*==================================*/

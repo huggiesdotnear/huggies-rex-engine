@@ -1,0 +1,8 @@
+/*==================================*/
+/* the transaction page's css: the components it mounts. */
+@import url(./components/HUGGIES_COMPONENT_TX_STATUS.css);
+@import url(./components/HUGGIES_COMPONENT_TX_SUMMARY.css);
+@import url(./components/HUGGIES_COMPONENT_TX_TRANSFERS.css);
+@import url(./components/HUGGIES_COMPONENT_TX_ACTIONS.css);
+@import url(./components/HUGGIES_COMPONENT_TX_RECEIPTS.css);
+/*==================================*/

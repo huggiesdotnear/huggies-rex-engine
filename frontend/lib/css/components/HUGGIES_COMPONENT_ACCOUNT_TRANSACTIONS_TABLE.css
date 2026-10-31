@@ -1,0 +1,77 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+   the account's transaction history table: the transaction, when it
+   happened, the block, how the account was involved and whether it
+   worked.
+
+   the row itself is a shared component
+   (shared/account_tx_row.css), so both the column widths and the
+   row's own look live in their own files. */
+/*==================================*/
+@import url(./shared/account_tx_row.css);
+
+/*==================================*/
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions .scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th,
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions td {
+  text-align: left;
+  padding: 6px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the row that carries a message — "LOADING TRANSACTIONS..." and
+   "NO TRANSACTIONS" — spans the whole table and is not a data row. */
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions td[colspan] {
+  text-align: center;
+  padding: 16px 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions .tx-error {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: var(--color-backend-light);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions .tx-loading-more {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  margin: 8px 0 0 0;
+}
+/*==================================*/

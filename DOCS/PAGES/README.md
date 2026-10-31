@@ -58,7 +58,8 @@ everything for that page. no component fetches anything.
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
 - [`frontend.app.swap.md`](./frontend.app.swap.md) - `frontend/app/swap.html` - SWAP
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
-- [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id=
+- [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id= - ?tab=
+- [`frontend.app.tx.md`](./frontend.app.tx.md) - `frontend/app/tx.html` - ?tx= - TRANSACTION
 - [`frontend.app.token.index.md`](./frontend.app.token.index.md) - `frontend/app/token/index.html` - ?id= - TOKEN
 - [`frontend.app.token.shit-1170.md`](./frontend.app.token.shit-1170.md) - `frontend/app/token/shit-1170.html`
 - [`frontend.app.contract.rhea.md`](./frontend.app.contract.rhea.md) - `frontend/app/contract/rhea.html` - RHEA

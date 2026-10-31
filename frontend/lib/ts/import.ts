@@ -17,6 +17,13 @@ import "../components/nav";
 import "../components/random_slogan_p";
 import "../components/auth_button";
 import "../components/app_page_account_id_h1";
+import "../components/app_page_account_tabs";
+import "../components/app_page_account_transactions_table";
+import "../components/app_page_tx_status";
+import "../components/app_page_tx_summary";
+import "../components/app_page_tx_actions";
+import "../components/app_page_tx_transfers";
+import "../components/app_page_tx_receipts";
 import "../components/app_page_account_direct_balance_table";
 import "../components/app_page_account_rhea_amm_balance_table";
 import "../components/app_page_account_rhea_dcl_balance_table";
@@ -57,6 +64,10 @@ import "../components/token_page_shit_1170_filters";
 import "../components/token_page_shit_1170_holders";
 import "../components/token_page_shit_1170_metadata";
 import "../components/shared/token_meta_grid";
+import "../components/shared/account_tx_row";
+import "../components/shared/account_tab_view";
+import "../components/shared/json_viewer";
+import "../components/shared/args_viewer";
 // ========================================
 // register the service worker (installability only, no caching).
 register_service_worker_fun();
