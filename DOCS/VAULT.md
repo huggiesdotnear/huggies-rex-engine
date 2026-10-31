@@ -10,6 +10,8 @@ can be overridden with a an `HUGGIES_VAULT_DB_LOCATION` env but the defualt is n
 
 we will mount this location in docker.
 
+NEVER wipe or delete this db.
+
 =====================
 <br/>
 copyright 2026 by sleet.near
