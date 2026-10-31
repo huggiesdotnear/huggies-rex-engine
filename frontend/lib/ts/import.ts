@@ -9,6 +9,7 @@
 // app/contract/ and app/token/ do not load hello.ts themselves, so it
 // is imported here for them.
 import "./hello";
+import "../components/loading_bar";
 import "../components/nav";
 import "../components/random_slogan_p";
 import "../components/auth_button";

@@ -13,10 +13,31 @@ lib/ts/<page>_state.ts    the STORE. the data, and the load that fills
 lib/ts/<page>_start.ts    the START. the page's first load. the page's
                           html loads it as a <script>.
 lib/ts/use_page_store.ts  the shared HOOK. one line per component.
+lib/ts/loading_bar.ts     the app-wide LOADING SIGNAL. how much of the
+                           page is still waiting. every page uses it.
 
 lib/components/<page>_*.tsx   the DISPLAY. each one reads the store
                               through the hook and renders jsx.
+lib/components/loading_bar.tsx the loading PROGRESS BAR. it is on every
+                              page and it reads the loading signal.
 ```
+
+## the loading signal
+
+the bar at the top of the screen is not a per-page thing. it is fed by
+one module, `lib/ts/loading_bar.ts`, and every page gets it for free.
+
+the module patches the one global `fetch`, so it counts EVERY request
+the page makes — the page's own loader, the token metadata cache, the
+icon loader, a LOAD MORE, a search, a sort. that is why a page does
+not have to tell the bar anything: the bar watches the network.
+
+the bar fills as the answers land. it shows the share of the requests
+that are DONE, so it creeps forward while the work is running and
+reaches the end only when the last answer is in.
+
+a page that wants to know whether something is running asks the signal
+(`HUGGIES_LOADING_BAR.is_loading()`); it never counts requests itself.
 
 ## the rules
 

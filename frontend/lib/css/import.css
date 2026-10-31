@@ -19,4 +19,7 @@
 /*==================================*/
 /* the component every page carries. */
 @import url(./components/HUGGIES_COMPONENT_AUTH_BUTTON.css);
+/* the loading bar: it is on every page, so it lives with the
+   app-wide ones and not in a page's own import file. */
+@import url(./components/HUGGIES_COMPONENT_LOADING_BAR.css);
 /*==================================*/
