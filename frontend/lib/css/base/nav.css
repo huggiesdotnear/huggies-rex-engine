@@ -12,6 +12,7 @@ nav {
   background-color: var(--color-fontend);
   color: var(--color-backend);
   border-top: 1px solid #474747;
+  z-index: 100;
 }
 nav a {
   display: flex;
