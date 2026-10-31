@@ -54,6 +54,11 @@ export const HUGGIES_PINNED_TOKENS: ReadonlyArray<HUGGIES_PINNED_TOKEN> = [
     reason: "meme token",
     weight: 20,
   },
+  {
+    id: "blackdragon.tkn.near",
+    reason: "meme token",
+    weight: 20,
+  },
 ];
 // ========================================
 // --- GET -------------------------------
