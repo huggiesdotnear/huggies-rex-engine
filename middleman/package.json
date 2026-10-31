@@ -1,5 +1,5 @@
 {
-  "name": "@huggies/middleman",
+  "name": "@huggies/huggies-rex-engine-middleman",
   "version": "0.1.0",
   "description": "Clean TypeScript middleman for the huggies-rex-engine backend routes (/api/huggies/*, /api/trezu/*).",
   "license": "MIT",
