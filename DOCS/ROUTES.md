@@ -30,7 +30,6 @@ user info and session managmnets
 
   see [`ROUTES/trezu-treasuries.md`](./ROUTES/trezu-treasuries.md)
 
-
 ### intear
 
 the intear api is NOT proxied through our backend. the

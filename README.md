@@ -11,7 +11,11 @@ bun tsc --noEmit
 # bun build recursive
 rm -rf static
 cd frontend
-bun build ./**/*.html --outdir=../static --minify
+bun build ./**/*.html sw.js \
+  --entry-naming='[dir]/[name].[ext]' \
+  --chunk-naming='[dir]/[name]-[hash].[ext]' \
+  --asset-naming='[dir]/[name].[ext]' \
+  --outdir=../static --minify
 ```
 
 rust/backend

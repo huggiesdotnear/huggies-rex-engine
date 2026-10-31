@@ -6,6 +6,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HUGGIES</title>
     <link rel="icon" type="image/svg+xml" href="./lib/img/favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <!--pwa icons-->
+    <!-- every icon is listed here because bun only copies an asset into
+         the output folder when something references it, and the manifest
+         alone does not count — bun treats it as opaque json. the names
+         must stay unhashed: the manifest points at these exact paths. -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./lib/img/pwa/icon-180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="72x72"
+      href="./lib/img/pwa/icon-72.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="./lib/img/pwa/icon-96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="128x128"
+      href="./lib/img/pwa/icon-128.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="144x144"
+      href="./lib/img/pwa/icon-144.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="152x152"
+      href="./lib/img/pwa/icon-152.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="./lib/img/pwa/icon-192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="256x256"
+      href="./lib/img/pwa/icon-256.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="384x384"
+      href="./lib/img/pwa/icon-384.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="./lib/img/pwa/icon-512.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="./lib/img/pwa/icon-maskable-192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="./lib/img/pwa/icon-maskable-512.png"
+    />
+    <!--pwa icons-->
     <!--css-->
     <link rel="stylesheet" href="./lib/css/import.css" />
     <!--css-->
@@ -26,9 +104,7 @@
     <!--==========================================-->
     <!--==========================================-->
     <!--==========================================-->
-    <!--==========================================-->
     <!--<footer>COPYRIGHT 2026</footer>-->
-    <!--==========================================-->
     <!--==========================================-->
     <!--script-->
     <script src="./lib/ts/index.ts"></script>

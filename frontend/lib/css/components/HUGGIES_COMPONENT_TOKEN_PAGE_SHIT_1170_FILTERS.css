@@ -6,7 +6,7 @@
 /*==================================*/
 #HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS .tabs {
   display: grid;
-    grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   margin-bottom: 12px;
 }

@@ -13,12 +13,11 @@ each skill should show example curl commands to do specif tracnastion types via 
 the skill should refference the live site at "https://shit-1170.com/"
 
 skills
+
 - [SKILLS/huggies-rex-engine](./huggies-rex-engine/SKILL.md)
 - huggies-rex-hello-sleet-near
 - huggies-rex-ft
 - ...
-
-
 
 =====================
 <br/>

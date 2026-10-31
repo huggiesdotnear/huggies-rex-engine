@@ -4,7 +4,7 @@
    ?id= on the url. */
 /*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_ID_H1 {
-    text-align: left;
+  text-align: left;
   /* full width of main's box, so the border spans the content rather
      than only the text. this keeps the heading at the column's width
      even where it is mounted outside main. */

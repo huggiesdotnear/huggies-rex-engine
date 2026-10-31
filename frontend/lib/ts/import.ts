@@ -9,6 +9,9 @@
 // app/contract/ and app/token/ do not load hello.ts themselves, so it
 // is imported here for them.
 import "./hello";
+// register the service worker so the app can be installed to a home
+// screen / dock. it caches nothing — see frontend/sw.js.
+import { register_service_worker_fun } from "./register_service_worker";
 import "../components/loading_bar";
 import "../components/nav";
 import "../components/random_slogan_p";
@@ -53,4 +56,7 @@ import "../components/token_page_shit_1170_filters";
 import "../components/token_page_shit_1170_holders";
 import "../components/token_page_shit_1170_metadata";
 import "../components/shared/token_meta_grid";
+// ========================================
+// register the service worker (installability only, no caching).
+register_service_worker_fun();
 // ========================================

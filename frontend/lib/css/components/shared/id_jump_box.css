@@ -25,7 +25,8 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.12);
-} .pumpopoly-input,
+}
+.pumpopoly-input,
 .token-input,
 .dao-input {
   display: flex;

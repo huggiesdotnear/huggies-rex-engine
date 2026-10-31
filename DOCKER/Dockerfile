@@ -66,6 +66,37 @@ RUN bun install
 # nothing and we'd ship an empty static folder. `find` also picks up
 # the nested pages under app/contract/ and app/token/.
 #
+# --- WHY: sw.js is its own entry point ---
+# the service worker has to land at the ROOT of the static folder as a
+# standalone, unbundled file, because the browser loads /sw.js as a
+# CLASSIC script and gives it the scope `/` (which is what lets it
+# control every page under /app/). if bun bundled it, the worker would
+# come out wrapped in a CommonJS interop shim (`export default s()`),
+# which is a SyntaxError in a classic worker — the worker would die
+# silently and the app would never be installable.
+#
+# so sw.js is listed as an entry here, NOT referenced from any html.
+# a `<script src="./sw.js">` in a page would make bun inline it into
+# that page's chunk and leave no /sw.js to register.
+#
+# the manifest does NOT need to be here: bun picks it up automatically
+# as an asset, because the pages link to it with
+# `<link rel="manifest" href="...">`.
+#
+# --- WHY: --asset-naming has NO [hash] in it ---
+# bun does NOT rewrite the `icons[].src` paths inside the manifest —
+# it treats the manifest as opaque JSON, so whatever path is written
+# there is what the browser will ask for. the manifest says
+# `./lib/img/pwa/icon-192.png`, so the built file has to be at exactly
+# that path. a hash would rename it to `icon-192-<hash>.png` and every
+# icon would 404.
+#
+# the same reason the html links to all twelve icons with
+# `<link rel="icon" ...>`: bun only copies an asset into the output if
+# something references it, and the manifest alone does not count.
+# the css keeps its hash — that comes from --chunk-naming, and hashed
+# css names are what let two pages with identical css coexist.
+#
 # --- WHY: build from INSIDE frontend/ ---
 # bun derives the entry path from the current working directory, so
 # building here makes `frontend/app/account.html` land at
@@ -78,10 +109,10 @@ RUN mkdir -p ../static \
     && bun build \
         --entry-naming='[dir]/[name].[ext]' \
         --chunk-naming='[dir]/[name]-[hash].[ext]' \
-        --asset-naming='[dir]/[name]-[hash].[ext]' \
+        --asset-naming='[dir]/[name].[ext]' \
         --outdir=../static \
         --minify \
-        $(find . -type f -name '*.html')
+        $(find . -type f -name '*.html') sw.js
 
 # ========================================
 # Stage 2: rust builder.
