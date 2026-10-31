@@ -6,9 +6,12 @@
    viewport, so it reads as a page-wide line rather than a piece of
    the app's column.
 
-   the bar is the app's middle colour (#00c6d7) — the bright cyan. the
-   track is the dimmer version of it and the fill is the bright one, so
-   the filled part stands out clearly against the red background. */
+   the two parts are deliberately different colours:
+   - the TRACK is the app's middle colour at low strength. it says
+     "this is the bar" without pretending to be progress.
+   - the FILL is the bright middle colour at full strength, with a
+     glow around it in the same colour, so the part that IS done
+     reads as lit up against the part that is not. */
 /*==================================*/
 #HUGGIES_COMPONENT_LOADING_BAR {
   position: fixed;
@@ -16,25 +19,29 @@
   left: 0px;
   right: 0px;
   width: 100vw;
-  height: 5px;
+  height: 6px;
   /* the bar sits above everything else, including the bottom nav. */
   z-index: 9999;
   pointer-events: none;
-  /* the track is the middle colour at half strength — dim enough to
-     read as "not yet filled", bright enough to be seen on the red. */
-  background-color: var(--color-middle-dark);
+  /* the track: the middle colour, dimmed. it must be clearly a
+     DIFFERENT colour from the fill, so the progress reads. */
+  background-color: rgba(0, 198, 215, 0.25);
 }
 /*==================================*/
 /* the filled part. the width is set inline from the progress, and the
-   glow is a drop shadow in the same colour so the bar looks lit. */
+   glow is a wide drop shadow in the same colour so the bar looks lit
+   rather than painted. */
 #HUGGIES_COMPONENT_LOADING_BAR .loading-bar-fill {
   height: 100%;
   width: 0%;
   /* the bright cyan, at full strength. */
   background-color: var(--color-middle);
-  border-radius: 0 5px 5px 0;
-  /* the soft glow: the same cyan spread out around the fill. */
-  box-shadow: 0 0 8px 3px var(--color-middle);
+  border-radius: 0 6px 6px 0;
+  /* the soft glow: the same cyan spread out around the fill, in two
+     passes — a tight one for the edge and a wide one for the halo. */
+  box-shadow:
+    0 0 10px 4px var(--color-middle),
+    0 0 22px 8px var(--color-middle);
   transition: width 0.25s ease-out;
 }
 /*==================================*/
