@@ -33,7 +33,7 @@ for pages see [DOCS/PAGES/README.md](./PAGES/README.md)
 
 ## MIDDLEMAN
 
-ts library for interacting with different APIs
+ts library for interacting with our huggies backend
 
 LOCATION: middleman
 

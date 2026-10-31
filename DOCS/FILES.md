@@ -5,7 +5,7 @@
 some files/folders
 
 - frontend/ - frontend
-- middleman/ - api client's
+- middleman/ - huggies-rex-engine-middleman api client
 - src/ - our backend
 - DOCS/
 - DOCKER/
