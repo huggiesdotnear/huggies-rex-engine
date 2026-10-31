@@ -3,14 +3,15 @@
 // balance and the usd value, paged by cursor.
 //
 // it reads the loaded holders from the page's store. it fetches nothing —
-// the load more button asks the page's loader for the next page.
-// ========================================
+// the next page is asked for when the reader nears the bottom of the list.
 import { render } from "preact";
+import { useRef as use_ref } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { HUGGIES_TOKEN_PAGE_TOKEN } from "../ts/token_page_token";
 import { token_holder_row_fun } from "./shared/token_holder_row";
 import { use_page_store_fun } from "../ts/use_page_store";
+import { use_scroll_load_fun } from "../ts/use_scroll_load";
 import type { HUGGIES_TOKEN_DETAIL } from "../ts/token_page_token_detail";
 // ========================================
 // ========================================
@@ -18,8 +19,9 @@ import type { HUGGIES_TOKEN_DETAIL } from "../ts/token_page_token_detail";
 function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
   const detail = state.detail;
-  if (detail === null) return null;
-
+  // the scroll box, so the reader's position at the bottom is
+  // detectable.
+  const scroll_ref = use_ref<HTMLDivElement | null>(null);
   // ask the loader for the next holder page and fold it into the store.
   const load_more_fun = () => {
     const token_id = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get_token_id();
@@ -50,10 +52,28 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
       });
   };
 
+  // --- WHY THE NEXT PAGE IS ASKED FOR ON SCROLL: the reader scrolls
+  // the list and the next page is already on its way by the time they
+  // reach the bottom. this is what the discover page's token list does,
+  // and a button in the middle of the list was the one thing the app
+  // did differently from itself.
+  use_scroll_load_fun(
+    scroll_ref,
+    state.next_cursor !== null,
+    state.loading_more,
+    load_more_fun,
+  );
+
+  // --- WHY THE CHECK IS HERE AND NOT AT THE TOP: a hook cannot be
+  // skipped — the number of hooks a component runs has to be the same
+  // every time it renders, or preact cannot keep the two renders in
+  // step. so the early return comes after the hook.
+  if (detail === null) return null;
+
   return (
     <section class="token-holders">
       <h2>INDEXED HOLDERS ({state.holder_total.toLocaleString()})</h2>
-      <div class="scroll">
+      <div class="scroll" ref={scroll_ref}>
         <table>
           <thead>
             <tr>
@@ -76,15 +96,6 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
           </tbody>
         </table>
       </div>
-      {state.next_cursor !== null && (
-        <button
-          type="button"
-          disabled={state.loading_more}
-          onClick={load_more_fun}
-        >
-          {state.loading_more ? "LOADING..." : "LOAD MORE"}
-        </button>
-      )}
     </section>
   );
 }

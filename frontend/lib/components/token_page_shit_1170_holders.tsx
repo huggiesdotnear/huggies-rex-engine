@@ -3,13 +3,15 @@
 // the usd value, the share of the supply and the holder type.
 //
 // it reads the loaded holders from the page's store and fetches nothing —
-// the load more button asks the page's loader for the next page.
+// the next page is asked for when the reader nears the bottom of the list.
 import { render } from "preact";
+import { useRef as use_ref } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
 import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "../ts/token_page_shit_1170";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { use_page_store_fun } from "../ts/use_page_store";
+import { use_scroll_load_fun } from "../ts/use_scroll_load";
 import {
   shit_holder_icon_fun,
   shit_holder_type_label_fun,
@@ -57,6 +59,9 @@ function render_holder_fun(
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
+  // the scroll box, so the reader's position at the bottom is
+  // detectable.
+  const scroll_ref = use_ref<HTMLDivElement | null>(null);
 
   // ask the loader for the next holder page and fold it into the store.
   const load_more_fun = () => {
@@ -100,6 +105,18 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
       ? state.holders
       : state.holders.filter((holder) => holder.type === state.active_filter);
 
+  // --- WHY THE NEXT PAGE IS ASKED FOR ON SCROLL: the reader scrolls
+  // the list and the next page is already on its way by the time they
+  // reach the bottom. this is what the discover page's token list does,
+  // and a button in the middle of the list was the one thing the app
+  // did differently from itself.
+  use_scroll_load_fun(
+    scroll_ref,
+    state.next_cursor !== null,
+    state.loading_more,
+    load_more_fun,
+  );
+
   return (
     <section class="holders">
       <h2>
@@ -112,7 +129,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
       {filtered_holders.length === 0 ? (
         <p>NO HOLDERS IN THIS CATEGORY</p>
       ) : (
-        <div class="holders-scroll">
+        <div class="holders-scroll" ref={scroll_ref}>
           <table>
             <thead>
               <tr>
@@ -131,15 +148,6 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
             </tbody>
           </table>
         </div>
-      )}
-      {state.next_cursor !== null && (
-        <button
-          type="button"
-          disabled={state.loading_more}
-          onClick={load_more_fun}
-        >
-          {state.loading_more ? "LOADING..." : "LOAD MORE"}
-        </button>
       )}
     </section>
   );

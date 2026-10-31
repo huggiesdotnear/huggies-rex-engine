@@ -27,6 +27,7 @@ import {
 } from "../ts/app_page_discover_token_sort";
 import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/app_page_discover_store";
 import { use_page_store_fun } from "../ts/use_page_store";
+import { use_scroll_load_fun } from "../ts/use_scroll_load";
 import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
 import { huggies_sort_control_fun } from "./shared/sort_control";
 import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_result";
@@ -36,10 +37,6 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_
 // how long to wait after a keystroke before asking the api. long enough
 // that typing a word is one request, not one per letter.
 const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
-// how close to the bottom of the list the reader has to scroll before the
-// next page is asked for. a little early, so the next page is usually there
-// by the time they reach the end.
-const HUGGIES_LOAD_MORE_THRESHOLD_PX = 600;
 // ========================================
 // ========================================
 // --- ROW -------------------------------
@@ -134,24 +131,9 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   // bottom of the list, not when they reach it exactly: the request
   // takes a moment, so asking early means the rows are usually there.
   const has_more = page_data?.token_list.has_more ?? false;
-  use_effect(() => {
-    if (searching || !has_more || loading) return;
-    const element = scroll_ref.current;
-    if (element === null) return;
-    const on_scroll_fun = (): void => {
-      const distance =
-        element.scrollHeight - element.scrollTop - element.clientHeight;
-      if (distance > HUGGIES_LOAD_MORE_THRESHOLD_PX) return;
-      void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(
-        sort,
-        direction === "desc",
-      );
-    };
-    element.addEventListener("scroll", on_scroll_fun);
-    return () => {
-      element.removeEventListener("scroll", on_scroll_fun);
-    };
-  }, [searching, has_more, loading, sort, direction]);
+  use_scroll_load_fun(scroll_ref, has_more && !searching, loading, () => {
+    void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(sort, direction === "desc");
+  });
 
   // the marked tokens are styled wherever the sort puts them.
   const marked_ids = pinned_token_ids_fun();

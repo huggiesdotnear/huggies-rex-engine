@@ -18,7 +18,7 @@
 // made from many places — the page's own loader, the token metadata
 // cache, the holder pager. patching the one global fetch catches every
 // one of them, including the ones that run after the page's first
-// paint (a search, a LOAD MORE, a sort change).
+// paint (a search, the next page of a list, a sort change).
 //
 // --- WHY IMAGES ARE NOT COUNTED: the token icons are <img> tags and
 // the browser loads them itself, so fetch never sees them. they are
@@ -245,8 +245,9 @@ function update_progress_fun(): void {
 // BETWEEN the parts of one page load, and shorter than the pause a
 // reader takes before they do the next thing. a page's second wave —
 // the metadata after the balances — comes within a few milliseconds,
-// so the gap only has to clear that. a search or a LOAD MORE comes
-// seconds later, so it opens a new batch and the bar sweeps again.
+// so the gap only has to clear that. a search or the next page of a
+// list comes seconds later, so it opens a new batch and the bar sweeps
+// again.
 const BATCH_GAP_MS = 400;
 // how long the finished sweep stays on screen before the bar rests.
 // it is long enough to be seen and short enough that it is not in the
@@ -264,8 +265,9 @@ let batch_closed = false;
 // sweeping again.
 //
 // --- WHY THE BAR GOES BACK TO THE LEFT: the bar is a timeline of the
-// work happening NOW. a LOAD MORE or a search is a new piece of work,
-// and the reader needs to see it happen, so the bar starts over.
+// work happening NOW. the next page of a list or a search is a new
+// piece of work, and the reader needs to see it happen, so the bar
+// starts over.
 //
 // --- WHY IT DOES NOT LOOK LIKE A SLAM: the css eases the width, so
 // the bar glides back to the left and then sweeps forward again. the
@@ -347,8 +349,8 @@ function push_batch_timer_fun(): void {
 //
 // --- WHY A REQUEST STARTS A NEW BATCH ONLY AFTER THE GAP: the gap
 // timer is what tells "still the same page load" apart from "a new
-// action". a search, a sort or a LOAD MORE comes after the page has
-// been quiet, and that is a new sweep of the bar.
+// action". a search, a sort or the next page of a list comes after the
+// page has been quiet, and that is a new sweep of the bar.
 function request_started_fun(): void {
   // the page is quiet and there is no work in flight: this is a new
   // batch and the bar starts over from the left.

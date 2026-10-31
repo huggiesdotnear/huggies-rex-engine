@@ -6,7 +6,7 @@
 // paints it. it fetches nothing itself — the signal is fed by the
 // global fetch and by the counted icon component, so every request
 // the page makes counts, whether it comes from the page's loader, the
-// token metadata cache, the icon loader or a LOAD MORE.
+// token metadata cache or the next page of a list.
 //
 // --- WHY IT IS NOT A PER-PAGE COMPONENT: the bar belongs to the
 // browser window, not to a page. it is the same on every page and it

@@ -13,15 +13,15 @@ lib/ts/<page>_state.ts    the STORE. the data, and the load that fills
 lib/ts/<page>_start.ts    the START. the page's first load. the page's
                           html loads it as a <script>.
 lib/ts/use_page_store.ts  the shared HOOK. one line per component.
+lib/ts/use_scroll_load.ts  the shared HOOK for a paged list. it asks
+                          for the next page when the reader nears the
+                          bottom of the scroll box.
 lib/ts/loading_bar.ts     the app-wide LOADING SIGNAL. how much of the
                           page is still waiting. every page uses it.
 lib/ts/page_loading_bar_start.ts
                           the one line every start script calls first,
                           so the loading signal is in place before the
                           page fires its first request.
-lib/ts/loading_bar.test.ts the signal's RULES, as checks. the rules
-                          were wrong three times while the bar was
-                          being built; these lock them in.
 
 lib/components/<page>_*.tsx   the DISPLAY. each one reads the store
                               through the hook and renders jsx.
@@ -35,9 +35,9 @@ the bar at the top of the screen is not a per-page thing. it is fed by
 one module, `lib/ts/loading_bar.ts`, and every page gets it for free.
 
 the module patches the one global `fetch`, so it counts EVERY request
-the page makes — the page's own loader, the token metadata cache, a
-LOAD MORE, a search, a sort. that is why a page does not have to tell
-the bar anything: the bar watches the network.
+the page makes — the page's own loader, the token metadata cache, the
+next page of a list, a search, a sort. that is why a page does not have
+to tell the bar anything: the bar watches the network.
 
 the token icons are NOT counted. they are `<img>` tags and the browser
 loads them itself, but they are decoration: the rows are readable
@@ -97,30 +97,44 @@ through it.
 ### the batch
 
 the bar runs once per BATCH of work. a batch is the page's load, or a
-later action of the reader's — a search, a sort, a LOAD MORE. a batch
-opens when a request arrives after the page has been quiet for a moment,
-and it closes when the page goes quiet again. the bar sweeps from the
-left on each new batch.
+later action of the reader's — a search, a sort, the next page of a
+list. a batch opens when a request arrives after the page has been quiet
+for a moment, and it closes when the page goes quiet again. the bar
+sweeps from the left on each new batch.
 
-### the rules are checked
+## a paged list
 
-`lib/ts/loading_bar.test.ts` holds the signal's rules as checks. it needs a
-slow server so a request can be seen in flight — see the top of that
-file. the checks that need it are skipped when the server is not
-running.
+a list that is longer than one page asks for the next page when the
+reader nears the bottom of its scroll box. there is no button.
 
---- the file is a local check and not part of the app. the repo's
-`.gitignore` keeps every `*.test.ts` out of the bundle and out of the
-repository, the same as the other checks in `lib/ts/`. run it with
-`bun run frontend/lib/ts/loading_bar.test.ts`.
+three lists work this way and they all use the same hook,
+`lib/ts/use_scroll_load.ts`:
 
+- the discover page's token list
+- the token page's holders
+- the $SHIT page's holders
 
+the hook owns the scroll listener, the threshold and the "is there
+another page" question. a list only says WHAT to load:
+
+```tsx
+use_scroll_load_fun(scroll_ref, has_more, loading, load_more_fun);
+```
+
+the scroll box has to be a `ref` on the element the reader scrolls, and
+the element needs a max-height and `overflow-y: auto` for the scroll to
+happen at all.
+
+--- the hook also asks for the next page when the rows do not fill the
+box. a list shorter than its box has no scrollbar, so no scroll event
+would ever fire and the next page would never be asked for. that
+happens when a filter narrows the rows.
 
 ## the rules
 
 1. **the ts files fetch, the components display.** no component fetches
-   the page's data. a component that needs a follow-up action (LOAD
-   MORE, search, sort) calls the loader `.ts` file for it.
+   the page's data. a component that needs a follow-up action (the next
+   page of a list, a search, a sort) calls the loader `.ts` file for it.
 
 2. **one `.ts` file holds the fetching.** the page's request list is
    knowable by reading that one file.
