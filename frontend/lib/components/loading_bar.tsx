@@ -15,6 +15,12 @@
 // --- WHY THE BAR IS NOT A SPINNER: a spinner says "something is
 // happening" and never says how much is left. a bar that fills as the
 // answers land tells the reader that the page is moving.
+//
+// --- WHY THE MOTION IS CSS: the component sets the fill's WIDTH and
+// nothing else. the css transitions that width with an ease-in-out
+// curve, so the browser does the animating. a javascript animation
+// would have to run on a timer to fake the same thing, and it would
+// stutter while the page's own fetches are hogging the main thread.
 import { render } from "preact";
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
@@ -50,11 +56,9 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
     >
-      {/* the glow. it is its own element and it is NOT transparent —
-          the blur is what makes it a glow, so the light it throws is
-          solid light and not a wash over the page. */}
-      <div class="loading-bar-glow" style={{ width: percent }} />
-      {/* the fill. fully opaque, so it is the exact middle colour. */}
+      {/* the fill. fully opaque, so it is the exact middle colour.
+          the WIDTH is what changes, and the css eases that change —
+          the component only sets the number, the browser animates it. */}
       <div class="loading-bar-fill" style={{ width: percent }} />
     </div>
   );

@@ -6,13 +6,12 @@
    viewport, so it reads as a page-wide line rather than a piece of
    the app's column.
 
-   the three layers, from the top down:
+   two parts, and they are the only two:
+   - the TRACK is a dark grey. it says "this is the bar" and nothing
+     more. it is never bright, so it can never be mistaken for
+     progress.
    - the FILL is the bright middle colour at FULL strength, with no
-     transparency at all. it is the bar itself.
-   - the GLOW is the same colour, blurred, and it sits BELOW the fill.
-     it is the light the bar throws down onto the page.
-   - the TRACK is a dark colour. it only says "this is the bar"; it is
-     never bright, so it can never be mistaken for progress. */
+     transparency at all. it is the bar itself. */
 /*==================================*/
 #HUGGIES_COMPONENT_LOADING_BAR {
   position: fixed;
@@ -24,59 +23,28 @@
   /* the bar sits above everything else, including the bottom nav. */
   z-index: 9999;
   pointer-events: none;
-  /* the track: a DARK colour. it must never be bright, so the bright
-     fill always reads as the only progress on screen. */
-  background-color: var(--color-middle-dark);
-}
-/*==================================*/
-/* the GLOW. it is its own element, not a box-shadow on the fill.
-
-   --- WHY a separate element and not a box-shadow: a box-shadow is
-   painted with the element's own alpha, so it comes out
-   half-transparent and the red page bleeds through it. the glow is a
-   solid strip with a BLUR on it instead — the blur is what turns it
-   into light, so the light it throws is real light.
-
-   --- WHY it sits BELOW the fill: it is a blurred strip, so its edges
-   are soft. if it painted OVER the fill, those soft edges would wash
-   over the crisp fill and the bar would look pale and half
-   transparent. under it, the fill stays perfectly solid and the glow
-   only shows where it spills out underneath. */
-#HUGGIES_COMPONENT_LOADING_BAR .loading-bar-glow {
-  position: absolute;
-  left: 0;
-  width: 0%;
-  /* the solid colour. the BLUR is what softens it into a glow. */
-  background-color: var(--color-middle);
-  /* the blur is the glow: it spreads the strip out and softens its
-     edges, so the light bleeds down over the red page. */
-  filter: blur(6px);
-  /* the blur eats into the strip, so it is made taller than the bar
-     and pulled up, to put the light BELOW the bar's own edge. */
-  top: 0px;
-  height: calc(100% + 10px);
-  /* the glow follows the fill's motion exactly, with the same easing,
-     so the two never drift apart. */
-  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  /* the track: a flat dark grey. fully opaque, so nothing shows
+     through it and it never reads as a washed-out bright colour. */
+  background-color: #474747;
 }
 /*==================================*/
 /* the filled part. the width is set inline from the progress.
    it is FULLY OPAQUE — no transparency at all — so the bright cyan
    is the exact #00c6d7 and nothing bleeds through it. */
 #HUGGIES_COMPONENT_LOADING_BAR .loading-bar-fill {
-  position: relative;
-  /* the fill paints OVER the glow, so the glow never washes over it.
-     the z-index makes that explicit rather than leaving it to the
-     order the two happen to sit in the markup. */
-  z-index: 1;
   height: 100%;
   width: 0%;
   /* the bright cyan, at full strength, fully opaque. */
   background-color: var(--color-middle);
   border-radius: 0 6px 6px 0;
-  /* the easing: the bar starts slow, speeds up, and settles down.
+  /* the motion is done by CSS, not by javascript: the width is the
+     animated property and the transition eases it. the component only
+     sets the new width and the browser does the rest.
+
      cubic-bezier(0.4, 0, 0.2, 1) is the standard "ease in, then ease
-     out" curve — the bar never jumps and never stops dead. */
+     out" curve: the bar starts slow, speeds up, and settles down, so
+     a fast load never looks like a jump and a slow one still creeps
+     forward. */
   transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /*==================================*/
