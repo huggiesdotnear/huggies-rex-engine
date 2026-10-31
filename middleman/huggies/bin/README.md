@@ -1,14 +1,15 @@
-# bin
+# @huggies/middleman/bin
 
-cli bins for talking to our own backend. every bin imports the
-middleman wrapper (never `fetch`), so the framed request/response block
-and the error handling are identical to what the frontend sees.
+cli bins for our own backend, called through this package's `src/`.
+every bin imports the middleman wrapper (never `fetch`), so the framed
+request/response block and the error handling are identical to what
+the frontend sees.
 
 the bins are grouped by the api they talk to, mirroring the
 middleman:
 
 - [`bin/huggies/`](./huggies/README.md) — our own backend, through
-  `middleman/huggies`.
+  `src/`.
 - `bin/fun/` — bin primitives shared by the bins above.
 
 each group has its own README with the example run commands.

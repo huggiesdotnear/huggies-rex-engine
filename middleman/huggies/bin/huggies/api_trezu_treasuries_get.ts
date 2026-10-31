@@ -5,11 +5,11 @@
 // adds a summary.
 //
 // argv:
-//   bun bin/huggies/api_trezu_treasuries_get.ts <account_id> \
+//   bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts <account_id> \
 //       [--include-hidden] [--base-url <url>]
 // ========================================
 
-import { api_trezu_treasuries_get } from "../../middleman/huggies";
+import { api_trezu_treasuries_get } from "@huggies/middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 import { split_argv } from "../fun/split_argv";
 
@@ -30,7 +30,7 @@ const { positional, seen } = split_argv(process.argv.slice(2), {
 const account_id = positional[0];
 if (account_id === undefined) {
   console.error(
-    "usage: bun bin/huggies/api_trezu_treasuries_get.ts <account_id> " +
+    "usage: bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts <account_id> " +
       "[--include-hidden] [--base-url <url>]",
   );
   process.exit(1);

@@ -12,10 +12,10 @@ GET /api/huggies/ping — liveness check. answers
 
 ```sh
 # defaults to http://127.0.0.1:54733
-bun bin/huggies/api_huggies_ping_get.ts
+bun middleman/huggies/bin/huggies/api_huggies_ping_get.ts
 
 # point at a different backend (staging / docker host / etc.)
-bun bin/huggies/api_huggies_ping_get.ts --base-url http://my-host:54733
+bun middleman/huggies/bin/huggies/api_huggies_ping_get.ts --base-url http://my-host:54733
 ```
 
 ## api_trezu_treasuries_get
@@ -25,9 +25,9 @@ account belongs to. the account id is required and is trimmed.
 `--include-hidden` stands alone, it takes no value.
 
 ```sh
-bun bin/huggies/api_trezu_treasuries_get.ts sleet.near
-bun bin/huggies/api_trezu_treasuries_get.ts sleet.near --include-hidden
-bun bin/huggies/api_trezu_treasuries_get.ts sleet.near --base-url http://my-host:54733
+bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts sleet.near
+bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts sleet.near --include-hidden
+bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts sleet.near --base-url http://my-host:54733
 ```
 
 ========================================

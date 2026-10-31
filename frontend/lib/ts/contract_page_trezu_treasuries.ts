@@ -4,7 +4,7 @@
 import {
   api_trezu_treasuries_get,
   type TREZU_TREASURY,
-} from "../../../middleman/huggies";
+} from "@huggies/middleman";
 import { HUGGIES_BASE_URL } from "./base_url";
 export type { TREZU_TREASURY };
 // ========================================

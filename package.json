@@ -1,16 +1,28 @@
 {
-  "name": "huggies-rex-frontend",
+  "name": "huggies-rex-engine",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "middleman/*"
+  ],
+  "scripts": {
+    "build": "bun run build.ts",
+    "build:middleman": "bun run --filter @huggies/middleman build",
+    "typecheck": "bun run --filter '*' typecheck && tsc --noEmit",
+    "clean": "bun run --filter @huggies/middleman clean"
+  },
   "dependencies": {
+    "@hot-labs/near-connect": "^0.12.0",
     "@near-kit-tool-box/fun": "0.3.0",
     "@near-kit-tool-box/web": "0.3.0",
     "@sleet-js/intear-api-tool-box": "^0.1.1",
+    "@huggies/middleman": "workspace:*",
     "@sleet-js/middleman-intear-api": "0.1.0",
     "@sleet-js/middleman-intear-dex-api": "0.1.0",
     "@sleet-js/middleman-rhea-api": "0.1.1",
     "lucide-preact": "^1.59.0",
+    "near-kit": "^0.20.2",
     "preact": "^11.0.1"
   },
   "devDependencies": {

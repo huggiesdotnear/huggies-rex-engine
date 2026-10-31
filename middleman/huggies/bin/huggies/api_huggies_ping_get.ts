@@ -5,10 +5,10 @@
 // a one-line summary.
 //
 // argv:
-//   bun bin/huggies/api_huggies_ping_get.ts [--base-url <url>]
+//   bun middleman/huggies/bin/huggies/api_huggies_ping_get.ts [--base-url <url>]
 // ========================================
 
-import { api_huggies_ping_get } from "../../middleman/huggies";
+import { api_huggies_ping_get } from "@huggies/middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 
 // --- CONFIG --------------------------------------------------------

@@ -20,19 +20,13 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "bin/**/*.ts",
-    "bin/**/*.tsx",
-    "middleman/**/*.ts",
-    "middleman/**/*.tsx",
-    "frontend/**/*.ts",
-    "frontend/**/*.tsx"
-  ],
+  "include": ["frontend/**/*.ts", "frontend/**/*.tsx"],
   "exclude": [
     "node_modules",
     "target",
     "dist",
     "build",
+    "middleman",
     "**/*.test.ts",
     "**/*.test.tsx"
   ]

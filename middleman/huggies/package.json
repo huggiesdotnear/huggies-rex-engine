@@ -1,0 +1,44 @@
+{
+  "name": "@huggies/middleman",
+  "version": "0.1.0",
+  "description": "Clean TypeScript middleman for the huggies-rex-engine backend routes (/api/huggies/*, /api/trezu/*).",
+  "license": "MIT",
+  "homepage": "https://sleet-js.near.page",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sleet-js/huggies-rex-engine.git",
+    "directory": "middleman/huggies"
+  },
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist/**/*",
+    "bin/**/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "rm -f .tsbuildinfo && bun run tsc --build tsconfig.build.json --force",
+    "clean": "bun run tsc --build --clean && rm -rf dist .tsbuildinfo"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "//": "compatible with bun + tsc --build; emit ESM to dist/, publish dist + bin + README + LICENSE."
+}

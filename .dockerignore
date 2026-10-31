@@ -4,12 +4,18 @@
 # `node_modules` and `target` are rebuilt inside the image (bun install /
 # cargo build), so shipping the host copies would only bloat the context
 # and risk the image picking up host-platform binaries.
+#
+# `dist` is the middleman package's build output. it is rebuilt inside
+# the image (the frontend imports the package by name, and the package
+# resolves to `dist/index.js`), so the host copy would only be a stale
+# artifact that the image overwrites anyway.
 # ========================================
 .git
 .gitignore
 node_modules
 target
 static
+dist
 
 # local env / editor noise
 .env

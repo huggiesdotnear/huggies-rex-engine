@@ -37,6 +37,11 @@ export function split_argv(
 
   for (let i = 0; i < argv.length; i++) {
     const token = argv[i];
+    // --- WHY --- the guard: with `noUncheckedIndexedAccess` an index
+    // into an array reads as `string | undefined`, and the loop bound
+    // is not enough for the compiler to prove it. an empty argv skips
+    // the loop entirely, so this branch is unreachable in practice.
+    if (token === undefined) continue;
     if (!token.startsWith("--")) {
       positional.push(token);
       continue;

@@ -17,7 +17,7 @@ import { HUGGIES_AUTH } from "./auth_status";
 import { HUGGIES_URL_ID } from "./url_id";
 import type { HUGGIES_DAO_INFO } from "./contract_page_sputnik_dao";
 import type { HUGGIES_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
-import type { TREZU_TREASURY } from "../../../middleman/huggies";
+import type { TREZU_TREASURY } from "@huggies/middleman";
 // ========================================
 // --- TYPES ------------------------------
 export interface HUGGIES_DAO_PAGE_STATE {
