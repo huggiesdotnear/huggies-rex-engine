@@ -4,20 +4,20 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "middleman/*"
+    "middleman"
   ],
   "scripts": {
     "build": "bun run build.ts",
-    "build:middleman": "bun run --filter @huggies/middleman build",
+    "build:middleman": "bun run --filter @huggies/huggies-rex-engine-middleman build",
     "typecheck": "bun run --filter '*' typecheck && tsc --noEmit",
-    "clean": "bun run --filter @huggies/middleman clean"
+    "clean": "bun run --filter @huggies/huggies-rex-engine-middleman clean"
   },
   "dependencies": {
     "@hot-labs/near-connect": "^0.12.0",
     "@near-kit-tool-box/fun": "0.3.0",
     "@near-kit-tool-box/web": "0.3.0",
     "@sleet-js/intear-api-tool-box": "^0.1.1",
-    "@huggies/middleman": "workspace:*",
+    "@huggies/huggies-rex-engine-middleman": "workspace:*",
     "@sleet-js/middleman-intear-api": "0.1.0",
     "@sleet-js/middleman-intear-dex-api": "0.1.0",
     "@sleet-js/middleman-rhea-api": "0.1.1",

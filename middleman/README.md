@@ -1,4 +1,4 @@
-# @huggies/middleman
+# @huggies/huggies-rex-engine-middleman
 
 clean ts library for interacting with the huggies-rex-engine backend routes.
 

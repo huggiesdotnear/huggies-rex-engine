@@ -29,8 +29,8 @@ the error codes are `invalid_account_id`, `trezu_unreachable`,
 
 ## CLIENT
 
-the typed client lives in `middleman/huggies/src/`, published as
-`@huggies/middleman`:
+the typed client lives in `middleman/src/`, published as
+`@huggies/huggies-rex-engine-middleman`:
 `api_trezu_treasuries_get(base_url, { accountId, includeHidden })`.
 
 the base url is the first argument, not a constant: the frontend

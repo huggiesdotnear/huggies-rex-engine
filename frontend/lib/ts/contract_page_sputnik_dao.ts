@@ -43,7 +43,7 @@ import type {
 } from "@near-kit-tool-box/fun";
 import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "./token_info";
-import type { TREZU_TREASURY } from "@huggies/middleman";
+import type { TREZU_TREASURY } from "@huggies/huggies-rex-engine-middleman";
 // ========================================
 // --- TYPES ------------------------------
 // how a role is open. `Group` names the accounts in it; `Everyone`

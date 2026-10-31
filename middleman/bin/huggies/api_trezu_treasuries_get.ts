@@ -1,15 +1,15 @@
 // ========================================
 // API_TREZU_TREASURIES_GET
-// runnable bin for GET /api/trezu/user/treasuries via middleman/huggies.
+// runnable bin for GET /api/trezu/user/treasuries via middleman.
 // the middleman logs the framed request + response, so this bin only
 // adds a summary.
 //
 // argv:
-//   bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts <account_id> \
+//   bun middleman/bin/huggies/api_trezu_treasuries_get.ts <account_id> \
 //       [--include-hidden] [--base-url <url>]
 // ========================================
 
-import { api_trezu_treasuries_get } from "@huggies/middleman";
+import { api_trezu_treasuries_get } from "@huggies/huggies-rex-engine-middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 import { split_argv } from "../fun/split_argv";
 
@@ -30,7 +30,7 @@ const { positional, seen } = split_argv(process.argv.slice(2), {
 const account_id = positional[0];
 if (account_id === undefined) {
   console.error(
-    "usage: bun middleman/huggies/bin/huggies/api_trezu_treasuries_get.ts <account_id> " +
+    "usage: bun middleman/bin/huggies/api_trezu_treasuries_get.ts <account_id> " +
       "[--include-hidden] [--base-url <url>]",
   );
   process.exit(1);

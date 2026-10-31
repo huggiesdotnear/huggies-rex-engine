@@ -1,4 +1,4 @@
-# @huggies/middleman/bin
+# @huggies/huggies-rex-engine-middleman/bin
 
 cli bins for our own backend, called through this package's `src/`.
 every bin imports the middleman wrapper (never `fetch`), so the framed

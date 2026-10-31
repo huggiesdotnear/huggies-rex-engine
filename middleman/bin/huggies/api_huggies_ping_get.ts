@@ -1,14 +1,14 @@
 // ========================================
 // API_HUGGIES_PING_GET
-// runnable bin for GET /api/huggies/ping via middleman/huggies. the
+// runnable bin for GET /api/huggies/ping via middleman. the
 // middleman logs the framed request + response, so this bin only adds
 // a one-line summary.
 //
 // argv:
-//   bun middleman/huggies/bin/huggies/api_huggies_ping_get.ts [--base-url <url>]
+//   bun middleman/bin/huggies/api_huggies_ping_get.ts [--base-url <url>]
 // ========================================
 
-import { api_huggies_ping_get } from "@huggies/middleman";
+import { api_huggies_ping_get } from "@huggies/huggies-rex-engine-middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 
 // --- CONFIG --------------------------------------------------------

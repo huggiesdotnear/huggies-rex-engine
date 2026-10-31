@@ -1,6 +1,6 @@
 // ========================================
 // API_CALL
-// the single fetch+log+error helper every wrapper in middleman/huggies
+// the single fetch+log+error helper every wrapper in middleman
 // goes through. the goal: one place to change if we ever want to add
 // retries, timeouts, tracing, or different log formatting.
 //
