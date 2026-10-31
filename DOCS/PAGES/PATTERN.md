@@ -19,15 +19,14 @@ lib/ts/page_loading_bar_start.ts
                           the one line every start script calls first,
                           so the loading signal is in place before the
                           page fires its first request.
+lib/ts/loading_bar.test.ts the signal's RULES, as checks. the rules
+                          were wrong three times while the bar was
+                          being built; these lock them in.
 
 lib/components/<page>_*.tsx   the DISPLAY. each one reads the store
                               through the hook and renders jsx.
 lib/components/loading_bar.tsx the loading PROGRESS BAR. it is on every
                               page and it reads the loading signal.
-lib/components/shared/counted_image.tsx
-                              an <img> that tells the loading signal it
-                              is loading. every token icon goes through
-                              it, so the bar waits for the icons too.
 ```
 
 ## the loading signal
@@ -40,19 +39,39 @@ the page makes — the page's own loader, the token metadata cache, a
 LOAD MORE, a search, a sort. that is why a page does not have to tell
 the bar anything: the bar watches the network.
 
-the token icons are NOT fetched with fetch. they are `<img>` tags and
-the browser loads them itself, so they go through
-`shared/counted_image.tsx`, which reports them to the same signal.
-without that the bar sat at 100% while a couple of hundred icons were
-still arriving.
+the token icons are NOT counted. they are `<img>` tags and the browser
+loads them itself, but they are decoration: the rows are readable
+without them, and a discover page asks for up to three hundred of them
+against ONE api call for the data itself. counting them would make the
+bar measure the pictures instead of the page's work.
 
-the bar fills as the answers land. it shows the share of the work that
-is DONE, so it creeps forward while the work is running and reaches the
-end only when the last answer is in. it is a HIGH-WATER MARK: it only
-moves forward, so a request that joins late can never drag it back.
+the bar has three states:
 
-a page that wants to know whether something is running asks the signal
-(`HUGGIES_LOADING_BAR.is_loading()`); it never counts requests itself.
+- **idle** — nothing is happening. the bar is hidden.
+- **loading** — work is on its way. the bar sweeps.
+- **done** — the work just finished. the sweep is shown for a moment
+  and then the bar goes away.
+
+a bar that rested at 100% forever would read as "still loading" to
+anyone glancing at it, and it would cover the top of the page
+permanently. so the bar comes and goes with the work.
+
+### the bar moves while it waits
+
+the bar's position is where it is GOING, not where the work has got to.
+a page that asks four things in parallel cannot know how long any of
+them will take, so a bar that only moved when an answer landed sat at
+zero for the whole of the slowest request and then jumped to the end —
+the reader saw nothing happen.
+
+so the bar CREEPS toward its target on a timer. the target is the
+share of the work that is finished, plus most of the share that is
+still running, so there is always somewhere for the bar to go. the bar
+moves a share of the remaining distance each tick, so it slows down as
+it approaches and eases into its target.
+
+the last answer covers the final stretch at once, so the reader sees
+the sweep FINISH rather than have it crawl the last tenth.
 
 ### the order of the scripts
 
@@ -75,8 +94,15 @@ through it.
 the bar runs once per BATCH of work. a batch is the page's load, or a
 later action of the reader's — a search, a sort, a LOAD MORE. a batch
 opens when a request arrives after the page has been quiet for a moment,
-and it closes when the page goes quiet again. the bar rests at the end
-after a batch and starts over from the left on the next one.
+and it closes when the page goes quiet again. the bar sweeps from the
+left on each new batch.
+
+### the rules are checked
+
+`lib/ts/loading_bar.test.ts` holds the rules as checks. it needs a
+slow server so a request can be seen in flight — see the top of that
+file. the checks that need it are skipped when it is not running.
+
 
 
 ## the rules

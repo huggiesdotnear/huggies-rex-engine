@@ -22,7 +22,6 @@ import { use_page_store_fun } from "../ts/use_page_store";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
 import { HUGGIES_SUPPLY_PERCENT } from "../ts/token_supply_percent";
 import { token_detail_href_fun } from "../ts/token_link";
-import { HUGGIES_COUNTED_IMAGE } from "./shared/counted_image";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -44,7 +43,7 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
             <div class="token-header">
               <span class="icon-wrap">
                 {token.icon !== null ? (
-                  <HUGGIES_COUNTED_IMAGE class="icon" src={token.icon} alt="" />
+                  <img class="icon" src={token.icon} alt="" />
                 ) : (
                   <span class="icon-placeholder">{token.symbol.charAt(0)}</span>
                 )}

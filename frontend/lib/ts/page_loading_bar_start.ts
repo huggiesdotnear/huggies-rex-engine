@@ -16,13 +16,17 @@
 // --- WHY EVERY START SCRIPT CALLS THIS: the start script is the page's
 // first action, and this is the first action in it. one line per page
 // is the whole cost, and it is the same line everywhere.
+//
+// --- WHY IT CALLS install() WHEN THE MODULE ALREADY INSTALLED ITSELF:
+// the module installs itself when it is imported, so this call is a
+// no-op. it is here because it makes the ORDERING explicit — the patch
+// is in place BEFORE the page's load, not merely by the time the
+// component mounts — and a call cannot be dropped by the bundler the
+// way an unused import can.
 import { HUGGIES_LOADING_BAR } from "./loading_bar";
 // ========================================
 // ========================================
 // --- START -----------------------------
-// put the patch in place. the loading bar module also installs itself
-// when it is imported, so this is belt and braces — but it makes the
-// ordering explicit and it cannot be dropped by the bundler.
 export function huggies_loading_bar_start_fun(): void {
   HUGGIES_LOADING_BAR.install();
 }

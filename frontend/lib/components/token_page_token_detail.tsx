@@ -10,7 +10,6 @@ import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
 import { format_price_usd_fun } from "../ts/token_page_token_price_format";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_token_meta_grid_fun } from "./shared/token_meta_grid";
-import { HUGGIES_COUNTED_IMAGE } from "./shared/counted_image";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -22,9 +21,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
   return (
     <>
       <header>
-        {detail.icon !== null && (
-          <HUGGIES_COUNTED_IMAGE class="icon" src={detail.icon} alt="" />
-        )}
+        {detail.icon !== null && <img class="icon" src={detail.icon} alt="" />}
         <div>
           <h1>{detail.symbol}</h1>
           <p>{detail.name}</p>

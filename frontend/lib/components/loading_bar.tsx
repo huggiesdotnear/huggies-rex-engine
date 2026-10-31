@@ -5,9 +5,8 @@
 // it reads the app-wide loading signal (lib/ts/loading_bar.ts) and
 // paints it. it fetches nothing itself — the signal is fed by the
 // global fetch and by the counted icon component, so every request
-// and every image the page makes counts, whether it comes from the
-// page's loader, the token metadata cache, the icon loader or a LOAD
-// MORE.
+// the page makes counts, whether it comes from the page's loader, the
+// token metadata cache, the icon loader or a LOAD MORE.
 //
 // --- WHY IT IS NOT A PER-PAGE COMPONENT: the bar belongs to the
 // browser window, not to a page. it is the same on every page and it
@@ -39,6 +38,9 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
   const [progress, set_progress] = use_state(
     HUGGIES_LOADING_BAR.get_progress(),
   );
+  // the bar's state: idle, loading or done. the component needs it to
+  // know whether to show the bar at all.
+  const [state, set_state] = use_state(HUGGIES_LOADING_BAR.get_state());
 
   // --- WHY THE PATCH IS NOT INSTALLED HERE: the module installs
   // itself when it is imported, and the page's start script calls it
@@ -48,10 +50,21 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
   use_effect(() => {
     return HUGGIES_LOADING_BAR.subscribe(() => {
       set_progress(HUGGIES_LOADING_BAR.get_progress());
+      set_state(HUGGIES_LOADING_BAR.get_state());
     });
   }, []);
 
   const percent = `${Math.round(progress * 100)}%`;
+
+  // --- WHY THE BAR IS HIDDEN WHEN IDLE: a bar that rests at 100%
+  // forever reads as "still loading" to anyone glancing at it, and it
+  // covers the top of the page permanently. the bar comes and goes
+  // with the work.
+  //
+  // --- WHY THE "done" STATE STILL SHOWS: the sweep is visible for a
+  // moment after the last answer lands, so the reader sees the bar
+  // FINISH rather than have it vanish mid-stride.
+  const visible = state !== "idle";
 
   return (
     // --- WHY THE FILL IS THE ROOT AND NOT WRAPPED: the mount div
@@ -69,6 +82,8 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
+      data-state={state}
+      data-visible={visible ? "yes" : "no"}
       style={{ width: percent }}
     />
   );

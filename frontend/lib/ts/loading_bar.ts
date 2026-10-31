@@ -16,16 +16,19 @@
 // --- WHY THE FETCH IS PATCHED AND NOT THE STORES: the stores know
 // when THEIR load is running, but the fetches that fill a page are
 // made from many places — the page's own loader, the token metadata
-// cache, the icon loader, the holder pager. patching the one global
-// fetch catches every one of them, including the ones that run after
-// the page's first paint (a search, a LOAD MORE, a sort change).
+// cache, the holder pager. patching the one global fetch catches every
+// one of them, including the ones that run after the page's first
+// paint (a search, a LOAD MORE, a sort change).
 //
-// --- WHY IMAGES ARE COUNTED TOO: the token icons are NOT fetched with
-// fetch. they are <img> tags pointing at the api's content-addressed
-// icon urls, and the browser loads them on its own. a discover page
-// asks for a couple of hundred of them, and they are the last thing
-// the reader waits for. counting only fetch left the bar sitting at
-// 100% while the icons were still streaming in.
+// --- WHY IMAGES ARE NOT COUNTED: the token icons are <img> tags and
+// the browser loads them itself, so fetch never sees them. they are
+// decoration though — the rows are readable without them, and a
+// discover page asks for up to three hundred of them against ONE api
+// call for the data itself. counting them would make the bar measure
+// the pictures instead of the page's work, and a lazy icon would keep
+// the bar alive for as long as the reader scrolled.
+//
+// the bar tracks the DATA. that is the work the reader is waiting for.
 //
 // the module is plain ts and holds no dom: the component in
 // lib/components/loading_bar.tsx reads it and paints the bar.
@@ -33,6 +36,22 @@
 // ========================================
 // ========================================
 // --- STATE ------------------------------
+// the bar's state. it is one of three things and the component needs
+// all three to draw itself.
+//
+// - IDLE: nothing is loading. the bar is hidden.
+// - LOADING: work is on its way. the bar shows the progress.
+// - DONE: the work just finished. the bar shows a full sweep once
+//   and then fades out.
+//
+// --- WHY DONE IS ITS OWN STATE: a bar that rests at 100% forever
+// reads as "still loading" to anyone glancing at it, and it covers
+// the top of the page permanently. a bar that snaps back to empty
+// instantly looks like it flickered. DONE is the small gap between
+// the two: the sweep is visible for a moment, then the bar goes away.
+export type HUGGIES_LOADING_BAR_STATE = "idle" | "loading" | "done";
+// the bar's state right now.
+let state: HUGGIES_LOADING_BAR_STATE = "idle";
 // how many requests are in flight right now.
 let in_flight = 0;
 // how many requests have ANSWERED in this batch.
@@ -48,9 +67,6 @@ let patched = false;
 let real_fetch: typeof fetch | null = null;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
-// true while the page has asked for something and the answer has not
-// all come back yet. it is what tells "idle" apart from "loading".
-let active = false;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -77,49 +93,122 @@ function subscribe_fun(listener: () => void): () => void {
 // --- PROGRESS --------------------------
 // how far along the bar is, from 0 to 1.
 //
-// --- WHY IT IS THE SHARE OF THE WORK THAT IS FINISHED: the bar fills
-// as the answers land. counting the finished ones means it creeps
-// forward as each answer comes in, instead of sitting at 100% for as
-// long as the slowest request runs.
+// --- WHY IT IS A TARGET AND NOT A VALUE: the bar's position is where
+// it is GOING, not where the work has got to. a page that asks four
+// things in parallel has no way of knowing how long each will take,
+// so a bar that only moves when an answer lands sits at zero for the
+// whole of the slowest request and then jumps to the end. the reader
+// sees nothing happen.
 //
-// --- WHY IT IS A HIGH-WATER MARK AND NOT A LIVE RATIO: a page's load
-// is not one fixed batch. the account page asks four contracts in
-// parallel, and THEN asks for the token metadata once all four have
-// answered. a live "done / total" ratio hit 100% when the four sources
-// landed and then dropped back to 80% when the metadata request joined
-// the batch — a bar that went 0 → 100 → 80 → 100.
+// so the bar has a TARGET — the share of the work that is finished —
+// and it CREEPS toward that target while it waits. when an answer
+// lands the target moves forward and the bar follows. the bar is
+// always behind its target and never reaches it, so there is always a
+// visible sign that something is still on its way.
 //
-// the bar only ever moves forward during a run, so the reader sees one
-// smooth sweep and never a bar that fights itself.
-//
-// --- WHY IT DOES NOT DROP TO ZERO WHEN THE PAGE GOES IDLE: the bar
-// rests at the end after a load, the way a progress bar that has
-// finished should look. snapping back to zero would make the bar
-// flicker every time the page went quiet, and a reader would see the
-// work undone. the next batch starts it over from zero on its own.
+// --- WHY THE CREEPS RUN ON A TIMER: the bar has to move while
+// nothing is happening, which means something has to wake it up. a
+// timer is the only thing that can do that.
 function get_progress_fun(): number {
-  if (!active) return high_water > 0 ? 1 : 0;
   return high_water;
 }
 // ========================================
+// where the bar is GOING: the share of the work that is finished,
+// held short of the end so there is always a sliver left for whatever
+// is still running.
+//
+// --- WHY THE TARGET COUNTS THE WORK IN FLIGHT AS ALMOST DONE: the
+// bar cannot know how long a request will take. if the target were
+// only the finished share, it would sit at zero until the first answer
+// landed and the bar would not move for the whole of the wait. the
+// work in flight counts as almost done, so the target is always
+// somewhere ahead of the bar and the bar always has somewhere to
+// creep to.
+function get_target_fun(): number {
+  if (total === 0) return 0;
+  if (in_flight === 0) return 1;
+  // the finished share, plus most of the share that is still running.
+  const finished = done / total;
+  const running = (in_flight / total) * 0.9;
+  return Math.min(finished + running, 0.95);
+}
+// ========================================
+// move the bar a little closer to its target.
+//
+// --- WHY IT MOVES BY A SHARE OF THE REMAINING DISTANCE AND NOT BY A
+// FIXED STEP: a fixed step reaches the end in the same number of ticks
+// whether the bar has ten percent to cover or ninety. a share of what
+// is left means the bar slows down as it approaches, so it eases into
+// its target instead of slamming into it.
+const CATCH_UP_RATE = 0.12;
+// ========================================
+// the timer that creeps the bar toward its target.
+let creep_timer: ReturnType<typeof setInterval> | null = null;
+// ========================================
+// one tick of the creep.
+//
+// --- WHY THE BAR CREEPS EVEN WHEN NOTHING HAS ANSWERED YET: a page
+// asks for four things in parallel and the bar cannot know how long
+// any of them will take. if the bar only moved when an answer landed,
+// it would sit at zero for the whole of the slowest request — which is
+// most of the wait — and then jump to the end. the reader would see
+// nothing happen.
+//
+// so the bar creeps toward its target on its own timer. the target is
+// the share of the work that is finished, and the bar always stays a
+// little behind it, so the reader sees the bar move the whole time
+// and the movement slows down as the work finishes.
+function creep_fun(): void {
+  const target = get_target_fun();
+  if (target <= high_water) return;
+  // the bar moves a share of the way to its target.
+  const step = (target - high_water) * CATCH_UP_RATE;
+  high_water += step;
+  notify_fun();
+}
+// ========================================
+// start the creep, if it is not already running.
+function start_creep_fun(): void {
+  if (creep_timer !== null) return;
+  creep_timer = setInterval(creep_fun, CREEP_INTERVAL_MS);
+}
+// ========================================
+// stop the creep. the bar has nothing left to do.
+function stop_creep_fun(): void {
+  if (creep_timer === null) return;
+  clearInterval(creep_timer);
+  creep_timer = null;
+}
+// ========================================
+// how often the bar creeps toward its target.
+const CREEP_INTERVAL_MS = 60;
+// ========================================
 // work out the bar's new position and move it there.
 //
-// --- WHY THE SHARE IS SCALED TO 90%: while a request is still running
-// the bar stops short of the end. the last tenth is only covered when
-// the queue empties, so the reader always has a visible sign that
-// something is still on its way.
+// --- WHY THE TARGET MOVES AND NOT THE BAR: the bar is a high-water
+// mark, so it only ever moves forward. the target is the share of the
+// work that is finished, and the bar creeps toward it on its timer.
+//
+// --- WHY THE BAR DOES NOT JUMP TO THE TARGET: the target is where the
+// bar is GOING. if the bar jumped to it every time an answer landed,
+// it would move in steps — 0, 45, 90, 100 — and the creep would have
+// nothing to do. the bar creeps toward the target instead, so the
+// motion is smooth and the reader sees it move.
+//
+// --- WHY THE BAR JUMPS TO THE END WHEN THE WORK IS DONE: the last
+// answer is the last thing the reader is waiting for, so the bar
+// covers the final stretch at once rather than crawling the last tenth
+// over another half second.
 function update_progress_fun(): void {
   if (total === 0) return;
-  // everything is answered — the requests AND the icons. the work is
-  // done and the bar may reach the end.
-  if (in_flight === 0 && images_in_flight === 0) {
+  // the work is done: the bar covers the last stretch at once.
+  if (in_flight === 0) {
     high_water = 1;
+    stop_creep_fun();
     return;
   }
-  // the share of the work that is finished, held short of the end.
-  const share = (done / total) * 0.9;
-  // the bar never goes backwards.
-  if (share > high_water) high_water = share;
+  // there is more to come: the bar creeps toward the target.
+  start_creep_fun();
 }
 // ========================================
 // --- BATCH -----------------------------
@@ -145,8 +234,14 @@ function update_progress_fun(): void {
 // empty, then full. 400ms is long enough to hold the whole of a page
 // load together and short enough that a search feels instant.
 const BATCH_GAP_MS = 400;
+// how long the finished sweep stays on screen before the bar goes
+// away. it is long enough to be seen and short enough that it is not
+// in the reader's way.
+const DONE_HOLD_MS = 500;
 // the timer that closes the batch, if nothing else comes in.
 let batch_timer: ReturnType<typeof setTimeout> | null = null;
+// the timer that takes the finished bar off the screen.
+let done_timer: ReturnType<typeof setTimeout> | null = null;
 // true once the batch has been closed by the gap timer. it is what
 // separates "the page is still loading" from "a new action started".
 let batch_closed = false;
@@ -157,20 +252,38 @@ function begin_batch_fun(): void {
   done = 0;
   total = 0;
   high_water = 0;
-  active = true;
   batch_closed = false;
+  state = "loading";
+  // the finished bar's timer is dropped, because a new load makes the
+  // bar live again.
+  if (done_timer !== null) {
+    clearTimeout(done_timer);
+    done_timer = null;
+  }
+  start_creep_fun();
 }
 // ========================================
-// close the batch once the page has gone quiet. the bar rests where it
-// is — at the end — and the counts are forgotten, so the next batch
-// starts over from the left.
+// close the batch once the page has gone quiet. the bar shows the end
+// of its sweep for a moment and then goes away.
 function close_batch_fun(): void {
-  active = false;
   batch_closed = true;
   done = 0;
   total = 0;
+  // the creep stops: there is no target left to creep toward.
+  stop_creep_fun();
   // the high-water mark is NOT reset here. the bar rests at the end
   // after a load; only a new batch moves it back to the left.
+  if (state !== "loading") return;
+  state = "done";
+  if (done_timer !== null) clearTimeout(done_timer);
+  done_timer = setTimeout(() => {
+    done_timer = null;
+    // --- WHY THE BAR ONLY GOES AWAY IF NOTHING NEW CAME IN: a request
+    // that arrived while the sweep was on screen started a new batch,
+    // and that batch owns the bar now.
+    if (state === "done") state = "idle";
+    notify_fun();
+  }, DONE_HOLD_MS);
   notify_fun();
 }
 // ========================================
@@ -188,7 +301,7 @@ function push_batch_timer_fun(): void {
     batch_timer = null;
     // still busy: the page has not gone quiet yet, so the batch stays
     // open and the timer is pushed back.
-    if (in_flight > 0 || images_in_flight > 0) {
+    if (in_flight > 0) {
       push_batch_timer_fun();
       return;
     }
@@ -216,7 +329,9 @@ function push_batch_timer_fun(): void {
 function request_started_fun(): void {
   // the page is quiet and there is no work in flight: this is a new
   // batch and the bar starts over from the left.
-  if (!active || (in_flight === 0 && images_in_flight === 0)) {
+  if (state === "idle" || state === "done") {
+    begin_batch_fun();
+  } else if (in_flight === 0) {
     // --- WHY THE GAP IS CHECKED: right after the page's last request
     // answered, the batch is still open but the queue is empty. a
     // request that lands in that moment is a CONTINUATION, not a new
@@ -245,7 +360,12 @@ function request_finished_fun(): void {
 // at 100% while the last request is still running, so the bar's own
 // width cannot say whether the page is still busy. this can.
 function is_loading_fun(): boolean {
-  return active;
+  return state === "loading";
+}
+// ========================================
+// the bar's state, so the component knows whether to show it at all.
+function get_state_fun(): HUGGIES_LOADING_BAR_STATE {
+  return state;
 }
 // ========================================
 // how many requests are in flight right now.
@@ -283,62 +403,6 @@ async function counted_fetch_fun(
   }
 }
 // ========================================
-// --- IMAGES ----------------------------
-// count the token icons.
-//
-// --- WHY IMAGES ARE COUNTED: the icons are <img> tags pointing at the
-// api's content-addressed icon urls. the browser loads them itself, so
-// fetch never sees them. on a discover page that is up to three
-// hundred images the reader waits for, and without counting them the
-// bar sat at 100% while they were still arriving.
-//
-// --- WHY THE COUNT IS THE PAGE'S OWN CODE AND NOT A PATCH ON THE DOM:
-// the browser's image loading cannot be observed from javascript
-// without replacing the element, and replacing every <img> would break
-// the lazy loading the long lists rely on. the icon urls are known to
-// the app, so the app counts them.
-//
-// --- WHY AN IMAGE IS COUNTED AS PART OF THE PAGE'S WORK AND NOT AS A
-// SEPARATE THING: an icon is something the reader waits for, so it
-// belongs in the same bar. it is counted in the same totals as the
-// fetches, which is what keeps the bar from reaching the end while the
-// icons are still arriving.
-let images_in_flight = 0;
-// ========================================
-// an icon started loading.
-//
-// --- WHY AN ICON JOINS THE PAGE'S BATCH INSTEAD OF STARTING A NEW ONE:
-// the icons arrive right after the page's data, and the reader is
-// waiting for both. if the icons started a new batch, the bar would go
-// 100% → 0% → 100% — full, then empty, then full again — as the icons
-// came in. the icons are part of the same page load, so they belong to
-// the same sweep of the bar.
-//
-// the batch still opens if the page has been quiet for a moment, which
-// is the case for an icon that loads much later on its own.
-function image_started_fun(): void {
-  request_started_fun();
-  images_in_flight += 1;
-  total += 1;
-  update_progress_fun();
-  notify_fun();
-}
-// ========================================
-// an icon finished loading, one way or the other.
-//
-// --- WHY A BROKEN ICON STILL CLOSES THE COUNT: the icon url can be
-// dead, and a dead icon must not hold the bar open forever. the
-// reader sees a broken image and the bar still finishes.
-function image_finished_fun(): void {
-  images_in_flight -= 1;
-  request_finished_fun();
-}
-// ========================================
-// how many icons are in flight right now.
-function get_images_in_flight_fun(): number {
-  return images_in_flight;
-}
-// ========================================
 // --- INSTALL ---------------------------
 // wrap the global fetch once. a second call does nothing, so the
 // module can be imported from anywhere without double counting.
@@ -367,15 +431,25 @@ function install_fun(): void {
 install_fun();
 // ========================================
 // --- PUBLIC ---------------------------
+// the signal's whole surface. it is small on purpose: the bar needs
+// the state and the progress, and that is all.
+//
+// --- WHY get_in_flight IS HERE: it is what tells "the page is busy"
+// apart from "the page is waiting on one slow request", and it is the
+// number a caller would want if it ever needed to explain the bar.
+//
+// --- WHY install IS HERE: the module installs itself when it is
+// imported, so the call is a no-op. it is on the surface because every
+// page's start script calls it to make the ORDERING explicit — the
+// patch is in place before the page's load, not merely by the time the
+// component mounts.
 export const HUGGIES_LOADING_BAR = {
   install: install_fun,
   subscribe: subscribe_fun,
+  get_state: get_state_fun,
   get_progress: get_progress_fun,
   get_in_flight: get_in_flight_fun,
   is_loading: is_loading_fun,
-  image_started: image_started_fun,
-  image_finished: image_finished_fun,
-  get_images_in_flight: get_images_in_flight_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near
