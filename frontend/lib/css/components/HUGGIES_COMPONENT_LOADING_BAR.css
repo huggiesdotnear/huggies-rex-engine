@@ -9,7 +9,7 @@
    the two parts are deliberately different colours:
    - the TRACK is the app's middle colour at low strength. it says
      "this is the bar" without pretending to be progress.
-   - the FILL is the bright middle colour at full strength, with a
+   - the FILL is the bright middle colour at FULL strength, with a
      glow around it in the same colour, so the part that IS done
      reads as lit up against the part that is not. */
 /*==================================*/
@@ -28,20 +28,40 @@
   background-color: rgba(0, 198, 215, 0.25);
 }
 /*==================================*/
-/* the filled part. the width is set inline from the progress, and the
-   glow is a wide drop shadow in the same colour so the bar looks lit
-   rather than painted. */
+/* the GLOW. it is its own element, not a box-shadow on the fill.
+
+   --- WHY: a box-shadow is painted with the element's own alpha, so a
+   shadow under a transparent bar comes out half-transparent and the
+   red page bleeds through it — which is what made the glow look weak
+   and washed out. the glow is its OWN layer here: a solid cyan strip
+   that is blurred, so the light it throws is real light and not a
+   transparent wash. */
+#HUGGIES_COMPONENT_LOADING_BAR .loading-bar-glow {
+  position: absolute;
+  left: 0;
+  width: 0%;
+  /* the solid colour. the BLUR is what softens it into a glow. */
+  background-color: var(--color-middle);
+  /* the blur is the glow: it spreads the strip out and softens its
+     edges, so the light bleeds down over the red page. */
+  filter: blur(6px);
+  /* the blur eats into the strip, so it is made taller than the bar
+     and pulled up, to keep the lit edge in the right place. */
+  top: -2px;
+  height: calc(100% + 4px);
+  /* no transition on the glow: it follows the fill exactly. */
+}
+/*==================================*/
+/* the filled part. the width is set inline from the progress.
+   it is FULLY OPAQUE — no transparency at all — so the bright cyan
+   is the exact #00c6d7 and nothing bleeds through it. */
 #HUGGIES_COMPONENT_LOADING_BAR .loading-bar-fill {
+  position: relative;
   height: 100%;
   width: 0%;
-  /* the bright cyan, at full strength. */
+  /* the bright cyan, at full strength, fully opaque. */
   background-color: var(--color-middle);
   border-radius: 0 6px 6px 0;
-  /* the soft glow: the same cyan spread out around the fill, in two
-     passes — a tight one for the edge and a wide one for the halo. */
-  box-shadow:
-    0 0 10px 4px var(--color-middle),
-    0 0 22px 8px var(--color-middle);
   transition: width 0.25s ease-out;
 }
 /*==================================*/

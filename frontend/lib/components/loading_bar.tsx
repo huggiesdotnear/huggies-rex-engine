@@ -39,6 +39,8 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
     });
   }, []);
 
+  const percent = `${Math.round(progress * 100)}%`;
+
   return (
     <div
       class="loading-bar-track"
@@ -48,10 +50,12 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
     >
-      <div
-        class="loading-bar-fill"
-        style={{ width: `${Math.round(progress * 100)}%` }}
-      />
+      {/* the glow. it is its own element and it is NOT transparent —
+          the blur is what makes it a glow, so the light it throws is
+          solid light and not a wash over the page. */}
+      <div class="loading-bar-glow" style={{ width: percent }} />
+      {/* the fill. fully opaque, so it is the exact middle colour. */}
+      <div class="loading-bar-fill" style={{ width: percent }} />
     </div>
   );
 }
