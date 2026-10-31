@@ -48,19 +48,23 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
   const percent = `${Math.round(progress * 100)}%`;
 
   return (
+    // --- WHY THE FILL IS THE ROOT AND NOT WRAPPED: the mount div
+    // (#HUGGIES_COMPONENT_LOADING_BAR) IS the track. the css gives IT
+    // the height, the position and the dark background. when the
+    // component rendered its own wrapper div inside it, that wrapper
+    // had no height of its own and collapsed to zero — so the fill's
+    // "height: 100%" resolved against a zero-height parent and the
+    // fill was invisible. the fill must be a direct child of the
+    // track.
     <div
-      class="loading-bar-track"
+      class="loading-bar-fill"
       role="progressbar"
       aria-label="loading"
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
-    >
-      {/* the fill. fully opaque, so it is the exact middle colour.
-          the WIDTH is what changes, and the css eases that change —
-          the component only sets the number, the browser animates it. */}
-      <div class="loading-bar-fill" style={{ width: percent }} />
-    </div>
+      style={{ width: percent }}
+    />
   );
 }
 // ========================================

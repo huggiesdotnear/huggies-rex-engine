@@ -7,11 +7,24 @@
    the app's column.
 
    two parts, and they are the only two:
-   - the TRACK is a dark grey. it says "this is the bar" and nothing
-     more. it is never bright, so it can never be mistaken for
-     progress.
+   - the TRACK is the mount div itself (#HUGGIES_COMPONENT_LOADING_BAR).
+     it is a dark grey. it says "this is the bar" and nothing more. it
+     is never bright, so it can never be mistaken for progress.
    - the FILL is the bright middle colour at FULL strength, with no
-     transparency at all. it is the bar itself. */
+     transparency at all. it is the bar itself.
+
+   --- WHY THE FILL IS ABSOLUTELY POSITIONED: the fill is a direct
+   child of the track, so it would normally be laid out INSIDE the
+   track's box and push it around. absolutely positioning it pins it
+   to the track's own left edge and lets it grow over the track
+   without moving anything else.
+
+   --- WHY THE FILL'S HEIGHT IS A PIXEL VALUE AND NOT 100%: the track
+   is 6px tall, so 100% would work — but the fill is absolutely
+   positioned, and a percentage height on an absolutely positioned
+   element resolves against its CONTAINING BLOCK's padding box. a
+   pixel value says exactly how tall the lit part is and cannot
+   collapse. */
 /*==================================*/
 #HUGGIES_COMPONENT_LOADING_BAR {
   position: fixed;
@@ -32,7 +45,12 @@
    it is FULLY OPAQUE — no transparency at all — so the bright cyan
    is the exact #00c6d7 and nothing bleeds through it. */
 #HUGGIES_COMPONENT_LOADING_BAR .loading-bar-fill {
-  height: 100%;
+  /* the fill sits ON the track, pinned to its left edge. */
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  /* the exact height of the track, so the lit part covers it fully. */
+  height: 6px;
   width: 0%;
   /* the bright cyan, at full strength, fully opaque. */
   background-color: var(--color-middle);
