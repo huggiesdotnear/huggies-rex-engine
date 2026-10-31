@@ -37,6 +37,9 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_
 // how long to wait after a keystroke before asking the api. long enough
 // that typing a word is one request, not one per letter.
 const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
+// the css selector that matches ONE row of the token list. the rows are
+// links, not table rows, so the scroll hook is told what a row is.
+const HUGGIES_DISCOVER_ROW_SELECTOR = ".result";
 // ========================================
 // ========================================
 // --- ROW -------------------------------
@@ -131,9 +134,19 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   // bottom of the list, not when they reach it exactly: the request
   // takes a moment, so asking early means the rows are usually there.
   const has_more = page_data?.token_list.has_more ?? false;
-  use_scroll_load_fun(scroll_ref, has_more && !searching, loading, () => {
-    void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(sort, direction === "desc");
-  });
+  use_scroll_load_fun(
+    scroll_ref,
+    has_more && !searching,
+    loading,
+    () => {
+      void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(
+        sort,
+        direction === "desc",
+      );
+    },
+    // the rows on this page are links, not table rows.
+    HUGGIES_DISCOVER_ROW_SELECTOR,
+  );
 
   // the marked tokens are styled wherever the sort puts them.
   const marked_ids = pinned_token_ids_fun();

@@ -30,20 +30,29 @@ const HUGGIES_SCROLL_LOAD_THRESHOLD_PX = 600;
 // @param has_more whether there is another page to load.
 // @param loading whether a load is running right now.
 // @param load_more what to call for the next page.
+// @param row_selector the css selector that matches ONE row of the list.
 export function use_scroll_load_fun(
   scroll_ref: { current: HTMLElement | null },
   has_more: boolean,
   loading: boolean,
   load_more: () => void,
+  row_selector: string,
 ): void {
   // the rows that have come in. it is what tells the hook that a new
   // page landed, so it can look again.
+  //
+  // --- WHY THE SELECTOR IS A PARAMETER AND NOT "tr": the hook is
+  // shared by three lists and they do not all use a table. the token
+  // list on the discover page is a list of links, not rows, so a
+  // hardcoded "tr" counted nothing there — the count stayed at zero and
+  // the hook never learned that a page had landed. each list says what
+  // one of its rows looks like.
   const [rows_count, set_rows_count] = use_state(0);
   use_effect(() => {
     const element = scroll_ref.current;
     if (element === null) return;
-    set_rows_count(element.querySelectorAll("tr").length);
-  }, [scroll_ref.current]);
+    set_rows_count(element.querySelectorAll(row_selector).length);
+  }, [scroll_ref.current, row_selector]);
 
   use_effect(() => {
     if (!has_more || loading) return;

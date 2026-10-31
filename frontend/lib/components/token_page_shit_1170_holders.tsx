@@ -19,6 +19,11 @@ import {
 } from "../ts/token_page_shit_1170_holders";
 // ========================================
 // ========================================
+// --- CONFIG -----------------------------
+// the css selector that matches ONE row of the holders table. the scroll
+// hook is told what a row is, so it can count the rows that have landed.
+const HUGGIES_SHIT_HOLDERS_ROW_SELECTOR = "tr";
+// ========================================
 // --- HELPERS ----------------------------
 function holder_account_href_fun(account_id: string, depth: number): string {
   const prefix = "../".repeat(Math.max(0, depth));
@@ -115,6 +120,8 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
     state.next_cursor !== null,
     state.loading_more,
     load_more_fun,
+    // the rows are table rows.
+    HUGGIES_SHIT_HOLDERS_ROW_SELECTOR,
   );
 
   return (

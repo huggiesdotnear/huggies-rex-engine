@@ -57,6 +57,56 @@ function set_state_fun(next: HUGGIES_TOKEN_PAGE_STATE): void {
   notify_fun();
 }
 // ========================================
+// --- LOAD MORE --------------------------
+// load the NEXT page of holders and append it to the rows on screen.
+//
+// --- WHY THIS LIVES IN THE STORE AND NOT IN THE COMPONENT: every other
+// list on the site asks for its next page through its store — the
+// discover page's token list and the rhea page's pools both do. the
+// holders table was the one that did it in the component, so the rule
+// that a page has exactly one loader was broken here: the component
+// fetched, the store only held.
+//
+// the page is appended rather than replacing, so the reader keeps what
+// they scrolled to. a load that fails leaves the rows on screen alone
+// and records the error.
+//
+// --- WHY THE CURSOR IS THE API'S OWN: the holders endpoint pages by
+// cursor, and the cursor it hands back is the only thing that knows
+// where the next page starts. it is stored and sent back untouched.
+async function token_page_token_state_load_more_fun(): Promise<void> {
+  // there is nothing more to ask for.
+  if (state.loading_more) return;
+  if (state.next_cursor === null) return;
+  // a load for an older token id must not overwrite a newer one.
+  if (token_id === null || loaded_token_id !== token_id) return;
+  const load_token_id = token_id;
+  const cursor = state.next_cursor;
+  set_state_fun({ ...state, loading_more: true });
+  try {
+    const page = await HUGGIES_TOKEN_PAGE_TOKEN.load_holders(
+      load_token_id,
+      cursor,
+    );
+    if (loaded_token_id !== load_token_id) return;
+    set_state_fun({
+      ...state,
+      holders: [...state.holders, ...page.rows],
+      holder_total: page.total,
+      next_cursor: page.next_cursor,
+      loading_more: false,
+      error: null,
+    });
+  } catch (err) {
+    if (loaded_token_id !== load_token_id) return;
+    set_state_fun({
+      ...state,
+      loading_more: false,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+// ========================================
 // --- READ ------------------------------
 function get_state_fun(): HUGGIES_TOKEN_PAGE_STATE {
   return state;
@@ -167,6 +217,7 @@ export const HUGGIES_TOKEN_PAGE_TOKEN_STATE = {
   subscribe: subscribe_fun,
   reset: reset_fun,
   load: token_page_token_state_load_fun,
+  load_more: token_page_token_state_load_more_fun,
   get_token_id: get_token_id_fun,
 };
 // ========================================

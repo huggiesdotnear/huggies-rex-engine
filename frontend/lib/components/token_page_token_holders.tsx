@@ -8,12 +8,16 @@ import { render } from "preact";
 import { useRef as use_ref } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
-import { HUGGIES_TOKEN_PAGE_TOKEN } from "../ts/token_page_token";
 import { token_holder_row_fun } from "./shared/token_holder_row";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { use_scroll_load_fun } from "../ts/use_scroll_load";
 import type { HUGGIES_TOKEN_DETAIL } from "../ts/token_page_token_detail";
 // ========================================
+// ========================================
+// --- CONFIG -----------------------------
+// the css selector that matches ONE row of the holders table. the scroll
+// hook is told what a row is, so it can count the rows that have landed.
+const HUGGIES_TOKEN_HOLDERS_ROW_SELECTOR = "tr";
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
@@ -22,36 +26,6 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
   // the scroll box, so the reader's position at the bottom is
   // detectable.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
-  // ask the loader for the next holder page and fold it into the store.
-  const load_more_fun = () => {
-    const token_id = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get_token_id();
-    const cursor = state.next_cursor;
-    if (token_id === null || cursor === null || state.loading_more) return;
-    HUGGIES_TOKEN_PAGE_TOKEN_STATE.set({
-      ...state,
-      loading_more: true,
-    });
-    void HUGGIES_TOKEN_PAGE_TOKEN.load_holders(token_id, cursor)
-      .then((page) => {
-        const current = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get();
-        HUGGIES_TOKEN_PAGE_TOKEN_STATE.set({
-          ...current,
-          holders: [...current.holders, ...page.rows],
-          holder_total: page.total,
-          next_cursor: page.next_cursor,
-          loading_more: false,
-        });
-      })
-      .catch((err: unknown) => {
-        const current = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get();
-        HUGGIES_TOKEN_PAGE_TOKEN_STATE.set({
-          ...current,
-          loading_more: false,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      });
-  };
-
   // --- WHY THE NEXT PAGE IS ASKED FOR ON SCROLL: the reader scrolls
   // the list and the next page is already on its way by the time they
   // reach the bottom. this is what the discover page's token list does,
@@ -61,7 +35,14 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
     scroll_ref,
     state.next_cursor !== null,
     state.loading_more,
-    load_more_fun,
+    // --- WHY THE PAGE ASKS ITS STORE FOR THE NEXT PAGE: the store holds
+    // the cursor and the rows, so it is the only place that knows where
+    // the next page starts. the component just says WHEN.
+    () => {
+      void HUGGIES_TOKEN_PAGE_TOKEN_STATE.load_more();
+    },
+    // the rows are table rows.
+    HUGGIES_TOKEN_HOLDERS_ROW_SELECTOR,
   );
 
   // --- WHY THE CHECK IS HERE AND NOT AT THE TOP: a hook cannot be
