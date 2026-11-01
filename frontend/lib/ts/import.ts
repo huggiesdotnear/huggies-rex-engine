@@ -64,7 +64,7 @@ import "../components/token_page_shit_1170_filters";
 import "../components/token_page_shit_1170_holders";
 import "../components/token_page_shit_1170_metadata";
 import "../components/shared/token_meta_grid";
-import "../components/shared/json_viewer";
+import "../components/app_page_tx_json_viewer";
 import "../components/app_page_account_tx_row";
 import "../components/app_page_account_tab_view";
 import "../components/app_page_tx_args_viewer";

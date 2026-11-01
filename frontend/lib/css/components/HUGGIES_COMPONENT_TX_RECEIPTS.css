@@ -5,9 +5,9 @@
 
    one card per receipt: its facts, what it returned and what it
    logged. the json viewer is a shared component
-   (shared/json_viewer.css), so its own look lives in its own file. */
+   (HUGGIES_COMPONENT_TX_JSON_VIEWER.css), so its own look lives in its own file. */
 /*==================================*/
-@import url(./shared/json_viewer.css);
+@import url(./HUGGIES_COMPONENT_TX_JSON_VIEWER.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts {

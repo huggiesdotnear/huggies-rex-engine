@@ -18,7 +18,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/app_page_tx_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { current_app_depth_fun } from "../ts/app_depth";
-import { huggies_json_viewer_fun } from "./shared/json_viewer";
+import { huggies_json_viewer_fun } from "./app_page_tx_json_viewer";
 import type { RECEIPT_WITH_OUTCOME } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================

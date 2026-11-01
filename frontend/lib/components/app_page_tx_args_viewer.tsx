@@ -25,7 +25,7 @@ import {
   bytes_to_hex,
   default_args_view_mode,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { huggies_json_viewer_fun } from "./shared/json_viewer";
+import { huggies_json_viewer_fun } from "./app_page_tx_json_viewer";
 import type { DECODED_ARGS } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================

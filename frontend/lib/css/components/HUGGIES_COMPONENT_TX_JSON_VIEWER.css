@@ -1,15 +1,15 @@
 /*==================================*/
-/* json_viewer
+/* HUGGIES_COMPONENT_TX_JSON_VIEWER
    the json tree: a collapsible tree of a json value.
 
    the fastnear explorer shows json with @uiw/react-json-view, which is
    a react library. this app is preact, so the tree is built here and
    carries the app's own look.
 
-   it is SHARED: the receipts component shows a json tree for a failed
-   receipt and an event log, and the arguments viewer shows one for
-   json arguments. both are on the transaction page, so the rules nest
-   under the class the tree carries and reach both of them. */
+   it is used by TWO components of the transaction page — the receipts
+   component shows a tree for a failed receipt and for an event log,
+   and the arguments viewer shows one for json arguments. so the rules
+   nest under the class the tree carries and reach both of them. */
 /*==================================*/
 .json-viewer {
   display: flex;

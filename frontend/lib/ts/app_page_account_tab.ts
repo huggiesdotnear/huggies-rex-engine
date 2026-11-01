@@ -122,11 +122,11 @@ function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
 // --- SET -------------------------------
 // switch to a tab and put it in the url.
 //
-// --- WHY --- THE URL IS WRITTEN FIRST: the tab lives in the url, so
-// the url is the truth about which tab is showing. writing it first
-// means a re-read of the url — from the browser's back button, or from
-// any other reader of the url — can never see the old tab and undo the
-// switch.
+// --- WHY --- THE URL IS WRITTEN FIRST, AND ALWAYS: the tab lives in
+// the url, so the url is the truth about which tab is showing. and it
+// is written even when the tab is already the one on screen — the
+// reader who clicks the tab they are on, or opens that tab's link in a
+// new tab, must get the url the link said.
 //
 // --- WHY --- THE STATE IS THE SOURCE OF TRUTH FOR THE RENDER: the
 // components read the state, and the state is what the reader asked
@@ -136,8 +136,8 @@ function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
 // view of the page that is already loaded, so the switch is instant and
 // the page does not fetch everything again.
 function set_tab_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TAB): void {
-  if (next === tab) return;
   HUGGIES_URL_TAB.write(next);
+  if (next === tab) return;
   tab = next;
   notify_fun();
 }

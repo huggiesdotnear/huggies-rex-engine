@@ -238,7 +238,12 @@ export async function load_account_transactions_fun(
   const rows = merge_rows_fun(fresh.rows, cached_rows);
   // the cache keeps the rows it has plus the new ones, so the next
   // visit starts from further down the history.
-  const merged_rows = merge_rows_fun(cached_rows, fresh.rows);
+  //
+  // --- WHY --- THE FRESH ROWS COME FIRST HERE TOO: the cache keeps the
+  // NEWEST rows, and the newest rows are the fresh ones. a merge that
+  // put the cached rows first would fill the cache with the oldest rows
+  // and drop the new ones — and the new ones are the ones that changed.
+  const merged_rows = merge_rows_fun(fresh.rows, cached_rows);
   // --- WHY --- THE DEEPER CURSOR IS KEPT: the first page's cursor
   // points at the SECOND page, and the cached rows already run deeper
   // than that. writing the first page's cursor back would send the

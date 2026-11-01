@@ -18,6 +18,15 @@
 // state needs a component of its own to hold it. a plain function
 // would put every branch's state in the reader above it.
 //
+// --- WHY --- IT IS A PAGE COMPONENT AND NOT A SHARED ONE: it is used
+// by the transaction page's receipts component and by its arguments
+// viewer, and by nothing else, so it carries the transaction page's
+// prefix.
+//
+// --- WHY --- THE RULES NEST UNDER THE CLASS AND NOT A MOUNT ID: two
+// components of the page use it, and it has no mount id of its own, so
+// the class on its root is what the rules reach through.
+//
 // this component does NOT fetch. it renders what it is given.
 import { useState as use_state } from "preact/hooks";
 // ========================================
