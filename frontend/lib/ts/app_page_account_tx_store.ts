@@ -317,6 +317,12 @@ async function prefetch_fun(): Promise<void> {
 // reader is on the transactions tab. a reader who lands on the
 // balances tab never asks for the history at all, and one who
 // switches to the transactions tab gets it fetched by itself.
+//
+// --- WHY THE LOAD RUNS ONCE RIGHT AWAY: the subscription only fires
+// on a CHANGE, and a reader who lands on the transactions tab has not
+// changed anything — the tab was already the transactions one when
+// the page loaded. without this the history would never be fetched
+// for that reader, and the tab would sit empty.
 function watch_fun(): void {
   HUGGIES_APP_PAGE_ACCOUNT_ID.subscribe(() => {
     void load_fun();
@@ -324,6 +330,8 @@ function watch_fun(): void {
   HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.subscribe(() => {
     void load_fun();
   });
+  // the page's first load.
+  void load_fun();
   // the history is warmed in the background, so the switch to the
   // transactions tab is instant.
   void prefetch_fun();
