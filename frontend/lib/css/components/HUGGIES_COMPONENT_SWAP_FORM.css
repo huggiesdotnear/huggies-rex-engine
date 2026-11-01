@@ -3,9 +3,15 @@
    the swap form: the two token cards, the two amount inputs and the
    swap button.
 
-   the two sides are stacked, with the flip button between them. each
-   side is a card: the token button on top, the amount input under it,
-   and the small note line under that. */
+   the two sides are stacked, with the switch direction bar between them.
+   each side is a card: the token button on top, the amount input under
+   it, and the small note line under that.
+
+   the switch direction bar between the two sides is the shared bar
+   (shared/switch_direction.css), so it brings its own css in with the
+   @import below. */
+@import url(./shared/switch_direction.css);
+/*==================================*/
 #HUGGIES_COMPONENT_SWAP_FORM .swap-form {
   display: flex;
   flex-direction: column;
@@ -14,13 +20,20 @@
   min-width: 0;
 }
 /*==================================*/
-/* one side of the swap: the card, the input and the note. */
+/* one side of the swap: the card, the input and the note.
+
+   --- WHY --- `box-sizing: border-box` MATTERS HERE: `main > *` sets it
+   for the page's own blocks, but this side is a CHILD of the swap form,
+   so it does not inherit it. without it, `width: 100%` plus `padding:
+   12px` renders the card 24px wider than the 500px column and the page
+   overflows sideways. */
 #HUGGIES_COMPONENT_SWAP_FORM .swap-side {
   display: flex;
   flex-direction: column;
   gap: 6px;
   width: 100%;
   min-width: 0;
+  box-sizing: border-box;
   padding: 12px;
   border: 2px solid rgba(255, 255, 255, 0.22);
   border-radius: 16px;
@@ -137,31 +150,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   opacity: 0.85;
-}
-/*==================================*/
-/* the flip button between the two sides. it is a small circle, so it
-   does not compete with the two cards it sits between. */
-#HUGGIES_COMPONENT_SWAP_FORM .swap-flip {
-  display: flex;
-  justify-content: center;
-  margin: -4px 0;
-}
-#HUGGIES_COMPONENT_SWAP_FORM .swap-flip-button {
-  width: 40px;
-  height: 40px;
-  max-width: 40px;
-  padding: 0;
-  margin: 0;
-  font-size: 18px;
-  line-height: 1;
-  border-radius: 50%;
-  border: 2px solid var(--color-middle);
-  background: #ffe8e6;
-  color: var(--color-backend);
-}
-#HUGGIES_COMPONENT_SWAP_FORM .swap-flip-button:hover {
-  background: var(--color-middle);
-  color: var(--color-fontend);
 }
 /*==================================*/
 /* the swap button itself. it is the page's one real action, so it is

@@ -7,16 +7,20 @@
 // amount formatter, so a balance never reads as "1500000" next to a
 // ticker called USDC.
 //
+// the thin bar between the two cards is the shared switch direction
+// bar, so the page that uses it does not carry its own.
+//
 // mounts into <div id="HUGGIES_COMPONENT_SWAP_FORM">.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "../ts/swap/app_page_swap_store";
 import { HUGGIES_SWAP_TOKEN_PICKER } from "../ts/swap/app_page_swap_token_picker";
 import { HUGGIES_APP_PAGE_SWAP_EXECUTE } from "../ts/swap/app_page_swap_execute";
-import { HUGGIES_TOAST_STORE } from "../ts/shared/toast_store";
+import { HUGGIES_TOAST_STORE } from "../ts/swap/app_page_swap_toast_store";
 import { HUGGIES_AUTH } from "../ts/shared/auth_status";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/shared/token_amount_format";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { huggies_switch_direction_fun } from "./shared/switch_direction";
 import {
   human_to_unit_fun,
   human_usd_fun,
@@ -221,19 +225,12 @@ function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
         )}
       </div>
 
-      <div class="swap-flip">
-        <button
-          type="button"
-          class="swap-flip-button"
-          title="swap the two tokens"
-          onClick={() => {
-            void HUGGIES_APP_PAGE_SWAP_STORE.set_token("in", page.token_out);
-            void HUGGIES_APP_PAGE_SWAP_STORE.set_token("out", page.token_in);
-          }}
-        >
-          ↓
-        </button>
-      </div>
+      {huggies_switch_direction_fun({
+        on_switch: () => {
+          void HUGGIES_APP_PAGE_SWAP_STORE.set_token("in", page.token_out);
+          void HUGGIES_APP_PAGE_SWAP_STORE.set_token("out", page.token_in);
+        },
+      })}
 
       <div class="swap-side">
         {token_card_fun(out_card, "out")}
