@@ -6,13 +6,11 @@
 // mounts, and these three are on every page's html — so they are
 // listed here once and every page's import file pulls this in.
 //
-// --- WHY --- THE NETWORK PIN IS HERE AND ALSO ON THE PAGES THAT NEED
-// IT EARLIER: hello.ts pins the network to mainnet, and the pin has to
-// land before the first near_connect_client() call. the account page's
-// routing script calls the wallet, and it runs BEFORE this file — so
-// the pages that touch the wallet on load load hello.ts as their own
-// first script. this import is here for the pages that do not: the ones
-// under app/contract/ and app/token/, and the splash page.
+// --- WHY --- THE NETWORK PIN IS HERE: hello.ts pins the network to
+// mainnet, and the pin has to land before the first
+// near_connect_client() call. every page's import file pulls this in
+// FIRST, so the pin is in place before the page's own start or route
+// script runs — those touch the wallet.
 //
 // see frontend/lib/ts/hello.ts.
 import "./hello";

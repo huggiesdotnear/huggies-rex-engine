@@ -1,9 +1,8 @@
 // ========================================
 // the swap page's first load.
 //
-// it runs when the html is parsed, before the components mount, so the
-// pair from the url and their balances are on the way before anything
-// is drawn.
+// it runs before the components mount, so the pair from the url and
+// their balances are on the way before anything is drawn.
 //
 // --- WHY IT CALLS THE LOADING BAR FIRST: the bar patches the global
 // fetch, and the patch has to be in place before the page's first

@@ -1,7 +1,15 @@
 // ========================================
-// the burn page's components: the burn info, the burn addresses and the
-// burn balances.
+// the burn page's ONE entry: the page's html loads this file and
+// nothing else.
+//
+// the order below IS the page's order of life, and it matters:
+//
+// 1. import-app-wide brings the network pin (hello.ts) and the
+//    app-wide components.
+// 2. the start begins the page's load, before any component mounts.
+// 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
+import "./burn/app_page_burn_start";
 import "../components/app_page_burn_info";
 import "../components/app_page_burn_addresses";
 import "../components/app_page_burn_balances";

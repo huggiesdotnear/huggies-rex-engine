@@ -1,8 +1,8 @@
 // ========================================
 // the account page's start: it begins the page's load.
 //
-// the page's html loads this script, so the load starts as soon as the page
-// is parsed — before the components mount.
+// the page's import file pulls this in, so the load starts before the
+// components mount.
 //
 // --- WHY --- a script and not a component: the four balance tables used
 // to each call the store's load() from their own effect. four components

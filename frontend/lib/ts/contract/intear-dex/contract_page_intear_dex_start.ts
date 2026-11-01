@@ -1,14 +1,13 @@
 // ========================================
 // the intear dex page's start: it begins the page's load.
 //
-// the page's html loads this script, so the load starts as soon as the
-// page is parsed — before the components mount, and without any
-// component having to ask for it.
+// the page's import file pulls this in, so the load starts before the
+// components mount, and without any component having to ask for it.
 //
 // --- WHY --- a script and not a component: a component that called the
 // load would be doing two jobs — displaying and starting the page's
-// work. the page's html says when the page starts, so the html starts
-// it.
+// work. the page's import file says when the page starts, so the page
+// starts it.
 //
 // --- WHY --- the store owns the load and this file only asks for it:
 // the fetching itself lives in lib/ts/contract_page_intear_dex.ts, so

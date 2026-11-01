@@ -10,10 +10,9 @@
 // network, so a toggle could take the other network's session down
 // with it.
 //
-// the pages at the top of app/ load this file as their own first
-// script, so the pin lands before anything reads the network. the
-// pages under app/contract/ and app/token/ do not load it themselves,
-// so their import file pulls it in for them.
+// every page's import file pulls this in first, so the pin lands before
+// anything reads the network — the page's own start or route script
+// touches the wallet, and the wallet reads the network.
 import { set_network_mainnet } from "@near-kit-tool-box/web";
 // ========================================
 if (typeof localStorage !== "undefined") set_network_mainnet();

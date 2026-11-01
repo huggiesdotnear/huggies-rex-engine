@@ -1,8 +1,8 @@
 // ========================================
 // the transaction page's start: it begins the page's load.
 //
-// the page's html loads this script, so the load starts as soon as the
-// page is parsed — before the components mount.
+// the page's import file pulls this in, so the load starts before the
+// components mount.
 //
 // --- WHY --- a script and not a component: a component that called the
 // load would be doing two jobs — displaying and starting the page's

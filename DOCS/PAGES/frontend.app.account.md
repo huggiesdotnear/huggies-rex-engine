@@ -42,9 +42,6 @@ a page's md file should only contain the html codeblock, nothing else.
   <!--==========================================-->
   <!--==========================================-->
   <!--script-->
-  <script src="../lib/ts/hello.ts"></script>
-  <script src="../lib/ts/account/app_page_account_route.ts"></script>
-  <script src="../lib/ts/account/app_page_account_start.ts"></script>
   <script src="../lib/ts/import-account.ts"></script>
   <!--script-->
   <!--==========================================-->

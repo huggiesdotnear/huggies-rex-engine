@@ -1,9 +1,8 @@
 // ========================================
 // the pumpopoly page's start: it begins the page's load.
 //
-// the page's html loads this script, so the load starts as soon as the
-// page is parsed — before the components mount, and without any
-// component having to ask for it.
+// the page's import file pulls this in, so the load starts before the
+// components mount, and without any component having to ask for it.
 //
 // --- WHY --- a script and not a component: the player stats and the nft
 // list used to each call the store's load() from their own effect. two

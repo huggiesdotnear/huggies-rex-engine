@@ -3,9 +3,9 @@
 // bar's patch on the global fetch BEFORE the page fires its first
 // request.
 //
-// --- WHY THIS IS ITS OWN FILE: a page's html loads its start script
-// BEFORE the shared import that brings the bar's component in. so the
-// patch on the global fetch has to be in place before the start
+// --- WHY THIS IS ITS OWN FILE: a page's import file pulls its start
+// script in BEFORE the components that bring the bar's component in.
+// so the patch on the global fetch has to be in place before the start
 // script's own load runs, or the page's FIRST load is never counted
 // and the bar sits dark through it.
 //

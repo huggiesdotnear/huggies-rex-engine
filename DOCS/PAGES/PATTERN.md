@@ -11,7 +11,11 @@ lib/ts/<page>_state.ts    the STORE. the data, and the load that fills
                           it. the store watches the page's id, so it
                           re-loads by itself when the id changes.
 lib/ts/<page>_start.ts    the START. the page's first load. the page's
-                          html loads it as a <script>.
+                          import file pulls it in.
+lib/ts/import-<page>.ts  the page's ONE ENTRY. the page's html loads
+                          this file and nothing else. its import order
+                          is the page's order of life: the network pin,
+                          then the page's start, then the components.
 lib/ts/use_page_store.ts  the shared HOOK. one line per component.
 lib/ts/use_scroll_load.ts  the shared HOOK for a paged list. it asks
                           for the next page when the reader nears the
@@ -80,19 +84,29 @@ the sweep FINISH rather than have it crawl the last tenth.
 
 ### the order of the scripts
 
-a page's html loads its start script BEFORE the shared import:
+a page's html loads ONE file — the page's own `import-<page>.ts`:
 
 ```html
-<script src="../lib/ts/app_page_discover_start.ts"></script>
-<script src="../lib/ts/import.ts"></script>
+<script src="../lib/ts/import-discover.ts"></script>
 ```
 
-so the start script fires the page's first request before the bar's
-component has even mounted. every start script therefore calls
-`huggies_loading_bar_start_fun()` as its first line, which puts the
-patch on the global fetch in place before the page's load runs. without
-that line the page's FIRST load was never counted and the bar sat dark
-through it.
+that file is the page's whole entry, and the order of its imports IS the
+order of the page's life:
+
+```ts
+import "./import-app-wide"; // the network pin + the app-wide three
+import "./discover/app_page_discover_start"; // the page's first load
+import "../components/app_page_discover_token_discover"; // the components
+```
+
+the pin lands first, because the pin has to be in place before anything
+reads the network. the start comes next, so the page fires its first
+request before the bar's component has even mounted. every start script
+therefore calls `huggies_loading_bar_start_fun()` as its first line,
+which puts the patch on the global fetch in place before the page's load
+runs. without that line the page's FIRST load was never counted and the
+bar sat dark through it. the components come last, so they mount against
+the data the load brought back.
 
 ### the batch
 
@@ -195,8 +209,7 @@ void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
 <main>
   <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
 </main>
-<script src="../lib/ts/app_page_account_start.ts"></script>
-<script src="../lib/ts/import.ts"></script>
+<script src="../lib/ts/import-account.ts"></script>
 ```
 
 =====================
