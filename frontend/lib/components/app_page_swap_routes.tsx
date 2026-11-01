@@ -72,12 +72,12 @@ function route_card_fun(
         {is_best && <span class="swap-route-badge">BEST</span>}
       </span>
       <span class="swap-route-amount">
-        {HUGGIES_AMOUNT_FORMAT.balance(amount, { decimals })}{" "}
-        {symbol}
+        {HUGGIES_AMOUNT_FORMAT.balance(amount, { decimals })} {symbol}
       </span>
       {guaranteed_out_unit !== null && (
         <span class="swap-route-get">
-          GET {HUGGIES_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
+          GET{" "}
+          {HUGGIES_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
             decimals: out_decimals,
           })}{" "}
           {out_symbol}
@@ -85,12 +85,9 @@ function route_card_fun(
       )}
       <span class="swap-route-detail">
         <span>
-          MIN {HUGGIES_AMOUNT_FORMAT.balance(worst_case, { decimals })}{" "}
-          {symbol}
+          MIN {HUGGIES_AMOUNT_FORMAT.balance(worst_case, { decimals })} {symbol}
         </span>
-        <span>
-          {route.tx_count} TX
-        </span>
+        <span>{route.tx_count} TX</span>
       </span>
     </button>
   );
@@ -130,9 +127,7 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
   // line would otherwise name a number the reader is not waiting for.
   const summary_symbol = card_symbol;
   const summary_decimals = card_decimals;
-  const summary_amount = selected === null
-    ? null
-    : card_amount(selected);
+  const summary_amount = selected === null ? null : card_amount(selected);
   const summary_word = fixed_out ? "YOU PAY" : "YOU GET";
 
   // --- WHY --- THE GUARANTEED OUTPUT IS THE READER'S OWN NUMBER: when

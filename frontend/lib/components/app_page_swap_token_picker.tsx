@@ -155,8 +155,7 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SWAP_TOKEN_PICKER;
+const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SWAP_TOKEN_PICKER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) render(<HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN />, el);

@@ -59,7 +59,10 @@ function read_url_out_fun(): string | null {
 // --- WHY --- the OTHER token is kept: a swap link is worth keeping
 // whole. dropping `?out=` when only `?in=` changed would leave a link
 // that swapped to nothing.
-function write_url_tokens_fun(token_in: string | null, token_out: string | null): void {
+function write_url_tokens_fun(
+  token_in: string | null,
+  token_out: string | null,
+): void {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return;
   }

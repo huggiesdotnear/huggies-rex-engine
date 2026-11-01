@@ -375,7 +375,10 @@ async function subscribe_swap_routes_fun(
             // socket open, so this is a message about this query, not
             // a dead socket. the one-shot fetch below says the same
             // thing, so it is not shown twice.
-            console.info("[swap] the route subscription reported", update.message);
+            console.info(
+              "[swap] the route subscription reported",
+              update.message,
+            );
             return;
           }
           on_routes(map_routes_fun(update.routes));

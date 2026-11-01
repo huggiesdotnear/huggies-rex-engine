@@ -54,7 +54,8 @@ export interface HUGGIES_SWAP_EXECUTION {
 // hash lives under `transaction.hash`.
 function outcome_hash_fun(outcome: unknown): string | null {
   if (typeof outcome !== "object" || outcome === null) return null;
-  const transaction = (outcome as { transaction?: { hash?: unknown } }).transaction;
+  const transaction = (outcome as { transaction?: { hash?: unknown } })
+    .transaction;
   if (typeof transaction !== "object" || transaction === null) return null;
   const hash = transaction.hash;
   return typeof hash === "string" && hash.length > 0 ? hash : null;
@@ -99,7 +100,9 @@ async function execute_swap_fun(
       succeeded: result.swap_succeeded,
       tx_hash: first_hash_fun(result.swap_outcomes),
       amount_out: result.final_outcome.amount_out ?? null,
-      error: result.swap_succeeded ? null : (result.outcome.error ?? "THE SWAP FAILED"),
+      error: result.swap_succeeded
+        ? null
+        : (result.outcome.error ?? "THE SWAP FAILED"),
       unknown: false,
     };
   } catch (err) {

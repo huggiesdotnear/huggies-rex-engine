@@ -316,7 +316,10 @@ function open_subscription_fun(
       set_state_fun({ ...state, routes });
     },
     (message) => {
-      console.warn("[app_page_swap_store] the route subscription failed", message);
+      console.warn(
+        "[app_page_swap_store] the route subscription failed",
+        message,
+      );
     },
   );
 }
@@ -393,7 +396,10 @@ async function quote_fun(): Promise<void> {
 // route at all — a swap of a token for itself. so the two sides trade
 // places, which is what the reader meant, and the page always holds a
 // pair that can trade.
-async function set_token_fun(side: "in" | "out", token_id: string): Promise<void> {
+async function set_token_fun(
+  side: "in" | "out",
+  token_id: string,
+): Promise<void> {
   const trimmed = token_id.trim();
   if (trimmed.length === 0) return;
   if (side === "in") {
@@ -404,7 +410,12 @@ async function set_token_fun(side: "in" | "out", token_id: string): Promise<void
       await swap_pair_fun();
       return;
     }
-    set_state_fun({ ...state, token_in: trimmed, amount_in: "", amount_out: "" });
+    set_state_fun({
+      ...state,
+      token_in: trimmed,
+      amount_in: "",
+      amount_out: "",
+    });
     HUGGIES_APP_PAGE_SWAP_URL.write(trimmed, state.token_out);
   } else {
     // the token is already on this side: nothing to do.
@@ -414,7 +425,12 @@ async function set_token_fun(side: "in" | "out", token_id: string): Promise<void
       await swap_pair_fun();
       return;
     }
-    set_state_fun({ ...state, token_out: trimmed, amount_in: "", amount_out: "" });
+    set_state_fun({
+      ...state,
+      token_out: trimmed,
+      amount_in: "",
+      amount_out: "",
+    });
     HUGGIES_APP_PAGE_SWAP_URL.write(state.token_in, trimmed);
   }
   clear_routes_fun();

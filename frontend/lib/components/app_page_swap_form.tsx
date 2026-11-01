@@ -170,11 +170,7 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
         : human_to_unit_fun(fixed_human, out_info.decimals);
   // the amount the router answered with, on the other side.
   const answered_unit =
-    route === null
-      ? null
-      : side === "in"
-        ? route.amount_out
-        : route.amount_in;
+    route === null ? null : side === "in" ? route.amount_out : route.amount_in;
 
   // what each of the two boxes shows.
   const in_box = swap_box_amount_fun(
@@ -218,11 +214,7 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
     sold_unit !== null &&
     BigInt(sold_unit) <= BigInt(in_card.balance === "" ? "0" : in_card.balance);
   const can_swap =
-    signed_in &&
-    has_amount &&
-    has_balance &&
-    route !== null &&
-    !page.swapping;
+    signed_in && has_amount && has_balance && route !== null && !page.swapping;
 
   const on_swap_fun = async () => {
     if (!can_swap || route === null) return;
@@ -251,7 +243,12 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
         result.tx_hash,
       );
     } else {
-      HUGGIES_TOAST_STORE.show("error", "SWAP FAILED", result.error, result.tx_hash);
+      HUGGIES_TOAST_STORE.show(
+        "error",
+        "SWAP FAILED",
+        result.error,
+        result.tx_hash,
+      );
     }
   };
 

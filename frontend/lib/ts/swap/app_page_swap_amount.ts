@@ -29,7 +29,10 @@ function parse_decimal_parts_fun(value: string): {
   if (!/^\d*\.?\d*$/.test(trimmed)) return null;
   const [whole_part = "", fraction_part = ""] = trimmed.split(".");
   if (whole_part.length === 0 && fraction_part.length === 0) return null;
-  return { whole: BigInt(whole_part.length === 0 ? "0" : whole_part), fraction: fraction_part };
+  return {
+    whole: BigInt(whole_part.length === 0 ? "0" : whole_part),
+    fraction: fraction_part,
+  };
 }
 // ========================================
 // ========================================
@@ -40,7 +43,10 @@ function parse_decimal_parts_fun(value: string): {
 // unit amount is what the router will trade, so it must never be
 // MORE than the reader asked for. rounding up would spend more than
 // they typed.
-export function human_to_unit_fun(human: string, decimals: number): string | null {
+export function human_to_unit_fun(
+  human: string,
+  decimals: number,
+): string | null {
   if (!Number.isInteger(decimals) || decimals < 0) return null;
   const parts = parse_decimal_parts_fun(human);
   if (parts === null) return null;
@@ -96,7 +102,10 @@ export function unit_to_raw_human_fun(unit: string, decimals: number): string {
 // unit amount: the price is quoted per whole token, so 1.5 USDC at
 // $1.00 is $1.50. multiplying the unit amount by the price would be
 // off by 10**decimals.
-export function human_usd_fun(human: string, info: Pick<HUGGIES_TOKEN_INFO, "price_usd">): number {
+export function human_usd_fun(
+  human: string,
+  info: Pick<HUGGIES_TOKEN_INFO, "price_usd">,
+): number {
   const value = Number(human);
   if (!Number.isFinite(value)) return 0;
   return value * info.price_usd;

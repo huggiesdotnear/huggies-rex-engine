@@ -14,10 +14,7 @@ import { search_tokens_fun } from "../discover/app_page_discover_token_search";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token_list";
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
-import {
-  HUGGIES_NEAR_ID,
-  HUGGIES_NEAR_SYMBOL,
-} from "../shared/token_near";
+import { HUGGIES_NEAR_ID, HUGGIES_NEAR_SYMBOL } from "../shared/token_near";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -126,8 +123,7 @@ function map_row_fun(row: {
 // has no `near` entry to ask for the hash of, and the hash for wNEAR
 // is a fixed value — the icon it points at is content addressed, so it
 // never changes under a different hash.
-const HUGGIES_NEAR_ICON_URL =
-  "https://api.intea.rs/icon/tKxD06CdiM_S80-L.webp";
+const HUGGIES_NEAR_ICON_URL = "https://api.intea.rs/icon/tKxD06CdiM_S80-L.webp";
 function near_row_fun(): HUGGIES_SWAP_PICKER_TOKEN {
   return {
     id: HUGGIES_NEAR_ID,
@@ -159,7 +155,10 @@ async function load_default_tokens_fun(): Promise<void> {
     // likely to be reaching for.
     set_state_fun({
       ...state,
-      tokens: [near_row_fun(), ...tokens.filter((t) => t.id !== HUGGIES_NEAR_ID)],
+      tokens: [
+        near_row_fun(),
+        ...tokens.filter((t) => t.id !== HUGGIES_NEAR_ID),
+      ],
       loading: false,
     });
   } catch (err) {

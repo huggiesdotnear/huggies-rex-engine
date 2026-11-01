@@ -10,27 +10,45 @@ a page's md file should only contain the html codeblock, nothing else.
 -->
 
 ```html
-<main>
+<body>
   <!--==========================================-->
-  <h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1"></h1>
+  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_TABS"></div>
+  <main>
+    <!--==========================================-->
+    <h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1"></h1>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_TABS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_TX_CARDS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE"></div>
+    <!--==========================================-->
+  </main>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
+  <nav id="HUGGIES_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE"></div>
+  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE"></div>
+  <!--<footer>COPYRIGHT 2026</footer>-->
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_TX_CARDS"></div>
+  <!--script-->
+  <script src="../lib/ts/hello.ts"></script>
+  <script src="../lib/ts/account/app_page_account_route.ts"></script>
+  <script src="../lib/ts/account/app_page_account_start.ts"></script>
+  <script src="../lib/ts/import-account.ts"></script>
+  <!--script-->
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE"></div>
-  <!--==========================================-->
-</main>
-<nav id="HUGGIES_COMPONENT_NAV"></nav>
-<div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+</body>
 ```
 
 ====================
