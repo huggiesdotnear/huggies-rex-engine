@@ -113,9 +113,9 @@
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   .tx-status .is-failed {
-  /* the app's own light red — it is a palette colour and it clears the
-     contrast bar too. */
-  color: var(--color-backend-light);
+  /* a light red tint of the app's own red — it clears the contrast bar
+     too. */
+  color: #ffe8e6;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th {
   font-family: Arial, Helvetica, sans-serif;
@@ -131,7 +131,7 @@
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
-  color: var(--color-backend-light);
+  color: #ffe8e6;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;

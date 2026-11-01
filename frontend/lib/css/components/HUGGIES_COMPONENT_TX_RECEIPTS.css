@@ -71,7 +71,7 @@
   color: #9df7c0;
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-head .is-failed {
-  color: var(--color-backend-light);
+  color: #ffe8e6;
 }
 /*==================================*/
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-row {

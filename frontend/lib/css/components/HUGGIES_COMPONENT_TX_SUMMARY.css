@@ -63,7 +63,7 @@
   font-weight: 700;
 }
 #HUGGIES_COMPONENT_TX_SUMMARY .tx-summary-value.is-failed {
-  color: var(--color-backend-light);
+  color: #ffe8e6;
   font-weight: 700;
 }
 #HUGGIES_COMPONENT_TX_SUMMARY .tx-summary-value.is-pending {

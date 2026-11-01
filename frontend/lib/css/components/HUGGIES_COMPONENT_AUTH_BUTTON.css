@@ -27,7 +27,7 @@
   box-sizing: border-box;
   margin-top: 8px;
   padding: 10px;
-  background-color: var(--color-backend-light);
+  background-color: #ffe8e6;
   border: 2px solid var(--color-middle);
   border-radius: 12px;
 }
@@ -82,7 +82,7 @@
   font-weight: 700;
   background-color: var(--color-middle);
   color: var(--color-fontend);
-  border-color: var(--color-middle-dark);
+  border-color: #009aab;
 }
 /*----------------------*/
 /* ADD ACCOUNT / SIGN OUT keep the base button look but sit inside

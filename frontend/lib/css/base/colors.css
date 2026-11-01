@@ -4,23 +4,20 @@
   --color-fontend: #ffffff;
   --color-middle: #00c6d7;
   --color-backend: #da291c;
-  /* derived tones */
-  --color-middle-dark: #009aab;
-  --color-backend-light: #ffe8e6;
 }
 /*==================================*/
 /*
 other colors that can be used
 
 ```palette
-#ffffff; #ffe8e6; #474747; #da291c; #00c6d7;
+#ffffff; #474747; #da291c; #00c6d7;
 ```
 
 DO NOT TOUCH THIS FILE.
 
 it holds the app's palette and nothing else — the three base colours,
-the two derived tones, and the note above. a new colour that a
-component needs belongs in that component's own css, not here.
+and the note above. a new colour that a component needs belongs in that
+component's own css, not here.
 
 adding a variable to this file changes every page that uses it, and
 this file is the one place the palette is written down. so it stays

@@ -16,7 +16,7 @@
   padding: 0.9rem 1.1rem;
   border: 2px solid var(--color-middle);
   border-radius: 12px;
-  background: var(--color-backend-light);
+  background: #ffe8e6;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: 700;
@@ -36,6 +36,6 @@
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE a.invite:focus-visible {
   background: var(--color-middle);
   color: var(--color-fontend);
-  border-color: var(--color-middle-dark);
+  border-color: #009aab;
 }
 /*==================================*/

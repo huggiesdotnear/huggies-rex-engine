@@ -34,7 +34,7 @@
 }
 #HUGGIES_COMPONENT_ACCOUNT_TX_CARDS .tx-cards-note.is-error {
   opacity: 1;
-  color: var(--color-backend-light);
+  color: #ffe8e6;
 }
 /*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_TX_CARDS .tx-card {
@@ -78,7 +78,7 @@
   color: #9df7c0;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TX_CARDS .tx-card-status.is-failed {
-  color: var(--color-backend-light);
+  color: #ffe8e6;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TX_CARDS .tx-card-status.is-pending {
   font-family: Arial, Helvetica, sans-serif;
