@@ -25,7 +25,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "../ts/account/app_page_account_tx_details_store";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../ts/shared/app_depth";
-import { tx_detail_href_fun } from "../ts/account/app_page_account_tx_link";
+import { tx_detail_href_fun } from "../ts/shared/tx_link";
 import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "../ts/account/app_page_account_tx_details";
 // ========================================
 // ========================================

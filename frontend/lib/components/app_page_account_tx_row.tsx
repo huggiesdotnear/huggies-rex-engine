@@ -19,7 +19,7 @@
 import { time_ago } from "@sleet-js/fastnear-explorer-api-client";
 import { CircleCheck, CircleX } from "lucide-preact";
 import { current_app_depth_fun } from "../ts/shared/app_depth";
-import { tx_detail_href_fun } from "../ts/account/app_page_account_tx_link";
+import { tx_detail_href_fun } from "../ts/shared/tx_link";
 // ========================================
 // ========================================
 // --- ROW -------------------------------
