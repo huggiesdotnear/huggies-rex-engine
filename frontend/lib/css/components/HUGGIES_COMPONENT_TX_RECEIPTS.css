@@ -4,11 +4,11 @@
    came of it.
 
    one card per receipt: its facts, its actions, what it returned and
-   what it logged. the code block is a shared component, so its own
-   look lives in its own file (shared/code_block.css). */
+   what it logged. the code block is the tx page's own component, so
+   its own look lives in its own file (tx/code_block.css). */
 /*==================================*/
-@import url(./shared/code_block.css);
-@import url(./HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css);
+@import url(./tx/code_block.css);
+@import url(./tx/app_page_tx_args_viewer.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts {

@@ -19,8 +19,8 @@
 // put the worker in place.
 import "./hello";
 import "./root/root_page_start";
-import "../components/loading_bar";
-import "../components/random_slogan_p";
+import "../components/app-wide/loading_bar";
+import "../components/root/random_slogan_p";
 // ========================================
 // --- SERVICE WORKER --------------------
 import { register_service_worker_fun } from "./shared/register_service_worker";

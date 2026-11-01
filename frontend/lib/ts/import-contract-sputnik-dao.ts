@@ -10,11 +10,11 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./contract/sputnik-dao/contract_page_sputnik_dao_start";
-import "../components/contract_page_sputnik_dao_selector";
-import "../components/contract_page_sputnik_dao_header";
-import "../components/contract_page_sputnik_dao_roles";
-import "../components/contract_page_sputnik_dao_proposals";
-import "../components/contract_page_sputnik_dao_balances";
+import "../components/contract/sputnik-dao/contract_page_sputnik_dao_selector";
+import "../components/contract/sputnik-dao/contract_page_sputnik_dao_header";
+import "../components/contract/sputnik-dao/contract_page_sputnik_dao_roles";
+import "../components/contract/sputnik-dao/contract_page_sputnik_dao_proposals";
+import "../components/contract/sputnik-dao/contract_page_sputnik_dao_balances";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

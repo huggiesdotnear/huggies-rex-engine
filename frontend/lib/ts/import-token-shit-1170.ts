@@ -10,12 +10,12 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./token/shit-1170/token_page_shit_1170_start";
-import "../components/token_page_shit_1170_status";
-import "../components/token_page_shit_1170_header";
-import "../components/token_page_shit_1170_groups";
-import "../components/token_page_shit_1170_filters";
-import "../components/token_page_shit_1170_holders";
-import "../components/token_page_shit_1170_metadata";
+import "../components/token/shit-1170/token_page_shit_1170_status";
+import "../components/token/shit-1170/token_page_shit_1170_header";
+import "../components/token/shit-1170/token_page_shit_1170_groups";
+import "../components/token/shit-1170/token_page_shit_1170_filters";
+import "../components/token/shit-1170/token_page_shit_1170_holders";
+import "../components/token/shit-1170/token_page_shit_1170_metadata";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

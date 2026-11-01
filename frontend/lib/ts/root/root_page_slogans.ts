@@ -1,6 +1,6 @@
 // ========================================
 // raw copy pool the random-slogan component draws from
-// (frontend/lib/components/random_slogan_p.tsx). strings are
+// (frontend/lib/components/root/random_slogan_p.tsx). strings are
 // literal — $SHIT / $NEAR / #HUGGIES are not template variables.
 // `readonly` so a consumer can't reorder in place; copy first.
 // ========================================

@@ -10,10 +10,10 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./discover/app_page_discover_start";
-import "../components/app_page_discover_page_links";
-import "../components/app_page_discover_quick_links";
-import "../components/app_page_discover_contract_discover";
-import "../components/app_page_discover_token_discover";
+import "../components/discover/app_page_discover_page_links";
+import "../components/discover/app_page_discover_quick_links";
+import "../components/discover/app_page_discover_contract_discover";
+import "../components/discover/app_page_discover_token_discover";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

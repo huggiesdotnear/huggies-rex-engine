@@ -16,11 +16,11 @@
 // css) — the two files list the same components, in the same order.
 import "./import-app-wide";
 import "./token/index/token_page_token_start";
-import "../components/token_page_token_status";
-import "../components/token_page_token_selector";
-import "../components/token_page_token_detail";
-import "../components/token_page_token_holders";
-import "../components/token_page_shit_1170_page_link";
+import "../components/token/index/token_page_token_status";
+import "../components/token/index/token_page_token_selector";
+import "../components/token/index/token_page_token_detail";
+import "../components/token/index/token_page_token_holders";
+import "../components/token/shit-1170/token_page_shit_1170_page_link";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

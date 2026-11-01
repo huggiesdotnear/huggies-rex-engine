@@ -3,14 +3,14 @@
    the transaction's actions: what the transaction actually did.
 
    one card per action: the action's kind, and the action itself as a
-   json block with its arguments decoded. the code block is a shared
-   component, so its own look lives in its own file
-   (shared/code_block.css). the arguments viewer is the same one the
+   json block with its arguments decoded. the code block is the tx
+   page's own component, so its own look lives in its own file
+   (tx/code_block.css). the arguments viewer is the same one the
    receipts use, so its look lives in its own file too
-   (HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css). */
+   (tx/app_page_tx_args_viewer.css). */
 /*==================================*/
-@import url(./shared/code_block.css);
-@import url(./HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css);
+@import url(./tx/code_block.css);
+@import url(./tx/app_page_tx_args_viewer.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_ACTIONS .tx-actions {

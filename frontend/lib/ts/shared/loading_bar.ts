@@ -31,7 +31,7 @@
 // the bar tracks the DATA. that is the work the reader is waiting for.
 //
 // the module is plain ts and holds no dom: the component in
-// lib/components/loading_bar.tsx reads it and paints the bar.
+// lib/components/app-wide/loading_bar.tsx reads it and paints the bar.
 //
 // ========================================
 // ========================================

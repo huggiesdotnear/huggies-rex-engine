@@ -1,17 +1,15 @@
 // ========================================
-// the shared sort control for a list whose sort keys are not the token
-// list's.
+// the shared sort control: a row of small toggle buttons.
 //
-// the discover page's token list has its own sort control
-// (sort_control.tsx), welded to the token sort keys — volume, market cap. a
-// dex pool list sorts by tvl, volume and apy, which are different keys and
-// different types.
+// it is used by more than one page — the discover page's token list and
+// the two dex pool pages (rhea and intear-dex) — so it lives in shared/.
 //
-// this control takes the keys as a prop, so any list can use it without
-// the control knowing what it is sorting.
+// --- WHY --- THE KEYS COME IN AS A PROP: a token list sorts by volume
+// and market cap, and a dex pool list sorts by tvl, volume and apy. the
+// keys are different AND their types are different, so the control takes
+// them as a prop and the page that uses it says which keys it offers.
 //
 // this component does NOT fetch. it renders what it is given.
-// ========================================
 import { ArrowDown, ArrowUp } from "lucide-preact";
 // ========================================
 // ========================================
@@ -20,6 +18,7 @@ export interface HUGGIES_SORT_OPTION<KEY extends string> {
   key: KEY;
   label: string;
 }
+// ========================================
 // ========================================
 // --- PROPS ------------------------------
 export interface HUGGIES_SORT_CONTROL_PROPS<KEY extends string> {
@@ -36,6 +35,7 @@ export interface HUGGIES_SORT_CONTROL_PROPS<KEY extends string> {
   // an extra class on the control, so a page can place it.
   class?: string;
 }
+// ========================================
 // ========================================
 // --- COMPONENT --------------------------
 export function huggies_sort_keys_control_fun<KEY extends string>(

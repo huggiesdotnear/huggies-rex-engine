@@ -1,0 +1,65 @@
+// ========================================
+// the account's rhea amm (ref finance v2) balances.
+//
+// this component does NOT fetch. the account page has one loader
+// (lib/ts/app_page_account.ts); this reads its store
+// (lib/ts/app_page_account_store.ts).
+//
+// the table is the shared one (lib/components/shared/balance_table.tsx).
+import { render } from "preact";
+// aliased on import so call sites follow this repo's snake_case rule.
+import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../../ts/account/app_page_account_store";
+import { use_page_store_fun } from "../../ts/shared/use_page_store";
+import { huggies_balance_table_fun } from "../shared/balance_table";
+import { huggies_account_tab_view_fun } from "./app_page_account_tab_view";
+// ========================================
+// ========================================
+// --- COMPONENT --------------------------
+function HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE_FUN() {
+  // ========================================
+  // --- WHY --- the id comes from the store: it watches the id and
+  // re-loads when it changes, so the id and the data change together.
+  const account_id = HUGGIES_APP_PAGE_ACCOUNT_STORE.get_account_id();
+  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_STORE);
+
+  // no `?id=` on this url — render nothing.
+  if (account_id === null) return <></>;
+
+  const rows = page_data?.rhea_amm ?? [];
+  // still loading, or the account has no balances at all: render
+  // nothing, so an account that never used rhea sees no empty section.
+  if (rows.length === 0) return <></>;
+
+  // --- WHY --- the table belongs to the balances tab: the account
+  // page's tab decides what the page shows, and the balances and the
+  // transactions are two views of the same account.
+  return (
+    <>
+      {huggies_account_tab_view_fun({
+        tab: "balances",
+        children: huggies_balance_table_fun({
+          rows,
+          title: "RHEA AMM BALANCE",
+          loading: false,
+          empty_text: "NO BALANCES",
+          account_id,
+        }),
+      })}
+    </>
+  );
+}
+// ========================================
+// --- MOUNT ------------------------------
+// self-mount guarded by id check.
+const SELF_MOUNT_ID =
+  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE;
+if (typeof document !== "undefined") {
+  const el = document.getElementById(SELF_MOUNT_ID);
+  if (el !== null) {
+    render(<HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE_FUN />, el);
+  }
+}
+// ========================================
+// copyright 2026 by sleet.near
+// ========================================

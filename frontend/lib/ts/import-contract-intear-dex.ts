@@ -10,8 +10,8 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./contract/intear-dex/contract_page_intear_dex_start";
-import "../components/contract_page_intear_dex_header";
-import "../components/contract_page_intear_dex_pools";
+import "../components/contract/intear-dex/contract_page_intear_dex_header";
+import "../components/contract/intear-dex/contract_page_intear_dex_pools";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

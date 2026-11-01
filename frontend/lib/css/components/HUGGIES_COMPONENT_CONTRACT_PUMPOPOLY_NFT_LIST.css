@@ -3,8 +3,8 @@
    the player's nfts: the count, the sort control, and the gallery of
    nft tiles. a grid of picture tiles, capped in height and scrolled, so
    a player with hundreds of nfts does not push the page off. */
-@import url(./shared/error_card.css);
-@import url(./shared/stat_tile.css);
+@import url(./contract/pumpopoly/error_card.css);
+@import url(./contract/pumpopoly/stat_tile.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-scroll {

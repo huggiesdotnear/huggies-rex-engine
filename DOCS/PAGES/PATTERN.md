@@ -5,38 +5,59 @@ how every page that has data is built. one shape for all of them.
 ## the files
 
 ```
-lib/ts/<page>.ts          the FETCHING. every request the page makes.
-                          read this file to know what the page requests.
-lib/ts/<page>_state.ts    the STORE. the data, and the load that fills
-                          it. the store watches the page's id, so it
-                          re-loads by itself when the id changes.
-lib/ts/<page>_start.ts    the START. the page's first load. the page's
-                          import file pulls it in.
+lib/ts/<page>/<page>_*.ts   the ts, in a FOLDER PER PAGE. one folder
+                            holds everything that page owns: its
+                            FETCHING (every request the page makes —
+                            read this file to know what the page
+                            requests), its STORE (the data, and the load
+                            that fills it — the store watches the
+                            page's id, so it re-loads by itself when
+                            the id changes) and its START (the page's
+                            first load, which the page's import file
+                            pulls in). a page under `app/contract/` has
+                            its folder at `lib/ts/contract/<page>/`, a
+                            page under `app/token/` at
+                            `lib/ts/token/<page>/`.
+lib/ts/shared/              the shared ts. the ts more than one page
+                            uses: the hooks, the loading signal, the
+                            store hook.
 lib/ts/import-<page>.ts  the page's ONE ENTRY. the page's html loads
                           this file and nothing else. its import order
                           is the page's order of life: the network pin,
                           then the page's start, then the components.
-lib/ts/use_page_store.ts  the shared HOOK. one line per component.
-lib/ts/use_scroll_load.ts  the shared HOOK for a paged list. it asks
+lib/ts/shared/use_page_store.ts
+                          the shared HOOK. one line per component.
+lib/ts/shared/use_scroll_load.ts
+                          the shared HOOK for a paged list. it asks
                           for the next page when the reader nears the
                           bottom of the scroll box.
-lib/ts/loading_bar.ts     the app-wide LOADING SIGNAL. how much of the
+lib/ts/shared/loading_bar.ts
+                          the app-wide LOADING SIGNAL. how much of the
                           page is still waiting. every page uses it.
-lib/ts/page_loading_bar_start.ts
+lib/ts/shared/loading_bar_start.ts
                           the one line every start script calls first,
                           so the loading signal is in place before the
                           page fires its first request.
 
-lib/components/<page>_*.tsx   the DISPLAY. each one reads the store
-                              through the hook and renders jsx.
-lib/components/loading_bar.tsx the loading PROGRESS BAR. it is on every
-                              page and it reads the loading signal.
+lib/components/<page>/<page>_*.tsx
+                          the DISPLAY, in a FOLDER PER PAGE, mirroring
+                          lib/ts. each component reads the store
+                          through the hook and renders jsx. a page
+                          under `app/contract/` has its folder at
+                          `lib/components/contract/<page>/`, a page
+                          under `app/token/` at
+                          `lib/components/token/<page>/`.
+lib/components/app-wide/  the app-wide components: the loading PROGRESS
+                          BAR, the nav and the auth button. they are on
+                          every page and belong to no one page.
+lib/components/shared/    the components more than one page uses. they
+                          keep a plain name.
 ```
 
 ## the loading signal
 
 the bar at the top of the screen is not a per-page thing. it is fed by
-one module, `lib/ts/loading_bar.ts`, and every page gets it for free.
+one module, `lib/ts/shared/loading_bar.ts`, and every page gets it for free.
 
 the module patches the one global `fetch`, so it counts EVERY request
 the page makes — the page's own loader, the token metadata cache, the
@@ -96,7 +117,7 @@ order of the page's life:
 ```ts
 import "./import-app-wide"; // the network pin + the app-wide three
 import "./discover/app_page_discover_start"; // the page's first load
-import "../components/app_page_discover_token_discover"; // the components
+import "../components/discover/app_page_discover_token_discover"; // the components
 ```
 
 the pin lands first, because the pin has to be in place before anything
@@ -122,7 +143,7 @@ a list that is longer than one page asks for the next page when the
 reader nears the bottom of its scroll box. there is no button.
 
 three lists work this way and they all use the same hook,
-`lib/ts/use_scroll_load.ts`:
+`lib/ts/shared/use_scroll_load.ts`:
 
 - the discover page's token list
 - the token page's holders

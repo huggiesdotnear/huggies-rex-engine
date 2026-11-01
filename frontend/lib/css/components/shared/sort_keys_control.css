@@ -1,0 +1,59 @@
+/*==================================*/
+/* sort_keys_control
+   the rules for the sort controls: the `.sort-control` bar and the
+   `.sort-button` buttons in it.
+
+   this css serves the shared sort keys control. the discover page's
+   token list uses it too, with the token sort keys as its options.
+
+   a page puts the control on its own full-width row and lets the
+   buttons share the width evenly, so the row reads as one bar and not
+   as little buttons in a wide gap. the direction button keeps its own
+   width: it is a small toggle, not another sort key. */
+/*==================================*/
+.sort-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  min-width: 0;
+}
+/* the global `button` rule in button.css sizes every button to the
+   full 500px page column. the sort buttons sit side by side, so they
+   opt out of that width and size to their own content. */
+.sort-button {
+  width: auto;
+  max-width: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.sort-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
+}
+.sort-button.is-active,
+.sort-button.is-active:hover {
+  opacity: 1;
+  background: var(--color-middle);
+  color: var(--color-fontend);
+}
+/*==================================*/

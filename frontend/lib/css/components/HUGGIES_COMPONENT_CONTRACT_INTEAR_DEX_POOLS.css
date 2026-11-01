@@ -3,7 +3,7 @@
    the intear dex page's pool list: the search box, the sort row and the
    pool rows. the shared sort control brings its own css in below. */
 /*==================================*/
-@import url(./shared/sort_control.css);
+@import url(./shared/sort_keys_control.css);
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS .controls {
   display: flex;

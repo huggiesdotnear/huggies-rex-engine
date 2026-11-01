@@ -13,13 +13,10 @@
 @import url(./base/a.css);
 @import url(./base/code.css);
 @import url(./base/button.css);
-/*@import url(./base/footer.css);*/
 @import url(./base/main.css);
-@import url(./base/nav.css);
 /*==================================*/
 /* the component every page carries. */
-@import url(./components/HUGGIES_COMPONENT_AUTH_BUTTON.css);
-/* the loading bar: it is on every page, so it lives with the
-   app-wide ones and not in a page's own import file. */
 @import url(./components/HUGGIES_COMPONENT_LOADING_BAR.css);
+@import url(./components/HUGGIES_COMPONENT_NAV.css);
+@import url(./components/HUGGIES_COMPONENT_AUTH_BUTTON.css);
 /*==================================*/

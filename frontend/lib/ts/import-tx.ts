@@ -10,16 +10,16 @@
 // 3. the components mount last and read what the load brought back.
 //
 // --- WHY --- the code block component is NOT listed here: the code
-// block is a shared component that the actions component and the
-// receipts component both pull in for themselves. a shared component
-// arrives with the component that uses it — it is not a page's own.
+// block is the tx page's own component, used by the actions component
+// and the receipts component. it arrives with the component that uses
+// it — it is not a page's own.
 import "./import-app-wide";
 import "./tx/app_page_tx_start";
-import "../components/app_page_tx_status";
-import "../components/app_page_tx_summary";
-import "../components/app_page_tx_transfers";
-import "../components/app_page_tx_actions";
-import "../components/app_page_tx_receipts";
+import "../components/tx/app_page_tx_status";
+import "../components/tx/app_page_tx_summary";
+import "../components/tx/app_page_tx_transfers";
+import "../components/tx/app_page_tx_actions";
+import "../components/tx/app_page_tx_receipts";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

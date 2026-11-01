@@ -10,9 +10,9 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./burn/app_page_burn_start";
-import "../components/app_page_burn_info";
-import "../components/app_page_burn_addresses";
-import "../components/app_page_burn_balances";
+import "../components/burn/app_page_burn_info";
+import "../components/burn/app_page_burn_addresses";
+import "../components/burn/app_page_burn_balances";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

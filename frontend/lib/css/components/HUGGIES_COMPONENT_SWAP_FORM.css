@@ -7,10 +7,10 @@
    each side is a card: the token button on top, the amount input under
    it, and the small note line under that.
 
-   the switch direction bar between the two sides is the shared bar
-   (shared/switch_direction.css), so it brings its own css in with the
-   @import below. */
-@import url(./shared/switch_direction.css);
+   the switch direction bar between the two sides is the swap page's
+   own component (swap/switch_direction.css), so it brings its own css
+   in with the @import below. */
+@import url(./swap/switch_direction.css);
 /*==================================*/
 #HUGGIES_COMPONENT_SWAP_FORM .swap-form {
   display: flex;

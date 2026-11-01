@@ -1,7 +1,7 @@
 // ========================================
 // <div id="..."> values every frontend component self-mounts
 // into. ids are SCREAMING_SNAKE, mirroring the component file
-// (frontend/lib/components/nav.tsx → HUGGIES_COMPONENT_NAV).
+// (frontend/lib/components/app-wide/nav.tsx → HUGGIES_COMPONENT_NAV).
 // `as const` keeps the values literal, so a consumer that mistypes
 // an id is a type error instead of a silent null mount.
 // ========================================

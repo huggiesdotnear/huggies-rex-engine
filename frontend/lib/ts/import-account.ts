@@ -14,14 +14,14 @@
 import "./import-app-wide";
 import "./account/app_page_account_route";
 import "./account/app_page_account_start";
-import "../components/app_page_account_id_h1";
-import "../components/app_page_account_tabs";
-import "../components/app_page_account_direct_balance_table";
-import "../components/app_page_account_rhea_amm_balance_table";
-import "../components/app_page_account_rhea_dcl_balance_table";
-import "../components/app_page_account_intear_balance_table";
-import "../components/app_page_account_tx_cards";
-import "../components/app_page_account_transactions_table";
+import "../components/account/app_page_account_id_h1";
+import "../components/account/app_page_account_tabs";
+import "../components/account/app_page_account_direct_balance_table";
+import "../components/account/app_page_account_rhea_amm_balance_table";
+import "../components/account/app_page_account_rhea_dcl_balance_table";
+import "../components/account/app_page_account_intear_balance_table";
+import "../components/account/app_page_account_tx_cards";
+import "../components/account/app_page_account_transactions_table";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

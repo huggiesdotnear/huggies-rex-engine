@@ -10,10 +10,10 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./contract/pumpopoly/contract_page_pumpopoly_start";
-import "../components/contract_page_pumpopoly_account_selector";
-import "../components/contract_page_pumpopoly_player_stats";
-import "../components/contract_page_pumpopoly_nft_list";
-import "../components/contract_page_pumpopoly_invite";
+import "../components/contract/pumpopoly/contract_page_pumpopoly_account_selector";
+import "../components/contract/pumpopoly/contract_page_pumpopoly_player_stats";
+import "../components/contract/pumpopoly/contract_page_pumpopoly_nft_list";
+import "../components/contract/pumpopoly/contract_page_pumpopoly_invite";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

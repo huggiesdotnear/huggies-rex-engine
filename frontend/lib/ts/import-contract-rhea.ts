@@ -10,8 +10,8 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./contract/rhea/contract_page_rhea_start";
-import "../components/contract_page_rhea_header";
-import "../components/contract_page_rhea_pools";
+import "../components/contract/rhea/contract_page_rhea_header";
+import "../components/contract/rhea/contract_page_rhea_pools";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

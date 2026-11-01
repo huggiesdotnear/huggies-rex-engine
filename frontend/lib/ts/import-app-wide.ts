@@ -14,9 +14,9 @@
 //
 // see frontend/lib/ts/hello.ts.
 import "./hello";
-import "../components/loading_bar";
-import "../components/nav";
-import "../components/auth_button";
+import "../components/app-wide/loading_bar";
+import "../components/app-wide/nav";
+import "../components/app-wide/auth_button";
 
 // ========================================
 // --- SERVICE WORKER --------------------

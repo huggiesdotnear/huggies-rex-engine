@@ -10,8 +10,8 @@
 // 3. the components mount last and read what the load brought back.
 import "./import-app-wide";
 import "./game/app_page_game_start";
-import "../components/app_page_game_emoji_match_game";
-import "../components/app_page_game_meme_tokens";
+import "../components/game/app_page_game_emoji_match_game";
+import "../components/game/app_page_game_meme_tokens";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================
