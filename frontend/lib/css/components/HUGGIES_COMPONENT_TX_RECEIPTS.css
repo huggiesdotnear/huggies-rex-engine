@@ -3,11 +3,13 @@
    the transaction's receipts: the work the transaction caused and what
    came of it.
 
-   one card per receipt: its facts, what it returned and what it
-   logged. the json viewer is a shared component
-   (HUGGIES_COMPONENT_TX_JSON_VIEWER.css), so its own look lives in its own file. */
+   one card per receipt: its facts, its actions, what it returned and
+   what it logged. the json tree is its own file
+   (HUGGIES_COMPONENT_TX_JSON_VIEWER.css), so its own look lives in
+   its own file. */
 /*==================================*/
 @import url(./HUGGIES_COMPONENT_TX_JSON_VIEWER.css);
+@import url(./HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts {
@@ -36,11 +38,16 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.12);
+  /* --- WHY --- THE TEXT IS LEFT ALIGNED: the app's column is centred
+     (base/main.css), and a card of facts reads badly down the middle
+     of the screen. */
+  text-align: left;
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-head {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-label {
   font-family: Arial, Helvetica, sans-serif;
@@ -53,12 +60,75 @@
   opacity: 0.8;
   overflow-wrap: anywhere;
   word-break: break-all;
+  flex: 1 1 auto;
+  min-width: 0;
 }
+/* the status icon, at the end of the head row. */
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-head svg {
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-head .is-success {
+  color: #7ef0b0;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-head .is-failed {
+  color: #ff9b9b;
+}
+/*==================================*/
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-row {
   display: flex;
   align-items: baseline;
   gap: 10px;
   font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-row .tx-receipt-label {
+  flex: 0 0 100px;
+}
+/*==================================*/
+/* the actions of the receipt — what the work did. */
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-type {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-gas,
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-deposit {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.75;
+}
+#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-extra {
+  font-size: 11px;
+  opacity: 0.85;
   overflow-wrap: anywhere;
   word-break: break-all;
 }
@@ -72,6 +142,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.16);
+  text-align: left;
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-result.is-failed {
   border-color: rgba(255, 90, 90, 0.5);

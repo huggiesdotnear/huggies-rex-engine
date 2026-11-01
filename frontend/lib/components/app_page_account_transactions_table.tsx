@@ -17,10 +17,7 @@ import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "../ts/app_page_account_tx_sto
 import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/app_page_account_tab";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { use_scroll_load_fun } from "../ts/use_scroll_load";
-import {
-  account_tx_row_fun,
-  type HUGGIES_TX_INVOLVEMENT,
-} from "./app_page_account_tx_row";
+import { account_tx_row_fun } from "./app_page_account_tx_row";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -28,26 +25,6 @@ import {
 // scroll hook is told what a row is, so it can count the rows that
 // have landed.
 const HUGGIES_ACCOUNT_TX_ROW_SELECTOR = "tbody tr";
-// ========================================
-// ========================================
-// --- HELPERS ----------------------------
-// how the account was involved in a transaction.
-//
-// --- WHY --- it is a helper and not inline in the row: the row is a
-// shared component, so it must not know about the api's row shape.
-function involvement_fun(row: {
-  is_real_signer: boolean;
-  is_delegated_signer: boolean;
-  is_real_receiver: boolean;
-  is_predecessor: boolean;
-  is_event_log: boolean;
-}): HUGGIES_TX_INVOLVEMENT {
-  if (row.is_real_signer) return "SENT";
-  if (row.is_delegated_signer) return "DELEGATED";
-  if (row.is_real_receiver) return "RECEIVED";
-  if (row.is_predecessor) return "CONTRACT";
-  return "EVENT";
-}
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -98,8 +75,6 @@ export function HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN() {
             <tr>
               <th class="tx-hash">TRANSACTION</th>
               <th class="tx-time">WHEN</th>
-              <th class="tx-height">BLOCK</th>
-              <th class="tx-involvement">INVOLVEMENT</th>
               <th class="tx-status">STATUS</th>
             </tr>
           </thead>
@@ -109,19 +84,17 @@ export function HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN() {
                 key: row.transaction_hash,
                 tx_hash: row.transaction_hash,
                 timestamp: row.tx_block_timestamp,
-                height: row.tx_block_height,
                 is_success: row.is_success,
-                involvement: involvement_fun(row),
               }),
             )}
             {state.rows.length === 0 && !state.loading && (
               <tr>
-                <td colSpan={5}>NO TRANSACTIONS</td>
+                <td colSpan={3}>NO TRANSACTIONS</td>
               </tr>
             )}
             {state.loading && state.rows.length === 0 && (
               <tr>
-                <td colSpan={5}>LOADING TRANSACTIONS...</td>
+                <td colSpan={3}>LOADING TRANSACTIONS...</td>
               </tr>
             )}
           </tbody>

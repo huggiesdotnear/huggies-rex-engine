@@ -2,24 +2,39 @@
 // the transaction's receipts: the work the transaction caused, and what
 // came of it.
 //
-// each receipt is a card: who it ran for, when, what it burnt, what
-// it did, what it returned and what it logged.
+// each receipt is a card: what it was, who ran it, when, what it burnt,
+// what it did, what it came back with and what it logged.
+//
+// --- WHY --- THE CARD SHOWS THE RECEIPT'S OWN FIELDS: a receipt is a
+// step of the work, not a copy of the transaction. the explorer shows
+// the same fields — the id, the predecessor, the receiver, the block,
+// the time, the gas, the tokens and the actions.
+//
+// --- WHY --- THE TEXT IS LEFT ALIGNED: the app's column is centred
+// (base/main.css), and a card of facts reads badly down the middle of
+// the screen.
 //
 // it reads the loaded transaction from the page's store. it fetches
 // nothing.
 import { render } from "preact";
 import {
+  decode_args,
   format_gas,
   format_near_with_unit,
   parse_event_json,
   time_ago,
 } from "@sleet-js/fastnear-explorer-api-client";
+import { CircleCheck, CircleX } from "lucide-preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/app_page_tx_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { current_app_depth_fun } from "../ts/app_depth";
 import { huggies_json_viewer_fun } from "./app_page_tx_json_viewer";
-import type { RECEIPT_WITH_OUTCOME } from "@sleet-js/fastnear-explorer-api-client";
+import { huggies_args_viewer_fun } from "./app_page_tx_args_viewer";
+import type {
+  ACTION,
+  RECEIPT_WITH_OUTCOME,
+} from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -34,18 +49,106 @@ function account_href_fun(account_id: string): string {
 }
 // ========================================
 // ========================================
-// --- RESULT ---------------------------
-// the outcome of a receipt: what it returned, or why it failed.
+// --- ACTION TYPE -----------------------
+// the name of an action, and its payload.
 //
-// --- WHY --- the status is a union and not a flag: a receipt can
+// --- WHY --- the api wraps an action in a single-key object, and one
+// action — CreateAccount — is a bare string. so both shapes are read
+// here and everything after this works with a plain name and a plain
+// payload.
+//
+// --- WHY --- THE PAYLOAD IS READ AS A RECORD AND NOT OFF THE UNION:
+// the union has one member per action kind, and a record with the
+// fields this card reads is what every one of them needs.
+function action_parts_fun(
+  action: ACTION,
+): { type: string; payload: Record<string, unknown> } {
+  if (typeof action === "string") {
+    return { type: action, payload: {} };
+  }
+  const type = Object.keys(action)[0];
+  const payload = (action as Record<string, unknown>)[type];
+  if (typeof payload === "object" && payload !== null) {
+    return { type, payload: payload as Record<string, unknown> };
+  }
+  return { type, payload: {} };
+}
+// ========================================
+// ========================================
+// --- RECEIPT ACTION --------------------
+// one action of a receipt: what it did, and the details it carried.
+//
+// --- WHY --- THE RECEIPT'S OWN ACTIONS ARE SHOWN: the transaction's
+// actions are what it ASKED for, and a receipt's actions are what the
+// work ACTUALLY did. a function call that ran a method is one action
+// on the transaction and one action on the receipt.
+function receipt_action_fun(action: ACTION): preact.JSX.Element {
+  const { type, payload } = action_parts_fun(action);
+  const method_name =
+    typeof payload.method_name === "string" ? payload.method_name : null;
+  const deposit =
+    typeof payload.deposit === "string" && payload.deposit !== "0"
+      ? payload.deposit
+      : null;
+  const gas = typeof payload.gas === "number" ? payload.gas : null;
+  const public_key =
+    typeof payload.public_key === "string" ? payload.public_key : null;
+  const beneficiary_id =
+    typeof payload.beneficiary_id === "string" ? payload.beneficiary_id : null;
+  const args = typeof payload.args === "string" ? payload.args : null;
+
+  return (
+    <div class="tx-receipt-action">
+      <div class="tx-receipt-action-head">
+        <span class="tx-receipt-action-type">
+          {method_name ?? type}
+        </span>
+        {gas !== null && (
+          <span class="tx-receipt-action-gas">{format_gas(gas)}</span>
+        )}
+        {deposit !== null && (
+          <span class="tx-receipt-action-deposit">
+            {format_near_with_unit(deposit)}
+          </span>
+        )}
+      </div>
+      {public_key !== null && (
+        <code class="tx-receipt-action-extra">{public_key}</code>
+      )}
+      {beneficiary_id !== null && (
+        <span class="tx-receipt-action-extra">
+          BENEFICIARY:{" "}
+          <a href={account_href_fun(beneficiary_id)}>{beneficiary_id}</a>
+        </span>
+      )}
+      {args !== null &&
+        huggies_args_viewer_fun({
+          base64: args,
+          decoded: decode_args(args),
+        })}
+    </div>
+  );
+}
+// ========================================
+// ========================================
+// --- RESULT ---------------------------
+// the outcome of a receipt: what it came back with, or why it failed.
+//
+// --- WHY --- THE STATUS IS A UNION AND NOT A FLAG: a receipt can
 // succeed with a value, succeed with a receipt to go to, or fail with
 // an error. three different things, and the reader wants to see which.
+//
+// --- WHY --- THE LABELS SAY WHAT HAPPENED: "RETURNED" said nothing —
+// returned what? a receipt that succeeded with a value returned that
+// value, and one that succeeded with a receipt to go to handed the
+// work on. so the first says SUCCESS and the second says the receipt
+// the work went to.
 function result_fun(receipt: RECEIPT_WITH_OUTCOME): preact.JSX.Element {
   const status = receipt.execution_outcome.outcome.status;
   if ("SuccessValue" in status) {
     return (
       <div class="tx-receipt-result">
-        <span class="tx-receipt-result-label">RETURNED</span>
+        <span class="tx-receipt-result-label">SUCCESS</span>
         <code class="tx-receipt-result-value">{status.SuccessValue}</code>
       </div>
     );
@@ -96,21 +199,63 @@ function log_fun(log: string): preact.JSX.Element {
 // ========================================
 // ========================================
 // --- RECEIPT -------------------------
-// one receipt: its facts, its result and its logs.
+// one receipt: its facts, its actions, its result and its logs.
 function receipt_fun(
   receipt: RECEIPT_WITH_OUTCOME,
   index: number,
 ): preact.JSX.Element {
   const outcome = receipt.execution_outcome.outcome;
+  const receipt_body = receipt.receipt.receipt;
+  // the receipt's own actions — what the work did, as against what the
+  // transaction asked for.
+  const actions =
+    "Action" in receipt_body ? receipt_body.Action.actions : [];
+  const is_success =
+    "SuccessValue" in outcome.status || "SuccessReceiptId" in outcome.status;
   return (
     <div class="tx-receipt" id={`receipt-${receipt.receipt.receipt_id}`}>
       <div class="tx-receipt-head">
         <span class="tx-receipt-label">RECEIPT {index + 1}</span>
         <code class="tx-receipt-id">{receipt.receipt.receipt_id}</code>
+        {is_success ? (
+          <CircleCheck
+            size={16}
+            class="is-success"
+            aria-label="succeeded"
+            title="SUCCEEDED"
+          />
+        ) : (
+          <CircleX
+            size={16}
+            class="is-failed"
+            aria-label="failed"
+            title="FAILED"
+          />
+        )}
+      </div>
+      <div class="tx-receipt-row">
+        <span class="tx-receipt-label">PREDECESSOR</span>
+        <a href={account_href_fun(receipt.receipt.predecessor_id)}>
+          {receipt.receipt.predecessor_id}
+        </a>
+      </div>
+      <div class="tx-receipt-row">
+        <span class="tx-receipt-label">RECEIVER</span>
+        <a href={account_href_fun(receipt.receipt.receiver_id)}>
+          {receipt.receipt.receiver_id}
+        </a>
       </div>
       <div class="tx-receipt-row">
         <span class="tx-receipt-label">EXECUTOR</span>
-        <a href={account_href_fun(outcome.executor_id)}>{outcome.executor_id}</a>
+        <a href={account_href_fun(outcome.executor_id)}>
+          {outcome.executor_id}
+        </a>
+      </div>
+      <div class="tx-receipt-row">
+        <span class="tx-receipt-label">BLOCK</span>
+        <span>
+          {receipt.execution_outcome.block_height.toLocaleString()}
+        </span>
       </div>
       <div class="tx-receipt-row">
         <span class="tx-receipt-label">TIME</span>
@@ -124,6 +269,16 @@ function receipt_fun(
         <span class="tx-receipt-label">NEAR BURNT</span>
         <span>{format_near_with_unit(outcome.tokens_burnt)}</span>
       </div>
+      {actions.length > 0 && (
+        <div class="tx-receipt-actions">
+          <span class="tx-receipt-label">ACTIONS</span>
+          <div class="tx-receipt-actions-list">
+            {actions.map((action, action_index) => (
+              <div key={`${action_index}`}>{receipt_action_fun(action)}</div>
+            ))}
+          </div>
+        </div>
+      )}
       {result_fun(receipt)}
       {outcome.logs.length > 0 && (
         <div class="tx-receipt-logs">

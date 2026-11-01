@@ -1,8 +1,7 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
    the account's transaction history table: the transaction, when it
-   happened, the block, how the account was involved and whether it
-   worked.
+   happened, and whether it worked.
 
    the row is its own component (app_page_account_tx_row.tsx), but it is
    a plain `<tr>` with no markup of its own, so the rules that give it
@@ -54,13 +53,13 @@
 /*==================================*/
 /* the row's columns.
 
-   the table has five columns, so the hash takes what it needs and the
-   rest share what is left. */
+   the table has three columns, so the hash takes what it needs and the
+   other two share what is left. */
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   th.tx-hash,
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   td.tx-hash {
-  width: 46%;
+  width: 68%;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   td.tx-hash a {
@@ -72,51 +71,43 @@
   word-break: break-all;
   line-height: 1.3;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 11px;
+  /* the hash is the way to the transaction, so it wears the link
+     colour — the same blue the rest of the app's links wear. */
+  color: #7ec8ff;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-hash a:hover {
+  color: #ffffff;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   th.tx-time,
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   td.tx-time {
-  width: 15%;
+  width: 20%;
   font-variant-numeric: tabular-nums;
-  opacity: 0.85;
-}
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
-  th.tx-height,
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
-  td.tx-height {
-  width: 13%;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.75;
-}
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
-  th.tx-involvement,
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
-  td.tx-involvement {
-  width: 16%;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.06em;
   opacity: 0.85;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   th.tx-status,
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   td.tx-status {
-  width: 10%;
+  width: 12%;
   text-align: right;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.06em;
 }
-/* a failed transaction is the one thing on the row the reader must not
-   miss. */
+/* the status is an icon, so the cell holds it centred on its line. */
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
-  td.tx-status.is-failed {
-  color: var(--color-backend-light);
-  opacity: 1;
-  font-weight: 700;
+  td.tx-status svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  .tx-status .is-success {
+  color: #7ef0b0;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  .tx-status .is-failed {
+  color: #ff9b9b;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th {
   font-family: Arial, Helvetica, sans-serif;

@@ -39,6 +39,47 @@
 .json-viewer .json-value.is-string {
   color: #a8e6a1;
 }
+/* an empty object or array — it says so, so the reader does not think
+   the tree failed to open. */
+.json-viewer .json-value.is-empty {
+  opacity: 0.55;
+}
+/* the kind of value: string, number, boolean, null. the difference
+   between the string "1" and the number 1 is the whole point of a json
+   viewer, and a colour alone does not say which is which. */
+.json-viewer .json-type {
+  flex: 0 0 auto;
+  opacity: 0.45;
+  font-style: italic;
+}
+/* the small buttons on a leaf: MORE for a long value, COPY for every
+   one. they are `<button>`s, so the global button rule has to be
+   undone — it pins every button to the page's 500px column. */
+.json-viewer .json-more,
+.json-viewer .json-copy {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0 5px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.json-viewer .json-more:hover,
+.json-viewer .json-copy:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+  border-color: rgba(255, 255, 255, 0.45);
+}
 /*==================================*/
 /* a branch: the toggle and its children. */
 .json-viewer .json-branch {
