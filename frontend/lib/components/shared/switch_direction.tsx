@@ -44,7 +44,6 @@ export function huggies_switch_direction_fun(props: {
         <span class="switch-direction-label">IN</span>
       </span>
       <span class="switch-direction-line" />
-      <span class="switch-direction-line" />
       <span class="switch-direction-end">
         <span class="switch-direction-label">OUT</span>
         <span class="switch-direction-arrow is-down">
