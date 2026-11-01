@@ -52,11 +52,6 @@ the side the reader fixed is the side the router is asked about, and
 the other box shows the answer. the api serves both questions:
 `AMOUNT_IN` and `AMOUNT_OUT`.
 
-each box carries a label saying what its number means — `YOU SELL`,
-`YOU PAY` or `YOU GET`. the two boxes mean different things (the one
-the reader typed into holds the amount they FIXED, the other holds the
-router's ANSWER), so the reader is told which is which.
-
 ## WHAT THE API ANSWERS
 
 the router answers ONE direction per question, and this is the whole
