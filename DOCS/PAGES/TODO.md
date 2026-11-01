@@ -7,6 +7,9 @@ spec gets written.
 a page is done when:
 
 - the md file holds the description and the html codeblock (no placeholder)
+- the codeblock holds the page's WHOLE `<body>` — the loading bar, the
+  `main` column, the nav, the auth button and the script tag — and it
+  mirrors the page's html exactly
 - `components.csv` has a row for every component the page mounts
 - `requests.csv` has a row for every request the page makes
 - the html matches the spec (no wrapper div, no classes — `main` is the

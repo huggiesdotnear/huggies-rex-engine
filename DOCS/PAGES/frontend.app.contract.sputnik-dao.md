@@ -3,22 +3,36 @@
 the page shows one Sputnik DAO: its name and purpose, its members and the roles they are in, its proposals, and its token balances, taken from the `?id=` url parameter.
 
 ```html
-<main>
-  <h1>DAO</h1>
+<body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR"></div>
+  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES"></div>
+  <main>
+    <h1>DAO</h1>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES"></div>
+    <!--==========================================-->
+    <!--==========================================-->
+  </main>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS"></div>
+  <nav id="HUGGIES_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES"></div>
+  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
-</main>
-<nav id="HUGGIES_COMPONENT_NAV"></nav>
-<div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <!--script-->
+  <script src="../../lib/ts/import-contract-sputnik-dao.ts"></script>
+  <!--script-->
+  <!--==========================================-->
+</body>
 ```
 
 ====================

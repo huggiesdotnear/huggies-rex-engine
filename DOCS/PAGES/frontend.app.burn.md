@@ -11,20 +11,31 @@ the native NEAR balance is not one of the cards: the gas left on a burn
 address is the dust the account needs to exist, not burned supply.
 
 ```html
-<main>
+<body>
   <!--==========================================-->
-  <h1>BURN</h1>
-  <p class="huggies-burn-tagline">JUST BURN IT</p>
+  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES"></div>
+  <main>
+    <h1>JUST BURN IT</h1>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_INFO"></div>
+    <!--==========================================-->
+  </main>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_INFO"></div>
+  <nav id="HUGGIES_COMPONENT_NAV"></nav>
   <!--==========================================-->
-</main>
-<nav id="HUGGIES_COMPONENT_NAV"></nav>
-<div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <!--==========================================-->
+  <!--script-->
+  <script src="../lib/ts/import-burn.ts"></script>
+  <!--script-->
+  <!--==========================================-->
+</body>
 ```
 
 ====================

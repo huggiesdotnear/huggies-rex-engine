@@ -10,21 +10,40 @@ a page's md file should only contain the html codeblock, nothing else.
 -->
 
 ```html
-<main>
+<body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_TX_STATUS"></div>
+  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_TX_SUMMARY"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_TX_TRANSFERS"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_TX_ACTIONS"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_TX_RECEIPTS"></div>
   <!--==========================================-->
-</main>
-<nav id="HUGGIES_COMPONENT_NAV"></nav>
-<div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <main>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_TX_STATUS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_TX_SUMMARY"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_TX_TRANSFERS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_TX_ACTIONS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_TX_RECEIPTS"></div>
+    <!--==========================================-->
+  </main>
+  <!--==========================================-->
+  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <!--==========================================-->
+  <!--<footer>COPYRIGHT 2026</footer>-->
+  <!--==========================================-->
+  <!--==========================================-->
+  <!--script-->
+  <script src="../lib/ts/import-tx.ts"></script>
+  <!--script-->
+  <!--==========================================-->
+</body>
 ```
 
 ====================

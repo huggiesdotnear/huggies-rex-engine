@@ -24,6 +24,13 @@ a page's md file holds a one-line description and the html codeblock,
 nothing else. the description says what the page is for; the codeblock
 is the layout.
 
+the codeblock holds the page's WHOLE `<body>` — the loading bar, the
+`main` column, the nav, the auth button and the page's script tag — and
+it mirrors the page's html exactly. a spec that lists only the mount
+ids is not a spec of the page: the loading bar, the nav and the script
+tag are on the page too, and a reader of the spec should see the whole
+body without opening the html.
+
 ## the components
 
 the components a page mounts are listed in

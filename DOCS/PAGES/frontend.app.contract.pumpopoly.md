@@ -3,21 +3,33 @@
 the page shows one pumpopoly player account info, taken from the `?id=` url parameter.
 
 ```html
-<main>
+<body>
   <!--==========================================-->
-  <h1>PUMPOPOLY</h1>
+  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS"></div>
+  <main>
+    <h1>PUMPOPOLY</h1>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST"></div>
+    <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE"></div>
+    <!--==========================================-->
+  </main>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST"></div>
+  <nav id="HUGGIES_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE"></div>
+  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
-</main>
-<nav id="HUGGIES_COMPONENT_NAV"></nav>
-<div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <!--script-->
+  <script src="../../lib/ts/import-contract-pumpopoly.ts"></script>
+  <!--script-->
+  <!--==========================================-->
+</body>
 ```
 
 ====================
