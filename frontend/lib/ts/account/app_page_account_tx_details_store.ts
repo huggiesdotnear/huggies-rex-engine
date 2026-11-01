@@ -197,7 +197,6 @@ async function newest_hashes_fun(account_id: string): Promise<string[]> {
     account_id,
     limit: 5,
     desc: true,
-    quiet: true,
   });
   return response.account_txs.map((row) => row.transaction_hash);
 }

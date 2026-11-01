@@ -47,7 +47,6 @@ async function app_page_tx_load_fun(
   if (trimmed.length === 0) return null;
   const response = await api_transactions({
     tx_hashes: [trimmed],
-    quiet: true,
   });
   const transaction = response.transactions[0];
   // the api answers with fewer transactions than asked for when a hash

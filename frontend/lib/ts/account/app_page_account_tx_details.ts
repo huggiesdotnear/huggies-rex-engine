@@ -118,7 +118,6 @@ export async function load_tx_details_fun(
     const batch = missing.slice(index, index + TRANSACTIONS_BATCH_SIZE);
     const response = await api_transactions({
       tx_hashes: batch,
-      quiet: true,
     });
     for (const transaction of response.transactions) {
       const parsed = parse_transaction(transaction);

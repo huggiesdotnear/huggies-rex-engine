@@ -158,7 +158,6 @@ async function load_account_tx_page_fun(
     limit: HUGGIES_ACCOUNT_TX_PAGE_SIZE,
     desc: true,
     ...(resume_token === null ? {} : { resume_token }),
-    quiet: true,
   });
   const rows: Array<HUGGIES_CACHED_ACCOUNT_TX_ROW> =
     response.account_txs.map((row) => ({
