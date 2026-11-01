@@ -7,6 +7,9 @@ spec gets written.
 a page is done when:
 
 - the md file holds the description and the html codeblock (no placeholder)
+- the md file has the standard shape: the `#` heading, the one-line
+  description, the codeblock, the footer — and nothing after the
+  codeblock
 - the codeblock holds the page's WHOLE `<body>` — the loading bar, the
   `main` column, the nav, the auth button and the script tag — and it
   mirrors the page's html exactly

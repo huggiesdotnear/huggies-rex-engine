@@ -24,6 +24,43 @@ a page's md file holds a one-line description and the html codeblock,
 nothing else. the description says what the page is for; the codeblock
 is the layout.
 
+## the shape of a page spec
+
+every page spec has the SAME shape, so a reader knows where to look:
+
+````
+# frontend/app/<page>.html ?<param>={<value>}
+
+the one-line description of what the page is for.
+
+```html
+<body>
+  ...
+</body>
+````
+
+=====================
+<br/>
+copyright 2026 by sleet.near
+
+```
+
+the `#` heading says which page the spec is for and which url
+parameters it reads. the description is ONE paragraph — what the page
+is for, not how it works. then the codeblock. then the footer.
+
+there is NOTHING after the codeblock but the footer. a page that needs
+more than that does not get extra sections in its spec:
+
+- what the page SHOWS belongs in the description and in
+  [`components.csv`](./components.csv) — one row per component
+- what the page ASKS FOR belongs in [`requests.csv`](./requests.csv) — one
+  row per request
+- how the page WORKS belongs in the ts, in the file that does the work
+
+a spec is the page. a spec that grows into a manual is a manual in the
+wrong place, and it drifts from the code it describes.
+
 the codeblock holds the page's WHOLE `<body>` — the loading bar, the
 `main` column, the nav, the auth button and the page's script tag — and
 it mirrors the page's html exactly. a spec that lists only the mount
@@ -84,3 +121,4 @@ everything for that page. no component fetches anything.
 =====================
 <br/>
 copyright 2026 by sleet.near
+```

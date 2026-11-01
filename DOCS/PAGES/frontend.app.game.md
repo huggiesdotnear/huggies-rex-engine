@@ -1,7 +1,5 @@
 # frontend/app/game.html
 
-GAME
-
 the page is an eight-pair emoji memory match game, played with the meme
 tokens the app knows about. the board is a four-by-four grid of face-down
 cards; two cards are flipped at a time and they stay up when their emojis

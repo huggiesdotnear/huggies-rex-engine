@@ -1,7 +1,5 @@
 # frontend/app/index.html
 
-FEED
-
 the page is the app's front door. it carries the nav and the auth button
 and says the app is coming soon.
 

@@ -1,11 +1,6 @@
 # frontend/app/burn.html
 
-BURN
-
-the page is the burn page. it shows the two community burn addresses as
-cards, the tokens those addresses hold as cards — with the combined
-balance of both accounts and the share of each token's total supply that
-is burned — and a short explanation of what burning on NEAR is.
+the page shows the two community burn addresses as cards, the tokens those addresses hold as cards — with the combined balance of both accounts and the share of each token's total supply that is burned — and a short explanation of what burning on NEAR is.
 
 the native NEAR balance is not one of the cards: the gas left on a burn
 address is the dust the account needs to exist, not burned supply.

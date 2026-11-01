@@ -1,7 +1,5 @@
 # frontend/app/skill.html
 
-SKILL
-
 the page is a placeholder. it carries the nav and the auth button and
 says the app is coming soon.
 
