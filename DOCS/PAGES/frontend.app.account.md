@@ -24,6 +24,8 @@ a page's md file should only contain the html codeblock, nothing else.
   <!--==========================================-->
   <div id="HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE"></div>
   <!--==========================================-->
+  <div id="HUGGIES_COMPONENT_ACCOUNT_TX_CARDS"></div>
+  <!--==========================================-->
   <div id="HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE"></div>
   <!--==========================================-->
 </main>

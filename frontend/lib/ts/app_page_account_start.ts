@@ -23,6 +23,7 @@
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "./app_page_account_store";
 import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab";
+import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "./app_page_account_tx_details_store";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
 import { huggies_loading_bar_start_fun } from "./page_loading_bar_start";
 // ========================================
@@ -44,6 +45,10 @@ HUGGIES_APP_PAGE_ACCOUNT_STORE.watch();
 // tab, and the store watches the tab and the account id, so it fetches
 // by itself when either changes.
 HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.watch();
+// the newest transactions get their full detail, for the cards above
+// the table. it is fetched when the reader is on the transactions tab,
+// the same as the history.
+HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE.watch();
 void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
 // ========================================
 // copyright 2026 by sleet.near

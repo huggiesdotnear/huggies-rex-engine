@@ -19,6 +19,7 @@ import "../components/auth_button";
 import "../components/app_page_account_id_h1";
 import "../components/app_page_account_tabs";
 import "../components/app_page_account_transactions_table";
+import "../components/app_page_account_tx_cards";
 import "../components/app_page_tx_status";
 import "../components/app_page_tx_summary";
 import "../components/app_page_tx_actions";
