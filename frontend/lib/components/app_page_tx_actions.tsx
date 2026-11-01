@@ -13,6 +13,12 @@
 // summary, but the raw action is everything the chain signed. the
 // block shows what was signed, so nothing is lost.
 //
+// --- WHY --- THE ARGUMENTS ARE DECODED IN THE BLOCK: the chain stores
+// a function call's arguments as base64, so the raw action holds a
+// wall of base64 that says nothing. the block shows the arguments
+// decoded into the json they are, and the viewer under it holds the
+// same bytes as plain text, hex and base64.
+//
 // it reads the loaded transaction from the page's store. it fetches
 // nothing.
 import { render } from "preact";
@@ -23,7 +29,9 @@ import {
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/tx/app_page_tx_store";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { app_page_tx_action_args_fun } from "../ts/tx/app_page_tx_action_args";
 import { huggies_code_block_fun } from "./shared/code_block";
+import { huggies_args_viewer_fun } from "./app_page_tx_args_viewer";
 import type { PARSED_ACTION } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -53,6 +61,50 @@ function deposit_fun(action: PARSED_ACTION): string | null {
 }
 // ========================================
 // ========================================
+// --- ACTION ---------------------------
+// one action: its summary, the action itself with the arguments decoded,
+// and the arguments viewer.
+//
+// --- WHY --- THE CARD IS THE DIV ABOVE AND NOT THIS ONE: the card is
+// the action, so the card class is on the action's own element. a
+// second wrapper around the same content would only add a box that
+// styles nothing.
+function action_fun(action: PARSED_ACTION): preact.JSX.Element {
+  const deposit = deposit_fun(action);
+  // the action's arguments, decoded. the helper returns the base64 for
+  // the viewer's own base64 mode and the action with the arguments
+  // replaced by the json they are.
+  const args = app_page_tx_action_args_fun(action.raw);
+  return (
+    <>
+      <div class="tx-action-head">
+        <span class="tx-action-type">{action_summary_fun(action)}</span>
+        {action.gas !== undefined && (
+          <span class="tx-action-gas">{format_gas(action.gas)}</span>
+        )}
+        {deposit !== null && (
+          // --- WHY --- the deposit is formatted and not shown raw: it
+          // is a yoctoNEAR integer, so "9 NEAR" would otherwise read
+          // as "9000000000000000000000000 NEAR".
+          <span class="tx-action-deposit">
+            {format_near_with_unit(deposit)}
+          </span>
+        )}
+      </div>
+      {huggies_code_block_fun({
+        code: JSON.stringify(args.action, null, 2),
+      })}
+      {args.base64 !== null &&
+        args.decoded !== null &&
+        huggies_args_viewer_fun({
+          base64: args.base64,
+          decoded: args.decoded,
+        })}
+    </>
+  );
+}
+// ========================================
+// ========================================
 // --- COMPONENT --------------------------
 export function HUGGIES_COMPONENT_TX_ACTIONS_FUN() {
   const state = use_page_store_fun(HUGGIES_APP_PAGE_TX_STORE);
@@ -69,24 +121,8 @@ export function HUGGIES_COMPONENT_TX_ACTIONS_FUN() {
       <h2>ACTIONS ({actions.length})</h2>
       <div class="tx-actions-list">
         {actions.map((action, index) => (
-          <div key={`${action.type}-${index}`}>
-            <div class="tx-action-head">
-              <span class="tx-action-type">{action_summary_fun(action)}</span>
-              {action.gas !== undefined && (
-                <span class="tx-action-gas">{format_gas(action.gas)}</span>
-              )}
-              {deposit_fun(action) !== null && (
-                // --- WHY --- the deposit is formatted and not shown raw: it
-                // is a yoctoNEAR integer, so "9 NEAR" would otherwise read
-                // as "9000000000000000000000000 NEAR".
-                <span class="tx-action-deposit">
-                  {format_near_with_unit(deposit_fun(action) as string)}
-                </span>
-              )}
-            </div>
-            {huggies_code_block_fun({
-              code: JSON.stringify(action.raw, null, 2),
-            })}
+          <div key={`${action.type}-${index}`} class="tx-action">
+            {action_fun(action)}
           </div>
         ))}
       </div>

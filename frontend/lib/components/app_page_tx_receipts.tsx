@@ -18,7 +18,6 @@
 // nothing.
 import { render } from "preact";
 import {
-  decode_args,
   format_gas,
   format_near_with_unit,
   get_action_payload,
@@ -31,6 +30,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/tx/app_page_tx_store";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../ts/shared/app_depth";
+import { app_page_tx_action_args_fun } from "../ts/tx/app_page_tx_action_args";
 import { huggies_code_block_fun } from "./shared/code_block";
 import { huggies_args_viewer_fun } from "./app_page_tx_args_viewer";
 import type {
@@ -59,9 +59,10 @@ function account_href_fun(account_id: string): string {
 // that an action is either a single-key object or a bare string —
 // CreateAccount is a bare string — and that a payload may be missing.
 // a second copy of that rule here would be a second chance to drift.
-function action_parts_fun(
-  action: ACTION,
-): { type: string; payload: Record<string, unknown> } {
+function action_parts_fun(action: ACTION): {
+  type: string;
+  payload: Record<string, unknown>;
+} {
   const type = get_action_type(action);
   if (type === null) {
     return { type: "Unknown", payload: {} };
@@ -90,14 +91,15 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
       ? payload.deposit
       : null;
   const gas = typeof payload.gas === "number" ? payload.gas : null;
-  const args = typeof payload.args === "string" ? payload.args : null;
+  // the action's arguments, decoded. the base64 goes to the viewer and
+  // the action comes back with the arguments replaced by the json they
+  // are.
+  const args = app_page_tx_action_args_fun(action);
 
   return (
     <div class="tx-receipt-action">
       <div class="tx-receipt-action-head">
-        <span class="tx-receipt-action-type">
-          {method_name ?? type}
-        </span>
+        <span class="tx-receipt-action-type">{method_name ?? type}</span>
         {gas !== null && (
           <span class="tx-receipt-action-gas">{format_gas(gas)}</span>
         )}
@@ -111,14 +113,21 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
           FIELDS: a receipt's action is one signed object — a key, a
           delete, a function call — and its fields are all json. one
           block shows the whole action, the way the chain signed it,
-          with nothing left out and nothing repeated. */}
+          with nothing left out and nothing repeated.
+
+          --- WHY --- THE ARGUMENTS IN THE BLOCK ARE DECODED: the chain
+          stores them as base64, so the raw action holds a wall of
+          base64 that says nothing. the block shows the json they are,
+          and the viewer under it holds the same bytes as plain text,
+          hex and base64. */}
       {huggies_code_block_fun({
-        code: JSON.stringify(action, null, 2),
+        code: JSON.stringify(args.action, null, 2),
       })}
-      {args !== null &&
+      {args.base64 !== null &&
+        args.decoded !== null &&
         huggies_args_viewer_fun({
-          base64: args,
-          decoded: decode_args(args),
+          base64: args.base64,
+          decoded: args.decoded,
         })}
     </div>
   );
@@ -223,7 +232,10 @@ function log_fun(log: string): preact.JSX.Element {
 // --- WHY --- IT COMPARES THE JSON AND NOT THE OBJECT: the two are
 // different objects with the same content, and the content is what
 // decides whether the reader would see the same thing twice.
-function same_actions_fun(a: ReadonlyArray<ACTION>, b: ReadonlyArray<ACTION>): boolean {
+function same_actions_fun(
+  a: ReadonlyArray<ACTION>,
+  b: ReadonlyArray<ACTION>,
+): boolean {
   if (a.length !== b.length) return false;
   for (let index = 0; index < a.length; index += 1) {
     if (JSON.stringify(a[index]) !== JSON.stringify(b[index])) {
@@ -295,9 +307,7 @@ function receipt_fun(
       </div>
       <div class="tx-receipt-row">
         <span class="tx-receipt-label">BLOCK</span>
-        <span>
-          {receipt.execution_outcome.block_height.toLocaleString()}
-        </span>
+        <span>{receipt.execution_outcome.block_height.toLocaleString()}</span>
       </div>
       <div class="tx-receipt-row">
         <span class="tx-receipt-label">TIME</span>
