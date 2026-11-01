@@ -4,9 +4,10 @@
 // is not fetched again.
 //
 // WHY A CACHE AT ALL
-// --- the details endpoint is big. a full transaction is about six
-// kilobytes with its receipts and their logs, and the endpoint takes
-// twenty hashes per call. so the details are worth keeping: the same
+// --- the details endpoint is big. on a busy account a full transaction
+// is eight kilobytes at the middle and a hundred at the top, and a
+// hundred of them is nearly three megabytes. the endpoint takes
+// twenty hashes per call, so the details are worth keeping: the same
 // transaction is fetched once and every later look at it is free.
 //
 // WHY IT IS KEYED BY TRANSACTION HASH

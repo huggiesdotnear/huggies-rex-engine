@@ -16,10 +16,13 @@
 // bigger per transaction.
 //
 // --- WHY ONLY THE NEWEST FEW: the details endpoint takes twenty
-// hashes per call, and a full transaction is about six kilobytes. so
-// a card per transaction is affordable for a handful of them and not
-// for a list that scrolls forever. the list below the cards keeps
-// using the history endpoint, which is cheap and pages forever.
+// hashes per call, and a full transaction on a busy account runs from
+// eight kilobytes at the middle to a hundred at the top. so a hundred
+// full transactions is nearly three megabytes and five calls at once,
+// which is past what the api's rate limit allows. a card per
+// transaction is affordable for a handful of them and not for a list
+// that scrolls forever. the list below the cards keeps using the
+// history endpoint, which is cheap and pages forever.
 //
 // THE CACHE
 // --- a transaction belongs to no one account — the same one is on
