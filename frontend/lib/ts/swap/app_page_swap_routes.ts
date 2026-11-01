@@ -25,9 +25,11 @@ import {
   AMOUNT_IN,
   GET_ROUTES,
   SUBSCRIBE_ROUTES,
+  default_socket_factory,
   type QUOTE_PARAMS,
   type ROUTE,
   type ROUTE_SUBSCRIPTION,
+  type SUBSCRIPTION_SOCKET,
 } from "@sleet-js/intear-dex-aggregator-tool-box";
 import { HUGGIES_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
 import { router_token_id_fun } from "./app_page_swap_router_token";
@@ -152,29 +154,134 @@ async function get_swap_routes_fun(
 // call owns its own socket and its own request id, so the id only has
 // to be unique WITHIN a socket. a fixed id keeps it simple.
 const HUGGIES_SWAP_SUBSCRIPTION_ID = 1;
+// how long a close waits for a socket to finish connecting before it
+// closes it anyway. a socket that cannot open must not hold the page
+// up, and a socket that opens quickly never waits at all.
+const HUGGIES_CLOSE_WAIT_MS = 1500;
+// how often the close checks whether the socket has finished
+// connecting.
+//
+// --- WHY --- it is a POLL and not a callback: the tool box sets
+// `socket.onopen` itself, so a handler the page sets is overwritten.
+const HUGGIES_CLOSE_POLL_MS = 50;
+// the WebSocket readyState that means "the handshake has not finished".
+//
+// --- WHY --- it is written out and not read off the socket: the number
+// is part of the WebSocket standard, and the tool box's own `close()`
+// already compares against the same value for the OPEN state.
+const SOCKET_CONNECTING = 0;
 // ========================================
 // the subscription the page currently holds, so it can be closed.
 let current_subscription: ROUTE_SUBSCRIPTION | null = null;
+// the newest subscribe's number.
+//
+// --- WHY --- it exists: a subscribe is opened with an `await`, and the
+// socket is created before that await resolves. two subscribes can
+// therefore overlap, and the older one can land AFTER the newer one.
+// this counter says which one is the newest, so the older one closes
+// itself on arrival instead of taking over.
+let generation = 0;
+// ========================================
+// the socket the current subscription is using.
+//
+// --- WHY --- IT IS TRACKED HERE: the tool box's subscription does not
+// expose its socket, so the page cannot tell whether the socket has
+// finished connecting. it matters: closing a socket that is still
+// CONNECTING makes the browser log "WebSocket is closed before the
+// connection is established" and report it as an error.
+//
+// the tool box takes a socket factory, so the page supplies its own and
+// keeps the socket it hands over.
+let current_socket: SUBSCRIPTION_SOCKET | null = null;
 // ========================================
 // close the live subscription, if there is one.
 //
 // --- WHY --- closing is safe to call when there is no subscription: the
 // page opens and closes these as the reader changes the swap, and a
 // close on an already-closed page must not throw.
+//
+// --- WHY --- THE CLOSE WAITS FOR THE SOCKET TO OPEN: closing a socket
+// that is still connecting makes the browser log the warning above and
+// report it as an error — an error the reader caused by typing one more
+// digit, because every keystroke opens a new socket and closes the old
+// one, and the old one is usually still connecting.
 function close_swap_subscription_fun(): void {
   if (current_subscription === null) return;
   const subscription = current_subscription;
   current_subscription = null;
-  try {
-    subscription.close();
-  } catch (err) {
-    console.warn("[swap] closing the route subscription failed", err);
+  current_socket = null;
+  close_when_open_fun(subscription, current_socket);
+}
+// ========================================
+// close a subscription, but only once its socket has finished
+// connecting.
+//
+// --- WHY --- THE WAIT: a socket that is still CONNECTING must not be
+// closed, or the browser logs "WebSocket is closed before the
+// connection is established" as an error. so the close waits for the
+// socket to open, and then closes it.
+//
+// --- WHY --- THE TIMEOUT: a socket that never opens — the network is
+// down, the server refuses it — must not leave the old subscription
+// running forever.
+function close_when_open_fun(
+  subscription: ROUTE_SUBSCRIPTION,
+  socket: SUBSCRIPTION_SOCKET | null,
+): void {
+  const close_now_fun = () => {
+    try {
+      subscription.close();
+    } catch (err) {
+      console.warn("[swap] closing the route subscription failed", err);
+    }
+  };
+  if (socket === null) {
+    close_now_fun();
+    return;
   }
+  // the socket is already open, or already gone. either way there is
+  // nothing to wait for.
+  if (socket.readyState !== SOCKET_CONNECTING) {
+    close_now_fun();
+    return;
+  }
+  // --- WHY --- THE READY STATE IS POLLED AND NOT A CALLBACK: the tool
+  // box sets `socket.onopen` itself, so a handler set here would be
+  // overwritten and never called. the readyState is the only thing the
+  // page can still read.
+  //
+  // --- WHY --- THE POLL STOPS EARLY: the socket is closed as soon as
+  // it is no longer connecting, so the poll does not keep running for
+  // the life of the socket.
+  const started_at = Date.now();
+  const timer = setInterval(() => {
+    const still_connecting = socket.readyState === SOCKET_CONNECTING;
+    const out_of_time = Date.now() - started_at >= HUGGIES_CLOSE_WAIT_MS;
+    if (still_connecting && !out_of_time) return;
+    clearInterval(timer);
+    close_now_fun();
+  }, HUGGIES_CLOSE_POLL_MS);
 }
 // ========================================
 // open a live subscription for one swap, replacing any open one.
 //
-// --- WHY --- the previous subscription is closed FIRST: the socket is
+// --- WHY --- THE GENERATION COUNTER: a subscription is opened with an
+// `await`, and the socket is created BEFORE that await resolves. so a
+// second subscribe can start while the first one is still in flight,
+// and the first one's subscription would land AFTER the second one and
+// overwrite it. the counter says which subscribe is the newest, and a
+// subscription that lands for an older generation is closed on arrival
+// instead of taking over.
+//
+// --- WHY --- THE SOCKET IS NOT CLOSED WHILE IT IS STILL CONNECTING:
+// closing a socket that has not finished its handshake makes the
+// browser log "WebSocket is closed before the connection is
+// established" and report it as an error. the reader sees that error
+// every time they type another digit, because every keystroke opens a
+// new socket and closes the old one, and the old one is usually still
+// connecting. so the close WAITS for the socket to have opened.
+//
+// --- WHY --- THE OLD SUBSCRIPTION IS CLOSED FIRST: the socket is
 // bound to one query, so an old socket answering the old query would
 // push stale routes over the fresh ones.
 async function subscribe_swap_routes_fun(
@@ -185,19 +292,40 @@ async function subscribe_swap_routes_fun(
   on_routes: (routes: HUGGIES_SWAP_ROUTE[]) => void,
   on_error: (message: string) => void,
 ): Promise<void> {
-  close_swap_subscription_fun();
+  // this subscribe is the newest one from now on.
+  generation += 1;
+  const my_generation = generation;
+  // the subscription we are about to open, and the socket it uses.
+  const previous_subscription = current_subscription;
+  const previous_socket = current_socket;
+  current_subscription = null;
+  current_socket = null;
+  if (previous_subscription !== null) {
+    close_when_open_fun(previous_subscription, previous_socket);
+  }
   const params = build_quote_params_fun(
     token_in,
     token_out,
     amount_in,
     trader_account_id,
   );
+  // the socket this subscribe hands to the tool box, so the page can
+  // tell whether it has finished connecting.
+  let socket: SUBSCRIPTION_SOCKET | null = null;
+  let subscription: ROUTE_SUBSCRIPTION;
   try {
-    current_subscription = await SUBSCRIBE_ROUTES(
+    subscription = await SUBSCRIBE_ROUTES(
       HUGGIES_SWAP_AGGREGATOR.client,
       params,
       {
         id: HUGGIES_SWAP_SUBSCRIPTION_ID,
+        // --- WHY --- THE FACTORY: the tool box's subscription does not
+        // expose its socket, and the page needs the socket's readyState
+        // to close it quietly. the factory hands the socket over.
+        socket_factory: (url: string) => {
+          socket = default_socket_factory(url);
+          return socket;
+        },
         on_update: (update) => {
           if (update.kind === "error") {
             // --- WHY --- an invalid query answers IN BAND and leaves the
@@ -216,7 +344,18 @@ async function subscribe_swap_routes_fun(
     );
   } catch (err) {
     on_error(err instanceof Error ? err.message : String(err));
+    return;
   }
+  // --- WHY --- THE GENERATION IS CHECKED AGAIN: a newer subscribe may
+  // have started while this one was opening. if so, this subscription
+  // is already stale, and it is closed on arrival rather than left to
+  // answer a question nobody is asking.
+  if (my_generation !== generation) {
+    close_when_open_fun(subscription, socket);
+    return;
+  }
+  current_subscription = subscription;
+  current_socket = socket;
 }
 // ========================================
 // ========================================

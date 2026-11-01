@@ -1,13 +1,13 @@
 /*==================================*/
 /* switch_direction
    the switch direction control: a thin bar between the two sides of a
-   swap, with an arrow at each end. the whole bar is the button, so the
-   reader clicks anywhere on the line and the swap happens.
+   swap, with an arrow chip at each end. the whole bar is the button, so
+   the reader clicks anywhere on the line and the swap happens.
 
    the bar is thin and quiet: it is a divider first and a control second,
    so it must not compete with the two token cards it sits between. the
-   label in the middle is small and dim, and the arrows are the only
-   bright part.
+   IN and OUT labels at the ends are small and dim, and the arrows are
+   the only bright part.
 
    the arrows flip on hover: the up arrow at the left end turns to point
    down and the down arrow at the right end turns to point up, so the
@@ -62,9 +62,21 @@
   outline-offset: -4px;
 }
 /*==================================*/
-/* the thin line on either side of the label. it is a rule, not a
-   divider: it sits inside the control and it grows out from the label
-   to meet the arrows. */
+/* one END of the bar: the arrow chip and its label together. the two
+   ends are mirror images of each other — IN on the left with its arrow
+   on the outside, OUT on the right with its arrow on the outside too —
+   so the labels sit between the two arrows and the middle of the bar
+   stays open. */
+.switch-direction-end {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+/*==================================*/
+/* the thin line between the two ends. it is a rule, not a divider: it
+   sits inside the control and it grows out from the labels to meet the
+   arrows. */
 .switch-direction-line {
   flex: 1 1 auto;
   min-width: 0;
@@ -76,8 +88,8 @@
   background: var(--color-middle);
 }
 /*==================================*/
-/* the label in the middle. it is small, so it reads as a caption on the
-   line rather than as a button of its own. */
+/* the label beside an arrow. it is small, so it reads as a caption on
+   the line rather than as a button of its own. */
 .switch-direction-label {
   flex: 0 0 auto;
   white-space: nowrap;

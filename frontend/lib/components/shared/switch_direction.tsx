@@ -8,6 +8,12 @@
 // down arrow does the reverse. so the left end carries the up arrow and
 // the right end the down arrow, and hovering flips both of them.
 //
+// --- WHY --- THE ENDS ARE LABELLED IN AND OUT: the two cards above and
+// below the bar are the input and the output, and saying which is which
+// ON the bar saves the reader from matching "in" and "out" to the two
+// cards themselves. the label sits beside its own arrow, so the arrow
+// and the word belong together.
+//
 // --- WHY --- THE ARROWS FLIP ON HOVER: the click swaps the pair, so the
 // arrows swapping places is the reader seeing the swap happen before it
 // does. the rotation is a css transition, so it reads as one motion and
@@ -31,14 +37,19 @@ export function huggies_switch_direction_fun(props: {
       aria-label="switch direction"
       onClick={() => props.on_switch()}
     >
-      <span class="switch-direction-arrow is-up">
-        <ArrowUp size={14} strokeWidth={2.5} />
+      <span class="switch-direction-end">
+        <span class="switch-direction-arrow is-up">
+          <ArrowUp size={14} strokeWidth={2.5} />
+        </span>
+        <span class="switch-direction-label">IN</span>
       </span>
       <span class="switch-direction-line" />
-      <span class="switch-direction-label">SWITCH DIRECTION</span>
       <span class="switch-direction-line" />
-      <span class="switch-direction-arrow is-down">
-        <ArrowDown size={14} strokeWidth={2.5} />
+      <span class="switch-direction-end">
+        <span class="switch-direction-label">OUT</span>
+        <span class="switch-direction-arrow is-down">
+          <ArrowDown size={14} strokeWidth={2.5} />
+        </span>
       </span>
     </button>
   );
