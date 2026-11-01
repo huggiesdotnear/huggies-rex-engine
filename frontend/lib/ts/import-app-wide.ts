@@ -6,10 +6,15 @@
 // mounts, and these three are on every page's html — so they are
 // listed here once and every page's import file pulls this in.
 //
-// --- WHY --- the network pin comes FIRST: near-kit-tool-box/web keeps
-// a separate near connector per network and picks between them from
-// the stored network id, so the pin has to land before the first
-// near_connect_client() call. the auth button is what calls it.
+// --- WHY --- THE NETWORK PIN IS HERE AND ALSO ON THE PAGES THAT NEED
+// IT EARLIER: hello.ts pins the network to mainnet, and the pin has to
+// land before the first near_connect_client() call. the account page's
+// routing script calls the wallet, and it runs BEFORE this file — so
+// the pages that touch the wallet on load load hello.ts as their own
+// first script. this import is here for the pages that do not: the ones
+// under app/contract/ and app/token/, and the splash page.
+//
+// see frontend/lib/ts/hello.ts.
 import "./hello";
 import "../components/loading_bar";
 import "../components/nav";

@@ -1,9 +1,8 @@
 // ========================================
-// the $SHIT page's components: the status line, the page link, the
-// header, the groups, the filters, the holders and the metadata.
+// the $SHIT page's components: the status line, the header, the groups,
+// the filters, the holders and the metadata.
 import "./import-app-wide";
 import "../components/token_page_shit_1170_status";
-import "../components/token_page_shit_1170_page_link";
 import "../components/token_page_shit_1170_header";
 import "../components/token_page_shit_1170_groups";
 import "../components/token_page_shit_1170_filters";
