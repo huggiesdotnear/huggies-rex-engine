@@ -2,7 +2,7 @@
 // pumpopoly page: the huggies invite link.
 //
 // the page's `?id=` is read through the shared
-// lib/ts/page_account_id.ts, not from here.
+// lib/ts/contract/pumpopoly/contract_page_pumpopoly_page_account_id.ts, not from here.
 // ========================================
 
 // ========================================

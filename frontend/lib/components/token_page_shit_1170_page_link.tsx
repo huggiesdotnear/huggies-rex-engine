@@ -7,7 +7,7 @@
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { current_app_depth_fun } from "../ts/shared/app_depth";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token/shit-1170/token_page_shit_1170_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shared/shit_1170_token";
 import { HUGGIES_URL_ID } from "../ts/shared/url_id";
 // ========================================
 // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim and

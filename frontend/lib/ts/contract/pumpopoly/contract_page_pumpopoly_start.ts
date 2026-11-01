@@ -21,7 +21,7 @@
 // page. with no id on the url, the signed-in account is the fallback, and a
 // later sign-in fills it in. the store watches that module and re-loads by
 // itself.
-import { HUGGIES_PAGE_ACCOUNT_ID } from "../../account/page_account_id";
+import { HUGGIES_PAGE_ACCOUNT_ID } from "./contract_page_pumpopoly_page_account_id";
 import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "./contract_page_pumpopoly_store";
 import { huggies_loading_bar_start_fun } from "../../shared/page_loading_bar_start";
 // ========================================

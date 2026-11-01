@@ -7,7 +7,7 @@
 // load. the loader writes here and the components subscribe, so no
 // component fetches anything itself.
 //
-// the shape is the same as lib/ts/page_account_id.ts: plain module state,
+// the shape is the same as lib/ts/contract/pumpopoly/contract_page_pumpopoly_page_account_id.ts: plain module state,
 // a subscribe/unsubscribe pair, and a notify that a throwing subscriber
 // cannot break.
 // ========================================

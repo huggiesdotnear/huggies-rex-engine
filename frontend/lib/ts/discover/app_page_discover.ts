@@ -30,7 +30,7 @@
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "./app_page_discover_token_list";
-import { fetch_token_icons_fun } from "./app_page_discover_token_icons";
+import { fetch_token_icons_fun } from "../shared/token_icons";
 import { search_tokens_fun } from "./app_page_discover_token_search";
 import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
 import { token_row_by_name_fun } from "../shared/token_row_by_name";

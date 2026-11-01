@@ -24,7 +24,7 @@
 // price, no reputation and no holder count. the icon hash never changes
 // for the life of a token, so it belongs with the durable half.
 // ========================================
-import { fetch_token_icons_fun } from "../discover/app_page_discover_token_icons";
+import { fetch_token_icons_fun } from "../shared/token_icons";
 import { HUGGIES_EMOJI_TOKENS } from "./app_page_game_emoji_tokens";
 // ========================================
 // ========================================

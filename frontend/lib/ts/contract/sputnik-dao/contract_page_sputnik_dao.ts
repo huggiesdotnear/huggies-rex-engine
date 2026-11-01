@@ -41,7 +41,7 @@ import type {
   SPUTNIK_DAO_PROPOSAL_TYPE,
   SPUTNIK_DAO_ROLE_KIND_TYPE,
 } from "@near-kit-tool-box/fun";
-import { list_trezu_treasuries_fun } from "./contract_page_trezu_treasuries";
+import { list_trezu_treasuries_fun } from "./contract_page_sputnik_dao_trezu_treasuries";
 import { HUGGIES_TOKEN_INFO } from "../../shared/token_info";
 import type { TREZU_TREASURY } from "@huggies/huggies-rex-engine-middleman";
 // ========================================

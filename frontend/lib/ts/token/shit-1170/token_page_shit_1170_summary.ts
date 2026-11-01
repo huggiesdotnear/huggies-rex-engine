@@ -2,7 +2,7 @@
 // token summary fetch for the dedicated SHIT page.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 // ========================================
 // the metadata fields the summary shows.
 //

@@ -11,7 +11,7 @@
 // the url changes. the store loads the new id by itself, so no component
 // has to watch for it and no component has to call load().
 import { load_pumpopoly_page_fun } from "./contract_page_pumpopoly";
-import { HUGGIES_PAGE_ACCOUNT_ID } from "../../account/page_account_id";
+import { HUGGIES_PAGE_ACCOUNT_ID } from "./contract_page_pumpopoly_page_account_id";
 import type { HUGGIES_PUMPOPOLY_DATA } from "./contract_page_pumpopoly_parse";
 // ========================================
 // ========================================

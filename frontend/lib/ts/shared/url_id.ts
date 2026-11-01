@@ -3,7 +3,7 @@
 //
 // every page that shows one thing reads it from the url: the token
 // page, the account page, the dao page, and the pumpopoly page
-// through lib/ts/page_account_id.ts. they all want the same thing —
+// through lib/ts/contract/pumpopoly/contract_page_pumpopoly_page_account_id.ts. they all want the same thing —
 // the id, trimmed, and blank treated as absent.
 //
 // --- WHY --- one helper and not four copies: the rule is small and

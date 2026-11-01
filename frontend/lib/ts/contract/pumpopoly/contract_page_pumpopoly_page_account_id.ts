@@ -14,8 +14,8 @@
 // module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 // ========================================
-import { HUGGIES_AUTH } from "../shared/auth_status";
-import { HUGGIES_URL_ID } from "../shared/url_id";
+import { HUGGIES_AUTH } from "../../shared/auth_status";
+import { HUGGIES_URL_ID } from "../../shared/url_id";
 // ========================================
 // ========================================
 // --- STATE ------------------------------

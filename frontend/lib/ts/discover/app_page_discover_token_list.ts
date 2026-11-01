@@ -17,7 +17,7 @@ import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_resu
 // `icon` is NOT in this list: it is a full inline data uri, and asking
 // for it on every token costs megabytes. icons are fetched separately
 // for the rows on screen, and cached durably — see
-// app_page_discover_token_icons.ts.
+// shared/token_icons.ts.
 const HUGGIES_TOKEN_LIST_FIELDS = [
   "name",
   "symbol",

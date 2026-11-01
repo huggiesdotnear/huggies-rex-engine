@@ -2,7 +2,7 @@
 // INTEAR all-holders fetch and display formatting for the SHIT page.
 // ========================================
 import { api_intear_holders_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 import {
   HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
   shit_holder_type_fun,

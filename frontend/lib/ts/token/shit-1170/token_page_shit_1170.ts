@@ -17,7 +17,7 @@
 // --- WHY --- there is no separate price request: the summary asks for
 // `price_usd` and gets it, so asking again would fetch the same number
 // twice over the wire.
-import { HUGGIES_SHIT_TOKEN_ID } from "./token_page_shit_1170_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 import { fetch_shit_summary_fun } from "./token_page_shit_1170_summary";
 import { fetch_shit_holders_fun } from "./token_page_shit_1170_holders";
 import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";

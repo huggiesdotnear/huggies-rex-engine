@@ -5,7 +5,7 @@
 // token, so the id is a constant and not something the api is asked for.
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token/shit-1170/token_page_shit_1170_token";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/shared/shit_1170_token";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
