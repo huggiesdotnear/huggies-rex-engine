@@ -1,9 +1,9 @@
 // ========================================
-// the components EVERY page carries: the loading bar, the nav, the
-// auth button and the toast layer.
+// the components EVERY page carries: the loading bar, the nav and the
+// auth button.
 //
 // --- WHY --- a page's own import file lists the components that page
-// mounts, and these four are on every page's html — so they are
+// mounts, and these three are on every page's html — so they are
 // listed here once and every page's import file pulls this in.
 //
 // --- WHY --- THE NETWORK PIN IS HERE AND ALSO ON THE PAGES THAT NEED
@@ -19,7 +19,7 @@ import "./hello";
 import "../components/loading_bar";
 import "../components/nav";
 import "../components/auth_button";
-import "../components/toasts";
+
 // ========================================
 // --- SERVICE WORKER --------------------
 // the service worker is registered on every page, so it lives here with

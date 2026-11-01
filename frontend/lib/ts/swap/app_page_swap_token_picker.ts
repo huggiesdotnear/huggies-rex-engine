@@ -14,6 +14,10 @@ import { search_tokens_fun } from "../discover/app_page_discover_token_search";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token_list";
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
+import {
+  HUGGIES_NEAR_ID,
+  HUGGIES_NEAR_SYMBOL,
+} from "../shared/token_near";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -106,6 +110,34 @@ function map_row_fun(row: {
 }
 // ========================================
 // ========================================
+// --- NEAR ------------------------------
+// native NEAR as a picker row.
+//
+// --- WHY --- THE API DOES NOT LIST IT: intear has no `near` entry in
+// /tokens — it comes back in the response's `missing` list — so the
+// chain's own token is not in the token list and not in the search
+// results either. without this row the picker could not offer the one
+// token every wallet holds.
+//
+// --- WHY --- IT BORROWS wNEAR's ICON: wNEAR tracks NEAR one for one,
+// so its icon IS the NEAR logo (the green "N"), not a lookalike.
+//
+// --- WHY --- THE ICON HASH IS WRITTEN DOWN AND NOT FETCHED: the api
+// has no `near` entry to ask for the hash of, and the hash for wNEAR
+// is a fixed value — the icon it points at is content addressed, so it
+// never changes under a different hash.
+const HUGGIES_NEAR_ICON_URL =
+  "https://api.intea.rs/icon/tKxD06CdiM_S80-L.webp";
+function near_row_fun(): HUGGIES_SWAP_PICKER_TOKEN {
+  return {
+    id: HUGGIES_NEAR_ID,
+    name: "Near Protocol",
+    symbol: HUGGIES_NEAR_SYMBOL,
+    icon: HUGGIES_NEAR_ICON_URL,
+  };
+}
+// ========================================
+// ========================================
 // --- FETCH -----------------------------
 // the tokens the picker shows before the reader searches: the most
 // liquid ones, by volume.
@@ -122,10 +154,17 @@ async function load_default_tokens_fun(): Promise<void> {
     const tokens = page.rows.map((row) =>
       map_row_fun({ ...row, icon: icons.get(row.id) ?? row.icon }),
     );
-    set_state_fun({ ...state, tokens, loading: false });
+    // --- WHY --- NEAR IS PUT AT THE TOP AND NOT AT THE END: it is the
+    // token every wallet holds, so it is the one a reader is most
+    // likely to be reaching for.
+    set_state_fun({
+      ...state,
+      tokens: [near_row_fun(), ...tokens.filter((t) => t.id !== HUGGIES_NEAR_ID)],
+      loading: false,
+    });
   } catch (err) {
     console.warn("[app_page_swap_token_picker] the token list failed", err);
-    set_state_fun({ ...state, tokens: [], loading: false });
+    set_state_fun({ ...state, tokens: [near_row_fun()], loading: false });
   }
 }
 // ========================================
@@ -138,7 +177,18 @@ async function search_fun(query: string): Promise<void> {
     const tokens = rows.map((row) =>
       map_row_fun({ ...row, icon: icons.get(row.id) ?? row.icon }),
     );
-    set_state_fun({ ...state, tokens, loading: false });
+    // --- WHY --- NEAR IS ADDED WHEN THE SEARCH FINDS IT: the api
+    // cannot find it, so a reader who typed "near" would get nothing.
+    // the query is matched against the symbol and the name, so it only
+    // joins the list when the reader was actually asking for it.
+    const matches_near =
+      query.trim().toLowerCase() === HUGGIES_NEAR_ID ||
+      query.trim().toLowerCase() === HUGGIES_NEAR_SYMBOL.toLowerCase();
+    const with_near =
+      matches_near && !tokens.some((t) => t.id === HUGGIES_NEAR_ID)
+        ? [near_row_fun(), ...tokens]
+        : tokens;
+    set_state_fun({ ...state, tokens: with_near, loading: false });
   } catch (err) {
     console.warn("[app_page_swap_token_picker] the search failed", err);
     set_state_fun({ ...state, tokens: [], loading: false });

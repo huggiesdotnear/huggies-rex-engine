@@ -1,11 +1,11 @@
 // ========================================
-// the toast store: the app-wide list of messages that appear over the
-// page and then go away.
+// the toast store: the list of messages that appear over the swap page
+// and then go away.
 //
 // a toast is the app's way of saying "that worked" or "that did not",
 // without taking the reader away from what they were doing. the swap
-// page is the first thing to use it — it is where the app's first
-// transaction happens, so the reader needs to be told what came of it.
+// page is where the app's first transaction happens, so the reader
+// needs to be told what came of it.
 //
 // --- WHY A STORE AND NOT A CALLBACK: the thing that CAUSES a toast
 // (a swap that finished) is not the thing that DRAWS it (a component
@@ -16,7 +16,7 @@
 // --- WHY THE READER IS A COMPONENT AND NOT A PIECE OF PAGE MARKUP:
 // a toast floats over the page, so it cannot live inside the page's
 // column — it has to be a fixed layer of its own.
-import { tx_detail_href_fun } from "./tx_link";
+import { tx_detail_href_fun } from "../shared/tx_link";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -115,8 +115,9 @@ function get_fun(): ReadonlyArray<HUGGIES_TOAST> {
 // ========================================
 // the link to the transaction page, for a toast that has a hash.
 //
-// --- WHY --- the depth is 0: the toast layer is app-wide, so it lives
-// at the top level of the app and links to the top-level tx page.
+// --- WHY --- the depth is 0: the toast layer sits on the swap page,
+// which is at the top of app/, so the transaction page is one level up
+// from it and needs no "../" prefix.
 function tx_link_fun(tx_hash: string): string {
   return tx_detail_href_fun(tx_hash, 0);
 }

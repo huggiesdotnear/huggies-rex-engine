@@ -54,11 +54,12 @@ export interface HUGGIES_APP_PAGE_SWAP_STATE {
 // --- CONFIG -----------------------------
 // the pair the page opens on.
 //
-// --- WHY NEAR FOR USDT: the pair the router serves best, and the one
-// the app's own tooling knows. the reader picks their own pair with the
-// token picker.
+// --- WHY NEAR FOR $SHIT: $SHIT is this app's own token, and NEAR is
+// the one every wallet holds, so the pair a reader can actually trade
+// is the one the page opens on. the reader picks their own pair with
+// the token picker.
 const HUGGIES_SWAP_DEFAULT_TOKEN_IN = HUGGIES_NEAR_ID;
-const HUGGIES_SWAP_DEFAULT_TOKEN_OUT = "usdt.tether-token.near";
+const HUGGIES_SWAP_DEFAULT_TOKEN_OUT = "shit-1170.meme-cooking.near";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
