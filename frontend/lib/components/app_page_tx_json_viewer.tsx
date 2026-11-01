@@ -26,10 +26,6 @@
 // viewer, and by nothing else, so it carries the transaction page's
 // prefix.
 //
-// --- WHY --- THE RULES NEST UNDER THE CLASS AND NOT A MOUNT ID: two
-// components of the page use it, and it has no mount id of its own, so
-// the class on its root is what the rules reach through.
-//
 // this component does NOT fetch. it renders what it is given.
 import { useState as use_state } from "preact/hooks";
 // ========================================
@@ -88,142 +84,25 @@ function children_fun(value: unknown): HUGGIES_JSON_NODE[] {
 }
 // ========================================
 // ========================================
-// --- CONFIG -----------------------------
-// how long a value may be before it is cut short.
-//
-// --- WHY 200: a long enough value shows its shape and a short one is
-// shown whole. a receipt's log can carry a megabyte of text, and one
-// unbroken line of it makes the page unusable.
-const HUGGIES_JSON_LONG_VALUE_CHARS = 200;
-// how long the copy button says COPIED before it goes back to COPY.
-//
-// --- WHY --- IT GOES BACK: a reader who copies one value would
-// otherwise see every button on the page saying COPIED for good, with
-// no way to tell which value was the last one copied.
-const HUGGIES_JSON_COPY_RESET_MS = 1500;
-// ========================================
-// ========================================
-// --- TYPE LABEL ------------------------
-// what kind of value a leaf holds.
-//
-// --- WHY --- THE KIND IS SHOWN: the difference between the string "1"
-// and the number 1 is the whole point of a json viewer, and a colour
-// alone does not say which is which.
-function type_label_fun(value: unknown): string {
-  if (value === null) return "null";
-  if (value === undefined) return "undefined";
-  if (Array.isArray(value)) return "array";
-  if (typeof value === "object") return "object";
-  if (typeof value === "string") return "string";
-  if (typeof value === "number") return "number";
-  if (typeof value === "boolean") return "boolean";
-  return "";
-}
-// ========================================
-// ========================================
-// --- COPY ------------------------------
-// put a value on the clipboard.
-//
-// --- WHY --- IT SAYS WHETHER IT WORKED: the clipboard is not always
-// there — the browser may refuse it, or the page may not be a secure
-// context — and a button that says COPIED when nothing was copied is
-// a lie.
-//
-// --- WHY --- IT NEVER THROWS: a failed copy is not worth an error the
-// reader has to see.
-async function copy_text_fun(text: string): Promise<boolean> {
-  try {
-    if (typeof navigator === "undefined") return false;
-    if (navigator.clipboard === undefined) return false;
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (err) {
-    console.warn("[json_viewer] copy failed", err);
-    return false;
-  }
-}
-// ========================================
-// ========================================
 // --- LEAF -----------------------------
-// a leaf: its label, its value and what kind of value it is.
+// a leaf: its label and its value on one line.
 //
 // --- WHY --- IT IS A COMPONENT AND NOT A PLAIN FUNCTION: a component
-// is the only thing that can hold a piece of state, and a leaf has
-// state — a long value is cut short until the reader asks for the rest,
-// and the copy button says whether the copy worked. the name follows
-// the repo's rule for a component function: SCREAMING_SNAKE with the
-// `_FUN` ending.
+// is the only thing that can hold a piece of state, and a leaf has no
+// state — but it is named like one so the tree reads the same all the
+// way down. the name follows the repo's rule for a component
+// function: SCREAMING_SNAKE with the `_FUN` ending.
 function JSON_VIEWER_LEAF_FUN(props: {
   node: HUGGIES_JSON_NODE;
 }): preact.JSX.Element {
-  const value = props.node.value;
-  const text = value_text_fun(value);
-  const is_string = typeof value === "string";
-  // --- WHY --- THE TYPE IS SHOWN: the difference between the string
-  // "1" and the number 1 is the whole point of a json viewer, and a
-  // colour alone does not say which is which.
-  const type_name = type_label_fun(value);
-  // --- WHY --- A LONG VALUE IS CUT SHORT: a receipt's log can carry a
-  // megabyte of text, and one unbroken line of it makes the page
-  // unusable. the reader asks for the rest.
-  const is_long = text.length > HUGGIES_JSON_LONG_VALUE_CHARS;
-  const [is_full, set_is_full] = use_state(false);
-  const [copy_state, set_copy_state] = use_state<
-    "idle" | "copied" | "failed"
-  >("idle");
-  const shown = is_long && !is_full ? `${text.slice(0, HUGGIES_JSON_LONG_VALUE_CHARS)}...` : text;
-
+  const text = value_text_fun(props.node.value);
+  const is_string = typeof props.node.value === "string";
   return (
     <div class="json-leaf">
       <span class="json-label">{props.node.label}</span>
       <span class={is_string ? "json-value is-string" : "json-value"}>
-        {shown}
+        {text}
       </span>
-      <span class="json-type">{type_name}</span>
-      {is_long && (
-        <button
-          type="button"
-          class="json-more"
-          title={is_full ? "show less" : "show the whole value"}
-          aria-label={
-            is_full
-              ? `show less of ${props.node.label}`
-              : `show the whole of ${props.node.label}`
-          }
-          onClick={() => set_is_full(!is_full)}
-        >
-          {is_full ? "LESS" : "MORE"}
-        </button>
-      )}
-      <button
-        type="button"
-        class="json-copy"
-        title="COPY"
-        aria-label={`copy ${props.node.label}`}
-        onClick={() => {
-          void copy_text_fun(text).then((did_copy) => {
-            // --- WHY --- THE BUTTON SAYS WHAT HAPPENED: the clipboard
-            // is not always there — the page may not be a secure
-            // context — and a button that says COPIED when nothing was
-            // copied is a lie.
-            set_copy_state(did_copy ? "copied" : "failed");
-            // --- WHY --- IT GOES BACK TO IDLE: a reader who copies one
-            // value would otherwise see every button on the page
-            // saying COPIED for good, with no way to tell which value
-            // was the last one copied.
-            setTimeout(
-              () => set_copy_state("idle"),
-              HUGGIES_JSON_COPY_RESET_MS,
-            );
-          });
-        }}
-      >
-        {copy_state === "copied"
-          ? "COPIED"
-          : copy_state === "failed"
-            ? "NO CLIPBOARD"
-            : "COPY"}
-      </button>
     </div>
   );
 }
@@ -247,23 +126,6 @@ function JSON_VIEWER_BRANCH_FUN(props: {
 }): preact.JSX.Element {
   const [is_open, set_is_open] = use_state(props.depth < 2);
   const children = children_fun(props.node.value);
-  // --- WHY --- A BRANCH WITH NO CHILDREN SAYS SO: an empty object as a
-  // branch would render as a toggle with nothing under it, and the
-  // reader would think it had failed to open. it is a plain row and not
-  // a button, because there is nothing to open.
-  if (children.length === 0) {
-    return (
-      <div class="json-branch">
-        <div class="json-toggle is-empty">
-          <span class="json-caret is-empty">-</span>
-          <span class="json-label">{props.node.label}</span>
-          <span class="json-value is-empty">
-            {Array.isArray(props.node.value) ? "[]" : "{}"}
-          </span>
-        </div>
-      </div>
-    );
-  }
   return (
     <div class="json-branch">
       <button
@@ -325,24 +187,6 @@ export function huggies_json_viewer_fun(props: {
             }
           >
             {value_text_fun(props.value)}
-          </span>
-          <span class="json-type">{type_label_fun(props.value)}</span>
-        </div>
-      </div>
-    );
-  }
-  // --- WHY --- AN EMPTY OBJECT SAYS SO: `{}` has no children, so the
-  // tree would render as an empty box and the reader would think it
-  // had failed. an empty object says it is empty.
-  if (children.length === 0) {
-    return (
-      <div class="json-viewer">
-        <div class="json-leaf">
-          <span class="json-value is-empty">
-            {Array.isArray(props.value) ? "[]" : "{}"}
-          </span>
-          <span class="json-type">
-            {Array.isArray(props.value) ? "array" : "object"}
           </span>
         </div>
       </div>

@@ -38,17 +38,21 @@ export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
     // --- WHY --- IT IS NOT A `<nav>`: the app-wide nav rule
     // (base/nav.css) styles every `<nav>` as the fixed bottom bar, so
     // a `<nav>` here would be pinned to the bottom of the screen on
-    // top of the app's own nav. a `<div>` with the tab role says what
-    // it is without taking the base rule.
-    <div class="account-tabs" role="tablist" aria-label="account views">
+    // top of the app's own nav.
+    //
+    // --- WHY --- THERE IS NO `role="tablist"`: a real tab widget needs
+    // the tab role ON the links, a tabpanel for the content, and arrow
+    // key navigation between the tabs. this bar is a row of links that
+    // switches the view, and `aria-current` already says which one is
+    // showing — so a half-made tab role would tell a screen reader the
+    // wrong thing.
+    <div class="account-tabs" aria-label="account views">
       {HUGGIES_ACCOUNT_TABS.map((item) => {
         const is_active = item.name === tab;
         return (
           <a
             class={is_active ? "is-active" : ""}
             href={tab_href_fun(item.name)}
-            role="tab"
-            aria-selected={is_active}
             aria-current={is_active ? "page" : undefined}
             onClick={(event) => {
               // --- WHY --- the click is handled here and not left to
