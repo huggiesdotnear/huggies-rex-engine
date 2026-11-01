@@ -7,7 +7,7 @@
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
-import { HUGGIES_SLOGANS } from "../ts/root/slogans";
+import { HUGGIES_SLOGANS } from "../ts/root/root_page_slogans";
 // ========================================
 // ========================================
 // ========================================

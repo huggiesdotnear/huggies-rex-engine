@@ -8,7 +8,7 @@
 // different after the styling moved to a shared class.
 import type { HUGGIES_TOKEN_INFO } from "../../ts/shared/token_info";
 import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
-import { token_amount_display_fun } from "../../ts/shared/token_amount_display";
+import { token_amount_row_fun } from "../../ts/shared/token_amount_row";
 import { token_detail_href_fun } from "../../ts/shared/token_link";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
 // ========================================
@@ -54,7 +54,7 @@ export function huggies_balance_row_fun(props: {
   const { id, raw, info, usd_value, pinned } = props;
   // the one shared amount presentation, so the account row and the holders
   // table always show the same numbers the same way.
-  const amount = token_amount_display_fun(raw, info);
+  const amount = token_amount_row_fun(raw, info);
   return (
     <tr key={id} class={pinned === true ? "is-pinned" : undefined}>
       <td>

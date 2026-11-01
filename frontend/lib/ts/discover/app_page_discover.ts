@@ -30,19 +30,19 @@
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "./app_page_discover_token_list";
-import { fetch_token_icons_fun } from "../shared/token_icons";
+import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { search_tokens_fun } from "./app_page_discover_token_search";
-import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
+import { HUGGIES_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
 import { token_row_by_name_fun } from "../shared/token_row_by_name";
-import { token_sort_field_fun } from "./app_page_discover_token_sort";
-import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort";
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
+import { token_sort_field_fun } from "./app_page_discover_token_sort_options";
+import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort_options";
+import type { HUGGIES_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 export interface HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST {
   // the rows on screen.
-  rows: HUGGIES_TOKEN_SEARCH_RESULT[];
+  rows: HUGGIES_DISCOVER_TOKEN_ROW[];
   // true when the api has more rows behind this one.
   has_more: boolean;
   // how many rows the API has served so far. this is NOT the length of
@@ -57,7 +57,7 @@ export interface HUGGIES_APP_PAGE_DISCOVER_DATA {
   // the token list, page by page.
   token_list: HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST;
   // the search results, when the reader has typed something.
-  search: HUGGIES_TOKEN_SEARCH_RESULT[] | null;
+  search: HUGGIES_DISCOVER_TOKEN_ROW[] | null;
   // the icons for the rows on screen, by token id.
   icons: Record<string, string>;
   // one message per thing that failed.
@@ -84,8 +84,8 @@ function to_finite_number_fun(value: unknown): number {
 // characters and a token id adds a label on top, so a list of ids does
 // not fit the api's ~8KB url limit. POST carries them in a body with a
 // 64KB limit.
-async function fetch_favourites_fun(): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
-  const ids = HUGGIES_PINNED_TOKENS.map((entry) => entry.id);
+async function fetch_favourites_fun(): Promise<HUGGIES_DISCOVER_TOKEN_ROW[]> {
+  const ids = HUGGIES_MARKED_TOKENS.map((entry) => entry.id);
   if (ids.length === 0) return [];
   const response = await api_intear_tokens_get({
     fields: [
@@ -155,7 +155,7 @@ async function load_token_list_fun(
       : Promise.resolve([]),
   ]);
   // the favourite rows are ADDED to the api's page. where they sit is
-  // NOT decided here: the order module (app_page_discover_token_order.ts)
+  // NOT decided here: the order module (app_page_discover_token_sort_apply.ts)
   // lifts them to the top of the `default` view, on every page, and it
   // is the only place that does it.
   //
@@ -181,7 +181,7 @@ async function load_token_list_fun(
 // of the sort, so the sorted page would cover none of them and their
 // icons are asked for by id instead.
 async function load_icons_fun(
-  rows: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
+  rows: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>,
   sort?: HUGGIES_TOKEN_SORT,
   desc?: boolean,
 ): Promise<Record<string, string>> {
@@ -206,7 +206,7 @@ async function load_icons_fun(
 // to download, so a token outside that set was unfindable.
 async function load_search_fun(
   query: string,
-): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
+): Promise<HUGGIES_DISCOVER_TOKEN_ROW[]> {
   return search_tokens_fun(query);
 }
 // ========================================

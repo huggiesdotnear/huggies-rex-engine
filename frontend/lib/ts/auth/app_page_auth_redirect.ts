@@ -1,7 +1,7 @@
 // ========================================
 // auth.html redirect logic: bounce the browser to account.html when the
 // user is signed in (on load or after a click). does NOT mount
-// components — the host page loads import.ts for that.
+// components — the host page loads its own import file for that.
 // ========================================
 import { HUGGIES_AUTH } from "../shared/auth_status";
 // ========================================

@@ -12,7 +12,7 @@
 // the fetching itself lives in lib/ts/app_page_tx.ts, so the page's
 // request list is still knowable by reading one file.
 import { HUGGIES_APP_PAGE_TX_STORE } from "./app_page_tx_store";
-import { huggies_loading_bar_start_fun } from "../shared/page_loading_bar_start";
+import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------

@@ -18,7 +18,7 @@ import {
   HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
 } from "./contract_page_rhea_pool_sort";
 import { HUGGIES_CONTRACT_PAGE_RHEA_STORE } from "./contract_page_rhea_store";
-import { huggies_loading_bar_start_fun } from "../../shared/page_loading_bar_start";
+import { huggies_loading_bar_start_fun } from "../../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------

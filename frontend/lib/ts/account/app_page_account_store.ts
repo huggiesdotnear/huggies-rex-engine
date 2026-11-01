@@ -12,9 +12,9 @@
 // --- WHY --- the store subscribes to the page's account id: the id can
 // change under the page — the reader signs in, signs out, or the id in
 // the url changes. the store loads the new id by itself.
-import { HUGGIES_APP_PAGE_ACCOUNT } from "./app_page_account";
+import { HUGGIES_APP_PAGE_ACCOUNT } from "./app_page_account_balances";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
-import type { HUGGIES_APP_PAGE_ACCOUNT_DATA } from "./app_page_account";
+import type { HUGGIES_APP_PAGE_ACCOUNT_DATA } from "./app_page_account_balances";
 // ========================================
 // ========================================
 // --- STATE ------------------------------

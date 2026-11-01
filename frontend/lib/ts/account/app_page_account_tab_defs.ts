@@ -12,7 +12,7 @@
 // carries no `?tab=` for it, which is the cleanest url for the view
 // most readers want.
 // ========================================
-import type { HUGGIES_APP_PAGE_ACCOUNT_TAB } from "./app_page_account_tab";
+import type { HUGGIES_APP_PAGE_ACCOUNT_TAB } from "./app_page_account_tab_state";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------

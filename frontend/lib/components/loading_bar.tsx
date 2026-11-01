@@ -11,7 +11,7 @@
 // --- WHY IT IS NOT A PER-PAGE COMPONENT: the bar belongs to the
 // browser window, not to a page. it is the same on every page and it
 // must be there before the page's own load starts, so it mounts from
-// the shared import (lib/ts/import.ts) rather than from a page.
+// the shared import (lib/ts/import-app-wide.ts) rather than from a page.
 //
 // --- WHY THE BAR IS NOT A SPINNER: a spinner says "something is
 // happening" and never says how much is left. a bar that fills as the

@@ -14,7 +14,7 @@
 // the fetching itself lives in lib/ts/contract_page_sputnik_dao.ts, so
 // the page's request list is still knowable by reading one file.
 import { HUGGIES_DAO_PAGE_STATE } from "./contract_page_sputnik_dao_state";
-import { huggies_loading_bar_start_fun } from "../../shared/page_loading_bar_start";
+import { huggies_loading_bar_start_fun } from "../../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------

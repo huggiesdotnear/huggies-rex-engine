@@ -1,7 +1,8 @@
 // ========================================
-// shared emoji-to-token mapping for the memory match game and the
-// discover spotlight. one list, so they can never show a different set
-// of memes.
+// the emoji-to-token mapping the memory match game draws its cards from.
+//
+// one list, so the cards and the meme tokens below them can never show
+// a different set of memes.
 //
 // source: the emojifi project
 // (https://gitlab.com/sleet-dev/sleet_vibe/emojifi), README + src/index.html.

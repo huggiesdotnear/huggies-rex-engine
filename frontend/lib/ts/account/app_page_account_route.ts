@@ -2,7 +2,7 @@
 // account.html fallback routing: the page has no `?id=` of its own, so
 // decide what it is showing. signed in → rewrite the url to
 // account.html?id=<id>, signed out → auth.html. does NOT mount
-// components — the host page loads import.ts for that.
+// components — the host page loads its own import file for that.
 // ========================================
 import { HUGGIES_AUTH } from "../shared/auth_status";
 import { HUGGIES_URL_ID } from "../shared/url_id";

@@ -8,16 +8,16 @@
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "../shared/token_row_by_name";
-import { token_sort_field_fun } from "./app_page_discover_token_sort";
-import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort";
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
+import { token_sort_field_fun } from "./app_page_discover_token_sort_options";
+import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort_options";
+import type { HUGGIES_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // `icon` is NOT in this list: it is a full inline data uri, and asking
 // for it on every token costs megabytes. icons are fetched separately
 // for the rows on screen, and cached durably — see
-// shared/token_icons.ts.
+// shared/token_icon_fetch.ts.
 const HUGGIES_TOKEN_LIST_FIELDS = [
   "name",
   "symbol",
@@ -49,7 +49,7 @@ function to_finite_number_fun(value: unknown): number {
 function map_token_row_fun(
   columns: ReadonlyArray<string>,
   row: readonly (string | number | null)[],
-): HUGGIES_TOKEN_SEARCH_RESULT {
+): HUGGIES_DISCOVER_TOKEN_ROW {
   const cell = token_row_by_name_fun(columns, row);
   const id = typeof cell.account_id === "string" ? cell.account_id : "";
   const name = cell.name;
@@ -76,7 +76,7 @@ function map_token_row_fun(
 // favourites-first view — so it pages by volume and the favourites are
 // pinned on top afterwards.
 export interface HUGGIES_DISCOVER_TOKEN_LIST {
-  rows: HUGGIES_TOKEN_SEARCH_RESULT[];
+  rows: HUGGIES_DISCOVER_TOKEN_ROW[];
   // true when the api has more rows behind this one.
   has_more: boolean;
   // how many rows the api has served, counting from the first page.

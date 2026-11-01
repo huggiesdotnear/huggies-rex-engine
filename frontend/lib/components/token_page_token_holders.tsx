@@ -11,7 +11,7 @@ import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token/index/token_page_tok
 import { token_holder_row_fun } from "./shared/token_holder_row";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { use_scroll_load_fun } from "../ts/shared/use_scroll_load";
-import type { HUGGIES_TOKEN_DETAIL } from "../ts/token/index/token_page_token_detail";
+import type { HUGGIES_TOKEN_DETAIL } from "../ts/token/index/token_page_token_types";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------

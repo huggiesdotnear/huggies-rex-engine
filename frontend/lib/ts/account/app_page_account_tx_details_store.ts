@@ -14,7 +14,7 @@
 import { api_account } from "@sleet-js/fastnear-explorer-api-client";
 import { load_tx_details_fun } from "./app_page_account_tx_details";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab";
+import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
 import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "./app_page_account_tx_details";
 import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";

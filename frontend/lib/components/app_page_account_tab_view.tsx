@@ -17,7 +17,7 @@
 //
 // this component does NOT fetch. it renders nothing when the tab on
 // screen is not the one it names.
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/account/app_page_account_tab";
+import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/account/app_page_account_tab_state";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
 import type { ComponentChildren } from "preact";
 // ========================================

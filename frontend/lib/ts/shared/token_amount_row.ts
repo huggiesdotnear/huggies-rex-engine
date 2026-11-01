@@ -18,7 +18,7 @@ export interface HUGGIES_TOKEN_AMOUNT_DISPLAY {
 // ========================================
 // --- BUILD ------------------------------
 // build the unified amount display for one raw balance.
-export function token_amount_display_fun(
+export function token_amount_row_fun(
   raw: string,
   info: Pick<HUGGIES_TOKEN_INFO, "decimals" | "price_usd">,
 ): HUGGIES_TOKEN_AMOUNT_DISPLAY {

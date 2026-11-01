@@ -10,7 +10,7 @@
 // subscriber cannot break.
 import { HUGGIES_APP_PAGE_DISCOVER } from "./app_page_discover";
 import type { HUGGIES_APP_PAGE_DISCOVER_DATA } from "./app_page_discover";
-import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort";
+import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort_options";
 // ========================================
 // ========================================
 // --- STATE ------------------------------

@@ -30,7 +30,7 @@ import { icon_hash_of_fun, token_icon_for_fun } from "../../shared/token_icon_ur
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,
-} from "./token_page_token_detail";
+} from "./token_page_token_types";
 // ========================================
 // the fields the metadata request asks for.
 //

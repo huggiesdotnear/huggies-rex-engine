@@ -16,7 +16,7 @@
 // url to read and no account to sign in. the burn addresses are a
 // constant, so the store has nothing to watch.
 import { HUGGIES_APP_PAGE_BURN_STORE } from "./app_page_burn_store";
-import { huggies_loading_bar_start_fun } from "../shared/page_loading_bar_start";
+import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------

@@ -10,9 +10,10 @@
 // network, so a toggle could take the other network's session down
 // with it.
 //
-// every app/* page loads this file ahead of import.ts for that reason;
-// the pages under app/contract/ and app/token/ do not load it
-// themselves, so import.ts pulls it in for them.
+// the pages at the top of app/ load this file as their own first
+// script, so the pin lands before anything reads the network. the
+// pages under app/contract/ and app/token/ do not load it themselves,
+// so their import file pulls it in for them.
 import { set_network_mainnet } from "@near-kit-tool-box/web";
 // ========================================
 if (typeof localStorage !== "undefined") set_network_mainnet();

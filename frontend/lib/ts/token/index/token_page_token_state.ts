@@ -8,11 +8,11 @@
 //
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break — the same shape as
-// lib/ts/contract/pumpopoly/contract_page_pumpopoly_page_account_id.ts.
+// lib/ts/contract/pumpopoly/contract_page_pumpopoly_account_id.ts.
 // ========================================
 import { HUGGIES_TOKEN_PAGE_TOKEN } from "./token_page_token";
 import { HUGGIES_TOKEN_PAGE_TOKEN_ID } from "./token_page_token_id";
-import type { HUGGIES_TOKEN_PAGE_STATE } from "./token_page_token_detail";
+import type { HUGGIES_TOKEN_PAGE_STATE } from "./token_page_token_types";
 // ========================================
 // --- STATE ------------------------------
 // the empty state the page holds before the first load answers.

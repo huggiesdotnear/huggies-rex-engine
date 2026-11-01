@@ -25,12 +25,12 @@
 // put the favourites on top AND this module lifted them again — and the
 // overlap showed a favourite twice once a later page of the list carried
 // the same token.
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
+import type { HUGGIES_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT,
-} from "./app_page_discover_token_sort";
-import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
+} from "./app_page_discover_token_sort_options";
+import { HUGGIES_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
 // ========================================
 // --- MARKED -----------------------------
 // the marked tokens and their weight, built ONCE when the module loads.
@@ -39,7 +39,7 @@ import { HUGGIES_PINNED_TOKENS } from "./app_page_discover_pinned_tokens";
 // too. it is not rebuilt on every render: the order of the marked block
 // must not drift between renders or between pages.
 const HUGGIES_MARKED_WEIGHT: Map<string, number> = new Map(
-  HUGGIES_PINNED_TOKENS.map((entry) => [entry.id, entry.weight]),
+  HUGGIES_MARKED_TOKENS.map((entry) => [entry.id, entry.weight]),
 );
 // ========================================
 // ========================================
@@ -62,11 +62,11 @@ const HUGGIES_MARKED_WEIGHT: Map<string, number> = new Map(
 // can arrive twice. showing it twice is a duplicate row, and lifting
 // both copies to the top is a double pin.
 export function order_discover_tokens_fun(
-  tokens: ReadonlyArray<HUGGIES_TOKEN_SEARCH_RESULT>,
+  tokens: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>,
   sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
-): HUGGIES_TOKEN_SEARCH_RESULT[] {
+): HUGGIES_DISCOVER_TOKEN_ROW[] {
   const seen = new Set<string>();
-  const unique: HUGGIES_TOKEN_SEARCH_RESULT[] = [];
+  const unique: HUGGIES_DISCOVER_TOKEN_ROW[] = [];
   for (const token of tokens) {
     if (seen.has(token.id)) continue;
     seen.add(token.id);

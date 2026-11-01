@@ -18,19 +18,19 @@ import {
 } from "preact/hooks";
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { token_detail_href_fun } from "../ts/shared/token_link";
-import { order_discover_tokens_fun } from "../ts/discover/app_page_discover_token_order";
+import { order_discover_tokens_fun } from "../ts/discover/app_page_discover_token_sort_apply";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
-} from "../ts/discover/app_page_discover_token_sort";
+} from "../ts/discover/app_page_discover_token_sort_options";
 import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/discover/app_page_discover_store";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { use_scroll_load_fun } from "../ts/shared/use_scroll_load";
-import { pinned_token_ids_fun } from "../ts/discover/app_page_discover_pinned_tokens";
+import { marked_token_ids_fun } from "../ts/discover/app_page_discover_marked_tokens";
 import { huggies_sort_control_fun } from "./shared/sort_control";
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/discover/app_page_discover_token_result";
+import type { HUGGIES_DISCOVER_TOKEN_ROW } from "../ts/discover/app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -44,7 +44,7 @@ const HUGGIES_DISCOVER_ROW_SELECTOR = ".result";
 // ========================================
 // --- ROW -------------------------------
 function token_result_row_fun(
-  token: HUGGIES_TOKEN_SEARCH_RESULT,
+  token: HUGGIES_DISCOVER_TOKEN_ROW,
   marked: boolean,
 ): preact.JSX.Element {
   return (
@@ -149,7 +149,7 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
   );
 
   // the marked tokens are styled wherever the sort puts them.
-  const marked_ids = pinned_token_ids_fun();
+  const marked_ids = marked_token_ids_fun();
   const errors = page_data?.errors ?? [];
 
   return (

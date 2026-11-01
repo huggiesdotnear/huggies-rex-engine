@@ -11,7 +11,7 @@
 // of hits and shows them; a reader who wants more can type more.
 import { api_intear_tokens_search } from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "../shared/token_row_by_name";
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "./app_page_discover_token_result";
+import type { HUGGIES_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -44,7 +44,7 @@ function to_finite_number_fun(value: unknown): number {
 function map_token_search_row_fun(
   columns: ReadonlyArray<string>,
   row: readonly (string | number | null)[],
-): HUGGIES_TOKEN_SEARCH_RESULT {
+): HUGGIES_DISCOVER_TOKEN_ROW {
   const cell = token_row_by_name_fun(columns, row);
   const id = typeof cell.account_id === "string" ? cell.account_id : "";
   const name = cell.name;
@@ -69,7 +69,7 @@ function map_token_search_row_fun(
 export async function search_tokens_fun(
   query: string,
   limit: number = HUGGIES_TOKEN_SEARCH_LIMIT,
-): Promise<HUGGIES_TOKEN_SEARCH_RESULT[]> {
+): Promise<HUGGIES_DISCOVER_TOKEN_ROW[]> {
   const response = await api_intear_tokens_search({
     q: query,
     fields: HUGGIES_TOKEN_SEARCH_FIELDS,

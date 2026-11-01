@@ -19,8 +19,8 @@ import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "./app_page_discover_store";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-} from "./app_page_discover_token_sort";
-import { huggies_loading_bar_start_fun } from "../shared/page_loading_bar_start";
+} from "./app_page_discover_token_sort_options";
+import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------

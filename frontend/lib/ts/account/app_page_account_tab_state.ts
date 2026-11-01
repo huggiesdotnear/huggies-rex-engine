@@ -21,16 +21,16 @@
 //
 // --- WHY --- an unknown tab falls back to the default: a stale link or
 // a typo should land on the page, not on an empty page.
-import { HUGGIES_URL_TAB } from "./app_page_account_url_tab";
+import { HUGGIES_URL_TAB } from "./app_page_account_tab_url";
 import {
   find_account_tab_fun,
   HUGGIES_DEFAULT_ACCOUNT_TAB,
-} from "./app_page_account_tabs";
+} from "./app_page_account_tab_defs";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // the names of the account page's tabs. it is the union of the names in
-// lib/ts/app_page_account_tabs.ts.
+// lib/ts/app_page_account_tab_defs.ts.
 export type HUGGIES_APP_PAGE_ACCOUNT_TAB =
   | "balances"
   | "transactions";

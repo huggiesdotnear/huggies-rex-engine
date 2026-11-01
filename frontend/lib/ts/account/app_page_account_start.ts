@@ -22,10 +22,10 @@
 // view.
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "./app_page_account_store";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab";
+import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "./app_page_account_tx_details_store";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
-import { huggies_loading_bar_start_fun } from "../shared/page_loading_bar_start";
+import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------

@@ -19,7 +19,7 @@
 // (lib/ts/token_page_shit_1170_token.ts), so the start file needs no id
 // from the url.
 import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "./token_page_shit_1170_state";
-import { huggies_loading_bar_start_fun } from "../../shared/page_loading_bar_start";
+import { huggies_loading_bar_start_fun } from "../../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
