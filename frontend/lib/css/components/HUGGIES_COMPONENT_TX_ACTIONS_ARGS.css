@@ -5,7 +5,12 @@
 
    the mode buttons are small and sit on the right of the box's own
    toolbar. they are `<button>`s, so the global button rule has to be
-   undone here: it pins every button to the page's 500px column. */
+   undone here: it pins every button to the page's 500px column.
+
+   --- WHY --- TWO COMPONENTS ARE NAMED: the arguments viewer is used by
+   the transaction page's actions component and by its receipts
+   component — a receipt's own function call carries arguments too — so
+   the rules reach both of them. */
 /*==================================*/
 #HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer {
@@ -18,7 +23,7 @@
   padding: 8px;
   min-width: 0;
 }
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer.is-empty,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer.is-empty {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
@@ -27,21 +32,21 @@
 }
 /*==================================*/
 /* the toolbar: the size on the left, the modes on the right. */
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-toolbar,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-toolbar {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-size,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-size {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   letter-spacing: 0.06em;
   opacity: 0.6;
 }
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-modes {
   display: flex;
   gap: 4px;
@@ -49,7 +54,7 @@
 }
 /* the mode buttons: the global button rule is undone here, because it
    pins every button to the page's 500px column. */
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes button,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-modes button {
   width: auto;
   max-width: none;
@@ -66,14 +71,14 @@
   opacity: 0.65;
   cursor: pointer;
 }
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes button:hover,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-modes button:hover {
   opacity: 1;
   background: rgba(255, 255, 255, 0.12);
   color: inherit;
   border-color: rgba(255, 255, 255, 0.45);
 }
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes button.is-active,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-modes button.is-active {
   opacity: 1;
   background: var(--color-middle);
@@ -83,13 +88,13 @@
 }
 /*==================================*/
 /* the body: whatever the chosen mode shows. */
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-body,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-body {
   min-width: 0;
   max-height: 320px;
   overflow: auto;
 }
-#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer,
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-text,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-text {
   margin: 0;
   font-family: monospace;

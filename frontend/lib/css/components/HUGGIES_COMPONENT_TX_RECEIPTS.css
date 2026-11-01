@@ -119,6 +119,12 @@
   font-family: monospace;
   font-size: 12px;
   font-weight: 700;
+  /* --- WHY --- THE NAME BREAKS: a method name can be very long
+     ("exchange_callback_post_ft_transfer"), and as a flex item it
+     would not shrink, so it pushed the page wider than the screen. */
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-all;
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-gas,
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-deposit {

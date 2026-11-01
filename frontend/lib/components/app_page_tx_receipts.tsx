@@ -21,6 +21,8 @@ import {
   decode_args,
   format_gas,
   format_near_with_unit,
+  get_action_payload,
+  get_action_type,
   parse_event_json,
   time_ago,
 } from "@sleet-js/fastnear-explorer-api-client";
@@ -52,26 +54,48 @@ function account_href_fun(account_id: string): string {
 // --- ACTION TYPE -----------------------
 // the name of an action, and its payload.
 //
-// --- WHY --- the api wraps an action in a single-key object, and one
-// action — CreateAccount — is a bare string. so both shapes are read
-// here and everything after this works with a plain name and a plain
-// payload.
-//
-// --- WHY --- THE PAYLOAD IS READ AS A RECORD AND NOT OFF THE UNION:
-// the union has one member per action kind, and a record with the
-// fields this card reads is what every one of them needs.
+// --- WHY --- THE CLIENT'S OWN HELPERS ARE USED: the fastnear client
+// ships get_action_type and get_action_payload, and they already know
+// that an action is either a single-key object or a bare string —
+// CreateAccount is a bare string — and that a payload may be missing.
+// a second copy of that rule here would be a second chance to drift.
 function action_parts_fun(
   action: ACTION,
 ): { type: string; payload: Record<string, unknown> } {
-  if (typeof action === "string") {
-    return { type: action, payload: {} };
+  const type = get_action_type(action);
+  if (type === null) {
+    return { type: "Unknown", payload: {} };
   }
-  const type = Object.keys(action)[0];
-  const payload = (action as Record<string, unknown>)[type];
-  if (typeof payload === "object" && payload !== null) {
-    return { type, payload: payload as Record<string, unknown> };
+  const payload = get_action_payload(action);
+  if (payload === null) {
+    return { type, payload: {} };
   }
-  return { type, payload: {} };
+  return { type, payload: payload as Record<string, unknown> };
+}
+// ========================================
+// ========================================
+// --- ACCESS KEY PERMISSION ------------
+// what an AddKey action gave the key.
+//
+// --- WHY --- IT IS READ HERE AND NOT FROM THE CLIENT: the client's
+// parse_action reads it, but the client only parses the TRANSACTION's
+// actions — the receipts are passed through raw — so a receipt's own
+// actions are never parsed by it.
+function access_key_permission_fun(
+  payload: Record<string, unknown>,
+): string | null {
+  const access_key = payload.access_key;
+  if (typeof access_key !== "object" || access_key === null) return null;
+  const permission = (access_key as Record<string, unknown>).permission;
+  if (typeof permission === "string") return permission;
+  if (typeof permission !== "object" || permission === null) return null;
+  const function_call = (permission as Record<string, unknown>).FunctionCall;
+  if (typeof function_call !== "object" || function_call === null) {
+    return null;
+  }
+  const receiver_id = (function_call as Record<string, unknown>).receiver_id;
+  if (typeof receiver_id !== "string") return null;
+  return `FUNCTION CALL ${receiver_id}`;
 }
 // ========================================
 // ========================================
@@ -96,6 +120,12 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
   const beneficiary_id =
     typeof payload.beneficiary_id === "string" ? payload.beneficiary_id : null;
   const args = typeof payload.args === "string" ? payload.args : null;
+  const stake =
+    typeof payload.stake === "string" && payload.stake !== "0"
+      ? payload.stake
+      : null;
+  const code_hash = typeof payload.code_hash === "string" ? payload.code_hash : null;
+  const permission = access_key_permission_fun(payload);
 
   return (
     <div class="tx-receipt-action">
@@ -111,7 +141,17 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
             {format_near_with_unit(deposit)}
           </span>
         )}
+        {stake !== null && (
+          <span class="tx-receipt-action-deposit">
+            STAKE: {format_near_with_unit(stake)}
+          </span>
+        )}
       </div>
+      {permission !== null && (
+        <span class="tx-receipt-action-extra">
+          PERMISSION: {permission}
+        </span>
+      )}
       {public_key !== null && (
         <code class="tx-receipt-action-extra">{public_key}</code>
       )}
@@ -120,6 +160,9 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
           BENEFICIARY:{" "}
           <a href={account_href_fun(beneficiary_id)}>{beneficiary_id}</a>
         </span>
+      )}
+      {code_hash !== null && (
+        <code class="tx-receipt-action-extra">{code_hash}</code>
       )}
       {args !== null &&
         huggies_args_viewer_fun({
@@ -157,7 +200,15 @@ function result_fun(receipt: RECEIPT_WITH_OUTCOME): preact.JSX.Element {
     return (
       <div class="tx-receipt-result">
         <span class="tx-receipt-result-label">RECEIPT</span>
-        <code class="tx-receipt-result-value">{status.SuccessReceiptId}</code>
+        {/* --- WHY --- IT LINKS TO THE RECEIPT: the card for that
+            receipt is further down the page, with its own anchor. the
+            link takes the reader straight to it. */}
+        <a
+          class="tx-receipt-result-value"
+          href={`#receipt-${status.SuccessReceiptId}`}
+        >
+          {status.SuccessReceiptId}
+        </a>
       </div>
     );
   }
@@ -198,18 +249,46 @@ function log_fun(log: string): preact.JSX.Element {
 }
 // ========================================
 // ========================================
+// --- SAME ACTIONS ----------------------
+// whether two sets of actions are the same.
+//
+// --- WHY --- THE FIRST RECEIPT'S ACTIONS ARE THE TRANSACTION'S ACTIONS:
+// the first receipt IS the transaction's actions, run. showing them
+// twice made the page twice as long and rendered every argument twice,
+// for no extra information.
+//
+// --- WHY --- IT COMPARES THE JSON AND NOT THE OBJECT: the two are
+// different objects with the same content, and the content is what
+// decides whether the reader would see the same thing twice.
+function same_actions_fun(a: ReadonlyArray<ACTION>, b: ReadonlyArray<ACTION>): boolean {
+  if (a.length !== b.length) return false;
+  for (let index = 0; index < a.length; index += 1) {
+    if (JSON.stringify(a[index]) !== JSON.stringify(b[index])) {
+      return false;
+    }
+  }
+  return true;
+}
+// ========================================
+// ========================================
 // --- RECEIPT -------------------------
 // one receipt: its facts, its actions, its result and its logs.
 function receipt_fun(
   receipt: RECEIPT_WITH_OUTCOME,
   index: number,
+  transaction_actions: ReadonlyArray<ACTION>,
 ): preact.JSX.Element {
   const outcome = receipt.execution_outcome.outcome;
   const receipt_body = receipt.receipt.receipt;
   // the receipt's own actions — what the work did, as against what the
   // transaction asked for.
-  const actions =
+  const receipt_actions =
     "Action" in receipt_body ? receipt_body.Action.actions : [];
+  // the first receipt runs the transaction's own actions, so showing
+  // them again would say the same thing twice.
+  const actions = same_actions_fun(receipt_actions, transaction_actions)
+    ? []
+    : receipt_actions;
   const is_success =
     "SuccessValue" in outcome.status || "SuccessReceiptId" in outcome.status;
   return (
@@ -302,6 +381,11 @@ export function HUGGIES_COMPONENT_TX_RECEIPTS_FUN() {
   const receipts = data.parsed.receipts;
   // a transaction that caused no receipts has no receipts section.
   if (receipts.length === 0) return null;
+  // the transaction's actions as the api sent them, so the first
+  // receipt's actions can be compared with them.
+  const transaction_raw_actions = data.parsed.actions.map(
+    (action) => action.raw as ACTION,
+  );
 
   return (
     <section class="tx-receipts">
@@ -309,7 +393,7 @@ export function HUGGIES_COMPONENT_TX_RECEIPTS_FUN() {
       <div class="tx-receipts-list">
         {receipts.map((receipt, index) => (
           <div key={receipt.receipt.receipt_id}>
-            {receipt_fun(receipt, index)}
+            {receipt_fun(receipt, index, transaction_raw_actions)}
           </div>
         ))}
       </div>
