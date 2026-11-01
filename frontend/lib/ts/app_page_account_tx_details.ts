@@ -36,7 +36,8 @@ import {
   TRANSACTIONS_BATCH_SIZE,
 } from "@sleet-js/fastnear-explorer-api-client";
 import { HUGGIES_TX_DETAIL_CACHE } from "./app_page_account_tx_details_cache";
-import type { PARSE_RESULT, TRANSACTION_DETAIL } from "@sleet-js/fastnear-explorer-api-client";
+import type { HUGGIES_CACHED_TX_DETAIL } from "./app_page_account_tx_details_cache";
+import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -91,24 +92,25 @@ export async function load_tx_details_fun(
   // the ones the cache already has.
   const cached = await HUGGIES_TX_DETAIL_CACHE.get_many(wanted);
   const missing: string[] = [];
-  const out: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL[] = [];
+  // the cached ones, by hash, so the answer can be put back in the
+  // order it was asked for.
+  const by_hash: Map<string, HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL> = new Map();
   for (const hash of wanted) {
     const entry = cached.get(hash);
     if (entry === undefined) {
       missing.push(hash);
       continue;
     }
-    const parsed = parse_transaction(entry.detail as TRANSACTION_DETAIL);
-    out.push({ hash, parsed });
+    const parsed = parse_transaction(entry.detail);
+    by_hash.set(hash, { hash, parsed });
   }
-  if (missing.length === 0) return out;
+  if (missing.length === 0) {
+    return wanted
+      .map((hash) => by_hash.get(hash))
+      .filter((item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL => item !== undefined);
+  }
 
-  const fetched: Array<HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL> = [];
-  const to_cache: Array<{
-    id: string;
-    detail: unknown;
-    fetched_at: number;
-  }> = [];
+  const to_cache: HUGGIES_CACHED_TX_DETAIL[] = [];
   for (let index = 0; index < missing.length; index += TRANSACTIONS_BATCH_SIZE) {
     const batch = missing.slice(index, index + TRANSACTIONS_BATCH_SIZE);
     const response = await api_transactions({
@@ -117,7 +119,7 @@ export async function load_tx_details_fun(
     });
     for (const transaction of response.transactions) {
       const parsed = parse_transaction(transaction);
-      fetched.push({ hash: parsed.hash, parsed });
+      by_hash.set(parsed.hash, { hash: parsed.hash, parsed });
       if (is_settled_fun(parsed)) {
         to_cache.push({
           id: parsed.hash,
@@ -128,9 +130,14 @@ export async function load_tx_details_fun(
     }
   }
   await HUGGIES_TX_DETAIL_CACHE.put_many(to_cache);
-  // the fetched ones come first — they are the newest — and the cached
-  // ones follow.
-  return [...fetched, ...out];
+  // --- WHY --- THE ANSWER IS PUT BACK IN THE ORDER IT WAS ASKED FOR:
+  // the hashes come from the history newest first, and the cached ones
+  // and the fetched ones have to go back in that same order. adding
+  // the fetched ones to the front would shuffle the cards whenever
+  // only some of them were missing.
+  return wanted
+    .map((hash) => by_hash.get(hash))
+    .filter((item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL => item !== undefined);
 }
 // ========================================
 // copyright 2026 by sleet.near

@@ -24,6 +24,7 @@
 // the indexeddb mechanics live in lib/ts/indexed_db_store.ts — this
 // file only says WHICH store this cache is and what a row looks like.
 import { HUGGIES_INDEXED_DB_STORE } from "./indexed_db_store";
+import type { TRANSACTION_DETAIL } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 const HUGGIES_TX_DETAIL_DB_NAME = "huggies_tx_details";
 const HUGGIES_TX_DETAIL_DB_VERSION = 1;
@@ -41,17 +42,18 @@ const HUGGIES_TX_DETAIL_STORE_CONFIG = {
 // one transaction's detail in the cache, keyed by `id` — the
 // transaction hash.
 //
-// `detail` is the api's own answer for that hash, kept whole. it is
-// the NESTED shape, not the parsed one: the parser is pure and cheap,
-// so the raw is kept and parsed on the way out. that way one cached
-// entry serves every reader of it.
-//
-// `fetched_at` says when it was fetched. a transaction that has
-// settled never changes, but one that has not can still change, and
-// the age is what tells the two apart.
+// --- WHY --- `fetched_at` IS THERE: it says when the transaction was
+// fetched. a transaction that has SETTLED never changes, so its entry
+// is good forever and the age is not consulted for it. a transaction
+// that has NOT settled can still change, so it is not cached at all —
+// and the age is what would decide if that ever changed.
 export interface HUGGIES_CACHED_TX_DETAIL {
   id: string;
-  detail: unknown;
+  // the api's own answer for that hash, kept whole. it is the NESTED
+  // shape, not the parsed one: the parser is pure and cheap, so the
+  // raw is kept and parsed on the way out. that way one cached entry
+  // serves every reader of it.
+  detail: TRANSACTION_DETAIL;
   fetched_at: number;
 }
 // ========================================

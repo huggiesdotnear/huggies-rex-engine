@@ -61,7 +61,9 @@
   min-width: 0;
   font-family: monospace;
   font-size: 11px;
-  color: var(--color-middle-light);
+  /* the same tint of the teal the table's hash link wears — the teal
+     itself is too dark to read against the red page. */
+  color: #a5eef5;
   overflow-wrap: anywhere;
   word-break: break-all;
 }

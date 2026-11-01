@@ -11,10 +11,23 @@
 // account's history — a list of hashes — and the details are the full
 // transaction of a handful of them. one asks the history endpoint and
 // the other asks the details endpoint.
+import { api_account } from "@sleet-js/fastnear-explorer-api-client";
 import { load_tx_details_fun } from "./app_page_account_tx_details";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab";
+import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
 import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "./app_page_account_tx_details";
+import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
+// ========================================
+// ========================================
+// --- CONFIG -----------------------------
+// how long the table's rows are waited for before the newest few are
+// asked for on their own.
+//
+// --- WHY --- IT IS SHORT: the table is fetching the same rows at the
+// same time, so it lands in about a second. the wait is there so the
+// page makes ONE request for the history and not two.
+const HUGGIES_TABLE_ROWS_WAIT_MS = 1500;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -116,20 +129,70 @@ async function load_fun(): Promise<void> {
 }
 // ========================================
 // ========================================
+// --- WAIT FOR THE TABLE'S ROWS ----------
+// the table's rows, once they have landed.
+//
+// --- WHY --- THE TABLE IS WATCHED AND NOT POLLED: the table's store
+// announces when it changes, so this waits for that announcement
+// instead of asking the database every few milliseconds.
+//
+// --- WHY --- IT GIVES UP AFTER A MOMENT: the table might be on a
+// different account, or it might have failed. the fallback then asks
+// for the newest few on its own.
+function wait_for_table_rows_fun(): Promise<
+  ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>
+> {
+  return new Promise((resolve) => {
+    let is_settled = false;
+    const finish = (): void => {
+      if (is_settled) return;
+      is_settled = true;
+      unsubscribe();
+      clearTimeout(timer);
+      resolve(HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows);
+    };
+    const unsubscribe = HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.subscribe(() => {
+      // the rows have landed.
+      if (HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows.length > 0) {
+        finish();
+      }
+    });
+    const timer = setTimeout(finish, HUGGIES_TABLE_ROWS_WAIT_MS);
+    // the rows may already be there.
+    if (HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows.length > 0) {
+      finish();
+    }
+  });
+}
+// ========================================
+// ========================================
 // --- NEWEST HASHES ---------------------
 // the hashes of the account's newest transactions.
 //
-// --- WHY --- THE HISTORY IS ASKED FOR ITS OWN SAKE: the details
-// endpoint takes hashes, and the history endpoint is what says which
-// hashes the account has. so the newest few come from there.
+// --- WHY --- THE TABLE'S ROWS ARE USED WHEN THEY ARE THERE: the table
+// already fetched the account's newest rows, and the rows carry the
+// hashes. asking the history endpoint again for the same hashes is a
+// second request for an answer the page already has, and the api
+// rate limits at about five requests a second.
 //
-// --- WHY --- IT IS A SEPARATE CALL AND NOT THE TABLE'S ROWS: the
-// table's store holds the rows it has already fetched, and it may not
-// have any yet — it only loads when the tab is opened, and this
-// section loads at the same time. asking for the newest few on their
-// own is one small request and it does not wait for the table.
+// --- WHY --- THERE IS A FALLBACK ANYWAY: the two stores load at the
+// same time, so the table's rows may not have landed yet. the
+// fallback asks for the newest few on their own, which is one small
+// request.
 async function newest_hashes_fun(account_id: string): Promise<string[]> {
-  const { api_account } = await import("@sleet-js/fastnear-explorer-api-client");
+  const rows = HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows;
+  if (rows.length > 0) {
+    return rows.map((row) => row.transaction_hash);
+  }
+  // --- WHY --- THE TABLE IS WAITED FOR FIRST: the table's store is
+  // fetching the same rows this would ask for, and two requests for
+  // one answer is what the api's rate limit punishes. so the table is
+  // given a moment to land its rows, and only then is the fallback
+  // used.
+  const settled = await wait_for_table_rows_fun();
+  if (settled.length > 0) {
+    return settled.map((row) => row.transaction_hash);
+  }
   const response = await api_account({
     account_id,
     limit: 5,

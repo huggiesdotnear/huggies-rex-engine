@@ -6,7 +6,6 @@
   --color-backend: #da291c;
   /* derived tones */
   --color-middle-dark: #009aab;
-  --color-middle-light: #a5eef5;
   --color-backend-light: #ffe8e6;
 }
 /*==================================*/
@@ -17,9 +16,13 @@ other colors that can be used
 #ffffff; #ffe8e6; #474747; #da291c; #00c6d7;
 ```
 
---- WHY --- `--color-middle-light` IS A TINT OF THE TEAL AND NOT A
-BLUE: the teal itself is too dark to read against the red page — it
-sits at 2.87:1 — and a link has to be readable. the tint is the same
-hue, lifted until it clears the 4.5:1 contrast bar, so a link still
-looks like it belongs to the app.
+DO NOT TOUCH THIS FILE.
+
+it holds the app's palette and nothing else — the three base colours,
+the two derived tones, and the note above. a new colour that a
+component needs belongs in that component's own css, not here.
+
+adding a variable to this file changes every page that uses it, and
+this file is the one place the palette is written down. so it stays
+exactly as it is.
 */
