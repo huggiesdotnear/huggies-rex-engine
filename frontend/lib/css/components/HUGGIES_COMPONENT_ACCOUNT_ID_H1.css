@@ -14,16 +14,11 @@
   border-bottom: 1px solid #474747;
   padding-bottom: 8px;
   margin-bottom: 16px;
-  /* --- WHY --- THE TOP MARGIN: the page's column centres its content
-     (base/main.css), so a page with little content sits in the middle
-     of the screen and a page with a lot of it starts at the top. the
-     account page has two views of very different lengths — the
-     balances tab is short and the transactions tab is long — so the
-     heading jumped down when the reader switched tabs.
-
-     the margin pushes the heading to about a third from the top, so
-     it holds its place on both tabs. */
-  margin-top: 28vh;
+  /* --- WHY --- THE TOP MARGIN: the page's column starts at the top
+     (base/main.css), so the heading needs some room above it. it is
+     the base h1's own 20px, so the heading sits where every other
+     page's heading sits. */
+  margin-top: 20px;
   /* a long account id wraps instead of stretching the page. */
   font-family: monospace;
   font-size: 18px;

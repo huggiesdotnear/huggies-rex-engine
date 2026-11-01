@@ -2,7 +2,15 @@
 /* the single 500px column every page renders into.
 
    the column is centred in the viewport: body centres main
-   horizontally, and main centres its own content vertically.
+   horizontally, and main centres its own content horizontally too.
+
+   --- WHY --- THE CONTENT IS NOT CENTRED VERTICALLY: a column that
+   centres its content vertically puts a short page in the middle of
+   the screen and a long page at the top, so the page's heading moves
+   when the content changes — the account page's heading jumped down
+   when the reader switched from the transactions tab to the balances
+   tab. the content starts at the top instead, so the heading holds
+   its place.
 
    `main > *` below keeps every page block the full width of the
    column.
@@ -13,7 +21,7 @@ main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
   width: 500px;

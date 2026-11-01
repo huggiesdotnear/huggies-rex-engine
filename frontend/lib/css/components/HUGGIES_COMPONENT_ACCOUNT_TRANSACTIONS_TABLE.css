@@ -72,9 +72,12 @@
   line-height: 1.3;
   font-family: monospace;
   font-size: 11px;
-  /* the hash is the way to the transaction, so it wears the link
-     colour — the same blue the rest of the app's links wear. */
-  color: #7ec8ff;
+  /* the hash is the way to the transaction, so it wears a link colour.
+     --- WHY --- THIS LIGHT BLUE: the row sits on the red page, and a
+     link has to be readable against it. this one clears the 4.5:1
+     contrast bar against the row's own background; the app's teal
+     accent does not. */
+  color: #bfe4ff;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   td.tx-hash a:hover {
@@ -103,11 +106,15 @@
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   .tx-status .is-success {
-  color: #7ef0b0;
+  /* a green that clears the 4.5:1 contrast bar on the row's own
+     background. */
+  color: #9df7c0;
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
   .tx-status .is-failed {
-  color: #ff9b9b;
+  /* the app's own light red — it is a palette colour and it clears the
+     contrast bar too. */
+  color: var(--color-backend-light);
 }
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th {
   font-family: Arial, Helvetica, sans-serif;

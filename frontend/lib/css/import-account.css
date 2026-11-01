@@ -1,5 +1,5 @@
 /*==================================*/
-/* the account page's own css: the components it mounts. */
+/* the account page's css: the components it mounts. */
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_ID_H1.css);
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_TABS.css);
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE.css);
@@ -7,27 +7,4 @@
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE.css);
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE.css);
 @import url(./components/HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE.css);
-/*==================================*/
-/*==================================*/
-/* the account page's column starts at the TOP of the screen.
-
-   base/main.css centres the column's content, so a page with little
-   content sits in the middle of the screen and a page with a lot of it
-   starts at the top. the account page has two views of very
-   different lengths — the balances tab is short and the transactions
-   tab is long — so the heading jumped down when the reader switched
-   tabs.
-
-   anchoring the column to the top means the heading's own margin is
-   what decides where it sits, and the heading holds its place on both
-   tabs.
-
-   --- WHY --- THE SELECTOR MATCHES ON THE HEADING: the heading is the
-   account page's first block in the column, so its presence is what
-   makes the column this page's column. the rule is here because
-   this is the account page's css, and it reaches main because main is
-   the page's column — the same thing base/main.css owns. */
-main:has(> #HUGGIES_COMPONENT_ACCOUNT_ID_H1) {
-  justify-content: flex-start;
-}
 /*==================================*/

@@ -59,7 +59,7 @@
 }
 /* the status word. */
 #HUGGIES_COMPONENT_TX_SUMMARY .tx-summary-value.is-success {
-  color: #7ef0b0;
+  color: #9df7c0;
   font-weight: 700;
 }
 #HUGGIES_COMPONENT_TX_SUMMARY .tx-summary-value.is-failed {
@@ -67,7 +67,7 @@
   font-weight: 700;
 }
 #HUGGIES_COMPONENT_TX_SUMMARY .tx-summary-value.is-pending {
-  color: #ffd479;
+  color: #ffe0a3;
   font-weight: 700;
 }
 /*==================================*/
