@@ -162,12 +162,21 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
   }
 
   if (page.routes.length === 0) {
+    // --- WHY --- NO ROUTE MESSAGE BEFORE AN AMOUNT IS ENTERED: the
+    // reader has not asked for a quote yet, so there is nothing to be
+    // found and nothing to explain. the empty state asks them for the
+    // amount that starts the search.
+    const fixed_human =
+      page.amount_side === "in" ? page.amount_in : page.amount_out;
+    const has_amount = fixed_human.trim().length > 0;
     return (
       <section class="swap-routes">
         <p class="swap-routes-note">
           {page.error !== null
             ? page.error
-            : "NO ROUTE FOR THIS PAIR — TRY ANOTHER AMOUNT OR ANOTHER TOKEN"}
+            : has_amount
+              ? "NO ROUTE FOR THIS PAIR — TRY ANOTHER AMOUNT OR ANOTHER TOKEN"
+              : "ENTER AN AMOUNT TO GET A ROUTE"}
         </p>
       </section>
     );
