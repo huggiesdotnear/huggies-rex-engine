@@ -50,6 +50,9 @@ export interface HUGGIES_SWAP_ROUTE {
   amount_in: string;
   // the minimum guaranteed output after slippage, in the same unit.
   worst_case_out: string;
+  // the minimum guaranteed input after slippage, in the input token's
+  // smallest unit. it is only there for an "amount out" quote.
+  worst_case_in: string;
   // how many transactions the route has to send.
   tx_count: number;
   // the route's own output token id, as the router names it.
@@ -96,6 +99,18 @@ function route_worst_case_out_fun(route: ROUTE): string {
   return route_amount_out_fun(route);
 }
 // ========================================
+// the worst-case input of a route, in the input token's smallest unit.
+//
+// --- WHY --- the "MIN" line needs one too: when the reader fixes the
+// output side, the number on the card is what the swap COSTS, and its
+// floor is the worst case of the INPUT amount. reading the output's
+// worst case there would show a number in the wrong token.
+function route_worst_case_in_fun(route: ROUTE): string {
+  const worst = route.worst_case_amount.amount_in;
+  if (typeof worst === "string" && worst.length > 0) return worst;
+  return route_amount_in_fun(route);
+}
+// ========================================
 // how many transactions the route sends.
 //
 // --- WHY --- the fee legs are counted too: they are transactions the
@@ -112,6 +127,7 @@ function map_routes_fun(routes: ReadonlyArray<ROUTE>): HUGGIES_SWAP_ROUTE[] {
     amount_out: route_amount_out_fun(route),
     amount_in: route_amount_in_fun(route),
     worst_case_out: route_worst_case_out_fun(route),
+    worst_case_in: route_worst_case_in_fun(route),
     tx_count: route_tx_count_fun(route),
     token_output: route.token_output,
     raw: route,

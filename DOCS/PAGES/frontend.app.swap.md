@@ -76,6 +76,12 @@ the aggregator answers with one route per dex that can serve the pair,
 best first. the best route is marked, and the reader can pick another.
 the route the reader picked is the one the output input shows.
 
+the route cards read the SIDE the reader is fixing. when they fixed the
+input, the card shows what the swap PAYS; when they fixed the output,
+the card shows what it COSTS. the router answers an amount out
+question with the amount IN, so a card that always read the amount out
+would show "0.00" for every route.
+
 the routes are fetched AND subscribed: the fetch fills the screen at
 once, and the socket keeps the amount out live as the pools move. the
 socket is bound to one query, so it is closed and reopened whenever the

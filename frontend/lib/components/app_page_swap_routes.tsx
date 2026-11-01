@@ -20,15 +20,25 @@ import type { HUGGIES_SWAP_ROUTE } from "../ts/swap/app_page_swap_routes";
 // ========================================
 // ========================================
 // --- CARD ------------------------------
-// one route card: the dex, the amount out, the worst case, the number
-// of transactions.
+// one route card: the dex, the amount, the worst case, the number of
+// transactions.
 //
-// --- WHY THE WORST CASE IS ON THE CARD: a quote is a promise about a
-// number that moves. the worst case is the floor the router will hold
+// --- WHY --- THE WORST CASE IS ON THE CARD: a quote is a promise about
+// a number that moves. the worst case is the floor the router will hold
 // to, and a reader choosing between routes wants to see it — a route
 // that pays more but can pay much less is not the better route.
+//
+// --- WHY --- THE CARD READS THE SIDE THE READER IS FIXING: the card's
+// job is to let the reader COMPARE the routes, and the number worth
+// comparing is the one they asked about. when they fixed the output,
+// the router answers with the amount IN, so the card shows what the
+// swap costs. showing the amount out there would read "0.00", because
+// the router does not answer an amount out question with an amount
+// out.
 function route_card_fun(
   route: HUGGIES_SWAP_ROUTE,
+  amount: string,
+  worst_case: string,
   decimals: number,
   symbol: string,
   is_best: boolean,
@@ -51,12 +61,12 @@ function route_card_fun(
         {is_best && <span class="swap-route-badge">BEST</span>}
       </span>
       <span class="swap-route-amount">
-        {HUGGIES_AMOUNT_FORMAT.balance(route.amount_out, { decimals })}{" "}
+        {HUGGIES_AMOUNT_FORMAT.balance(amount, { decimals })}{" "}
         {symbol}
       </span>
       <span class="swap-route-detail">
         <span>
-          MIN {HUGGIES_AMOUNT_FORMAT.balance(route.worst_case_out, { decimals })}{" "}
+          MIN {HUGGIES_AMOUNT_FORMAT.balance(worst_case, { decimals })}{" "}
           {symbol}
         </span>
         <span>
@@ -69,31 +79,41 @@ function route_card_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
+export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
   const page = use_page_store_fun(HUGGIES_APP_PAGE_SWAP_STORE);
 
   const out_info = page.token_out_info;
   const in_info = page.token_in_info;
-  const decimals = out_info?.decimals ?? 0;
-  const symbol = out_info?.symbol ?? page.token_out;
   const selected = HUGGIES_APP_PAGE_SWAP_STORE.get_selected_route();
+
+  // --- WHY --- THE CARDS READ THE SIDE THE READER IS FIXING: when they
+  // fix the output, the router answers with the amount IN, so the card
+  // shows what the swap COSTS. reading the output amount there would
+  // read "0.00", because the router does not answer an amount out
+  // question with an amount out.
+  const fixed_out = page.amount_side === "out";
+  // the token the number on the card is in.
+  const card_symbol = fixed_out
+    ? (in_info?.symbol ?? page.token_in)
+    : (out_info?.symbol ?? page.token_out);
+  const card_decimals = fixed_out
+    ? (in_info?.decimals ?? 0)
+    : (out_info?.decimals ?? 0);
+  // the number on the card, and its floor.
+  const card_amount = (route: HUGGIES_SWAP_ROUTE): string =>
+    fixed_out ? route.amount_in : route.amount_out;
+  const card_worst_case = (route: HUGGIES_SWAP_ROUTE): string =>
+    fixed_out ? route.worst_case_in : route.worst_case_out;
 
   // --- WHY --- THE SUMMARY READS THE SIDE THE READER IS FIXING: when
   // they fix the output, the number they care about is what it COSTS,
   // and the router answers that question with the input amount. the
   // line would otherwise name a number the reader is not waiting for.
-  const fixed_out = page.amount_side === "out";
-  const summary_symbol = fixed_out
-    ? (in_info?.symbol ?? page.token_in)
-    : symbol;
-  const summary_decimals = fixed_out
-    ? (in_info?.decimals ?? 0)
-    : decimals;
+  const summary_symbol = card_symbol;
+  const summary_decimals = card_decimals;
   const summary_amount = selected === null
     ? null
-    : fixed_out
-      ? selected.amount_in
-      : selected.amount_out;
+    : card_amount(selected);
   const summary_word = fixed_out ? "YOU PAY" : "YOU GET";
 
   if (page.loading_routes && page.routes.length === 0) {
@@ -126,8 +146,10 @@ function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
         {page.routes.map((route, index) =>
           route_card_fun(
             route,
-            decimals,
-            symbol,
+            card_amount(route),
+            card_worst_case(route),
+            card_decimals,
+            card_symbol,
             index === 0,
             selected !== null && selected.dex_id === route.dex_id,
           ),
