@@ -245,7 +245,9 @@ function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
           value={
             route === null || out_info === null
               ? ""
-              : unit_to_human_fun(route.amount_out, out_info.decimals)
+              : HUGGIES_AMOUNT_FORMAT.balance(route.amount_out, {
+                  decimals: out_info.decimals,
+                })
           }
           placeholder="0.00"
         />

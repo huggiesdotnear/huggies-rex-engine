@@ -15,7 +15,7 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "../ts/swap/app_page_swap_store";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
-import { unit_to_human_fun } from "../ts/swap/app_page_swap_amount";
+import { HUGGIES_AMOUNT_FORMAT } from "../ts/shared/token_amount_format";
 import type { HUGGIES_SWAP_ROUTE } from "../ts/swap/app_page_swap_routes";
 // ========================================
 // ========================================
@@ -51,11 +51,13 @@ function route_card_fun(
         {is_best && <span class="swap-route-badge">BEST</span>}
       </span>
       <span class="swap-route-amount">
-        {unit_to_human_fun(route.amount_out, decimals)} {symbol}
+        {HUGGIES_AMOUNT_FORMAT.balance(route.amount_out, { decimals })}{" "}
+        {symbol}
       </span>
       <span class="swap-route-detail">
         <span>
-          MIN {unit_to_human_fun(route.worst_case_out, decimals)} {symbol}
+          MIN {HUGGIES_AMOUNT_FORMAT.balance(route.worst_case_out, { decimals })}{" "}
+          {symbol}
         </span>
         <span>
           {route.tx_count} TX
@@ -114,7 +116,9 @@ function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
       </div>
       {selected !== null && (
         <p class="swap-routes-note">
-          YOU GET {unit_to_human_fun(selected.amount_out, decimals)} {symbol}
+          YOU GET{" "}
+          {HUGGIES_AMOUNT_FORMAT.balance(selected.amount_out, { decimals })}{" "}
+          {symbol}
         </p>
       )}
     </section>

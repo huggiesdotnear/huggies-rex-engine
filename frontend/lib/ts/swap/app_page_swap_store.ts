@@ -17,6 +17,7 @@ import { HUGGIES_APP_PAGE_SWAP_ROUTES } from "./app_page_swap_routes";
 import { HUGGIES_TOKEN_INFO } from "../shared/token_info";
 import { HUGGIES_AUTH } from "../shared/auth_status";
 import { HUGGIES_NEAR_ID } from "../shared/token_near";
+import { human_to_unit_fun } from "./app_page_swap_amount";
 import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../shared/token_info";
 import type { HUGGIES_SWAP_ROUTE } from "./app_page_swap_routes";
 // ========================================
@@ -284,15 +285,30 @@ async function load_fun(): Promise<void> {
 // ========================================
 // quote the swap: the routes for the current pair and amount, and the
 // live subscription that keeps them fresh.
+//
+// --- WHY --- THE HUMAN AMOUNT COMES IN AND THE UNIT AMOUNT GOES OUT:
+// the router quotes in the token's smallest unit, but the reader types
+// in whole tokens. the conversion happens HERE, in the store that owns
+// the quoting, so every caller quotes the same way and no caller can
+// forget the conversion.
 async function quote_fun(
   token_in: string,
   token_out: string,
   amount_in: string,
 ): Promise<void> {
-  await load_routes_fun(token_in, token_out, amount_in);
+  const info = state.token_in_info;
+  if (info === null) return;
+  const unit = human_to_unit_fun(amount_in, info.decimals);
+  // a half-typed amount has no unit amount, and a zero amount is not
+  // a trade. there is nothing to quote.
+  if (unit === null || unit === "0") {
+    set_state_fun({ ...state, routes: [], loading_routes: false });
+    return;
+  }
+  await load_routes_fun(token_in, token_out, unit);
   // the socket is opened after the fetch answered, so the reader sees
   // the routes immediately and the socket keeps them fresh from there.
-  open_subscription_fun(token_in, token_out, amount_in);
+  open_subscription_fun(token_in, token_out, unit);
 }
 // ========================================
 // ========================================
