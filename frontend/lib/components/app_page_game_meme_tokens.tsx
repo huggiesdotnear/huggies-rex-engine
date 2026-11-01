@@ -7,11 +7,11 @@
 // this component does not fetch. it reads the page's store and renders.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_EMOJI_TOKENS } from "../ts/app_page_game_emoji_tokens";
-import { token_detail_href_fun } from "../ts/token_link";
-import { HUGGIES_APP_PAGE_GAME_STORE } from "../ts/app_page_game_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_EMOJI_TOKENS } from "../ts/game/app_page_game_emoji_tokens";
+import { token_detail_href_fun } from "../ts/shared/token_link";
+import { HUGGIES_APP_PAGE_GAME_STORE } from "../ts/game/app_page_game_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 // ========================================
 function HUGGIES_COMPONENT_GAME_MEME_TOKENS_FUN() {
   // the page's icons, by token id. the store owns the load, so this only

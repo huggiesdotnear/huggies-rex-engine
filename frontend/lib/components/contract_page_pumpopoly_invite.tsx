@@ -11,11 +11,11 @@
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE">.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import {
   HUGGIES_PUMPOPOLY_INVITE_ACCOUNT,
   pumpopoly_invite_link_fun,
-} from "../ts/contract_page_pumpopoly_link";
+} from "../ts/contract/pumpopoly/contract_page_pumpopoly_link";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

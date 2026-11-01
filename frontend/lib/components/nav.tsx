@@ -6,7 +6,7 @@
 // filenames under /app/.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { Home, ArrowLeftRight, User, LayoutGrid } from "lucide-preact";
 // ========================================
 // ========================================

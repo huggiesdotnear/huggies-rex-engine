@@ -24,8 +24,8 @@
 // stutter while the page's own fetches are hogging the main thread.
 import { render } from "preact";
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_LOADING_BAR } from "../ts/loading_bar";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_LOADING_BAR } from "../ts/shared/loading_bar";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

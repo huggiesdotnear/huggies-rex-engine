@@ -11,8 +11,8 @@ import {
   useEffect as use_effect,
   useRef as use_ref,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_AUTH } from "../ts/auth_status";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_AUTH } from "../ts/shared/auth_status";
 // ========================================
 // ========================================
 // ========================================

@@ -16,21 +16,21 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { token_detail_href_fun } from "../ts/token_link";
-import { order_discover_tokens_fun } from "../ts/app_page_discover_token_order";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { token_detail_href_fun } from "../ts/shared/token_link";
+import { order_discover_tokens_fun } from "../ts/discover/app_page_discover_token_order";
 import {
   HUGGIES_DEFAULT_TOKEN_SORT,
   HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
-} from "../ts/app_page_discover_token_sort";
-import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/app_page_discover_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { use_scroll_load_fun } from "../ts/use_scroll_load";
-import { pinned_token_ids_fun } from "../ts/app_page_discover_pinned_tokens";
+} from "../ts/discover/app_page_discover_token_sort";
+import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../ts/discover/app_page_discover_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { use_scroll_load_fun } from "../ts/shared/use_scroll_load";
+import { pinned_token_ids_fun } from "../ts/discover/app_page_discover_pinned_tokens";
 import { huggies_sort_control_fun } from "./shared/sort_control";
-import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/app_page_discover_token_result";
+import type { HUGGIES_TOKEN_SEARCH_RESULT } from "../ts/discover/app_page_discover_token_result";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------

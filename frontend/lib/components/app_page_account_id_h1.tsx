@@ -3,9 +3,9 @@
 // id from the page's store and renders nothing when there is none.
 // mounts into <h1 id="HUGGIES_COMPONENT_ACCOUNT_ID_H1">.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/account/app_page_account_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

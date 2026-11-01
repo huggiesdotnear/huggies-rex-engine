@@ -9,9 +9,9 @@
 // (lib/ts/app_page_burn_addresses.ts), and the page's loader reads their
 // balances.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_BURN_ADDRESSES } from "../ts/app_page_burn_addresses";
-import { current_app_depth_fun } from "../ts/app_depth";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_BURN_ADDRESSES } from "../ts/burn/app_page_burn_addresses";
+import { current_app_depth_fun } from "../ts/shared/app_depth";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

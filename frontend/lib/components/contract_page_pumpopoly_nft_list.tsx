@@ -26,12 +26,12 @@
 import { render } from "preact";
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract/pumpopoly/contract_page_pumpopoly_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { huggies_error_card_fun } from "./shared/error_card";
 import { huggies_stat_tile_fun } from "./shared/stat_tile";
-import type { HUGGIES_PUMPOPOLY_NFT } from "../ts/contract_page_pumpopoly_parse";
+import type { HUGGIES_PUMPOPOLY_NFT } from "../ts/contract/pumpopoly/contract_page_pumpopoly_parse";
 // ========================================
 // ========================================
 // --- SORT ------------------------------

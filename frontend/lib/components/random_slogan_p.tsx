@@ -6,8 +6,8 @@
 // including SSR/node.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_SLOGANS } from "../ts/slogans";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_SLOGANS } from "../ts/shared/slogans";
 // ========================================
 // ========================================
 // ========================================

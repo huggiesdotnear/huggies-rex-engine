@@ -1,0 +1,64 @@
+/*==================================*/
+/* code_block
+   the highlighted code box, shared by every page that shows code: the
+   transaction page shows json in it.
+
+   shiki writes the colours inline on each token, so there is nothing
+   to colour here — the rules below are only the box the coloured code
+   sits in.
+
+   --- WHY --- THE BOX IS DARK AND NOT THE PAGE'S OWN TINT: shiki's
+   theme paints its own background, and a box around it in the page's
+   translucent black would show as a second frame around the first. the
+   frame here is a plain border. */
+/*==================================*/
+.code-block {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #282c34;
+  text-align: left;
+}
+/*==================================*/
+/* the plain text shown before the highlighter is ready. */
+.code-block.is-plain {
+  margin: 0;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* shiki's own output: the <pre> it writes, and the lines in it.
+   --- WHY --- THE LINES WRAP AND THE BOX DOES NOT SCROLL SIDEWAYS: a
+   json value can carry a string longer than the screen — a mint
+   address, a base64 blob — and a reader on a phone would have to
+   scroll sideways to read it. the code keeps its own line breaks, and
+   a line too long for the box breaks inside itself.
+   --- WHY --- THE LINE IS NOT inline-block: an inline-block line is
+   one unbreakable box, so a long line inside it cannot wrap. it is a
+   plain block instead, and the line's own width does not matter. */
+.code-block pre {
+  margin: 0;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  /* the code keeps its own line breaks — a json value broken across
+     lines is still one value — and a line too long for the box wraps
+     inside itself. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: transparent !important;
+}
+.code-block pre code {
+  display: block;
+}
+.code-block .line {
+  display: block;
+}
+/*==================================*/

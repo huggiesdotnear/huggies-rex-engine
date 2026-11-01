@@ -5,10 +5,10 @@
 // on that token's own page — it is an easter egg.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { current_app_depth_fun } from "../ts/app_depth";
-import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token_page_shit_1170_token";
-import { HUGGIES_URL_ID } from "../ts/url_id";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { current_app_depth_fun } from "../ts/shared/app_depth";
+import { HUGGIES_SHIT_TOKEN_ID } from "../ts/token/shit-1170/token_page_shit_1170_token";
+import { HUGGIES_URL_ID } from "../ts/shared/url_id";
 // ========================================
 // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim and
 // the blank-means-absent rule live there, so this link and the token

@@ -9,11 +9,11 @@
 // it reads the tab from the page's tab state and writes to it when the
 // reader picks one. it fetches nothing.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/app_page_account_tab";
-import { HUGGIES_ACCOUNT_TABS } from "../ts/app_page_account_tabs";
-import { HUGGIES_URL_TAB } from "../ts/app_page_account_url_tab";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/account/app_page_account_tab";
+import { HUGGIES_ACCOUNT_TABS } from "../ts/account/app_page_account_tabs";
+import { HUGGIES_URL_TAB } from "../ts/account/app_page_account_url_tab";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

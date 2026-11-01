@@ -9,10 +9,10 @@
 // nothing.
 import { render } from "preact";
 import { format_near_with_unit } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/app_page_tx_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { current_app_depth_fun } from "../ts/app_depth";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/tx/app_page_tx_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { current_app_depth_fun } from "../ts/shared/app_depth";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

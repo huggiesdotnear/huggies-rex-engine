@@ -19,18 +19,18 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_RHEA_STORE } from "../ts/contract_page_rhea_store";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_CONTRACT_PAGE_RHEA_STORE } from "../ts/contract/rhea/contract_page_rhea_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 import {
   HUGGIES_DEFAULT_RHEA_POOL_SORT,
   HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
   HUGGIES_RHEA_POOL_SORTS,
   type HUGGIES_RHEA_POOL_SORT,
   type HUGGIES_RHEA_POOL_SORT_DIRECTION,
-} from "../ts/contract_page_rhea_pool_sort";
+} from "../ts/contract/rhea/contract_page_rhea_pool_sort";
 import { huggies_sort_keys_control_fun } from "./shared/sort_keys_control";
-import type { HUGGIES_RHEA_POOL } from "../ts/contract_page_rhea";
+import type { HUGGIES_RHEA_POOL } from "../ts/contract/rhea/contract_page_rhea";
 import type { RHEA_POOL_SEARCH_TYPE } from "@sleet-js/middleman-rhea-api";
 // ========================================
 // ========================================

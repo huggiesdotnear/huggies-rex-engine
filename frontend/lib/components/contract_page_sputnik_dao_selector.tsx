@@ -13,12 +13,12 @@
 // mounts into <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR">.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_AUTH } from "../ts/auth_status";
-import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract_page_sputnik_dao_state";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_AUTH } from "../ts/shared/auth_status";
+import { HUGGIES_DAO_PAGE_STATE } from "../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
-import { HUGGIES_URL_ID } from "../ts/url_id";
+import { HUGGIES_URL_ID } from "../ts/shared/url_id";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

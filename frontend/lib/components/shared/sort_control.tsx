@@ -6,7 +6,7 @@ import {
   HUGGIES_TOKEN_SORTS,
   type HUGGIES_TOKEN_SORT,
   type HUGGIES_TOKEN_SORT_DIRECTION,
-} from "../../ts/app_page_discover_token_sort";
+} from "../../ts/discover/app_page_discover_token_sort";
 // ========================================
 export function huggies_sort_control_fun(props: {
   sort: HUGGIES_TOKEN_SORT;

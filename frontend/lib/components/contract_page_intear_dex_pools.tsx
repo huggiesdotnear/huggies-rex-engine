@@ -14,12 +14,12 @@
 // ========================================
 import { render } from "preact";
 import { useMemo as use_memo, useState as use_state } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../ts/contract_page_intear_dex_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { HUGGIES_INTEAR_DEX_POOL_SORTS } from "../ts/contract_page_intear_dex_pool_sort";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../ts/contract/intear-dex/contract_page_intear_dex_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { HUGGIES_INTEAR_DEX_POOL_SORTS } from "../ts/contract/intear-dex/contract_page_intear_dex_pool_sort";
 import { huggies_sort_keys_control_fun } from "./shared/sort_keys_control";
-import type { HUGGIES_INTEAR_DEX_POOL } from "../ts/contract_page_intear_dex";
+import type { HUGGIES_INTEAR_DEX_POOL } from "../ts/contract/intear-dex/contract_page_intear_dex";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

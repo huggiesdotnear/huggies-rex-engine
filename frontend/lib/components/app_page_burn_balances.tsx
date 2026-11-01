@@ -16,12 +16,12 @@
 //
 // this component does not fetch. it reads the page's store and renders.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_BURN_STORE } from "../ts/app_page_burn_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { HUGGIES_AMOUNT_FORMAT } from "../ts/token_amount_format";
-import { HUGGIES_SUPPLY_PERCENT } from "../ts/token_supply_percent";
-import { token_detail_href_fun } from "../ts/token_link";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_BURN_STORE } from "../ts/burn/app_page_burn_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { HUGGIES_AMOUNT_FORMAT } from "../ts/shared/token_amount_format";
+import { HUGGIES_SUPPLY_PERCENT } from "../ts/shared/token_supply_percent";
+import { token_detail_href_fun } from "../ts/shared/token_link";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

@@ -10,7 +10,7 @@
 // UTF-8, Hex, Base64) and the fastnear client decodes the arguments
 // for us, so the modes here are the ones the data actually has.
 //
-// --- WHY --- the mode buttons are `<button>` and not tabs: they change
+// --- WHY --- THE MODE BUTTONS ARE `<button>` AND NOT TABS: they change
 // what is shown inside the box, and the box stays where it is.
 //
 // --- WHY --- IT IS A COMPONENT AND NOT A PLAIN FUNCTION: the chosen
@@ -25,7 +25,7 @@ import {
   bytes_to_hex,
   default_args_view_mode,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { huggies_json_viewer_fun } from "./app_page_tx_json_viewer";
+import { huggies_code_block_fun } from "./shared/code_block";
 import type { DECODED_ARGS } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -81,19 +81,30 @@ function ARGS_VIEWER_FUN(props: {
         </span>
       </div>
       <div class="args-body">
+        {/* --- WHY --- THE JSON MODE SHOWS THE PARSED VALUE AND NOT THE
+            RAW BYTES: the raw bytes of a json argument are json with
+            the whitespace already gone, so the pretty-printed form is
+            the same value and much easier to read. */}
         {mode === "json" &&
           decoded.json !== null &&
-          huggies_json_viewer_fun({ value: decoded.json })}
-        {mode === "raw" && <pre class="args-text">{decoded.text}</pre>}
-        {mode === "hex" && (
-          <pre class="args-text">{bytes_to_hex(decoded.bytes)}</pre>
+          huggies_code_block_fun({
+            code: JSON.stringify(decoded.json, null, 2),
+          })}
+        {mode === "raw" && (
+          <div class="args-text">{huggies_code_block_fun({ code: decoded.text })}</div>
         )}
-        {mode === "base64" && <pre class="args-text">{props.base64}</pre>}
+        {mode === "hex" && (
+          <div class="args-text">
+            {huggies_code_block_fun({ code: bytes_to_hex(decoded.bytes) })}
+          </div>
+        )}
+        {mode === "base64" && (
+          <div class="args-text">{huggies_code_block_fun({ code: props.base64 })}</div>
+        )}
       </div>
     </div>
   );
 }
-// ========================================
 // ========================================
 // --- PUBLIC ---------------------------
 // the viewer, called the way the app calls its components.

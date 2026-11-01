@@ -6,11 +6,11 @@
 // --- WHY --- this exists because they already did: each table had its own
 // copy of this markup, and the copies were why the tables still looked
 // different after the styling moved to a shared class.
-import type { HUGGIES_TOKEN_INFO } from "../../ts/token_info";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/token_amount_format";
-import { token_amount_display_fun } from "../../ts/token_amount_display";
-import { token_detail_href_fun } from "../../ts/token_link";
-import { current_app_depth_fun } from "../../ts/app_depth";
+import type { HUGGIES_TOKEN_INFO } from "../../ts/shared/token_info";
+import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import { token_amount_display_fun } from "../../ts/shared/token_amount_display";
+import { token_detail_href_fun } from "../../ts/shared/token_link";
+import { current_app_depth_fun } from "../../ts/shared/app_depth";
 // ========================================
 // ========================================
 // --- ICON ------------------------------

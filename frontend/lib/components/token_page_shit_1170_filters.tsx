@@ -7,10 +7,10 @@
 // the tooltip on each tab is what the legend used to say — hovering the
 // emoji explains what that group of holders is.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
-import { HUGGIES_SHIT_FILTERS } from "../ts/token_page_shit_1170_filters";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token/shit-1170/token_page_shit_1170_state";
+import { HUGGIES_SHIT_FILTERS } from "../ts/token/shit-1170/token_page_shit_1170_filters";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

@@ -9,10 +9,10 @@
 // (lib/ts/contract_page_intear_dex_store.ts).
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../ts/contract_page_intear_dex_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { compact_usd_fun } from "../ts/compact_usd";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../ts/contract/intear-dex/contract_page_intear_dex_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { compact_usd_fun } from "../ts/shared/compact_usd";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------

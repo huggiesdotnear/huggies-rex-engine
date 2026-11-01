@@ -2,11 +2,11 @@
 // discover links for supported smart contracts.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import {
   contract_page_href_fun,
   list_contract_cards_fun,
-} from "../ts/app_page_discover_contract_cards";
+} from "../ts/discover/app_page_discover_contract_cards";
 // ========================================
 function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
   return (

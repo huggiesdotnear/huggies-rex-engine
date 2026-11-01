@@ -27,11 +27,11 @@ import {
   time_ago,
 } from "@sleet-js/fastnear-explorer-api-client";
 import { CircleCheck, CircleX } from "lucide-preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/app_page_tx_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { current_app_depth_fun } from "../ts/app_depth";
-import { huggies_json_viewer_fun } from "./app_page_tx_json_viewer";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/tx/app_page_tx_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { current_app_depth_fun } from "../ts/shared/app_depth";
+import { huggies_code_block_fun } from "./shared/code_block";
 import { huggies_args_viewer_fun } from "./app_page_tx_args_viewer";
 import type {
   ACTION,
@@ -74,31 +74,6 @@ function action_parts_fun(
 }
 // ========================================
 // ========================================
-// --- ACCESS KEY PERMISSION ------------
-// what an AddKey action gave the key.
-//
-// --- WHY --- IT IS READ HERE AND NOT FROM THE CLIENT: the client's
-// parse_action reads it, but the client only parses the TRANSACTION's
-// actions — the receipts are passed through raw — so a receipt's own
-// actions are never parsed by it.
-function access_key_permission_fun(
-  payload: Record<string, unknown>,
-): string | null {
-  const access_key = payload.access_key;
-  if (typeof access_key !== "object" || access_key === null) return null;
-  const permission = (access_key as Record<string, unknown>).permission;
-  if (typeof permission === "string") return permission;
-  if (typeof permission !== "object" || permission === null) return null;
-  const function_call = (permission as Record<string, unknown>).FunctionCall;
-  if (typeof function_call !== "object" || function_call === null) {
-    return null;
-  }
-  const receiver_id = (function_call as Record<string, unknown>).receiver_id;
-  if (typeof receiver_id !== "string") return null;
-  return `FUNCTION CALL ${receiver_id}`;
-}
-// ========================================
-// ========================================
 // --- RECEIPT ACTION --------------------
 // one action of a receipt: what it did, and the details it carried.
 //
@@ -115,17 +90,7 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
       ? payload.deposit
       : null;
   const gas = typeof payload.gas === "number" ? payload.gas : null;
-  const public_key =
-    typeof payload.public_key === "string" ? payload.public_key : null;
-  const beneficiary_id =
-    typeof payload.beneficiary_id === "string" ? payload.beneficiary_id : null;
   const args = typeof payload.args === "string" ? payload.args : null;
-  const stake =
-    typeof payload.stake === "string" && payload.stake !== "0"
-      ? payload.stake
-      : null;
-  const code_hash = typeof payload.code_hash === "string" ? payload.code_hash : null;
-  const permission = access_key_permission_fun(payload);
 
   return (
     <div class="tx-receipt-action">
@@ -141,29 +106,15 @@ function receipt_action_fun(action: ACTION): preact.JSX.Element {
             {format_near_with_unit(deposit)}
           </span>
         )}
-        {stake !== null && (
-          <span class="tx-receipt-action-deposit">
-            STAKE: {format_near_with_unit(stake)}
-          </span>
-        )}
       </div>
-      {permission !== null && (
-        <span class="tx-receipt-action-extra">
-          PERMISSION: {permission}
-        </span>
-      )}
-      {public_key !== null && (
-        <code class="tx-receipt-action-extra">{public_key}</code>
-      )}
-      {beneficiary_id !== null && (
-        <span class="tx-receipt-action-extra">
-          BENEFICIARY:{" "}
-          <a href={account_href_fun(beneficiary_id)}>{beneficiary_id}</a>
-        </span>
-      )}
-      {code_hash !== null && (
-        <code class="tx-receipt-action-extra">{code_hash}</code>
-      )}
+      {/* --- WHY --- THE ACTION IS ONE JSON BLOCK AND NOT A LIST OF
+          FIELDS: a receipt's action is one signed object — a key, a
+          delete, a function call — and its fields are all json. one
+          block shows the whole action, the way the chain signed it,
+          with nothing left out and nothing repeated. */}
+      {huggies_code_block_fun({
+        code: JSON.stringify(action, null, 2),
+      })}
       {args !== null &&
         huggies_args_viewer_fun({
           base64: args,
@@ -215,7 +166,13 @@ function result_fun(receipt: RECEIPT_WITH_OUTCOME): preact.JSX.Element {
   return (
     <div class="tx-receipt-result is-failed">
       <span class="tx-receipt-result-label">FAILED</span>
-      {huggies_json_viewer_fun({ value: status.Failure })}
+      {/* --- WHY --- THE FAILURE IS A CODE BLOCK: a failure is json — an
+          error kind and a message, sometimes with more under them — and
+          the message is the one thing a reader comes to this page for.
+          the block shows the whole failure, not just the message. */}
+      {huggies_code_block_fun({
+        code: JSON.stringify(status.Failure, null, 2),
+      })}
     </div>
   );
 }
@@ -224,13 +181,17 @@ function result_fun(receipt: RECEIPT_WITH_OUTCOME): preact.JSX.Element {
 // --- LOG ------------------------------
 // one log line of a receipt.
 //
-// --- WHY --- an event log is json: the contract wrote a json event, and
-// showing it as a tree says what it was and what it carried. a log
+// --- WHY --- AN EVENT LOG IS JSON: the contract wrote a json event, and
+// showing it in a block says what it was and what it carried. a log
 // that is not json is shown as the text it is.
 function log_fun(log: string): preact.JSX.Element {
   const event = parse_event_json(log);
   if (event === null) {
-    return <pre class="tx-receipt-log-text">{log}</pre>;
+    return (
+      <div class="tx-receipt-log-text">
+        {huggies_code_block_fun({ code: log })}
+      </div>
+    );
   }
   return (
     <div class="tx-receipt-event">
@@ -243,7 +204,9 @@ function log_fun(log: string): preact.JSX.Element {
         )}
       </div>
       {event.data !== undefined &&
-        huggies_json_viewer_fun({ value: event.data })}
+        huggies_code_block_fun({
+          code: JSON.stringify(event.data, null, 2),
+        })}
     </div>
   );
 }

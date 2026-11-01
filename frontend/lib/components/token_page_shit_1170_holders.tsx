@@ -6,17 +6,17 @@
 // the next page is asked for when the reader nears the bottom of the list.
 import { render } from "preact";
 import { useRef as use_ref } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "../ts/token_page_shit_1170";
-import { current_app_depth_fun } from "../ts/app_depth";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { use_scroll_load_fun } from "../ts/use_scroll_load";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token/shit-1170/token_page_shit_1170_state";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "../ts/token/shit-1170/token_page_shit_1170";
+import { current_app_depth_fun } from "../ts/shared/app_depth";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { use_scroll_load_fun } from "../ts/shared/use_scroll_load";
 import {
   shit_holder_icon_fun,
   shit_holder_type_label_fun,
   type HUGGIES_SHIT_HOLDER,
-} from "../ts/token_page_shit_1170_holders";
+} from "../ts/token/shit-1170/token_page_shit_1170_holders";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------

@@ -13,9 +13,9 @@
 // <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS">.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract_page_pumpopoly_store";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../ts/contract/pumpopoly/contract_page_pumpopoly_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { huggies_error_card_fun } from "./shared/error_card";
 import { huggies_stat_tile_fun } from "./shared/stat_tile";
 // ========================================

@@ -5,10 +5,10 @@
 // it reads the loaded token from the page's store. it fetches nothing.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
-import { format_price_usd_fun } from "../ts/token_page_token_price_format";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token/index/token_page_token_state";
+import { format_price_usd_fun } from "../ts/token/index/token_page_token_price_format";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { huggies_token_meta_grid_fun } from "./shared/token_meta_grid";
 // ========================================
 // ========================================

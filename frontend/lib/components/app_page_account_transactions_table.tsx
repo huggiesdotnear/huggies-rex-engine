@@ -12,11 +12,11 @@
 // the transactions tab.
 import { render } from "preact";
 import { useRef as use_ref } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "../ts/app_page_account_tx_store";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/app_page_account_tab";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { use_scroll_load_fun } from "../ts/use_scroll_load";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "../ts/account/app_page_account_tx_store";
+import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/account/app_page_account_tab";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { use_scroll_load_fun } from "../ts/shared/use_scroll_load";
 import { account_tx_row_fun } from "./app_page_account_tx_row";
 // ========================================
 // ========================================

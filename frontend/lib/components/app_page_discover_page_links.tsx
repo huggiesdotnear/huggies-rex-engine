@@ -13,7 +13,7 @@
 // pages change, and a constant keeps the cards honest: there is one
 // place to add a page.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { ArrowLeftRight, GraduationCap } from "lucide-preact";
 import type { ComponentType } from "preact";
 // ========================================

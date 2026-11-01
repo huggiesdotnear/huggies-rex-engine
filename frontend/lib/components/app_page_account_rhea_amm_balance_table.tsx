@@ -8,9 +8,9 @@
 // the table is the shared one (lib/components/shared/balance_table.tsx).
 import { render } from "preact";
 // aliased on import so call sites follow this repo's snake_case rule.
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/account/app_page_account_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { huggies_balance_table_fun } from "./shared/balance_table";
 import { huggies_account_tab_view_fun } from "./app_page_account_tab_view";
 // ========================================

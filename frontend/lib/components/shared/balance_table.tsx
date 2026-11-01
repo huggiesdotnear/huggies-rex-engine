@@ -16,13 +16,13 @@
 // height cap.
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/token_amount_format";
-import { HUGGIES_BALANCE_FILTER } from "../../ts/balance_filter";
-import { HUGGIES_BALANCE_SORT } from "../../ts/balance_sort";
+import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import { HUGGIES_BALANCE_FILTER } from "../../ts/shared/balance_filter";
+import { HUGGIES_BALANCE_SORT } from "../../ts/shared/balance_sort";
 import { huggies_balance_row_fun } from "./balance_row";
-import type { HUGGIES_BALANCE_ENTRY } from "../../ts/balance_filter";
-import type { HUGGIES_BALANCE_SORT_BY } from "../../ts/balance_sort";
-import { HUGGIES_NEAR_ID } from "../../ts/token_near";
+import type { HUGGIES_BALANCE_ENTRY } from "../../ts/shared/balance_filter";
+import type { HUGGIES_BALANCE_SORT_BY } from "../../ts/shared/balance_sort";
+import { HUGGIES_NEAR_ID } from "../../ts/shared/token_near";
 // ========================================
 // --- CONFIG -----------------------------
 // the native NEAR row is pinned above the sorted list: it is the gas balance

@@ -5,9 +5,9 @@
 // it reads the page's store through the shared hook. it fetches nothing
 // — the page's start script runs the load.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token_page_shit_1170_state";
-import { use_page_store_fun } from "../ts/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../ts/token/shit-1170/token_page_shit_1170_state";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

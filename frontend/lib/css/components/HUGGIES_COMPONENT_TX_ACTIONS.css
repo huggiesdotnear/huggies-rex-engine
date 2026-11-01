@@ -2,15 +2,11 @@
 /* HUGGIES_COMPONENT_TX_ACTIONS
    the transaction's actions: what the transaction actually did.
 
-   one card per action, with the action's kind and the details it
-   carries. the arguments viewer is its own file
-   (HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css), so its own look lives in
-   its own file. the json tree it shows is its own file
-   (HUGGIES_COMPONENT_TX_JSON_VIEWER.css), so the receipts component
-   and this one share it. */
+   one card per action: the action's kind, and the action itself as a
+   json block. the code block is a shared component, so its own look
+   lives in its own file (shared/code_block.css). */
 /*==================================*/
-@import url(./HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css);
-@import url(./HUGGIES_COMPONENT_TX_JSON_VIEWER.css);
+@import url(./shared/code_block.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_ACTIONS .tx-actions {
@@ -31,7 +27,7 @@
   gap: 8px;
 }
 /*==================================*/
-#HUGGIES_COMPONENT_TX_ACTIONS .tx-action {
+#HUGGIES_COMPONENT_TX_ACTIONS .tx-actions-list > div {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -56,11 +52,5 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   opacity: 0.75;
-}
-#HUGGIES_COMPONENT_TX_ACTIONS .tx-action-extra {
-  font-size: 11px;
-  opacity: 0.85;
-  overflow-wrap: anywhere;
-  word-break: break-all;
 }
 /*==================================*/

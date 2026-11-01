@@ -4,11 +4,10 @@
    came of it.
 
    one card per receipt: its facts, its actions, what it returned and
-   what it logged. the json tree is its own file
-   (HUGGIES_COMPONENT_TX_JSON_VIEWER.css), so its own look lives in
-   its own file. */
+   what it logged. the code block is a shared component, so its own
+   look lives in its own file (shared/code_block.css). */
 /*==================================*/
-@import url(./HUGGIES_COMPONENT_TX_JSON_VIEWER.css);
+@import url(./shared/code_block.css);
 @import url(./HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css);
 
 /*==================================*/
@@ -132,12 +131,6 @@
   font-size: 11px;
   opacity: 0.75;
 }
-#HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-action-extra {
-  font-size: 11px;
-  opacity: 0.85;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
 /*==================================*/
 /* the result of the receipt — what it returned, or why it failed. */
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-result {
@@ -175,15 +168,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-log-text {
-  margin: 0;
-  padding: 8px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.16);
-  font-family: monospace;
-  font-size: 11px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-all;
+  min-width: 0;
 }
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipt-event {
   display: flex;

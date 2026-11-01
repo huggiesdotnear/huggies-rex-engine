@@ -8,7 +8,7 @@
 // two short ideas side by side, and a reader takes one of them in at a
 // time. a single paragraph of both would be a wall.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

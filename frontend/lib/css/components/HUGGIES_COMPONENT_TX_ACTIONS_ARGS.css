@@ -94,14 +94,9 @@
   max-height: 320px;
   overflow: auto;
 }
+/* the text modes (raw, hex, base64) keep their own box. */
 #HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-text,
 #HUGGIES_COMPONENT_TX_RECEIPTS .args-viewer .args-text {
-  margin: 0;
-  font-family: monospace;
-  font-size: 11px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  line-height: 1.4;
+  min-width: 0;
 }
 /*==================================*/

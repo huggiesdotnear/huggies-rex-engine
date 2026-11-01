@@ -9,8 +9,8 @@
 // <div id="HUGGIES_COMPONENT_TOKEN_SELECTOR">.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token_page_token_state";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../ts/token/index/token_page_token_state";
 import { huggies_id_jump_box_fun } from "./shared/id_jump_box";
 // ========================================
 // ========================================

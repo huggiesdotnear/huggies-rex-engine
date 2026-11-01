@@ -1,9 +1,17 @@
 // ========================================
 // the transaction's actions: what the transaction actually did.
 //
-// each action is one line with its kind and the details that kind
-// carries — the method name and the arguments of a function call, the
-// beneficiary of a delete, the public key of a key action.
+// --- WHY --- THE ACTIONS ARE ONE JSON BLOCK AND NOT A CARD EACH: a
+// function call's arguments are json, a key action's permission is
+// json, and a stake is a number. showing each action as a card meant
+// a row of loose fields with the arguments buried under them. one
+// block of json says all of it at once, and it is the same shape the
+// explorer shows.
+//
+// --- WHY --- THE RAW ACTION IS SHOWN AND NOT THE PARSED ONE: the
+// parsed action has the method name and the gas lifted out for the
+// summary, but the raw action is everything the chain signed. the
+// block shows what was signed, so nothing is lost.
 //
 // it reads the loaded transaction from the page's store. it fetches
 // nothing.
@@ -12,10 +20,10 @@ import {
   format_gas,
   format_near_with_unit,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
-import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/app_page_tx_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_args_viewer_fun } from "./app_page_tx_args_viewer";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
+import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/tx/app_page_tx_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { huggies_code_block_fun } from "./shared/code_block";
 import type { PARSED_ACTION } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -45,55 +53,6 @@ function deposit_fun(action: PARSED_ACTION): string | null {
 }
 // ========================================
 // ========================================
-// --- ACTION ---------------------------
-// one action: its summary, the extras it carries and its arguments.
-function action_fun(action: PARSED_ACTION): preact.JSX.Element {
-  const deposit = deposit_fun(action);
-  return (
-    <div class="tx-action">
-      <div class="tx-action-head">
-        <span class="tx-action-type">{action_summary_fun(action)}</span>
-        {action.gas !== undefined && (
-          <span class="tx-action-gas">{format_gas(action.gas)}</span>
-        )}
-        {deposit !== null && (
-          // --- WHY --- the deposit is formatted and not shown raw: it
-          // is a yoctoNEAR integer, so "9 NEAR" would otherwise read
-          // as "9000000000000000000000000 NEAR".
-          <span class="tx-action-deposit">
-            {format_near_with_unit(deposit)}
-          </span>
-        )}
-      </div>
-      {action.public_key !== undefined && (
-        <code class="tx-action-extra">{action.public_key}</code>
-      )}
-      {action.beneficiary_id !== undefined && (
-        <span class="tx-action-extra">
-          BENEFICIARY: {action.beneficiary_id}
-        </span>
-      )}
-      {action.code_hash !== undefined && (
-        <code class="tx-action-extra">{action.code_hash}</code>
-      )}
-      {action.stake !== undefined && (
-        // --- WHY --- the stake is formatted and not shown raw: it is a
-        // yoctoNEAR integer.
-        <span class="tx-action-extra">
-          STAKE: {format_near_with_unit(action.stake)}
-        </span>
-      )}
-      {action.args !== undefined &&
-        action.args_decoded !== undefined &&
-        huggies_args_viewer_fun({
-          base64: action.args,
-          decoded: action.args_decoded,
-        })}
-    </div>
-  );
-}
-// ========================================
-// ========================================
 // --- COMPONENT --------------------------
 export function HUGGIES_COMPONENT_TX_ACTIONS_FUN() {
   const state = use_page_store_fun(HUGGIES_APP_PAGE_TX_STORE);
@@ -110,7 +69,25 @@ export function HUGGIES_COMPONENT_TX_ACTIONS_FUN() {
       <h2>ACTIONS ({actions.length})</h2>
       <div class="tx-actions-list">
         {actions.map((action, index) => (
-          <div key={`${action.type}-${index}`}>{action_fun(action)}</div>
+          <div key={`${action.type}-${index}`}>
+            <div class="tx-action-head">
+              <span class="tx-action-type">{action_summary_fun(action)}</span>
+              {action.gas !== undefined && (
+                <span class="tx-action-gas">{format_gas(action.gas)}</span>
+              )}
+              {deposit_fun(action) !== null && (
+                // --- WHY --- the deposit is formatted and not shown raw: it
+                // is a yoctoNEAR integer, so "9 NEAR" would otherwise read
+                // as "9000000000000000000000000 NEAR".
+                <span class="tx-action-deposit">
+                  {format_near_with_unit(deposit_fun(action) as string)}
+                </span>
+              )}
+            </div>
+            {huggies_code_block_fun({
+              code: JSON.stringify(action.raw, null, 2),
+            })}
+          </div>
         ))}
       </div>
     </section>

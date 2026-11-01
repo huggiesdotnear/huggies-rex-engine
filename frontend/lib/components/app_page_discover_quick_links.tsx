@@ -8,7 +8,7 @@
 // the links stay quiet on purpose: they are meant to be found, so they
 // are small, low contrast, and only a little brighter on hover.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

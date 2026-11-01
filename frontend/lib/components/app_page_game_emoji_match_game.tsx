@@ -13,10 +13,10 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_EMOJI_TOKENS } from "../ts/app_page_game_emoji_tokens";
-import { HUGGIES_APP_PAGE_GAME_STORE } from "../ts/app_page_game_store";
-import { use_page_store_fun } from "../ts/use_page_store";
-import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
+import { HUGGIES_EMOJI_TOKENS } from "../ts/game/app_page_game_emoji_tokens";
+import { HUGGIES_APP_PAGE_GAME_STORE } from "../ts/game/app_page_game_store";
+import { use_page_store_fun } from "../ts/shared/use_page_store";
+import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 // ========================================
 interface HUGGIES_EMOJI_CARD {
   id: number;
