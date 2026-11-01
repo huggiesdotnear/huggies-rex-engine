@@ -12,37 +12,18 @@ import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/app_page_account_tab";
 import { HUGGIES_ACCOUNT_TABS } from "../ts/app_page_account_tabs";
+import { HUGGIES_URL_TAB } from "../ts/app_page_account_url_tab";
 import { use_page_store_fun } from "../ts/use_page_store";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // the href of a tab.
 //
-// --- WHY THE DEFAULT TAB HAS NO `?tab=`: it is the view most readers
-// want, and a url without a parameter is the cleanest way to say it.
-// the second tab carries its name, so it can be linked to directly.
-//
-// --- WHY --- the href KEEPS the other parameters: the url carries the
-// account the reader is looking at, and a tab link that dropped it
-// would take the account away.
-//
-// --- WHY --- the link works without javascript: the click handler
-// below only makes the switch instant. without it the browser follows
-// the href, and the page reads the tab off the url and shows the same
-// view.
+// --- WHY --- IT COMES FROM THE URL MODULE: the link a reader copies
+// has to be the url they get when they click it, so the href and the
+// written url are built by the same code.
 function tab_href_fun(name: string): string {
-  if (typeof window === "undefined" || typeof window.location === "undefined") {
-    return "";
-  }
-  const url = new URL(window.location.href);
-  if (name === HUGGIES_ACCOUNT_TABS[0].name) {
-    url.searchParams.delete("tab");
-  } else {
-    url.searchParams.set("tab", name);
-  }
-  // the path and the search only — the hash is not part of the page's
-  // own state.
-  return `${url.pathname}${url.search}`;
+  return HUGGIES_URL_TAB.href(name);
 }
 // ========================================
 // ========================================
@@ -54,13 +35,20 @@ export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
   const tab = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE);
 
   return (
-    <nav class="account-tabs" aria-label="account views">
+    // --- WHY --- IT IS NOT A `<nav>`: the app-wide nav rule
+    // (base/nav.css) styles every `<nav>` as the fixed bottom bar, so
+    // a `<nav>` here would be pinned to the bottom of the screen on
+    // top of the app's own nav. a `<div>` with the tab role says what
+    // it is without taking the base rule.
+    <div class="account-tabs" role="tablist" aria-label="account views">
       {HUGGIES_ACCOUNT_TABS.map((item) => {
         const is_active = item.name === tab;
         return (
           <a
             class={is_active ? "is-active" : ""}
             href={tab_href_fun(item.name)}
+            role="tab"
+            aria-selected={is_active}
             aria-current={is_active ? "page" : undefined}
             onClick={(event) => {
               // --- WHY --- the click is handled here and not left to
@@ -93,7 +81,7 @@ export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
           </a>
         );
       })}
-    </nav>
+    </div>
   );
 }
 // ========================================

@@ -3,10 +3,14 @@
    the transaction's actions: what the transaction actually did.
 
    one card per action, with the action's kind and the details it
-   carries. the arguments viewer is a shared component
-   (shared/args_viewer.css), so its own look lives in its own file. */
+   carries. the arguments viewer is its own file
+   (HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css), so its own look lives in
+   its own file. the json tree it shows is the shared one
+   (shared/json_viewer.css), so the receipts component and this one
+   share it. */
 /*==================================*/
-@import url(./shared/args_viewer.css);
+@import url(./HUGGIES_COMPONENT_TX_ACTIONS_ARGS.css);
+@import url(./shared/json_viewer.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_ACTIONS .tx-actions {

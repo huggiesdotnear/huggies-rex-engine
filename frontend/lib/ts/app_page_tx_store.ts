@@ -11,7 +11,7 @@
 // holds one thing. the account page's store holds four balance tables
 // and the transaction page's holds one transaction.
 import { HUGGIES_APP_PAGE_TX } from "./app_page_tx";
-import { HUGGIES_URL_TX } from "./url_tx";
+import { HUGGIES_URL_TX } from "./app_page_tx_url";
 import type { HUGGIES_APP_PAGE_TX_DATA } from "./app_page_tx";
 // ========================================
 // ========================================
@@ -124,23 +124,11 @@ function get_state_fun(): HUGGIES_APP_PAGE_TX_STATE {
 }
 // ========================================
 // ========================================
-// --- WATCH -----------------------------
-// the store follows the url's hash, so a change of hash reloads the
-// page by itself.
-function watch_fun(): void {
-  // the url is read on every load, so the page's own start is enough
-  // for a fresh navigation. a change of the url without a reload is
-  // not something this page does, so there is nothing to watch.
-  void load_fun;
-}
-// ========================================
-// ========================================
 // --- PUBLIC ---------------------------
 export const HUGGIES_APP_PAGE_TX_STORE = {
   get: get_state_fun,
   subscribe: subscribe_fun,
   load: load_fun,
-  watch: watch_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

@@ -8,11 +8,14 @@
 // it reads the loaded transaction from the page's store. it fetches
 // nothing.
 import { render } from "preact";
-import { format_gas } from "@sleet-js/fastnear-explorer-api-client";
+import {
+  format_gas,
+  format_near_with_unit,
+} from "@sleet-js/fastnear-explorer-api-client";
 import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_TX_STORE } from "../ts/app_page_tx_store";
 import { use_page_store_fun } from "../ts/use_page_store";
-import { huggies_args_viewer_fun } from "./shared/args_viewer";
+import { huggies_args_viewer_fun } from "./app_page_tx_args_viewer";
 import type { PARSED_ACTION } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -54,7 +57,12 @@ function action_fun(action: PARSED_ACTION): preact.JSX.Element {
           <span class="tx-action-gas">{format_gas(action.gas)}</span>
         )}
         {deposit !== null && (
-          <span class="tx-action-deposit">{deposit} NEAR</span>
+          // --- WHY --- the deposit is formatted and not shown raw: it
+          // is a yoctoNEAR integer, so "9 NEAR" would otherwise read
+          // as "9000000000000000000000000 NEAR".
+          <span class="tx-action-deposit">
+            {format_near_with_unit(deposit)}
+          </span>
         )}
       </div>
       {action.public_key !== undefined && (
@@ -69,10 +77,18 @@ function action_fun(action: PARSED_ACTION): preact.JSX.Element {
         <code class="tx-action-extra">{action.code_hash}</code>
       )}
       {action.stake !== undefined && (
-        <span class="tx-action-extra">STAKE: {action.stake}</span>
+        // --- WHY --- the stake is formatted and not shown raw: it is a
+        // yoctoNEAR integer.
+        <span class="tx-action-extra">
+          STAKE: {format_near_with_unit(action.stake)}
+        </span>
       )}
       {action.args !== undefined &&
-        huggies_args_viewer_fun({ base64: action.args })}
+        action.args_decoded !== undefined &&
+        huggies_args_viewer_fun({
+          base64: action.args,
+          decoded: action.args_decoded,
+        })}
     </div>
   );
 }

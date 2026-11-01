@@ -20,11 +20,11 @@ import {
   load_account_transactions_fun,
   load_cached_account_transactions_fun,
   load_more_account_transactions_fun,
-} from "./account_transactions";
+} from "./app_page_account_transactions";
 import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
 import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab";
-import type { HUGGIES_ACCOUNT_TX_PAGE } from "./account_transactions";
-import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./account_transactions_cache";
+import type { HUGGIES_ACCOUNT_TX_PAGE } from "./app_page_account_transactions";
+import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------

@@ -8,8 +8,8 @@
 //
 // it renders what it is given and fetches nothing.
 import { time_ago } from "@sleet-js/fastnear-explorer-api-client";
-import { current_app_depth_fun } from "../../ts/app_depth";
-import { tx_detail_href_fun } from "../../ts/tx_link";
+import { current_app_depth_fun } from "../ts/app_depth";
+import { tx_detail_href_fun } from "../ts/app_page_account_tx_link";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------

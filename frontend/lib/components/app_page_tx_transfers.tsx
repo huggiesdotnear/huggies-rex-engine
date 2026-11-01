@@ -68,9 +68,23 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
               {endpoint_fun(transfer.to)}
             </div>
             <div class="tx-transfer-amount">
-              {transfer.token_type === "near"
-                ? format_near_with_unit(transfer.amount)
-                : transfer.amount}
+              {/* --- WHY --- a NEAR amount is formatted and a TOKEN
+                  amount is not: the token's amount is in the token's
+                  own smallest unit, and this page does not know the
+                  token's decimals — so it would be a lie to divide it
+                  by something. the raw amount is shown with the
+                  token's standard beside it, so the reader knows what
+                  they are looking at. */}
+              {transfer.token_type === "near" ? (
+                format_near_with_unit(transfer.amount)
+              ) : (
+                <>
+                  <span class="tx-transfer-raw">{transfer.amount}</span>
+                  <span class="tx-transfer-type">
+                    {transfer.token_type.toUpperCase()}
+                  </span>
+                </>
+              )}
               {transfer.contract_id !== undefined && (
                 <code class="tx-transfer-contract">
                   {transfer.contract_id}

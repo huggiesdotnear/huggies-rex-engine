@@ -4,12 +4,9 @@
    happened, the block, how the account was involved and whether it
    worked.
 
-   the row itself is a shared component
-   (shared/account_tx_row.css), so both the column widths and the
-   row's own look live in their own files. */
-/*==================================*/
-@import url(./shared/account_tx_row.css);
-
+   the row is its own component (app_page_account_tx_row.tsx), but it is
+   a plain `<tr>` with no markup of its own, so the rules that give it
+   its columns live here — with the table that owns the row. */
 /*==================================*/
 #HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions {
   margin-top: 20px;
@@ -45,7 +42,8 @@
 }
 /* the row that carries a message — "LOADING TRANSACTIONS..." and
    "NO TRANSACTIONS" — spans the whole table and is not a data row. */
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions td[colspan] {
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td[colspan] {
   text-align: center;
   padding: 16px 4px;
   font-family: Arial, Helvetica, sans-serif;
@@ -54,7 +52,83 @@
   opacity: 0.7;
 }
 /*==================================*/
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions .tx-error {
+/* the row's columns.
+
+   the table has five columns, so the hash takes what it needs and the
+   rest share what is left. */
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  th.tx-hash,
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-hash {
+  width: 46%;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-hash a {
+  display: block;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+  font-family: monospace;
+  font-size: 10px;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  th.tx-time,
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-time {
+  width: 15%;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  th.tx-height,
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-height {
+  width: 13%;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  th.tx-involvement,
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-involvement {
+  width: 16%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  th.tx-status,
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-status {
+  width: 10%;
+  text-align: right;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+/* a failed transaction is the one thing on the row the reader must not
+   miss. */
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  td.tx-status.is-failed {
+  color: var(--color-backend-light);
+  opacity: 1;
+  font-weight: 700;
+}
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/
+/* the messages under and over the table. */
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  .tx-error {
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
@@ -66,7 +140,8 @@
   margin: 8px 0;
   overflow-wrap: anywhere;
 }
-#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions .tx-loading-more {
+#HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions
+  .tx-loading-more {
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;

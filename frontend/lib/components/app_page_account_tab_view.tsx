@@ -7,20 +7,23 @@
 // a gate, every component would have to ask the tab state the same
 // question and return early, and one of them would forget.
 //
-// --- WHY --- it is a shared component: the gate is used by five
-// components on the account page and by nothing else, but it is not
-// the account page's own component either — it carries no mount id
-// and it is asked for by other components, so it belongs here.
+// --- WHY --- IT IS A PAGE COMPONENT AND NOT A SHARED ONE: it is used
+// by the account page's balance tables and by nothing else, so it
+// carries the account page's prefix.
+//
+// --- WHY --- IT HAS NO MARKUP OF ITS OWN: a gate is a decision, not a
+// thing on the screen. it renders its children and nothing else, so
+// there is no element of its own to style.
 //
 // this component does NOT fetch. it renders nothing when the tab on
 // screen is not the one it names.
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/app_page_account_tab";
-import { use_page_store_fun } from "../../ts/use_page_store";
+import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../ts/app_page_account_tab";
+import { use_page_store_fun } from "../ts/use_page_store";
 import type { ComponentChildren } from "preact";
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_ACCOUNT_TAB_VIEW_PROPS {
+export interface HUGGIES_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS {
   // the tab whose contents these are.
   tab: "balances" | "transactions";
   // what to render when that tab is the one on screen.
@@ -30,7 +33,7 @@ export interface HUGGIES_ACCOUNT_TAB_VIEW_PROPS {
 // ========================================
 // --- COMPONENT --------------------------
 export function huggies_account_tab_view_fun(
-  props: HUGGIES_ACCOUNT_TAB_VIEW_PROPS,
+  props: HUGGIES_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS,
 ): preact.JSX.Element {
   const tab = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE);
   if (tab !== props.tab) return <></>;

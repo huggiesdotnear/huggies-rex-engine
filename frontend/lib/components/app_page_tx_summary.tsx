@@ -28,6 +28,25 @@ function account_href_fun(account_id: string): string {
 }
 // ========================================
 // ========================================
+// --- EXACT TIME ------------------------
+// the exact time of the transaction, in UTC.
+//
+// --- WHY --- THE TIMESTAMP COMES AS NANOSECONDS: that is what the api
+// sends, and a reader cannot read a nanosecond count. it is divided
+// down to milliseconds and written out as a date.
+//
+// --- WHY --- UTC AND NOT THE READER'S OWN TIME ZONE: the chain's time
+// is one time, and saying it in UTC says the same thing to everyone.
+function exact_time_fun(timestamp: string): string {
+  const nanoseconds = Number(timestamp);
+  if (!Number.isFinite(nanoseconds)) return timestamp;
+  const milliseconds = Math.floor(nanoseconds / 1_000_000);
+  const date = new Date(milliseconds);
+  if (Number.isNaN(date.getTime())) return timestamp;
+  return `${date.toISOString().replace("T", " ").slice(0, 19)} UTC`;
+}
+// ========================================
+// ========================================
 // --- STATUS ---------------------------
 // the status word and its state class.
 //
@@ -112,7 +131,11 @@ export function HUGGIES_COMPONENT_TX_SUMMARY_FUN() {
           <span class="tx-summary-label">TIME</span>
           <span class="tx-summary-value">
             {time_ago(parsed.timestamp)}
-            <span class="tx-summary-sub">{parsed.timestamp}</span>
+            {/* --- WHY --- THE EXACT TIME IS SHOWN AND NOT THE RAW
+                NANOSECONDS: the timestamp comes as nanoseconds since
+                the epoch, and "1793489431259123500" is not a time a
+                reader can read. */}
+            <span class="tx-summary-sub">{exact_time_fun(parsed.timestamp)}</span>
           </span>
         </div>
         <div class="tx-summary-row">

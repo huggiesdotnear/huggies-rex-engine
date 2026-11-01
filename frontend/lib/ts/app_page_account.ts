@@ -1,7 +1,15 @@
 // ========================================
-// the account page's ONE load: every fetch the page makes happens here.
+// the account page's BALANCES load: every fetch the balances tab makes
+// happens here.
 //
-// read this file to know what the page requests.
+// read this file to know what the balances tab requests.
+//
+// --- WHY --- THE PAGE HAS TWO LOADERS AND NOT ONE: the account page
+// has two views — the balances and the transactions — and the
+// transactions are only fetched when the reader opens the
+// transactions tab. so the balances are loaded here and the history is
+// loaded in app_page_account_transactions.ts. a reader who never opens
+// the transactions tab never pays for the history.
 //
 // WHY this exists
 // --- the four balance tables used to fetch independently, each asking
@@ -11,7 +19,7 @@
 // one loader fixes that. the four sources report their raw balances, the
 // token ids are unioned, and the metadata is fetched ONCE.
 //
-// WHAT THE PAGE REQUESTS
+// WHAT THE BALANCES TAB REQUESTS
 //   1. GET /balances   direct + native, the intear api
 //   2. near view      rhea amm  get_deposits
 //   3. near view      rhea dcl  list_user_assets
@@ -19,6 +27,9 @@
 //   5. GET /tokens     durable fields, only for tokens never seen
 //                      before (skipped on a warm cache)
 //   6. GET /tokens     volatile fields, once, for every token
+//
+// the transactions tab's one request is in
+// lib/ts/app_page_account_transactions.ts.
 //
 // the four sources are four different contracts, so they cannot be
 // merged. the token metadata CAN be merged, and is. each source is

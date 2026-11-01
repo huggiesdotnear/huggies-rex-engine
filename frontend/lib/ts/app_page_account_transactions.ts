@@ -20,8 +20,8 @@
 // current; the cache saves the WORK of asking for the pages below it,
 // and covers the moment before the api answers.
 import { api_account } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_ACCOUNT_TX_CACHE } from "./account_transactions_cache";
-import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./account_transactions_cache";
+import { HUGGIES_ACCOUNT_TX_CACHE } from "./app_page_account_transactions_cache";
+import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -31,6 +31,18 @@ import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./account_transactions_cache
 // rows first. 50 is enough to fill the scroll box several times over
 // without making the first answer slow.
 const HUGGIES_ACCOUNT_TX_PAGE_SIZE = 50;
+// how many rows the cache keeps for one account.
+//
+// --- WHY --- THE CACHE IS CAPPED: the cache exists so the second visit
+// to the tab is instant, and the first few pages are all it takes for
+// that. a busy account has tens of thousands of transactions, and
+// keeping every one of them would mean one record that grows without
+// bound and is rewritten whole on every page. the cap keeps the
+// record a size that costs nothing to write.
+//
+// --- WHY --- THE NEWEST ROWS ARE THE ONES KEPT: they are the ones a
+// reader sees first, and the ones that change.
+const HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS = 500;
 // how long a cached history is trusted as the whole answer.
 //
 // --- WHY ONE MINUTE: the cache is a HEAD start, not the answer. the
@@ -52,9 +64,6 @@ export interface HUGGIES_ACCOUNT_TX_PAGE {
   resume_token: string | null;
   // how many transactions the api says the account has in total.
   txs_count: number;
-  // true when these rows came out of the cache and the api has not
-  // answered yet. the table shows them straight away.
-  from_cache: boolean;
 }
 // ========================================
 // ========================================
@@ -95,7 +104,6 @@ function cached_page_fun(
     txs_count: entry.txs_count > 0
       ? entry.txs_count
       : (txs_counts.get(account_id) ?? 0),
-    from_cache: true,
   };
 }
 // ========================================
@@ -176,6 +184,12 @@ async function load_account_tx_page_fun(
     response.resume_token === undefined ? null : response.resume_token;
   // the count is remembered, and a later page that carries no count
   // keeps the one the first page gave.
+  //
+  // --- WHY --- THE COUNT IS CHECKED AT RUNTIME: the api sends
+  // `txs_count` with the FIRST page of a history and omits it from
+  // every page after it, but the client's type says the field is
+  // always there. so the check is invisible to the type checker and
+  // only the api knows the truth.
   if (response.txs_count !== undefined) {
     txs_counts.set(account_id, response.txs_count);
   }
@@ -183,8 +197,24 @@ async function load_account_tx_page_fun(
     rows,
     resume_token: next_token,
     txs_count: txs_counts.get(account_id) ?? 0,
-    from_cache: false,
   };
+}
+// ========================================
+// ========================================
+// --- CAP -------------------------------
+// the newest rows of a history, no more than the cap.
+//
+// --- WHY --- THE CACHE KEEPS A BOUNDED NUMBER OF ROWS: the history of
+// a busy account is tens of thousands of transactions, and one record
+// holding all of them would be rewritten whole on every page. the
+// cache is a HEAD start for the second visit, and the first few pages
+// are all it needs to be one.
+function cap_rows_fun(
+  rows: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>,
+): ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW> {
+  if (rows.length <= HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS) return rows;
+  // the rows are newest first, so the ones to keep are at the front.
+  return rows.slice(0, HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS);
 }
 // ========================================
 // ========================================
@@ -209,18 +239,34 @@ export async function load_account_transactions_fun(
   // the cache keeps the rows it has plus the new ones, so the next
   // visit starts from further down the history.
   const merged_rows = merge_rows_fun(cached_rows, fresh.rows);
+  // --- WHY --- THE DEEPER CURSOR IS KEPT: the first page's cursor
+  // points at the SECOND page, and the cached rows already run deeper
+  // than that. writing the first page's cursor back would send the
+  // reader's next scroll back to the top of the history, and every
+  // page between here and there would be fetched again.
+  //
+  // --- WHY --- THE CURSOR IS ONLY TRUSTED WHEN THE CACHE IS FRESH: a
+  // cursor points at a position in a history that has moved on, so a
+  // stale one can skip rows.
+  const cache_age =
+    cached === null ? null : Date.now() - cached.fetched_at;
+  const cached_cursor_is_fresh =
+    cache_age !== null && cache_age < HUGGIES_ACCOUNT_TX_CACHE_TTL_MS;
+  const resume_token =
+    cached_cursor_is_fresh && cached !== null && cached.resume_token !== null
+      ? cached.resume_token
+      : fresh.resume_token;
   await HUGGIES_ACCOUNT_TX_CACHE.put({
     id: account_id,
-    rows: merged_rows,
-    resume_token: fresh.resume_token,
+    rows: cap_rows_fun(merged_rows),
+    resume_token,
     txs_count: fresh.txs_count,
     fetched_at: Date.now(),
   });
   return {
     rows,
-    resume_token: fresh.resume_token,
+    resume_token,
     txs_count: fresh.txs_count,
-    from_cache: false,
   };
 }
 // ========================================
@@ -253,7 +299,7 @@ export async function load_more_account_transactions_fun(
   const cached_rows = cached === null ? [] : cached.rows;
   await HUGGIES_ACCOUNT_TX_CACHE.put({
     id: account_id,
-    rows: merge_rows_fun(cached_rows, page.rows),
+    rows: cap_rows_fun(merge_rows_fun(cached_rows, page.rows)),
     resume_token: page.resume_token,
     txs_count: page.txs_count,
     fetched_at: Date.now(),

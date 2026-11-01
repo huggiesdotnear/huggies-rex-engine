@@ -7,8 +7,12 @@
 //
 // --- WHY --- it is its own module and not a field on the account id:
 // the tab changes on its own. clicking a tab changes the tab and
-// nothing else, so a component that only shows balances must not
-// re-render because the reader switched tabs, and vice versa.
+// nothing else — the balances stay loaded, and the history is fetched
+// only when the transactions tab is the one on screen.
+//
+// --- WHY --- the components of a tab re-render when the tab changes:
+// the gate (app_page_account_tab_view.tsx) has to know which tab is on
+// screen to decide what to show, so it follows the tab.
 //
 // --- WHY --- it has the same shape as lib/ts/app_page_account_id.ts:
 // plain module state, a subscribe/unsubscribe pair, and a notify that
@@ -17,7 +21,7 @@
 //
 // --- WHY --- an unknown tab falls back to the default: a stale link or
 // a typo should land on the page, not on an empty page.
-import { HUGGIES_URL_TAB } from "./url_tab";
+import { HUGGIES_URL_TAB } from "./app_page_account_url_tab";
 import {
   find_account_tab_fun,
   HUGGIES_DEFAULT_ACCOUNT_TAB,
@@ -79,8 +83,9 @@ function resolve_tab_fun(raw: string | null): HUGGIES_APP_PAGE_ACCOUNT_TAB {
 //
 // --- WHY --- THE URL IS READ EVERY TIME AND NOT ONLY ONCE: the tab
 // lives in the url, so the url is the truth about which tab is
-// showing. a reader who uses the browser's back button changes the url
-// without reloading the page, and the tab bar has to follow it.
+// showing. a reader who steps back in the browser's history changes
+// the url without reloading the page, and the tab bar has to follow
+// it.
 //
 // --- WHY --- THE READING IS THE SHARED lib/ts/url_tab.ts: the trim and
 // the blank-means-absent rule live there, so the pages cannot drift.
@@ -133,7 +138,6 @@ function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
 function set_tab_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TAB): void {
   if (next === tab) return;
   HUGGIES_URL_TAB.write(next);
-  if (tab === next) return;
   tab = next;
   notify_fun();
 }

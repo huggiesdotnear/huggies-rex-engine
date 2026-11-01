@@ -20,7 +20,7 @@ import { use_scroll_load_fun } from "../ts/use_scroll_load";
 import {
   account_tx_row_fun,
   type HUGGIES_TX_INVOLVEMENT,
-} from "./shared/account_tx_row";
+} from "./app_page_account_tx_row";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------

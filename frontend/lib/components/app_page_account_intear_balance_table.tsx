@@ -12,7 +12,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/mount_ids";
 import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "../ts/app_page_account_store";
 import { use_page_store_fun } from "../ts/use_page_store";
 import { huggies_balance_table_fun } from "./shared/balance_table";
-import { huggies_account_tab_view_fun } from "./shared/account_tab_view";
+import { huggies_account_tab_view_fun } from "./app_page_account_tab_view";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

@@ -24,9 +24,9 @@ import {
   args_view_modes,
   bytes_to_hex,
   default_args_view_mode,
-  decode_args,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { huggies_json_viewer_fun } from "./json_viewer";
+import { huggies_json_viewer_fun } from "./shared/json_viewer";
+import type { DECODED_ARGS } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -37,8 +37,15 @@ export type HUGGIES_ARGS_VIEW_MODE = "json" | "raw" | "hex" | "base64";
 // --- COMPONENT --------------------------
 function ARGS_VIEWER_FUN(props: {
   base64: string;
+  // the arguments, already decoded by the fastnear client's parser.
+  //
+  // --- WHY --- IT IS PASSED IN AND NOT DECODED HERE: the parser
+  // decodes the arguments once, when it parses the transaction, and
+  // hands the result over. decoding them again on every render would
+  // do the same work over and over for a big payload.
+  decoded: DECODED_ARGS;
 }): preact.JSX.Element {
-  const decoded = decode_args(props.base64);
+  const decoded = props.decoded;
   // --- WHY --- the default mode comes from the client: it knows
   // whether the bytes are json and whether they are printable text, so
   // the first view is the one that shows something readable.
@@ -89,11 +96,12 @@ function ARGS_VIEWER_FUN(props: {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-// the viewer, called the way the app calls its shared components.
+// the viewer, called the way the app calls its components.
 export function huggies_args_viewer_fun(props: {
   base64: string;
+  decoded: DECODED_ARGS;
 }): preact.JSX.Element {
-  return <ARGS_VIEWER_FUN base64={props.base64} />;
+  return <ARGS_VIEWER_FUN base64={props.base64} decoded={props.decoded} />;
 }
 // ========================================
 // copyright 2026 by sleet.near

@@ -61,6 +61,18 @@
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
+/* a token amount is in the token's own smallest unit, so it is shown
+   raw — and the standard beside it says what it is. */
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-raw {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-type {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
 #HUGGIES_COMPONENT_TX_TRANSFERS .tx-transfer-contract {
   font-size: 10px;
   opacity: 0.7;

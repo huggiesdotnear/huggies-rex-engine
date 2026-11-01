@@ -2,8 +2,8 @@
 // read the `?tab=` off the current url, the one way.
 //
 // the account page has a tab bar and the tab lives in the url, so a
-// reader can link to the transactions tab directly and the browser's
-// back button walks the tabs.
+// reader can link to the transactions tab directly and a reload of that
+// link lands on the same tab.
 //
 // --- WHY --- it lives in lib/ts and not in the account page's own
 // file: the rule is the same one lib/ts/url_id.ts holds for `?id=` —
@@ -43,6 +43,29 @@ function read_url_tab_fun(): string | null {
 }
 // ========================================
 // ========================================
+// --- HREF ------------------------------
+// the url of a tab, as a link the reader can copy or open in a new tab.
+//
+// --- WHY --- THE HREF AND THE URL ARE BUILT THE SAME WAY: the link a
+// reader copies has to be the url they get when they click it. so
+// both come from here, and neither of them decides on its own what
+// the url looks like.
+//
+// --- WHY --- THE OTHER PARAMETERS ARE KEPT: the url carries the
+// account the reader is looking at, and a tab link that dropped it
+// would take the account away.
+function build_url_tab_fun(tab: string): string {
+  if (typeof window === "undefined" || typeof window.location === "undefined") {
+    return "";
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set(URL_TAB_PARAM, tab);
+  // the path and the search only — the hash is not part of the page's
+  // own state.
+  return `${url.pathname}${url.search}`;
+}
+// ========================================
+// ========================================
 // --- WRITE ------------------------------
 // write a tab to the url, without reloading the page.
 //
@@ -53,7 +76,7 @@ function read_url_tab_fun(): string | null {
 //
 // --- WHY --- replaceState and not pushState: the tab bar is a switch
 // between two views of ONE page, so it is not a step back in the
-// browser's history. the back button should leave the page, not walk
+// browser's history. the back button leaves the page rather than walk
 // the tabs. and replaceState means a reload of the url lands on the
 // same tab, so a tab can still be linked to.
 //
@@ -84,6 +107,7 @@ function write_url_tab_fun(tab: string): void {
 export const HUGGIES_URL_TAB = {
   read: read_url_tab_fun,
   write: write_url_tab_fun,
+  href: build_url_tab_fun,
   normalize: normalize_tab_fun,
 };
 // ========================================

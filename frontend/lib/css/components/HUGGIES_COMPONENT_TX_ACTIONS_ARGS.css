@@ -1,5 +1,5 @@
 /*==================================*/
-/* args_viewer
+/* HUGGIES_COMPONENT_TX_ACTIONS_ARGS
    the arguments of a function call: the bytes, and the four ways they
    can be read — json, plain text, hex and base64.
 
@@ -7,7 +7,7 @@
    toolbar. they are `<button>`s, so the global button rule has to be
    undone here: it pins every button to the page's 500px column. */
 /*==================================*/
-.args-viewer {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -17,7 +17,7 @@
   padding: 8px;
   min-width: 0;
 }
-.args-viewer.is-empty {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer.is-empty {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -25,26 +25,26 @@
 }
 /*==================================*/
 /* the toolbar: the size on the left, the modes on the right. */
-.args-viewer .args-toolbar {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-toolbar {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
-.args-viewer .args-size {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-size {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   letter-spacing: 0.06em;
   opacity: 0.6;
 }
-.args-viewer .args-modes {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes {
   display: flex;
   gap: 4px;
   margin-left: auto;
 }
 /* the mode buttons: the global button rule is undone here, because it
    pins every button to the page's 500px column. */
-.args-viewer .args-modes button {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes button {
   width: auto;
   max-width: none;
   margin: 0;
@@ -60,13 +60,13 @@
   opacity: 0.65;
   cursor: pointer;
 }
-.args-viewer .args-modes button:hover {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes button:hover {
   opacity: 1;
   background: rgba(255, 255, 255, 0.12);
   color: inherit;
   border-color: rgba(255, 255, 255, 0.45);
 }
-.args-viewer .args-modes button.is-active {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-modes button.is-active {
   opacity: 1;
   background: var(--color-middle);
   border-color: var(--color-middle);
@@ -75,12 +75,12 @@
 }
 /*==================================*/
 /* the body: whatever the chosen mode shows. */
-.args-viewer .args-body {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-body {
   min-width: 0;
   max-height: 320px;
   overflow: auto;
 }
-.args-viewer .args-text {
+#HUGGIES_COMPONENT_TX_ACTIONS .args-viewer .args-text {
   margin: 0;
   font-family: monospace;
   font-size: 11px;
