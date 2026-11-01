@@ -118,9 +118,7 @@ function set_state_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TX_STATE): void {
 // making it twice would mean two requests for one answer. one
 // promise is kept while it is on its way, and the second caller waits
 // for it.
-function fetch_fun(
-  account_id: string,
-): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
+function fetch_fun(account_id: string): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
   if (in_flight !== null) return in_flight;
   const promise = load_account_transactions_fun(account_id)
     .then((page) => {
@@ -241,9 +239,7 @@ async function load_more_fun(): Promise<void> {
     const page = await load_more_account_transactions_fun(account_id, token);
     if (loaded_account_id !== account_id) return;
     const seen = new Set(state.rows.map((row) => row.transaction_hash));
-    const appended = page.rows.filter(
-      (row) => !seen.has(row.transaction_hash),
-    );
+    const appended = page.rows.filter((row) => !seen.has(row.transaction_hash));
     set_state_fun({
       ...state,
       rows: [...state.rows, ...appended],

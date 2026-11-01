@@ -57,7 +57,8 @@ function status_fun(is_success: boolean | null): {
   label: string;
   class_name: string;
 } {
-  if (is_success === null) return { label: "PENDING", class_name: "is-pending" };
+  if (is_success === null)
+    return { label: "PENDING", class_name: "is-pending" };
   if (is_success) return { label: "SUCCESS", class_name: "is-success" };
   return { label: "FAILED", class_name: "is-failed" };
 }
@@ -135,7 +136,9 @@ export function HUGGIES_COMPONENT_TX_SUMMARY_FUN() {
                 NANOSECONDS: the timestamp comes as nanoseconds since
                 the epoch, and "1793489431259123500" is not a time a
                 reader can read. */}
-            <span class="tx-summary-sub">{exact_time_fun(parsed.timestamp)}</span>
+            <span class="tx-summary-sub">
+              {exact_time_fun(parsed.timestamp)}
+            </span>
           </span>
         </div>
         <div class="tx-summary-row">

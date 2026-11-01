@@ -101,9 +101,7 @@ function detail_card_fun(
       </div>
       <div class="tx-card-row">
         <span class="tx-card-label">RECEIVER</span>
-        <a href={account_href_fun(parsed.receiver_id)}>
-          {parsed.receiver_id}
-        </a>
+        <a href={account_href_fun(parsed.receiver_id)}>{parsed.receiver_id}</a>
       </div>
       <div class="tx-card-row">
         <span class="tx-card-label">GAS</span>
@@ -113,13 +111,11 @@ function detail_card_fun(
         <div class="tx-card-row">
           <span class="tx-card-label">ACTION</span>
           <span class="tx-card-actions">
-            {actions
-              .slice(0, 3)
-              .map((action) => (
-                <span class="tx-card-action">
-                  {action_label_fun(action.type, action.method_name)}
-                </span>
-              ))}
+            {actions.slice(0, 3).map((action) => (
+              <span class="tx-card-action">
+                {action_label_fun(action.type, action.method_name)}
+              </span>
+            ))}
             {actions.length > 3 && (
               <span class="tx-card-action">+{actions.length - 3}</span>
             )}
@@ -139,9 +135,7 @@ function detail_card_fun(
               </span>
             ))}
             {nft_transfers.length > 0 && (
-              <span class="tx-card-transfer">
-                {nft_transfers.length} NFT
-              </span>
+              <span class="tx-card-transfer">{nft_transfers.length} NFT</span>
             )}
           </span>
         </div>

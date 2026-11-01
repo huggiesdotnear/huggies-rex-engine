@@ -16,7 +16,10 @@
 // nested and every screen of it would have to reach into it. the
 // parser is pure and it does the nesting once, so the page's
 // components read flat fields.
-import { api_transactions, parse_transaction } from "@sleet-js/fastnear-explorer-api-client";
+import {
+  api_transactions,
+  parse_transaction,
+} from "@sleet-js/fastnear-explorer-api-client";
 import type {
   PARSE_RESULT,
   TRANSACTION_DETAIL,

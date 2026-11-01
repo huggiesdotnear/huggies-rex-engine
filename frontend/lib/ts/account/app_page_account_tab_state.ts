@@ -31,9 +31,7 @@ import {
 // --- TYPES ------------------------------
 // the names of the account page's tabs. it is the union of the names in
 // lib/ts/app_page_account_tab_defs.ts.
-export type HUGGIES_APP_PAGE_ACCOUNT_TAB =
-  | "balances"
-  | "transactions";
+export type HUGGIES_APP_PAGE_ACCOUNT_TAB = "balances" | "transactions";
 // ========================================
 // ========================================
 // --- STATE ------------------------------

@@ -57,7 +57,9 @@ function ARGS_VIEWER_FUN(props: {
   // --- WHY --- the modes come from the client: it offers the json view
   // only when there IS json, so a reader is never shown a mode that
   // cannot work.
-  const modes = args_view_modes(decoded.json !== null) as HUGGIES_ARGS_VIEW_MODE[];
+  const modes = args_view_modes(
+    decoded.json !== null,
+  ) as HUGGIES_ARGS_VIEW_MODE[];
 
   if (decoded.bytes.length === 0) {
     return <div class="args-viewer is-empty">NO ARGUMENTS</div>;
@@ -91,7 +93,9 @@ function ARGS_VIEWER_FUN(props: {
             code: JSON.stringify(decoded.json, null, 2),
           })}
         {mode === "raw" && (
-          <div class="args-text">{huggies_code_block_fun({ code: decoded.text })}</div>
+          <div class="args-text">
+            {huggies_code_block_fun({ code: decoded.text })}
+          </div>
         )}
         {mode === "hex" && (
           <div class="args-text">
@@ -99,7 +103,9 @@ function ARGS_VIEWER_FUN(props: {
           </div>
         )}
         {mode === "base64" && (
-          <div class="args-text">{huggies_code_block_fun({ code: props.base64 })}</div>
+          <div class="args-text">
+            {huggies_code_block_fun({ code: props.base64 })}
+          </div>
         )}
       </div>
     </div>

@@ -69,9 +69,7 @@ export interface HUGGIES_ACCOUNT_TX_PAGE {
 // ========================================
 // --- HELPERS ----------------------------
 // how old a cached history is, in ms. null when there is no cache.
-function cache_age_ms_fun(
-  entry: { fetched_at: number } | null,
-): number | null {
+function cache_age_ms_fun(entry: { fetched_at: number } | null): number | null {
   if (entry === null) return null;
   return Date.now() - entry.fetched_at;
 }
@@ -101,9 +99,8 @@ function cached_page_fun(
     rows: entry.rows,
     resume_token: is_fresh ? entry.resume_token : null,
     // the count the cache holds, or the one this session already knows.
-    txs_count: entry.txs_count > 0
-      ? entry.txs_count
-      : (txs_counts.get(account_id) ?? 0),
+    txs_count:
+      entry.txs_count > 0 ? entry.txs_count : (txs_counts.get(account_id) ?? 0),
   };
 }
 // ========================================
@@ -159,8 +156,8 @@ async function load_account_tx_page_fun(
     desc: true,
     ...(resume_token === null ? {} : { resume_token }),
   });
-  const rows: Array<HUGGIES_CACHED_ACCOUNT_TX_ROW> =
-    response.account_txs.map((row) => ({
+  const rows: Array<HUGGIES_CACHED_ACCOUNT_TX_ROW> = response.account_txs.map(
+    (row) => ({
       account_id: row.account_id,
       transaction_hash: row.transaction_hash,
       tx_block_height: row.tx_block_height,
@@ -178,7 +175,8 @@ async function load_account_tx_page_fun(
       is_event_log: row.is_event_log,
       is_action_arg: row.is_action_arg,
       is_explicit_refund_to: row.is_explicit_refund_to,
-    }));
+    }),
+  );
   const next_token =
     response.resume_token === undefined ? null : response.resume_token;
   // the count is remembered, and a later page that carries no count
@@ -252,8 +250,7 @@ export async function load_account_transactions_fun(
   // --- WHY --- THE CURSOR IS ONLY TRUSTED WHEN THE CACHE IS FRESH: a
   // cursor points at a position in a history that has moved on, so a
   // stale one can skip rows.
-  const cache_age =
-    cached === null ? null : Date.now() - cached.fetched_at;
+  const cache_age = cached === null ? null : Date.now() - cached.fetched_at;
   const cached_cursor_is_fresh =
     cache_age !== null && cache_age < HUGGIES_ACCOUNT_TX_CACHE_TTL_MS;
   const resume_token =

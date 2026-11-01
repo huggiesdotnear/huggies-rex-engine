@@ -100,10 +100,9 @@ async function get_cached_account_transactions_fun(
 async function put_cached_account_transactions_fun(
   entry: HUGGIES_CACHED_ACCOUNT_TRANSACTIONS,
 ): Promise<void> {
-  await HUGGIES_INDEXED_DB_STORE.put_many(
-    HUGGIES_ACCOUNT_TX_STORE_CONFIG,
-    [entry],
-  );
+  await HUGGIES_INDEXED_DB_STORE.put_many(HUGGIES_ACCOUNT_TX_STORE_CONFIG, [
+    entry,
+  ]);
 }
 // ========================================
 // ========================================

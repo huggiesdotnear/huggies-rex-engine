@@ -92,8 +92,10 @@ function write_url_tab_fun(tab: string): void {
   // --- WHY --- the history check: a page opened from a file:// url or
   // in an environment without history would throw here, and the tab
   // must still switch.
-  if (typeof window.history !== "undefined" &&
-    typeof window.history.replaceState === "function") {
+  if (
+    typeof window.history !== "undefined" &&
+    typeof window.history.replaceState === "function"
+  ) {
     window.history.replaceState(null, "", url.toString());
     return;
   }

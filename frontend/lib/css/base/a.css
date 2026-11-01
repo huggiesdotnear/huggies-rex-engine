@@ -1,7 +1,12 @@
 /*==================================*/
 a {
-  color: inherit;
+  /*if we need to over right a color do it else where do not touch this file*/
+  /*color: inherit;*/
   text-decoration: none;
   overflow-wrap: anywhere;
+  color: var(--color-middle);
+}
+a:hover {
+  color: var(--color-fontend);
 }
 /*==================================*/

@@ -26,7 +26,10 @@ import {
   api_intear_tokens_get,
 } from "@sleet-js/middleman-intear-api";
 import { token_row_by_name_fun } from "../../shared/token_row_by_name";
-import { icon_hash_of_fun, token_icon_for_fun } from "../../shared/token_icon_url";
+import {
+  icon_hash_of_fun,
+  token_icon_for_fun,
+} from "../../shared/token_icon_url";
 import type {
   HUGGIES_TOKEN_DETAIL,
   HUGGIES_TOKEN_HOLDERS_PAGE,

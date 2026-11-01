@@ -86,9 +86,7 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
                 </>
               )}
               {transfer.contract_id !== undefined && (
-                <code class="tx-transfer-contract">
-                  {transfer.contract_id}
-                </code>
+                <code class="tx-transfer-contract">{transfer.contract_id}</code>
               )}
             </div>
             {transfer.memo !== undefined && transfer.memo.length > 0 && (

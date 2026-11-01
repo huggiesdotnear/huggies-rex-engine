@@ -110,11 +110,18 @@ export async function load_tx_details_fun(
   if (missing.length === 0) {
     return wanted
       .map((hash) => by_hash.get(hash))
-      .filter((item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL => item !== undefined);
+      .filter(
+        (item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL =>
+          item !== undefined,
+      );
   }
 
   const to_cache: HUGGIES_CACHED_TX_DETAIL[] = [];
-  for (let index = 0; index < missing.length; index += TRANSACTIONS_BATCH_SIZE) {
+  for (
+    let index = 0;
+    index < missing.length;
+    index += TRANSACTIONS_BATCH_SIZE
+  ) {
     const batch = missing.slice(index, index + TRANSACTIONS_BATCH_SIZE);
     const response = await api_transactions({
       tx_hashes: batch,
@@ -139,7 +146,9 @@ export async function load_tx_details_fun(
   // only some of them were missing.
   return wanted
     .map((hash) => by_hash.get(hash))
-    .filter((item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL => item !== undefined);
+    .filter(
+      (item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL => item !== undefined,
+    );
 }
 // ========================================
 // copyright 2026 by sleet.near
