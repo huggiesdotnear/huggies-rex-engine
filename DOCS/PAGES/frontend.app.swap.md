@@ -40,8 +40,6 @@ the two inputs are for HUMANS. the reader types `1`, and the app shows
 usd value underneath it. the router quotes in the smallest unit, so the
 conversion happens in the store that owns the quoting.
 
-the output input is read-only: it shows what the chosen route pays.
-
 BOTH inputs can be typed into. the reader fixes ONE side of the swap
 and the router answers the other:
 
@@ -53,6 +51,39 @@ and the router answers the other:
 the side the reader fixed is the side the router is asked about, and
 the other box shows the answer. the api serves both questions:
 `AMOUNT_IN` and `AMOUNT_OUT`.
+
+each box carries a label saying what its number means — `YOU SELL`,
+`YOU PAY` or `YOU GET`. the two boxes mean different things (the one
+the reader typed into holds the amount they FIXED, the other holds the
+router's ANSWER), so the reader is told which is which.
+
+## WHAT THE API ANSWERS
+
+the router answers ONE direction per question, and this is the whole
+shape of the api:
+
+```
+?amount_in=X   ->  { estimated_amount: { amount_out }, worst_case_amount: { amount_out } }
+?amount_out=X  ->  { estimated_amount: { amount_in },  worst_case_amount: { amount_in } }
+```
+
+an amount OUT question is answered with the amount IN and NOTHING
+else. the requested output is not in the answer at all — it only lives
+inside the base64 transaction args, and the router GUARANTEES it by
+buying enough to cover the slippage (its `constraint` is larger than
+the quoted cost, because it over-buys to be safe).
+
+so the output-specified screen shows two numbers and they are not the
+same kind of number:
+
+- the OUT box holds the reader's own number — the guaranteed output
+- the IN box holds the cost the router quoted
+- the route card shows the cost per dex, and names the guaranteed
+  output on a `GET` line
+
+this is why the input-specified screen and the output-specified screen
+do not look alike: the api only has ONE figure to give in each
+direction, and the page shows the figure it has.
 
 ## the switch direction
 
@@ -81,6 +112,11 @@ input, the card shows what the swap PAYS; when they fixed the output,
 the card shows what it COSTS. the router answers an amount out
 question with the amount IN, so a card that always read the amount out
 would show "0.00" for every route.
+
+when the output is fixed, the card also names the GUARANTEED output on
+a `GET` line — the router does not send it, so the page uses the
+reader's own number, which is what the router guarantees. every route
+pays the same output, so the cost is what the cards compare.
 
 the routes are fetched AND subscribed: the fetch fills the screen at
 once, and the socket keeps the amount out live as the pools move. the

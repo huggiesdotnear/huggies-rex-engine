@@ -16,6 +16,7 @@ import { HUGGIES_MOUNT_ID } from "../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "../ts/swap/app_page_swap_store";
 import { use_page_store_fun } from "../ts/shared/use_page_store";
 import { HUGGIES_AMOUNT_FORMAT } from "../ts/shared/token_amount_format";
+import { human_to_unit_fun } from "../ts/swap/app_page_swap_amount";
 import type { HUGGIES_SWAP_ROUTE } from "../ts/swap/app_page_swap_routes";
 // ========================================
 // ========================================
@@ -35,6 +36,13 @@ import type { HUGGIES_SWAP_ROUTE } from "../ts/swap/app_page_swap_routes";
 // swap costs. showing the amount out there would read "0.00", because
 // the router does not answer an amount out question with an amount
 // out.
+//
+// --- WHY --- THE GUARANTEED OUTPUT IS ON THE CARD TOO: when the reader
+// fixes the output, every route pays the SAME output — that is what
+// "I want this much out" means — so the only thing that differs
+// between the cards is the cost. but the reader still wants to see what
+// they are getting, so the card names it, and the line under it says
+// what it costs.
 function route_card_fun(
   route: HUGGIES_SWAP_ROUTE,
   amount: string,
@@ -43,6 +51,9 @@ function route_card_fun(
   symbol: string,
   is_best: boolean,
   is_selected: boolean,
+  guaranteed_out_unit: string | null,
+  out_decimals: number,
+  out_symbol: string,
 ): preact.JSX.Element {
   const classes = ["swap-route"];
   if (is_best) classes.push("is-best");
@@ -64,6 +75,14 @@ function route_card_fun(
         {HUGGIES_AMOUNT_FORMAT.balance(amount, { decimals })}{" "}
         {symbol}
       </span>
+      {guaranteed_out_unit !== null && (
+        <span class="swap-route-get">
+          GET {HUGGIES_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
+            decimals: out_decimals,
+          })}{" "}
+          {out_symbol}
+        </span>
+      )}
       <span class="swap-route-detail">
         <span>
           MIN {HUGGIES_AMOUNT_FORMAT.balance(worst_case, { decimals })}{" "}
@@ -116,6 +135,24 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
     : card_amount(selected);
   const summary_word = fixed_out ? "YOU PAY" : "YOU GET";
 
+  // --- WHY --- THE GUARANTEED OUTPUT IS THE READER'S OWN NUMBER: when
+  // they fix the output, the router does NOT answer with an amount
+  // out — it answers with the cost, and guarantees the output the
+  // reader asked for by buying enough to cover the slippage. so the
+  // output is the number the reader typed, and every route pays it.
+  //
+  // --- WHY --- IT IS CONVERTED TO THE UNIT AMOUNT: the display
+  // formatter takes the smallest unit, and the reader's number is a
+  // human one. handing "1" to the formatter as if it were a unit
+  // amount would read it as a fraction of a token.
+  const guaranteed_out_decimal = out_info?.decimals ?? 0;
+  const guaranteed_out_unit =
+    fixed_out && page.amount_out.trim().length > 0
+      ? human_to_unit_fun(page.amount_out, guaranteed_out_decimal)
+      : null;
+  const guaranteed_out_decimals = guaranteed_out_decimal;
+  const guaranteed_out_symbol = out_info?.symbol ?? page.token_out;
+
   if (page.loading_routes && page.routes.length === 0) {
     return (
       <section class="swap-routes">
@@ -152,6 +189,9 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
             card_symbol,
             index === 0,
             selected !== null && selected.dex_id === route.dex_id,
+            guaranteed_out_unit,
+            guaranteed_out_decimals,
+            guaranteed_out_symbol,
           ),
         )}
       </div>
@@ -162,6 +202,15 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
             decimals: summary_decimals,
           })}{" "}
           {summary_symbol}
+          {guaranteed_out_unit !== null && (
+            <>
+              {" · GET "}
+              {HUGGIES_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
+                decimals: guaranteed_out_decimals,
+              })}{" "}
+              {guaranteed_out_symbol}
+            </>
+          )}
         </p>
       )}
     </section>

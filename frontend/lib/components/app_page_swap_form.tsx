@@ -89,6 +89,22 @@ function token_card_fun(
 }
 // ========================================
 // ========================================
+// --- AMOUNT LABEL ----------------------
+// the small label above an amount box, saying what that box means.
+//
+// --- WHY --- the two boxes mean DIFFERENT THINGS and the reader has to
+// be told which is which: the box the reader typed into holds the
+// amount they FIXED, and the other box holds the router's ANSWER. so
+// one box is "YOU SELL" and the other is "YOU PAY" or "YOU GET",
+// depending on which side the reader fixed.
+//
+// --- WHY --- the label is NOT the token's name: the token card above
+// already says which token it is. the label says what the NUMBER
+// means, which is the thing the two cards do not carry.
+function amount_label_fun(label: string): preact.JSX.Element {
+  return <span class="swap-amount-label">{label}</span>;
+}
+// ========================================
 // --- AMOUNT LINE -----------------------
 // the small line under an input: the unit amount and the usd value.
 //
@@ -259,6 +275,7 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
     <section class="swap-form">
       <div class="swap-side">
         {token_card_fun(in_card, "in")}
+        {amount_label_fun(side === "in" ? "YOU SELL" : "YOU PAY")}
         <input
           class="swap-input"
           type="text"
@@ -287,6 +304,7 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
 
       <div class="swap-side">
         {token_card_fun(out_card, "out")}
+        {amount_label_fun(side === "out" ? "YOU SELL" : "YOU GET")}
         <input
           class="swap-input is-out"
           type="text"

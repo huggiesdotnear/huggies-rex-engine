@@ -102,6 +102,21 @@
   opacity: 0.75;
 }
 /*==================================*/
+/* the label above an amount box: what the number in the box means.
+
+   --- WHY --- the two boxes mean different things — one is the amount
+   the reader FIXED, the other is the router's ANSWER — so the reader
+   has to be told which is which. it is quiet: it is a caption, not a
+   headline. */
+#HUGGIES_COMPONENT_SWAP_FORM .swap-amount-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  text-align: right;
+}
+/*==================================*/
 /* the amount inputs. the input is the big number, so it gets the big
    type — the reader's number is the thing they are looking at. */
 #HUGGIES_COMPONENT_SWAP_FORM .swap-input {

@@ -107,3 +107,17 @@
   opacity: 0.72;
 }
 /*==================================*/
+/* the guaranteed output line: what the reader RECEIVES.
+   it sits between the headline and the detail line, so the card reads
+   top to bottom: the cost, what you get, and the floor. it is its own
+   class and not a detail row because a detail row spreads its two
+   children apart, and this line has one. */
+#HUGGIES_COMPONENT_SWAP_ROUTES .swap-route-get {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-middle);
+}
+/*==================================*/
