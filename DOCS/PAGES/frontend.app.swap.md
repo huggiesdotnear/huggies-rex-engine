@@ -42,6 +42,34 @@ conversion happens in the store that owns the quoting.
 
 the output input is read-only: it shows what the chosen route pays.
 
+BOTH inputs can be typed into. the reader fixes ONE side of the swap
+and the router answers the other:
+
+- typing in the top box fixes the amount IN — the router is asked
+  "what do I get for this much?"
+- typing in the bottom box fixes the amount OUT — the router is asked
+  "what does this much cost?"
+
+the side the reader fixed is the side the router is asked about, and
+the other box shows the answer. the api serves both questions:
+`AMOUNT_IN` and `AMOUNT_OUT`.
+
+## the switch direction
+
+the bar between the two sides swaps the pair AND carries the amount
+over. the reader said "sell 5 A and get 10 B"; after the switch the
+same trade reads "sell 10 B and get 5 A", so the two amounts trade
+places with the two tokens.
+
+the swap is ONE action in the store, not two writes. writing the two
+tokens one after the other reads the state the first write already
+changed, which puts the same token on both sides.
+
+picking a token in the picker that is already on the OTHER side swaps
+the pair too. the page never shows the same token on both sides — a
+swap of a token for itself is not a trade, and the router has no route
+for it.
+
 ## the routes
 
 the aggregator answers with one route per dex that can serve the pair,
@@ -52,6 +80,10 @@ the routes are fetched AND subscribed: the fetch fills the screen at
 once, and the socket keeps the amount out live as the pools move. the
 socket is bound to one query, so it is closed and reopened whenever the
 pair or the amount changes.
+
+erasing the amount closes the socket and drops the routes. the socket
+answers ONE query, so a socket left open after the amount is erased
+would push the old answer back over the cleared screen.
 
 ## the swap
 

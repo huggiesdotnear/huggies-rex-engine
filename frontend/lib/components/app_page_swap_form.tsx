@@ -27,6 +27,7 @@ import {
   unit_to_human_fun,
   unit_to_raw_human_fun,
 } from "../ts/swap/app_page_swap_amount";
+import { swap_box_amount_fun } from "../ts/swap/app_page_swap_box_amount";
 import type { HUGGIES_TOKEN_INFO } from "../ts/shared/token_info";
 // ========================================
 // ========================================
@@ -119,7 +120,7 @@ function amount_note_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
+export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
   // --- WHY --- the store is read through the shared hook: preact only
   // re-renders a component when its OWN state changes, so the form
   // subscribes to the store and re-renders when it changes.
@@ -147,24 +148,81 @@ function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
     balance: HUGGIES_APP_PAGE_SWAP_STORE.get_balance(page.token_out),
   };
 
-  // the amount the reader typed, as the unit amount the router wants.
-  const amount_unit =
-    in_info === null
+  // the route the page is showing.
+  const route = HUGGIES_APP_PAGE_SWAP_STORE.get_selected_route();
+
+  // --- WHY --- THE SIDE THE READER IS FIXING DECIDES WHICH BOX IS
+  // FILLED: the reader typed into one box, and the router answered that
+  // question. the box they typed into shows their number, and the other
+  // box shows the answer.
+  const side = page.amount_side;
+  // the amount the reader typed, on the side they typed it.
+  const fixed_human = side === "in" ? page.amount_in : page.amount_out;
+  // the same amount in the token's smallest unit, so the line under the
+  // box can show the figure the chain sees.
+  const fixed_unit =
+    side === "in"
+      ? in_info === null
+        ? null
+        : human_to_unit_fun(fixed_human, in_info.decimals)
+      : out_info === null
+        ? null
+        : human_to_unit_fun(fixed_human, out_info.decimals);
+  // the amount the router answered with, on the other side.
+  const answered_unit =
+    route === null
       ? null
-      : human_to_unit_fun(page.amount_in, in_info.decimals);
+      : side === "in"
+        ? route.amount_out
+        : route.amount_in;
+
+  // what each of the two boxes shows.
+  const in_box = swap_box_amount_fun(
+    "in",
+    side,
+    fixed_human,
+    side === "in" ? fixed_unit : null,
+    answered_unit,
+    in_card.decimals,
+    unit_to_human_fun,
+  );
+  const out_box = swap_box_amount_fun(
+    "out",
+    side,
+    fixed_human,
+    side === "out" ? fixed_unit : null,
+    answered_unit,
+    out_card.decimals,
+    unit_to_human_fun,
+  );
 
   // --- WHY --- the swap button needs the balance: it is disabled when
   // the reader is short, and that check is a comparison of the unit
   // amount against the raw balance. both are in the same unit, so the
   // comparison is exact.
+  //
+  // --- WHY --- THE AMOUNT THAT IS SOLD IS THE ROUTER'S ANSWER WHEN THE
+  // READER FIXED THE OUTPUT: the reader said "I want this much OUT", so
+  // the router answered how much IN it costs, and that is what leaves
+  // their wallet. the balance check has to be against that number.
+  //
+  // --- WHY --- THE INPUT BOX IS THE ONE THAT MATTERS: the balance is
+  // the balance of the token being SOLD, and that is always the input
+  // token. so the check reads the input box's unit amount, which is
+  // the reader's number when they fixed the input and the router's
+  // answer when they fixed the output.
   const signed_in = HUGGIES_AUTH.is_signed_in();
-  const has_amount = amount_unit !== null && amount_unit !== "0";
+  const sold_unit = in_box.unit;
+  const has_amount = sold_unit !== null && sold_unit !== "0";
   const has_balance =
-    amount_unit !== null &&
-    BigInt(amount_unit) <= BigInt(in_card.balance === "" ? "0" : in_card.balance);
-  const route = HUGGIES_APP_PAGE_SWAP_STORE.get_selected_route();
+    sold_unit !== null &&
+    BigInt(sold_unit) <= BigInt(in_card.balance === "" ? "0" : in_card.balance);
   const can_swap =
-    signed_in && has_amount && has_balance && route !== null && !page.swapping;
+    signed_in &&
+    has_amount &&
+    has_balance &&
+    route !== null &&
+    !page.swapping;
 
   const on_swap_fun = async () => {
     if (!can_swap || route === null) return;
@@ -205,30 +263,25 @@ function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
           class="swap-input"
           type="text"
           inputMode="decimal"
-          value={page.amount_in}
+          value={in_box.human}
           placeholder="0.00"
           onInput={(event) => {
             const next = (event.currentTarget as HTMLInputElement).value;
-            HUGGIES_APP_PAGE_SWAP_STORE.set_amount(next);
-            void HUGGIES_APP_PAGE_SWAP_STORE.quote(
-              page.token_in,
-              page.token_out,
-              next,
-            );
+            HUGGIES_APP_PAGE_SWAP_STORE.set_amount("in", next);
+            void HUGGIES_APP_PAGE_SWAP_STORE.quote();
           }}
         />
         {amount_note_fun(
-          amount_unit,
+          in_box.unit,
           in_card.decimals,
           in_card.price_usd,
-          page.amount_in,
+          in_box.human,
         )}
       </div>
 
       {huggies_switch_direction_fun({
         on_switch: () => {
-          void HUGGIES_APP_PAGE_SWAP_STORE.set_token("in", page.token_out);
-          void HUGGIES_APP_PAGE_SWAP_STORE.set_token("out", page.token_in);
+          void HUGGIES_APP_PAGE_SWAP_STORE.switch_direction();
         },
       })}
 
@@ -238,23 +291,19 @@ function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
           class="swap-input is-out"
           type="text"
           inputMode="decimal"
-          readOnly
-          value={
-            route === null || out_info === null
-              ? ""
-              : HUGGIES_AMOUNT_FORMAT.balance(route.amount_out, {
-                  decimals: out_info.decimals,
-                })
-          }
+          value={out_box.human}
           placeholder="0.00"
+          onInput={(event) => {
+            const next = (event.currentTarget as HTMLInputElement).value;
+            HUGGIES_APP_PAGE_SWAP_STORE.set_amount("out", next);
+            void HUGGIES_APP_PAGE_SWAP_STORE.quote();
+          }}
         />
         {amount_note_fun(
-          route === null || out_info === null
-            ? null
-            : route.amount_out,
+          out_box.unit,
           out_card.decimals,
           out_card.price_usd,
-          route === null ? "" : unit_to_human_fun(route.amount_out, out_card.decimals),
+          out_box.human,
         )}
       </div>
 
@@ -269,7 +318,7 @@ function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
         {page.swapping ? "SWAPPING..." : "SWAP"}
       </button>
       {!signed_in && <p class="swap-hint">SIGN IN TO SWAP</p>}
-      {signed_in && !has_amount && page.amount_in.length > 0 && (
+      {signed_in && !has_amount && fixed_human.length > 0 && (
         <p class="swap-hint">ENTER AN AMOUNT</p>
       )}
       {signed_in && has_amount && !has_balance && (

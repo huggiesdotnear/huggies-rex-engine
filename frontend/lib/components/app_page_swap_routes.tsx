@@ -73,9 +73,28 @@ function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
   const page = use_page_store_fun(HUGGIES_APP_PAGE_SWAP_STORE);
 
   const out_info = page.token_out_info;
+  const in_info = page.token_in_info;
   const decimals = out_info?.decimals ?? 0;
   const symbol = out_info?.symbol ?? page.token_out;
   const selected = HUGGIES_APP_PAGE_SWAP_STORE.get_selected_route();
+
+  // --- WHY --- THE SUMMARY READS THE SIDE THE READER IS FIXING: when
+  // they fix the output, the number they care about is what it COSTS,
+  // and the router answers that question with the input amount. the
+  // line would otherwise name a number the reader is not waiting for.
+  const fixed_out = page.amount_side === "out";
+  const summary_symbol = fixed_out
+    ? (in_info?.symbol ?? page.token_in)
+    : symbol;
+  const summary_decimals = fixed_out
+    ? (in_info?.decimals ?? 0)
+    : decimals;
+  const summary_amount = selected === null
+    ? null
+    : fixed_out
+      ? selected.amount_in
+      : selected.amount_out;
+  const summary_word = fixed_out ? "YOU PAY" : "YOU GET";
 
   if (page.loading_routes && page.routes.length === 0) {
     return (
@@ -114,11 +133,13 @@ function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
           ),
         )}
       </div>
-      {selected !== null && (
+      {selected !== null && summary_amount !== null && (
         <p class="swap-routes-note">
-          YOU GET{" "}
-          {HUGGIES_AMOUNT_FORMAT.balance(selected.amount_out, { decimals })}{" "}
-          {symbol}
+          {summary_word}{" "}
+          {HUGGIES_AMOUNT_FORMAT.balance(summary_amount, {
+            decimals: summary_decimals,
+          })}{" "}
+          {summary_symbol}
         </p>
       )}
     </section>

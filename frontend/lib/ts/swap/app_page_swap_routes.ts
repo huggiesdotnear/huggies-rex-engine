@@ -23,6 +23,7 @@
 // nobody is asking any more, so it is closed and a new one opened.
 import {
   AMOUNT_IN,
+  AMOUNT_OUT,
   GET_ROUTES,
   SUBSCRIBE_ROUTES,
   default_socket_factory,
@@ -33,6 +34,7 @@ import {
 } from "@sleet-js/intear-dex-aggregator-tool-box";
 import { HUGGIES_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
 import { router_token_id_fun } from "./app_page_swap_router_token";
+import type { HUGGIES_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -42,6 +44,10 @@ export interface HUGGIES_SWAP_ROUTE {
   dex_id: string;
   // the quoted output amount, in the output token's smallest unit.
   amount_out: string;
+  // the quoted input amount, in the input token's smallest unit. it is
+  // only there for an "amount out" quote, where the router answers how
+  // much the wanted output costs.
+  amount_in: string;
   // the minimum guaranteed output after slippage, in the same unit.
   worst_case_out: string;
   // how many transactions the route has to send.
@@ -69,6 +75,20 @@ function route_amount_out_fun(route: ROUTE): string {
   return "0";
 }
 // ========================================
+// the input amount of a route, whichever field the quote carries.
+//
+// --- WHY --- a quote answers with `amount_in` for an amount_out
+// request, and the page needs it to fill the input box when the reader
+// fixes the output side. a route that answered the other way is still
+// a route, so it is read rather than dropped.
+function route_amount_in_fun(route: ROUTE): string {
+  const estimated = route.estimated_amount.amount_in;
+  if (typeof estimated === "string" && estimated.length > 0) return estimated;
+  const worst = route.worst_case_amount.amount_in;
+  if (typeof worst === "string" && worst.length > 0) return worst;
+  return "0";
+}
+// ========================================
 // the worst-case output of a route, in the same unit.
 function route_worst_case_out_fun(route: ROUTE): string {
   const worst = route.worst_case_amount.amount_out;
@@ -90,6 +110,7 @@ function map_routes_fun(routes: ReadonlyArray<ROUTE>): HUGGIES_SWAP_ROUTE[] {
   return routes.map((route) => ({
     dex_id: route.dex_id,
     amount_out: route_amount_out_fun(route),
+    amount_in: route_amount_in_fun(route),
     worst_case_out: route_worst_case_out_fun(route),
     tx_count: route_tx_count_fun(route),
     token_output: route.token_output,
@@ -112,14 +133,16 @@ function map_routes_fun(routes: ReadonlyArray<ROUTE>): HUGGIES_SWAP_ROUTE[] {
 function build_quote_params_fun(
   token_in: string,
   token_out: string,
-  amount_in: string,
+  amount: string,
+  side: HUGGIES_SWAP_AMOUNT_SIDE,
   trader_account_id: string | null,
 ): QUOTE_PARAMS {
-  const params = AMOUNT_IN(
-    router_token_id_fun(token_in),
-    router_token_id_fun(token_out),
-    amount_in,
-  );
+  const token_in_id = router_token_id_fun(token_in);
+  const token_out_id = router_token_id_fun(token_out);
+  const params =
+    side === "in"
+      ? AMOUNT_IN(token_in_id, token_out_id, amount)
+      : AMOUNT_OUT(token_in_id, token_out_id, amount);
   if (trader_account_id === null) return params;
   return {
     ...params,
@@ -133,13 +156,15 @@ function build_quote_params_fun(
 async function get_swap_routes_fun(
   token_in: string,
   token_out: string,
-  amount_in: string,
+  amount: string,
+  side: HUGGIES_SWAP_AMOUNT_SIDE,
   trader_account_id: string | null,
 ): Promise<HUGGIES_SWAP_ROUTE[]> {
   const params = build_quote_params_fun(
     token_in,
     token_out,
-    amount_in,
+    amount,
+    side,
     trader_account_id,
   );
   const routes = await GET_ROUTES(HUGGIES_SWAP_AGGREGATOR.client, params);
@@ -287,7 +312,8 @@ function close_when_open_fun(
 async function subscribe_swap_routes_fun(
   token_in: string,
   token_out: string,
-  amount_in: string,
+  amount: string,
+  side: HUGGIES_SWAP_AMOUNT_SIDE,
   trader_account_id: string | null,
   on_routes: (routes: HUGGIES_SWAP_ROUTE[]) => void,
   on_error: (message: string) => void,
@@ -306,7 +332,8 @@ async function subscribe_swap_routes_fun(
   const params = build_quote_params_fun(
     token_in,
     token_out,
-    amount_in,
+    amount,
+    side,
     trader_account_id,
   );
   // the socket this subscribe hands to the tool box, so the page can

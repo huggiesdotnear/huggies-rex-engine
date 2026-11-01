@@ -126,10 +126,12 @@
 #HUGGIES_COMPONENT_SWAP_FORM .swap-input::placeholder {
   color: rgba(255, 255, 255, 0.35);
 }
-/* the output input cannot be typed into, so it reads as a figure and
-   not as a field. */
+/* the output box can be typed into as well — the reader may fix the
+   amount they want OUT instead of the amount they sell — so it reads
+   as a field, not as a locked figure. it sits a little quieter than
+   the input side, because most readers fix the input. */
 #HUGGIES_COMPONENT_SWAP_FORM .swap-input.is-out {
-  cursor: default;
+  color: rgba(255, 255, 255, 0.85);
 }
 /*==================================*/
 /* the small line under an input: the unit amount and the usd value.
