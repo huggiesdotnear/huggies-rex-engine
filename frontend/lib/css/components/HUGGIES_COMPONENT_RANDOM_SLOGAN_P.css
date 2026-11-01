@@ -1,0 +1,28 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_RANDOM_SLOGAN_P
+   the splash page's one line of text: a random slogan, shown for a
+   moment before the page hands the browser to the feed.
+
+   --- WHY IT IS FIXED AND CENTRED: the splash page is a single line
+   in a tall screen, so the line belongs in the middle of the screen
+   and not at the top of the column. the slogan is taken out of the
+   flow with position:fixed and centred on the VIEWPORT, so it lands
+   in the middle without the app-wide column (base/main.css) having to
+   centre itself for every page. the element stays a child of main in
+   the markup — fixed takes it out of the flow, not out of the page.
+
+   --- WHY THE WIDTH IS SET: main > * gives the slogan width:100%, but
+   a fixed element's 100% is measured against the VIEWPORT, not
+   against main, so the line would stretch across the whole screen.
+   the width here is the same column main and nav use, so the slogan
+   sits on the same line as everything else in the app. */
+/*==================================*/
+#HUGGIES_COMPONENT_RANDOM_SLOGAN_P {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  max-width: 90vw;
+}
+/*==================================*/
