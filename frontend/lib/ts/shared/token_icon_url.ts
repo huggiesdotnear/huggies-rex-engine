@@ -52,6 +52,7 @@ const HUGGIES_INTEAR_BASE_URL = "https://api.intea.rs";
 // shows it.
 const HUGGIES_ICON_FALLBACKS: Readonly<Record<string, string>> = {
   "pussy.laboratory.jumpfinance.near": "https://i.imgur.com/zjkBYpA.jpeg",
+  "ftv2.nekotoken.near": "https://i.imgur.com/glVxMOD.png",
 };
 // ========================================
 // ========================================
