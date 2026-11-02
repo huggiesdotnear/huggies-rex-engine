@@ -1,5 +1,5 @@
-import { rm } from "node:fs/promises";
-import { join } from "node:path";
+import { cp, mkdir, rm } from "node:fs/promises";
+import { dirname, join } from "node:path";
 
 const repositoryRoot = import.meta.dir;
 const frontendDirectory = join(repositoryRoot, "frontend");
@@ -31,5 +31,22 @@ if (!result.success) {
   }
   process.exit(1);
 }
+
+// ========================================
+// the open graph image is copied by hand, not by the bundler.
+//
+// bun tracks an asset only when a LINK tag references it, and the only
+// rels it follows are "icon" and "apple-touch-icon". the og image is
+// referenced by META tags (og:image, twitter:image), which the bundler
+// does not look at, so the file would never reach the output folder.
+//
+// it is copied here under its exact path because the meta tags point at
+// that path — a hashed name would break every crawler that reads them.
+// ========================================
+const openGraphImage = "lib/img/og-1200x630.png";
+const openGraphImageOutput = join(outputDirectory, openGraphImage);
+
+await mkdir(dirname(openGraphImageOutput), { recursive: true });
+await cp(join(frontendDirectory, openGraphImage), openGraphImageOutput);
 
 console.log(`Built ${result.outputs.length} files into ${outputDirectory}`);
