@@ -10,10 +10,10 @@
 - see [DOCS/ROUTES.md](./DOCS/ROUTES.md) for routes
 - see [DOCS/RULES.md](./DOCS/RULES.md) for rules
 
-WORKFLOW
+### SLEET AI AGENT
 
+WORKFLOW
 - always pull first.
-- undo local chages/commits if commits on the remote that are not local, rather than some rebase/force bullshit, then manually reapply changes if applicable.
 - commit and push after making changes.
 
 HUGGIES-REX-ENGINE IS DEPLOYED live to https://shit-1170.com/
