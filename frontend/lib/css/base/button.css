@@ -74,18 +74,8 @@ button:disabled {
   opacity: 0.55;
 }
 /*----------------------*/
-/* an error shown under a button — e.g. a rejected wallet popup. kept
-   here with the other button states since it only ever appears as
-   feedback for a button, rather than in a component css file. */
-[data-huggies-auth-error] {
-  width: 500px;
-  max-width: 90vw;
-  box-sizing: border-box;
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--color-fontend);
-  text-align: center;
-}
+/* an error shown under a button — e.g. a rejected wallet popup — is
+   the button's own feedback, so it is styled by the component that
+   draws it (components/HUGGIES_COMPONENT_AUTH_BUTTON.css), not here.
+   base holds the element look, not a component's error text. */
 /*==================================*/

@@ -26,8 +26,9 @@ for pages see [DOCS/PAGES/README.md](./PAGES/README.md)
 **FRONTEND RULES**
 
 CSS
-- css lives in `frontend/lib/css`, the base folder there is for elements. the components one is for components css named by mount id or components/shared to match the tsx file names.
-- each page has it's own import css file.
+- css lives in `frontend/lib/css`, base is for elements, components is for components css. each page has it's own import css file.
+- a self-mounting component's css file is named after its mount id — `HUGGIES_COMPONENT_X.css` for mount id `HUGGIES_COMPONENT_X` — and its rules are scoped under that id, id selector first: `#HUGGIES_COMPONENT_X .class`. a piece with no mount id of its own is named after its tsx in lower snake case, lives in `components/shared/` when many components use it and in its owner's folder when only one does, and styles itself by class only.
+- a component's css file `@import`s the pieces it contains, so the page's import file lists only components. `components/shared/` css is imported by the component using it, never by the page's import file.
 
 TSX
 - tsx files live in `frontend/lib/components/pagefolder/`, named `<page>_<section>.tsx` after the page and the part of it they render. each one self-mounts: it renders itself into the element whose id is its mount id, and does nothing on a page that has no such element.

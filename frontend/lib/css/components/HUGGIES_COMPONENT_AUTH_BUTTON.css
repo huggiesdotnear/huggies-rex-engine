@@ -10,15 +10,17 @@
    reads as a wall of text.
 
    the active account is marked with a filled dot, the others an empty
-   one. */
-/*==================================*/
-[data-huggies-auth-root] {
+   one.
+
+   every rule is scoped under the mount id, so the auth button's look
+   can never reach another component's markup. */
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-root {
   width: 500px;
   max-width: 90vw;
   box-sizing: border-box;
 }
 /*----------------------*/
-[data-huggies-auth-menu] {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-menu {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -32,7 +34,7 @@
   border-radius: 12px;
 }
 /*----------------------*/
-[data-huggies-auth-menu-label] {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-menu-label {
   margin: 0 0 2px;
   font-size: 11px;
   font-weight: 700;
@@ -43,13 +45,13 @@
 /* one account row: the pick button plus its remove button. the row is a
    flex line so the ✕ sits at the far right instead of dropping onto
    its own line under a full-width pick button. */
-[data-huggies-auth-account] {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-account {
   display: flex;
   align-items: stretch;
   gap: 6px;
 }
 /*----------------------*/
-[data-huggies-auth-account] > button {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-account > button {
   width: auto;
   flex: 1 1 auto;
   min-width: 0;
@@ -67,7 +69,7 @@
 /*----------------------*/
 /* the ✕ that forgets one account. square, so it lines up with the
    row's height instead of stretching to the column width. */
-[data-huggies-auth-account] > button.account-remove {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-account > button.account-remove {
   flex: 0 0 auto;
   width: 38px;
   padding: 8px 0;
@@ -78,7 +80,7 @@
 /* the account the app is currently acting as. the filled dot plus a
    bolder label, so it reads as "current" without relying on the
    dot's color alone. */
-[data-huggies-auth-account] > button.account.is-active {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-account > button.account.is-active {
   font-weight: 700;
   background-color: var(--color-middle);
   color: var(--color-fontend);
@@ -87,12 +89,26 @@
 /*----------------------*/
 /* ADD ACCOUNT / SIGN OUT keep the base button look but sit inside
    the menu, so they lose the menu's outer margins. */
-[data-huggies-auth-menu] > button {
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-menu > button {
   width: 100%;
   margin-top: 0;
   margin-bottom: 0;
   padding: 8px 12px;
   font-size: 13px;
   letter-spacing: 1px;
+}
+/*----------------------*/
+/* the error shown under the button — e.g. a rejected wallet popup. it
+   is the button's own feedback, so it lives here rather than in base. */
+#HUGGIES_COMPONENT_AUTH_BUTTON .auth-error {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-fontend);
+  text-align: center;
 }
 /*==================================*/

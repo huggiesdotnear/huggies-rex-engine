@@ -122,7 +122,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
       : "LOGIN";
 
   return (
-    <div ref={root_ref} data-huggies-auth-root={is_signed_in ? "1" : "0"}>
+    <div ref={root_ref} class="auth-root">
       <button
         type="button"
         onClick={on_click_fun}
@@ -136,10 +136,10 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
         {label}
       </button>
       {open && is_signed_in && (
-        <div data-huggies-auth-menu="1">
-          <p data-huggies-auth-menu-label="1">ACCOUNTS</p>
+        <div class="auth-menu">
+          <p class="auth-menu-label">ACCOUNTS</p>
           {accounts.map((id) => (
-            <div key={id} data-huggies-auth-account={id}>
+            <div key={id} class="auth-account">
               <button
                 type="button"
                 class={id === account_id ? "account is-active" : "account"}
@@ -183,7 +183,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
           </button>
         </div>
       )}
-      {error !== null && <p data-huggies-auth-error={error}>{error}</p>}
+      {error !== null && <p class="auth-error">{error}</p>}
     </div>
   );
 }
