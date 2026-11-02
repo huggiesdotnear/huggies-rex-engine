@@ -1,10 +1,16 @@
 # RULES
 
-🧬 human put rules, do not add this to rules you add yourslef, even if it was something i said.
+🧬 human put rules, do not add this to rules you add yourself, even if it was something i said.
 
-- 🧬 one function per a file, clean clear sanke_case nameing for functions. and file name should match function name.
-- 🧬 `========================================` comments at the top of the file between import statemnets, and at the bottom of the file. and in vaires places in the html files. never remove these comments.
+GENERAL RULES
+- 🧬 one function per file, clean clear snake_case naming for functions, and file name should match function name.
+- 🧬 `========================================` comments at the top of the file between import statements, and at the bottom of the file, and in various places in the html files. never remove these comments.
 - 🧬 please no camel case only snake_case or SCREAMING_SNAKE.
+- 🧬 never put a table in a markdown file. prefer to create .csv files instead.
+- if you run "bunx prettier . --write" don't undo the prettier changes, can commit with your work, even if files that you were not working on got touched
+- 🧬 do not touch files with a do not touch comment in them.
+  - do not touch the AGENTS.md file unless asked
+  - never touch the repo main README
 
 ## the frontend layout is in GOLD.md
 
@@ -29,17 +35,12 @@ layout changes, GOLD.md changes, not this file.
 
 - a class is used ONLY where an element selector cannot say it: when the same element type appears twice with different rules (a card's label span and its value span), when it carries a state (`.is-active`, `.is-revealed`), or when it is a variant (`.is-dev`, `.is-dex`). everything else is a bare element selector — `p`, `a`, `code`, `strong`, `td`, `h2`.
 
-## the layers
+## the layers + workflow
 
 - 🧬 i am sure i mentioned this somewhere but we have clean clear spearteion of logic, the middleman should never import form the frontend logic or have any forntend specify logic. when i am working on the frontend and i ask to add features we may need to add backend or middleman logic. if i ask to remove something form a page only stuff in the fornted should be touchd remove the css and logic for that feature. do not touch the middleman or backend logic for that unless i say or ask first.
+- if working on the UI and the human asks about working on something in the UI, be sure to be informative about what the component mount id is and such, as they may not be able to look at the code, and so they may not be clear when they tell you to fix something in the UI
+- always tell the user at the end of your work, very briefly, what files you touched and whether they were backend, frontend, or middleman
 
-## the workflow
-
-- 🧬 never put a table in a mardown file. perfer to create .csv files instead.
-- if you run "bunx prettier . --write" dont undo the prettier chages, can commit with your work, even if files that you where not working on got touched
-- 🧬 dont not touch files with a do not touch comment in them.
-  - do not touch the AGENTS.md file unless asked
-  - never touch the repo main README
 
 =====================
 <br/>
