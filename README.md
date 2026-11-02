@@ -1,6 +1,6 @@
 # huggies-rex-engine
 
-💩 near agentic engine
+💩 shit-1170.near agentic and defi engine
 
 bun/frontend
 
