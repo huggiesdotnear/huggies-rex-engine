@@ -5,7 +5,7 @@
 
    the page's CONTRACTS and TOKENS sections are plain <section>
    elements in the page column, styled by base/main.css. */
-@import url(./shared/sort_keys_control.css);
+@import url(../shared/sort_keys_control.css);
 
 /*==================================*/
 /* the search box sits on its own row above the sort buttons: the page

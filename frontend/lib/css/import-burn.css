@@ -1,6 +1,6 @@
 /*==================================*/
 /* the burn page's css: the components it mounts. */
-@import url(./components/HUGGIES_COMPONENT_APP_PAGE_BURN_INFO.css);
-@import url(./components/HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES.css);
-@import url(./components/HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES.css);
+@import url(./components/burn/HUGGIES_COMPONENT_APP_PAGE_BURN_INFO.css);
+@import url(./components/burn/HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES.css);
+@import url(./components/burn/HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES.css);
 /*==================================*/

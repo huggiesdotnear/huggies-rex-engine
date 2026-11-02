@@ -2,7 +2,7 @@
 /* HUGGIES_COMPONENT_TOKEN_DETAIL
    the token's card: the icon, the symbol, the name, the id, the metadata
    grid, the description and the socials. */
-@import url(./shared/token_meta_grid.css);
+@import url(../../shared/token_meta_grid.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TOKEN_DETAIL header {

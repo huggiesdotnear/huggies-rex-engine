@@ -1,8 +1,8 @@
 /*==================================*/
 /* the token page's css: the components it mounts. */
-@import url(./components/HUGGIES_COMPONENT_TOKEN_STATUS.css);
-@import url(./components/HUGGIES_COMPONENT_TOKEN_SELECTOR.css);
-@import url(./components/HUGGIES_COMPONENT_TOKEN_DETAIL.css);
-@import url(./components/HUGGIES_COMPONENT_TOKEN_HOLDERS.css);
-@import url(./components/HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK.css);
+@import url(./components/token/index/HUGGIES_COMPONENT_TOKEN_STATUS.css);
+@import url(./components/token/index/HUGGIES_COMPONENT_TOKEN_SELECTOR.css);
+@import url(./components/token/index/HUGGIES_COMPONENT_TOKEN_DETAIL.css);
+@import url(./components/token/index/HUGGIES_COMPONENT_TOKEN_HOLDERS.css);
+@import url(./components/token/shit-1170/HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_PAGE_LINK.css);
 /*==================================*/

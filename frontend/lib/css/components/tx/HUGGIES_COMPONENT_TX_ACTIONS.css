@@ -9,8 +9,8 @@
    receipts use, so its look lives in its own file too
    (tx/app_page_tx_args_viewer.css). */
 /*==================================*/
-@import url(./tx/code_block.css);
-@import url(./tx/app_page_tx_args_viewer.css);
+@import url(./code_block.css);
+@import url(./app_page_tx_args_viewer.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_ACTIONS .tx-actions {

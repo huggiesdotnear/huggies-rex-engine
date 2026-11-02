@@ -3,8 +3,8 @@
    the player's balance and the six world cards. the tile's own shape is
    the pumpopoly page's own component
    (contract/pumpopoly/stat_tile.css); this file holds the page's parts. */
-@import url(./contract/pumpopoly/error_card.css);
-@import url(./contract/pumpopoly/stat_tile.css);
+@import url(./error_card.css);
+@import url(./stat_tile.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .cards {

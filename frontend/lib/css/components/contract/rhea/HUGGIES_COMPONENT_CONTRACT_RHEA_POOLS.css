@@ -4,7 +4,7 @@
    sort row and the pool rows. the shared sort control brings its own
    css in below. */
 /*==================================*/
-@import url(./shared/sort_keys_control.css);
+@import url(../../shared/sort_keys_control.css);
 /*==================================*/
 #HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS .controls {
   display: flex;

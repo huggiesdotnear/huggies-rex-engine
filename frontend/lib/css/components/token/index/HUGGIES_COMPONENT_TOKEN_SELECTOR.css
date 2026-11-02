@@ -3,7 +3,7 @@
    the token id jump box on the token page. the box itself is the shared
    id jump box (shared/id_jump_box.css); this file holds only the token
    spacing. */
-@import url(./shared/id_jump_box.css);
+@import url(../../shared/id_jump_box.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TOKEN_SELECTOR .token-selector {

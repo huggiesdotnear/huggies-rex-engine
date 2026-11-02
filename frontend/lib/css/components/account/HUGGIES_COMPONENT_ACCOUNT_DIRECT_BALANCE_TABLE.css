@@ -1,6 +1,6 @@
 /*==================================*/
-/* HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE
+/* HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE
    the shared balance table brings its own css in with the @import below. */
 /*==================================*/
-@import url(./shared/balance_table.css);
+@import url(../shared/balance_table.css);
 /*==================================*/

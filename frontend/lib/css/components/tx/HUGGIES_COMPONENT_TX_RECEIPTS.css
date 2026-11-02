@@ -7,8 +7,8 @@
    what it logged. the code block is the tx page's own component, so
    its own look lives in its own file (tx/code_block.css). */
 /*==================================*/
-@import url(./tx/code_block.css);
-@import url(./tx/app_page_tx_args_viewer.css);
+@import url(./code_block.css);
+@import url(./app_page_tx_args_viewer.css);
 
 /*==================================*/
 #HUGGIES_COMPONENT_TX_RECEIPTS .tx-receipts {

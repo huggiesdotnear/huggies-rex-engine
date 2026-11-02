@@ -10,7 +10,7 @@
    the switch direction bar between the two sides is the swap page's
    own component (swap/switch_direction.css), so it brings its own css
    in with the @import below. */
-@import url(./swap/switch_direction.css);
+@import url(./switch_direction.css);
 /*==================================*/
 #HUGGIES_COMPONENT_SWAP_FORM .swap-form {
   display: flex;

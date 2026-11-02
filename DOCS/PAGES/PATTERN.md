@@ -52,6 +52,19 @@ lib/components/app-wide/  the app-wide components: the loading PROGRESS
                           every page and belong to no one page.
 lib/components/shared/    the components more than one page uses. they
                           keep a plain name.
+
+lib/css/import-<page>.css the page's ONE css entry. it holds only
+                          import statements, and it lists the page's
+                          components in the same order as the page's ts
+                          entry file.
+lib/css/components/<page>/
+                          the page's component css, mirroring
+                          lib/components/. one file per component,
+                          named after its mount id.
+lib/css/components/shared/
+                          the css of the shared components, named after
+                          their tsx file.
+lib/css/base/           the base css, one file per element.
 ```
 
 ## the loading signal
