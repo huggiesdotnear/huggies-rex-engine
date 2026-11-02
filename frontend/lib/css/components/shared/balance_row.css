@@ -26,11 +26,15 @@
   white-space: nowrap;
 }
 /* the contract id sits on row one, clipped so a 64-char id cannot push
-   the row past the page. the title holds the complete value. */
+   the row past the page. the title holds the complete value.
+
+   the id is a LINK, so it keeps the link color. it is not dimmed with
+   opacity: opacity blends the link with the red background behind it,
+   so the cyan turns into a muddy grey-teal that does not read as a
+   link at all. */
 .balance-table .contract {
   font-family: monospace;
   font-size: 10px;
-  opacity: 0.55;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
