@@ -1,6 +1,6 @@
 # AGENTS
 
-💩 near agentic engine
+💩 shit-1170 agentic and defi engine for near
 
 ---
 
