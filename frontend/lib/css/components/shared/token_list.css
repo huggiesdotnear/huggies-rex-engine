@@ -105,6 +105,14 @@
   width: 100%;
   max-width: 100%;
   margin: 0;
+  /* --- WHY --- THE ROW IS BORDER-BOX: the row is a link on the discover
+     page and a button in the picker. the global `button` rule is
+     border-box, but an `a` is not, so a link row with `width: 100%`
+     added its own padding and border ON TOP of the hundred percent and
+     came out 22px wider than the page column — which pushed the volume
+     and market cap figures off the right edge and cut them off. the
+     row sizes itself the same way in both places. */
+  box-sizing: border-box;
   color: inherit;
   text-decoration: none;
   text-align: left;
@@ -142,6 +150,14 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+}
+/* --- WHY --- THE VALUES TAKE THEIR OWN WIDTH AND THE COPY GIVES UP
+   THE REST: the volume and market cap figures are numbers and must
+   never be cut off — a cut figure is a wrong figure. the name and the
+   id are text and they ellipsis, which is what they are for. so the
+   copy column is the one that shrinks. */
+.token-list-values {
+  flex: 0 0 auto;
 }
 .token-list-copy span,
 .token-list-copy code,

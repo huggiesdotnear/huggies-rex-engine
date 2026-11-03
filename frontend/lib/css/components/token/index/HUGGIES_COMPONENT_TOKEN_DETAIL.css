@@ -20,18 +20,8 @@
   flex: 1 1 auto;
   min-width: 0;
 }
-#HUGGIES_COMPONENT_TOKEN_DETAIL header h1,
-#HUGGIES_COMPONENT_TOKEN_DETAIL header p {
+#HUGGIES_COMPONENT_TOKEN_DETAIL header h1 {
   margin: 0;
-}
-#HUGGIES_COMPONENT_TOKEN_DETAIL header p {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  opacity: 0.75;
-}
-#HUGGIES_COMPONENT_TOKEN_DETAIL header code {
-  display: block;
-  font-size: 10px;
 }
 #HUGGIES_COMPONENT_TOKEN_DETAIL .icon {
   width: 52px;
@@ -40,16 +30,42 @@
   object-fit: cover;
   flex: none;
 }
+/* --- WHY --- THE CARD'S ROWS ARE LEFT-ALIGNED: the page column is
+   centred, so a label and a value in the middle of the card read as
+   floating. a label is a label wherever it sits — it reads as a label
+   when it sits above its value at the left, the way the metadata grid
+   does when it is left-aligned. */
 #HUGGIES_COMPONENT_TOKEN_DETAIL .description-card {
   margin: 1rem 0;
   padding: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+/* --- WHY --- THE ROWS IN THE CARD ARE NOT CARDS THEMSELVES: they are
+   rows inside a card, so they drop the grid's own border and fill and
+   keep only the label-over-value shape. the shared rules are what the
+   grid's rows use; these are what the same rows look like inside a
+   card. */
+#HUGGIES_COMPONENT_TOKEN_DETAIL .description-card .meta-row {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0.6rem;
+}
+#HUGGIES_COMPONENT_TOKEN_DETAIL .description-card .meta-row strong {
+  font-size: 14px;
 }
 #HUGGIES_COMPONENT_TOKEN_DETAIL .description-card h2 {
-  margin: 0 0 0.45rem;
+  margin: 0.85rem 0 0.45rem;
   font-size: 16px;
+}
+/* --- WHY --- THE FIRST HEADING HAS NO TOP MARGIN: the name and the id
+   come before it in the card, and the heading that follows them should
+   sit close to the row above it rather than open a gap. */
+#HUGGIES_COMPONENT_TOKEN_DETAIL .description-card h2:first-child {
+  margin-top: 0;
 }
 #HUGGIES_COMPONENT_TOKEN_DETAIL .description-card p {
   margin: 0;

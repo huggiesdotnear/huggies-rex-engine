@@ -5,8 +5,17 @@
 // it is shared: the token page and the $SHIT page both show one, so the grid
 // lives here and both pages render it. the grid's rules live in
 // lib/css/components/shared/token_meta_grid.css.
-// ========================================
-function token_meta_row_fun(label: string, value: string): preact.JSX.Element {
+//
+// --- WHY --- THE ROW IS EXPORTED: the token page's card shows the name
+// and the id as LABEL and VALUE rows too, and they must be the SAME
+// element as the grid's rows — a reader who sees a label above a value
+// in the grid must see the same label above a value in the card. a
+// second row with its own class would be a second shape for the same
+// thing.
+export function huggies_token_meta_row_fun(
+  label: string,
+  value: string,
+): preact.JSX.Element {
   return (
     <div class="meta-row">
       <span>{label}</span>
@@ -20,7 +29,7 @@ export function huggies_token_meta_grid_fun(
 ): preact.JSX.Element {
   return (
     <div class="token-meta">
-      {rows.map((row) => token_meta_row_fun(row.label, row.value))}
+      {rows.map((row) => huggies_token_meta_row_fun(row.label, row.value))}
     </div>
   );
 }

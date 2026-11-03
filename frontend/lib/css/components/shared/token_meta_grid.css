@@ -2,7 +2,12 @@
 /* token_meta_grid
    the metadata grid — the rows of LABEL and VALUE that a token's page
    shows. shared: the token page and the $SHIT page both show one, so
-   the grid's rules live here and both pages import this file. */
+   the grid's rules live here and both pages import this file.
+
+   the ROW is shared too: the token page's card shows the name and the
+   id as the same label-over-value rows, so the row's rules are on
+   `.meta-row` itself and not on the grid's wrapper. a row that only
+   worked inside the grid would be a second shape for the same thing. */
 /*==================================*/
 .token-meta {
   display: grid;
@@ -11,7 +16,7 @@
   padding: 0;
   margin-bottom: 1rem;
 }
-.token-meta .meta-row {
+.meta-row {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -23,12 +28,12 @@
   font-size: 13px;
   min-width: 0;
 }
-.token-meta .meta-row span {
+.meta-row span {
   font-size: 10px;
   letter-spacing: 0.06em;
   opacity: 0.65;
 }
-.token-meta .meta-row strong {
+.meta-row strong {
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }

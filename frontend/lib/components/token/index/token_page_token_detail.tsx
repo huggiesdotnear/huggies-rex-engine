@@ -3,6 +3,12 @@
 // id, the metadata grid, the description and the socials.
 //
 // it reads the loaded token from the page's store. it fetches nothing.
+//
+// --- WHY --- THE NAME AND THE ID ARE IN THE CARD AND NOT IN THE HEADER:
+// the header holds the icon and the symbol, and it is the one thing on
+// the page that is NOT a card. the name and the id are facts about the
+// token, and the card is where the facts live — so they sit in the card
+// with the description, each under its own label.
 // ========================================
 import { render } from "preact";
 import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
@@ -10,6 +16,7 @@ import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_pa
 import { format_price_usd_fun } from "../../../ts/token/index/token_page_token_price_format";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { huggies_token_meta_grid_fun } from "../../shared/token_meta_grid";
+import { huggies_token_meta_row_fun } from "../../shared/token_meta_grid";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -24,8 +31,6 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
         {detail.icon !== null && <img class="icon" src={detail.icon} alt="" />}
         <div>
           <h1>{detail.symbol}</h1>
-          <p>{detail.name}</p>
-          <code>{detail.id}</code>
         </div>
       </header>
       {huggies_token_meta_grid_fun([
@@ -42,12 +47,16 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
         },
         { label: "DECIMALS", value: String(detail.decimals) },
       ])}
-      {detail.description !== null && (
-        <section class="description-card">
-          <h2>DESCRIPTION:</h2>
-          <p class="description">{detail.description}</p>
-        </section>
-      )}
+      <section class="description-card">
+        {huggies_token_meta_row_fun("NAME", detail.name)}
+        {huggies_token_meta_row_fun("CA", detail.id)}
+        {detail.description !== null && (
+          <>
+            <h2>DESCRIPTION:</h2>
+            <p class="description">{detail.description}</p>
+          </>
+        )}
+      </section>
       {Object.keys(detail.socials).length > 0 && (
         <section class="socials">
           {Object.entries(detail.socials).map(([name, url]) => (
