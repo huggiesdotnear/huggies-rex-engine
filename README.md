@@ -1,6 +1,6 @@
 # shit-1170
 
-💩 shit-1170.near agentic and defi engine
+💩 shit-1170 agentic and defi engine
 
 bun/frontend
 
