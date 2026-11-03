@@ -49,6 +49,7 @@ const HUGGIES_TOKEN_DETAIL_FIELDS = [
   "holders",
   "liquidity_usd",
   "market_cap_usd",
+  "total_supply",
   "socials",
   "description",
 ] as const;
@@ -61,6 +62,17 @@ const HUGGIES_TOKEN_HOLDERS_LIMIT = 100;
 function to_finite_number_fun(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number(String(value));
   return Number.isFinite(parsed) ? parsed : 0;
+}
+// ========================================
+// read a decimal string the api reports, keeping it as a string so the
+// big-integer math downstream stays exact.
+//
+// --- WHY --- the supply does not fit in a double once it carries 18
+// decimals, and the holders' share of the supply needs every digit.
+function to_decimal_string_fun(value: unknown, fallback: string): string {
+  if (typeof value === "string" && value.trim().length > 0) return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return fallback;
 }
 // ========================================
 // --- METADATA --------------------------
@@ -98,6 +110,7 @@ async function fetch_token_detail_fun(
     holders: to_finite_number_fun(cell.holders),
     liquidity_usd: to_finite_number_fun(cell.liquidity_usd),
     market_cap_usd: to_finite_number_fun(cell.market_cap_usd),
+    total_supply_raw: to_decimal_string_fun(cell.total_supply, "0"),
     socials:
       socials !== null && typeof socials === "object"
         ? (socials as Record<string, string>)

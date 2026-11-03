@@ -15,6 +15,10 @@ export interface HUGGIES_TOKEN_DETAIL {
   holders: number;
   liquidity_usd: number;
   market_cap_usd: number;
+  // the total supply, in the token's smallest unit, as the raw decimal
+  // string the api reports. the holders table divides the balances by
+  // it, so it has to stay exact.
+  total_supply_raw: string;
   socials: Record<string, string>;
   description: string | null;
 }

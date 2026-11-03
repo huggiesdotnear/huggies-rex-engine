@@ -1,9 +1,10 @@
 /*==================================*/
 /* token_holder_row
-   one row of the holders table: the rank, the account, the balance and
-   the usd value. the table has four columns, so it cannot use the
-   account table's single stacked column: the account cell stays wide
-   and the two amount columns share what is left. */
+   one row of the holders table: the rank, the account, the balance, the
+   usd value and the share of the total supply. the table has five
+   columns, so it cannot use the account table's single stacked column:
+   the account cell stays wide and the three amount columns share what is
+   left. */
 /*==================================*/
 .token-holders th.holder-rank,
 .token-holders td.holder-rank {
@@ -13,7 +14,7 @@
 }
 .token-holders th.holder-account,
 .token-holders td.holder-account {
-  width: 40%;
+  width: 30%;
 }
 /* a long account id wraps inside its cell instead of stretching the
    table, so the columns keep their widths. */
@@ -30,12 +31,21 @@
 }
 .token-holders th.holder-amount,
 .token-holders td.holder-amount {
-  width: 30%;
+  width: 21%;
   font-variant-numeric: tabular-nums;
 }
 .token-holders th.holder-usd,
 .token-holders td.holder-usd {
-  width: 30%;
+  width: 18%;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+/* the share of the supply. it sits at the far right, next to the usd
+   value it explains. */
+.token-holders th.holder-percent,
+.token-holders td.holder-percent {
+  width: 17%;
   text-align: right;
   font-variant-numeric: tabular-nums;
   opacity: 0.85;

@@ -24,6 +24,17 @@
 // a link carrying both would be a link saying two different questions
 // at once, and the page would have to pick one to answer.
 //
+// --- WHY THE URL CARRIES THE UNIT AMOUNT AND NOT THE HUMAN ONE: the
+// unit amount is the EXACT number the chain and the router trade, and
+// it is the same number whatever the token's decimals are. a human
+// amount ("1.5") is only meaningful next to the token it belongs to —
+// "1.5 NEAR" and "1.5 USDC" are different trades, and "1.5" of a token
+// with six decimals is a different number of units than "1.5" of one
+// with eighteen. so a link that says `?amount_in=1.5` cannot be read
+// without knowing which token the link means, and the unit amount
+// says it on its own. it also matches what the router is asked, so the
+// number that travels in the link is the number that trades.
+//
 // --- WHY IT IMPORTS NOTHING: the rule is the whole of it.
 const URL_IN_PARAM = "in";
 const URL_OUT_PARAM = "out";
@@ -85,7 +96,7 @@ function read_url_amount_out_fun(): string | null {
   return normalize_token_id_fun(params.get(URL_AMOUNT_OUT_PARAM));
 }
 // ========================================
-// the amount the url carries and the side it belongs to.
+// the unit amount the url carries and the side it belongs to.
 //
 // --- WHY --- THE SIDE IS READ FROM THE PARAMETER NAME AND NOT FROM A
 // FLAG: the name IS the side. `?amount_in=` is the input box and
@@ -96,18 +107,22 @@ function read_url_amount_out_fun(): string | null {
 // both is a link asking two questions at once, and the page answers
 // one. the input side is the side the reader types into first, so it
 // is the one that is answered.
+//
+// --- WHY --- THE AMOUNT IS THE UNIT AMOUNT AND NOT THE HUMAN ONE: see
+// the note at the top of the file. the caller turns it into the human
+// amount the box shows, using the token's decimals.
 export interface HUGGIES_SWAP_URL_AMOUNT {
-  // the human amount, or null when the url carries none.
-  amount: string | null;
+  // the unit amount, or null when the url carries none.
+  unit: string | null;
   // the side the amount belongs to.
   side: "in" | "out";
 }
 function read_url_amount_fun(): HUGGIES_SWAP_URL_AMOUNT {
   const amount_in = read_url_amount_in_fun();
-  if (amount_in !== null) return { amount: amount_in, side: "in" };
+  if (amount_in !== null) return { unit: amount_in, side: "in" };
   const amount_out = read_url_amount_out_fun();
-  if (amount_out !== null) return { amount: amount_out, side: "out" };
-  return { amount: null, side: "in" };
+  if (amount_out !== null) return { unit: amount_out, side: "out" };
+  return { unit: null, side: "in" };
 }
 // ========================================
 // ========================================
@@ -135,6 +150,10 @@ function write_url_tokens_fun(
 // put the reader's amount on the url, and take the OTHER side's amount
 // off it.
 //
+// --- WHY --- THE AMOUNT IS THE UNIT AMOUNT: the url carries the exact
+// number of the token's smallest unit that trades — the same number the
+// router is asked about. see the note at the top of the file.
+//
 // --- WHY --- THE OTHER SIDE'S AMOUNT GOES: the two boxes are two views of
 // ONE quote. when the reader types into the input box, the output box
 // shows the router's answer, and that answer is not the reader's number.
@@ -144,8 +163,8 @@ function write_url_tokens_fun(
 // --- WHY --- `replaceState` and not `pushState`: the amount changes on
 // every keystroke, and a history entry per keystroke would fill the
 // back button with every prefix of the number the reader typed.
-function write_url_amount_fun(side: "in" | "out", amount: string | null): void {
-  const trimmed = amount === null ? null : amount.trim();
+function write_url_amount_fun(side: "in" | "out", unit: string | null): void {
+  const trimmed = unit === null ? null : unit.trim();
   const empty = trimmed === null || trimmed.length === 0;
   if (side === "in") {
     write_url_fun({

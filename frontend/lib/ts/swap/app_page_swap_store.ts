@@ -100,6 +100,17 @@ let quoted_amount_in: string | null = null;
 // the side the live quote was asked for. a quote on the other side is
 // about a different question, so it must not overwrite this one.
 let quoted_amount_side: HUGGIES_SWAP_AMOUNT_SIDE = "in";
+// the unit amount the url carried on the first load, waiting for the
+// token's decimals.
+//
+// --- WHY --- IT IS HELD AND NOT CONVERTED RIGHT AWAY: the url carries
+// the unit amount, and the unit amount only becomes a human amount once
+// the token's decimals are known — and those arrive with the token
+// info, which the page fetches. so the unit amount waits here until the
+// info lands, and is turned into the human amount the box shows then.
+let pending_url_unit: string | null = null;
+// the side the pending unit amount belongs to.
+let pending_url_side: HUGGIES_SWAP_AMOUNT_SIDE = "in";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -158,27 +169,18 @@ function read_tokens_fun(): { token_in: string; token_out: string } {
 // --- WHY --- THE OTHER SIDE'S AMOUNT IS EMPTY: only the side the reader
 // fixed carries a number, so the other side starts blank and the
 // router fills it.
+//
+// --- WHY --- THE URL CARRIES THE UNIT AMOUNT: the link says the exact
+// number of the token's smallest unit that trades, so it means the
+// same thing whatever the token's decimals are. the box, though, shows
+// the human amount, so the unit amount is turned into one with the
+// token's decimals once the token info has landed.
 function read_amount_fun(): {
-  amount_in: string;
-  amount_out: string;
-  amount_side: HUGGIES_SWAP_AMOUNT_SIDE;
+  unit: string | null;
+  side: HUGGIES_SWAP_AMOUNT_SIDE;
 } {
   const from_url = HUGGIES_APP_PAGE_SWAP_URL.read_amount();
-  if (from_url.amount === null) {
-    return { amount_in: "", amount_out: "", amount_side: "in" };
-  }
-  if (from_url.side === "in") {
-    return {
-      amount_in: from_url.amount,
-      amount_out: "",
-      amount_side: "in",
-    };
-  }
-  return {
-    amount_in: "",
-    amount_out: from_url.amount,
-    amount_side: "out",
-  };
+  return { unit: from_url.unit, side: from_url.side };
 }
 // ========================================
 // the token infos for the two tokens, and the balances of them.
@@ -201,13 +203,20 @@ async function load_tokens_and_balances_fun(
       account_id === null
         ? new Map<string, string>()
         : await HUGGIES_APP_PAGE_SWAP_BALANCES.load(account_id, ids);
+    const token_in_info = info_map.get(token_in) ?? null;
+    const token_out_info = info_map.get(token_out) ?? null;
     set_state_fun({
       ...state,
-      token_in_info: info_map.get(token_in) ?? null,
-      token_out_info: info_map.get(token_out) ?? null,
+      token_in_info,
+      token_out_info,
       balances,
       loading_balances: false,
     });
+    // --- WHY --- THE URL'S AMOUNT IS APPLIED HERE: the unit amount the
+    // url carried becomes the human amount the box shows, and that
+    // needs the token's decimals — which have just landed. applying it
+    // here is what puts the link's number in the box.
+    apply_pending_url_amount_fun(token_in_info, token_out_info);
   } catch (err) {
     set_state_fun({
       ...state,
@@ -215,6 +224,52 @@ async function load_tokens_and_balances_fun(
       error: err instanceof Error ? err.message : String(err),
     });
   }
+}
+// ========================================
+// put the url's unit amount into the box, as the human amount.
+//
+// --- WHY --- THE UNIT AMOUNT IS TURNED INTO A HUMAN AMOUNT HERE: the
+// box shows whole tokens and the url carries the token's smallest unit,
+// so the two have to meet somewhere, and this is where the token's
+// decimals are known.
+//
+// --- WHY --- THE SIDE THE AMOUNT BELONGS TO IS THE URL'S: the
+// parameter it sat in IS the side, and the box that side is the one
+// that shows it.
+//
+// --- WHY --- THE AMOUNT GOES WHEN IT CANNOT BE TURNED: without the
+// token's decimals there is no human amount, so there is nothing to
+// show. the unit amount is dropped with it, so a later load does not
+// find a stale number waiting.
+function apply_pending_url_amount_fun(
+  token_in_info: TOKEN_INFO | null,
+  token_out_info: TOKEN_INFO | null,
+): void {
+  const unit = pending_url_unit;
+  if (unit === null) return;
+  const side = pending_url_side;
+  const info = side === "in" ? token_in_info : token_out_info;
+  if (info === null) {
+    pending_url_unit = null;
+    return;
+  }
+  const human = unit_to_human_fun(unit, info.decimals);
+  pending_url_unit = null;
+  if (side === "in") {
+    set_state_fun({
+      ...state,
+      amount_in: human,
+      amount_out: "",
+      amount_side: "in",
+    });
+    return;
+  }
+  set_state_fun({
+    ...state,
+    amount_in: "",
+    amount_out: human,
+    amount_side: "out",
+  });
 }
 // ========================================
 // ========================================
@@ -367,6 +422,11 @@ function open_subscription_fun(
 // and the components read the store. if each component read the url
 // itself they could disagree about which side the amount is on.
 //
+// --- WHY --- THE URL'S AMOUNT WAITS FOR THE TOKEN INFO: the url carries
+// the unit amount, and turning it into the human amount the box shows
+// needs the token's decimals. so it is held here and applied when the
+// info lands — see apply_pending_url_amount_fun.
+//
 // --- WHY --- THE QUOTE IS ASKED AT THE END: the quote needs the token's
 // decimals, and the decimals come with the token info. so the quote
 // waits until the info has landed.
@@ -374,13 +434,16 @@ async function load_fun(): Promise<void> {
   const tokens = read_tokens_fun();
   const amounts = read_amount_fun();
   HUGGIES_APP_PAGE_SWAP_URL.write(tokens.token_in, tokens.token_out);
+  // the unit amount the link carried, waiting for the token's decimals.
+  pending_url_unit = amounts.unit;
+  pending_url_side = amounts.side;
   set_state_fun({
     ...state,
     token_in: tokens.token_in,
     token_out: tokens.token_out,
-    amount_in: amounts.amount_in,
-    amount_out: amounts.amount_out,
-    amount_side: amounts.amount_side,
+    amount_in: "",
+    amount_out: "",
+    amount_side: amounts.side,
   });
   await load_tokens_and_balances_fun(tokens.token_in, tokens.token_out);
   // the amount the link carried is quoted, so the page opens with the
@@ -544,6 +607,18 @@ async function swap_pair_fun(): Promise<void> {
 // copies while the amount is on screen then says the same thing the
 // screen does. the url is written AFTER the state, so the state and
 // the url never disagree about which side is fixed.
+//
+// --- WHY THE URL CARRIES THE UNIT AMOUNT: the url holds the exact
+// number of the token's smallest unit that trades, so the reader types
+// "1.5" and the url carries "1500000000000000000000000" for an
+// eighteen-decimal token. the unit amount is the same number the router
+// is asked about, and it means the same thing whatever the token's
+// decimals are.
+//
+// --- WHY A HALF-TYPED AMOUNT PUTS NOTHING ON THE URL: the reader is
+// still typing ("1." or "1.5e"), so there may be no unit amount yet.
+// writing nothing keeps the url from carrying a number the reader did
+// not finish typing.
 function set_amount_fun(side: HUGGIES_SWAP_AMOUNT_SIDE, amount: string): void {
   if (side === "in") {
     set_state_fun({
@@ -560,7 +635,15 @@ function set_amount_fun(side: HUGGIES_SWAP_AMOUNT_SIDE, amount: string): void {
       amount_side: "out",
     });
   }
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount(side, amount);
+  // the token's decimals turn the reader's number into the unit amount
+  // the url carries.
+  const info = side === "in" ? state.token_in_info : state.token_out_info;
+  if (info === null) {
+    HUGGIES_APP_PAGE_SWAP_URL.write_amount(side, null);
+    return;
+  }
+  const unit = human_to_unit_fun(amount, info.decimals);
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount(side, unit);
 }
 // ========================================
 // the reader picked a route.
@@ -672,10 +755,21 @@ async function switch_direction_fun(): Promise<void> {
   // with them. so the url carries the amount the reader FIXED on the
   // side they are NOW fixing, and it is the same trade read the other
   // way round.
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount(
-    new_side,
-    new_side === "in" ? new_amount_in : new_amount_out,
-  );
+  //
+  // --- WHY --- THE UNIT AMOUNT IS BUILT FROM THE OLD TOKEN'S INFO: the
+  // two tokens have traded places, so the token on the new side is the
+  // one that was on the OTHER side, and ITS decimals are the ones the
+  // amount has to be scaled by. the info is reloaded for the new pair
+  // right after, but the url is written now, so the old info is the one
+  // that is right here.
+  const new_side_info =
+    new_side === "in" ? state.token_out_info : state.token_in_info;
+  const new_fixed_human = new_side === "in" ? new_amount_in : new_amount_out;
+  const new_fixed_unit =
+    new_side_info === null
+      ? null
+      : human_to_unit_fun(new_fixed_human, new_side_info.decimals);
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount(new_side, new_fixed_unit);
   clear_routes_fun();
   await load_tokens_and_balances_fun(new_token_in, new_token_out);
   // the amount the reader fixed is now the amount they SELL, and it has
@@ -704,6 +798,9 @@ async function switch_direction_fun(): Promise<void> {
 function reset_fun(): void {
   clear_routes_fun();
   quoted_amount_side = "in";
+  // the amount the url carried goes with the rest of the page, so it
+  // cannot land in the box after the reset.
+  pending_url_unit = null;
   // the amount goes off the url with the rest of the page, so a reload
   // after a reset opens the page the way it opens.
   HUGGIES_APP_PAGE_SWAP_URL.write_amount("in", null);

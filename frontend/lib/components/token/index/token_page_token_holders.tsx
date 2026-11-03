@@ -1,6 +1,7 @@
 // ========================================
 // the indexed holders table on the token page: the rank, the account, the
-// balance and the usd value, paged by cursor.
+// balance, the usd value and the share of the total supply, paged by
+// cursor.
 //
 // it reads the loaded holders from the page's store. it fetches nothing —
 // the next page is asked for when the reader nears the bottom of the list.
@@ -62,6 +63,7 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
               <th class="holder-account">ACCOUNT</th>
               <th class="holder-amount">BALANCE</th>
               <th class="holder-usd">USD</th>
+              <th class="holder-percent">% SUPPLY</th>
             </tr>
           </thead>
           <tbody>
@@ -72,6 +74,7 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
                 account_id: holder.account_id,
                 balance: holder.balance,
                 info: holder_info_fun(detail),
+                total_supply_raw: detail.total_supply_raw,
               }),
             )}
           </tbody>
