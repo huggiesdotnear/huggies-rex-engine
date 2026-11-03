@@ -10,16 +10,26 @@
    the key is shown in a <code>, so it reads as a value and not as a
    sentence. the buttons sit under it, two across, so the card's width
    is the app's 500px column and not the width of two long button
-   labels. */
+   labels.
+
+   the card is a white sheet on the dark page, and its text is the
+   app's #474747 grey. the ACTIVE account is marked by a small dot
+   drawn by css beside the id, so the id reads as a clean id and not
+   as a bullet point. */
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION > section {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #474747;
 }
 /*----------------------*/
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h2 {
   margin: 0;
+  color: #474747;
 }
 /*----------------------*/
 /* the accounts, one under the other. */
@@ -33,18 +43,37 @@
   min-width: 0;
   box-sizing: border-box;
   padding: 0.8rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(71, 71, 71, 0.22);
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(71, 71, 71, 0.06);
   text-align: left;
 }
 /*----------------------*/
+/* the account's id. the ACTIVE account is marked by a small dot on
+   the left of the name, drawn by css and not written into the text,
+   so the id itself stays a clean id and reads no bullet. */
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h3 {
   margin: 0 0 0.4rem;
   padding-bottom: 4px;
   font-size: 13px;
   letter-spacing: 0.08em;
   word-break: break-all;
+  color: #474747;
+}
+/*----------------------*/
+#SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h3.is-active {
+  padding-left: 14px;
+  position: relative;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h3.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #474747;
 }
 /*----------------------*/
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION p {
@@ -53,6 +82,7 @@
   font-size: 13px;
   line-height: 1.55;
   opacity: 0.9;
+  color: #474747;
 }
 /*----------------------*/
 /* the session key. it wraps inside the code element so a 74-character
@@ -62,11 +92,12 @@
   margin: 0 0 0.5rem;
   padding: 0.5rem 0.6rem;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(71, 71, 71, 0.1);
   font-size: 12px;
   line-height: 1.5;
   word-break: break-all;
   text-align: left;
+  color: #474747;
 }
 /*----------------------*/
 /* the two buttons under a key. they share the row so the card's width
@@ -108,11 +139,14 @@
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-note {
   margin: 0.4rem 0 0;
   text-align: left;
+  color: #474747;
 }
 /*----------------------*/
+/* the error under the card. the page's own error red is too light to
+   read on the white sheet, so it is a darker red here. */
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-error {
   margin: 0.4rem 0 0;
-  color: #ffd7d2;
+  color: #a31209;
   text-align: left;
 }
 /*==================================*/
