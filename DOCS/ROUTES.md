@@ -23,6 +23,18 @@ user info and session managmnets
   the typed client is `api_huggies_ping_get(base_url)`. it is named
   after us because it is OUR route — nothing is proxied through it.
 
+- `/api/huggies/sessions` - turn signed messages into a session key.
+  `POST`. the browser sends every account it holds a signed message for,
+  the backend verifies each one, and the answer is the ONE session key
+  the user has.
+
+  see [`ROUTES/huggies-sessions.md`](./ROUTES/huggies-sessions.md)
+
+- `/api/huggies/session/me` - who does this session key belong to.
+  `GET`. the key travels in the `x-session-token` header.
+
+  see [`ROUTES/huggies-session-me.md`](./ROUTES/huggies-session-me.md)
+
 ### `/api/trezu/` - trezu specifics
 
 - `/api/trezu/user/treasuries` - the treasuries (sputnik daos) an account

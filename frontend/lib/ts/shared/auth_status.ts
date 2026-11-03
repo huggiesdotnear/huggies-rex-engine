@@ -25,6 +25,7 @@ import {
   HUGGIES_AUTH_SESSIONS,
   type HUGGIES_AUTH_SESSION,
 } from "./auth_sessions";
+import { HUGGIES_SESSION } from "./session";
 // ========================================
 // ========================================
 // ========================================
@@ -393,6 +394,9 @@ async function sign_out_fun(): Promise<void> {
     console.info("[auth] disconnect had no wallet to close", err);
   } finally {
     clear_session_fun();
+    // the backend session key belongs to the user, and the user is
+    // gone — so the key is forgotten here and not left in memory.
+    HUGGIES_SESSION.reset();
     account_id = null;
     set_error_fun(null);
     notify_fun();
@@ -419,6 +423,13 @@ function remove_account_fun(target_account_id: string): void {
     account_id = pick_fallback_account_fun();
     HUGGIES_AUTH_SESSIONS.save_active(account_id);
     if (account_id !== null) sync_url_account_fun(account_id);
+  }
+  // --- WHY --- the backend session key is forgotten when the LAST
+  // account goes: the key belongs to the user, and with no account left
+  // there is nobody to verify it for. the key is re-fetched if the
+  // reader signs in again.
+  if (HUGGIES_AUTH_SESSIONS.list_account_ids().length === 0) {
+    HUGGIES_SESSION.reset();
   }
   notify_fun();
 }
@@ -487,6 +498,9 @@ function init_fun(): void {
     // mirror external sign-out (from the wallet UI itself).
     connector.on("wallet:signOut", () => {
       clear_session_fun();
+      // the user is gone, so the backend session key is forgotten here
+      // too — same as our own sign out.
+      HUGGIES_SESSION.reset();
       account_id = null;
       notify_fun();
     });

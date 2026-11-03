@@ -10,9 +10,9 @@
 # final image is debian:bookworm-slim so the binary's libc matches the one
 # it was linked against.
 #
-# NOTE: no vault / no persistent state here yet. the backend keeps nothing
-# on disk — `static/` is baked into the image and the frontend calls the
-# intear api directly from the browser.
+# NOTE: the vault. the sqlite db lives OUTSIDE the image, in a volume
+# mounted at /home/huggies/.huggies-rex-engine — see DOCS/VAULT.md. the
+# image carries no db, so a rebuild never touches the data.
 # ========================================
 # syntax=docker/dockerfile:1.7
 
@@ -185,6 +185,15 @@ WORKDIR /app
 ENV HUGGIES_HOST=0.0.0.0
 ENV HUGGIES_PORT=54733
 ENV RUST_LOG=huggies_rex_engine=info
+# --- WHY --- the vault path is baked in as the default: the db lives
+# under the user's home, which is /home/huggies in the image, and the
+# volume is mounted exactly there. the app's own default is
+# `${HOME}/.huggies-rex-engine/huggies-rex-engine.db`, so it needs no
+# env at all — this just says where that is.
+ENV HUGGIES_VAULT_DB_LOCATION=/home/huggies/.huggies-rex-engine/huggies-rex-engine.db
+# --- WHY --- the session secret is NOT baked in: it encrypts the
+# session keys in the db, so it must come from the environment and not
+# from the image. a secret in an image is a secret in every image layer.
 EXPOSE 54733
 
 USER huggies

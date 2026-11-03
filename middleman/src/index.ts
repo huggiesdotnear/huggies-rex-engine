@@ -15,6 +15,8 @@
 // ========================================
 
 export * from "./fun/api_huggies_ping_get";
+export * from "./fun/api_huggies_session_me_get";
+export * from "./fun/api_huggies_sessions_post";
 export * from "./fun/api_trezu_treasuries_get";
 
 export { api_call } from "./stuff/api_call";
@@ -31,6 +33,11 @@ export type { REQUEST_OPTIONS } from "./stuff/request_options";
 
 export type { HUGGIES_ERROR_RESPONSE } from "./types/common";
 export type { HUGGIES_PING } from "./types/huggies_ping";
+export type {
+  HUGGIES_SESSIONS_REQUEST,
+  HUGGIES_SESSIONS_RESPONSE,
+  HUGGIES_SIGNED_ACCOUNT,
+} from "./types/huggies_sessions";
 export type { TREZU_TREASURY } from "./types/trezu_treasury";
 export type { TREZU_TREASURY_CONFIG } from "./types/trezu_treasury_config";
 export type { TREZU_TREASURY_METADATA } from "./types/trezu_treasury_metadata";

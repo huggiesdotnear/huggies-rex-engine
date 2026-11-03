@@ -14,11 +14,14 @@ use axum::{
     http::{HeaderValue, Method, StatusCode},
     middleware::{self, Next},
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, post},
 };
+use sqlx::SqlitePool;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
 use super::ping_route::ping_route;
+use super::session_me_route::session_me_route;
+use super::sessions_route::sessions_route;
 use super::trezu_treasuries_route::trezu_treasuries_route;
 // ====================================
 // CORS preflight middleware — intercepts every OPTIONS request before
@@ -65,7 +68,7 @@ async fn fresh_static_middleware_fun(req: Request, next: Next) -> Response {
     res
 }
 // ====================================
-pub fn app_router_fun() -> Router {
+pub fn app_router_fun(pool: SqlitePool) -> Router {
     let cors = CorsLayer::new()
         .allow_origin(HeaderValue::from_static("*"))
         .allow_methods([
@@ -85,6 +88,8 @@ pub fn app_router_fun() -> Router {
     // --------------------------------------------------------
     let api_router = Router::new()
         .route("/api/huggies/ping", get(ping_route))
+        .route("/api/huggies/sessions", post(sessions_route))
+        .route("/api/huggies/session/me", get(session_me_route))
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
     // static ServeDir is the FALLBACK at `/`, so any unmatched GET
@@ -104,6 +109,9 @@ pub fn app_router_fun() -> Router {
     Router::new()
         .merge(api_router)
         .merge(static_router)
+        // the db pool is the router's state, so the routes that need the
+        // db can reach it without opening a pool per request.
+        .with_state(pool)
         // axum wraps layers in REVERSE declaration order, so the
         // request runs preflight -> cors -> route. the preflight
         // intercepts OPTIONS and short-circuits to 204 with CORS

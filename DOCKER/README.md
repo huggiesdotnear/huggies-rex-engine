@@ -27,8 +27,13 @@ first time only, put your tunnel token in a `.env` at the repo root
 ```sh
 cp .env.example .env
 # then edit .env and set TUNNEL_TOKEN to the token from the cloudflare dashboard
+# and HUGGIES_SESSION_SECRET to a long random string of your own
 chmod 600 .env
 ```
+
+`HUGGIES_SESSION_SECRET` encrypts the session keys in the sqlite db. the
+app refuses to start without it, and **changing it makes every existing
+session key unreadable** — the db holds the keys encrypted with it.
 
 then:
 
@@ -63,8 +68,12 @@ secure context).
 ## notes
 
 - the frontend is baked into the image at `/app/static` — no host volume
-  is needed for it, and there is no vault or database yet, so nothing is
-  mounted.
+  is needed for it.
+- the sqlite db lives in the named volume `huggies-vault`, mounted at
+  `/home/huggies/.huggies-rex-engine`. it survives `docker compose down`
+  and a rebuild. **never delete it** — it holds the session keys.
+  the location can be moved with `HUGGIES_VAULT_DB_LOCATION`; see
+  [`DOCS/VAULT.md`](../DOCS/VAULT.md).
 - the binary binds `0.0.0.0:54733` inside the container so cloudflared can
   reach it over the compose network by container name. no host port is
   published.

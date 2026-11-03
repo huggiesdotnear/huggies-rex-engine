@@ -1,0 +1,84 @@
+/*==================================*/
+/* HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION
+   the session management card: the accounts the browser is signed in
+   with, and the one session key the backend issued for them.
+
+   two blocks side by side: the accounts on one side, the key on the
+   other. the key is long — 64 hex characters — so it gets its own
+   column and wraps instead of pushing the layout wide.
+
+   the key is shown in a <code>, so it reads as a value and not as a
+   sentence. the copy button sits under it, full width, like every other
+   button in the app. */
+/*==================================*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION > section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION > section > div > div {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION h3 {
+  margin: 0 0 0.4rem;
+  padding-bottom: 4px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION p {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  opacity: 0.9;
+}
+/*----------------------*/
+/* the signed in accounts. a list of long account ids, so each one
+   breaks rather than widening the column. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+/*----------------------*/
+/* the session key. it wraps inside the code element so a 64-character
+   key never widens the card. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION code {
+  display: block;
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-all;
+  text-align: left;
+}
+/*----------------------*/
+/* the copy button. it lives inside the card's column, so it drops the
+   base button's page width and takes the column's instead. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION button {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  padding: 8px 12px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+/*==================================*/

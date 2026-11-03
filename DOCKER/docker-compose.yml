@@ -5,10 +5,11 @@
 #   docker compose -f DOCKER/docker-compose.yml logs -f
 #   docker compose -f DOCKER/docker-compose.yml down
 #
-# there is no persistent state yet: the `static/` frontend bundle is
-# baked into the image, and the frontend talks to the intear api
-# directly from the browser (the backend is never rate limited by
-# it). so there is no vault / db volume to mount here yet.
+# there IS persistent state: the sqlite db. it lives in the named volume
+# `huggies-vault`, mounted at the app's default vault path. the
+# `static/` frontend bundle is baked into the image, and the frontend
+# talks to the intear api directly from the browser (the backend is
+# never rate limited by it).
 #
 # ACCESS: nothing is published to the host on purpose. the app is
 # reachable only through the cloudflare tunnel over https, which is
@@ -17,6 +18,10 @@
 # `ports:` block on huggies-backend below.
 
 name: huggies-rex-engine-fullstack-backend
+volumes:
+  # the sqlite db. named, so `docker compose down` keeps it and a
+  # rebuild never touches it.
+  huggies-vault:
 services:
   huggies-backend:
     build:
@@ -41,6 +46,19 @@ services:
       HUGGIES_HOST: "0.0.0.0"
       HUGGIES_PORT: "54733"
       RUST_LOG: "huggies_rex_engine=info"
+      # --- WHY --- the session secret comes from the repo-root .env
+      # and not from here: it encrypts the session keys in the db, so it
+      # must be a secret and not a value in this file. the app refuses
+      # to start without it.
+      HUGGIES_SESSION_SECRET: "${HUGGIES_SESSION_SECRET}"
+
+    # --- WHY --- the vault is a named volume and not a bind mount: the
+    # db must survive `docker compose down`, and it must never be
+    # touched by a rebuild. the path inside the container matches the
+    # app's default (`${HOME}/.huggies-rex-engine/`), so no env is
+    # needed for it.
+    volumes:
+      - huggies-vault:/home/huggies/.huggies-rex-engine
 
   # ----------------------------------------
   # cloudflare tunnel — the only way in.
