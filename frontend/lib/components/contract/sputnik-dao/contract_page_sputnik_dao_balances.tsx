@@ -9,16 +9,16 @@
 // it reads the loaded balances from the page's store. it fetches nothing.
 //
 // mounts into
-// <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES">.
+// <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES">.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_DAO_PAGE_STATE } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_DAO_PAGE_STATE } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
-import { huggies_balance_table_fun } from "../../shared/balance_table";
+import { shit_1170_balance_table_fun } from "../../shared/balance_table";
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN() {
-  const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
+function SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN() {
+  const page_state = use_page_store_fun(SHIT_1170_DAO_PAGE_STATE);
 
   const state = page_state;
   // no dao on this url, or it has no balances at all: render nothing, so a
@@ -27,7 +27,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN() {
 
   return (
     <>
-      {huggies_balance_table_fun({
+      {shit_1170_balance_table_fun({
         rows: state.balances,
         title: "BALANCES",
         loading: false,
@@ -41,11 +41,11 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES_FUN />, el);
   }
 }
 // ========================================

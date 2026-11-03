@@ -111,13 +111,13 @@ function read_url_amount_out_fun(): string | null {
 // --- WHY --- THE AMOUNT IS THE UNIT AMOUNT AND NOT THE HUMAN ONE: see
 // the note at the top of the file. the caller turns it into the human
 // amount the box shows, using the token's decimals.
-export interface HUGGIES_SWAP_URL_AMOUNT {
+export interface SHIT_1170_SWAP_URL_AMOUNT {
   // the unit amount, or null when the url carries none.
   unit: string | null;
   // the side the amount belongs to.
   side: "in" | "out";
 }
-function read_url_amount_fun(): HUGGIES_SWAP_URL_AMOUNT {
+function read_url_amount_fun(): SHIT_1170_SWAP_URL_AMOUNT {
   const amount_in = read_url_amount_in_fun();
   if (amount_in !== null) return { unit: amount_in, side: "in" };
   const amount_out = read_url_amount_out_fun();
@@ -204,7 +204,7 @@ function write_url_fun(values: Record<string, string | null>): void {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_SWAP_URL = {
+export const SHIT_1170_APP_PAGE_SWAP_URL = {
   read_in: read_url_in_fun,
   read_out: read_url_out_fun,
   read_amount: read_url_amount_fun,

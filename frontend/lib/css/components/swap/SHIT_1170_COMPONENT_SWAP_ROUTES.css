@@ -1,0 +1,123 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_SWAP_ROUTES
+   the route cards: one per dex that can serve the swap.
+
+   the best route is the one at the top, and it is marked with a badge
+   and a teal edge. the route the reader picked is marked with a
+   brighter fill, so the two marks never fight. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-routes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+}
+/* the line above the cards: how many routes there are, and which one
+   is in use. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-routes-note {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+  text-align: left;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+/*==================================*/
+/* one route card. it is a button, so it gets the app's button look
+   with the square corners and the pale fill that the page's red
+   background needs. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  text-align: left;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--color-fontend);
+}
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.26);
+}
+/* the best route carries the teal edge. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route.is-best {
+  border-color: var(--color-middle);
+}
+/* the route the reader picked is filled in, so the pick is unmistakable
+   even when it is not the best one. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route.is-selected {
+  background: rgba(0, 198, 215, 0.2);
+  border-color: var(--color-middle);
+  border-width: 3px;
+}
+/*==================================*/
+/* the head of a card: the dex name and the BEST badge. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-head strong {
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+/* the badge is a small pill in the teal. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-badge {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--color-middle);
+  color: var(--color-fontend);
+}
+/*==================================*/
+/* the amount out: the headline of the card. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-amount {
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the small line under it: the worst case and the transaction count. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  opacity: 0.72;
+}
+/*==================================*/
+/* the guaranteed output line: what the reader RECEIVES.
+   it sits between the headline and the detail line, so the card reads
+   top to bottom: the cost, what you get, and the floor. it is its own
+   class and not a detail row because a detail row spreads its two
+   children apart, and this line has one. */
+#SHIT_1170_COMPONENT_SWAP_ROUTES .swap-route-get {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-middle);
+}
+/*==================================*/

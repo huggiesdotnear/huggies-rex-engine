@@ -8,11 +8,11 @@
 // the links stay quiet on purpose: they are meant to be found, so they
 // are small, low contrast, and only a little brighter on hover.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS_FUN() {
+function SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS_FUN() {
   return (
     <div>
       <a href="game.html">🃏 EMOJI GAME</a>
@@ -24,11 +24,11 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS_FUN />, el);
+    render(<SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

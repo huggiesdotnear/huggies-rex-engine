@@ -76,6 +76,6 @@ button:disabled {
 /*----------------------*/
 /* an error shown under a button — e.g. a rejected wallet popup — is
    the button's own feedback, so it is styled by the component that
-   draws it (components/HUGGIES_COMPONENT_AUTH_BUTTON.css), not here.
+   draws it (components/SHIT_1170_COMPONENT_AUTH_BUTTON.css), not here.
    base holds the element look, not a component's error text. */
 /*==================================*/

@@ -12,12 +12,12 @@
 // --- WHY --- the game page has no id: there is nothing in the url to
 // read and no account to sign in. the meme tokens are a constant
 // (lib/ts/app_page_game_emoji_tokens.ts), so the store loads once.
-import { HUGGIES_APP_PAGE_GAME } from "./app_page_game";
-import type { HUGGIES_APP_PAGE_GAME_DATA } from "./app_page_game";
+import { SHIT_1170_APP_PAGE_GAME } from "./app_page_game";
+import type { SHIT_1170_APP_PAGE_GAME_DATA } from "./app_page_game";
 // ========================================
 // --- STATE ------------------------------
 // the loaded data, or null while it is still loading.
-let data: HUGGIES_APP_PAGE_GAME_DATA | null = null;
+let data: SHIT_1170_APP_PAGE_GAME_DATA | null = null;
 // true while a load is running.
 let loading = false;
 // true once the load has run, so it is not run again by a second
@@ -57,7 +57,7 @@ async function app_page_game_store_load_fun(): Promise<void> {
   loading = true;
   notify_fun();
   try {
-    data = await HUGGIES_APP_PAGE_GAME.load();
+    data = await SHIT_1170_APP_PAGE_GAME.load();
   } catch (err) {
     data = {
       icons: {},
@@ -71,7 +71,7 @@ async function app_page_game_store_load_fun(): Promise<void> {
 }
 // ========================================
 // --- READ ------------------------------
-function get_fun(): HUGGIES_APP_PAGE_GAME_DATA | null {
+function get_fun(): SHIT_1170_APP_PAGE_GAME_DATA | null {
   return data;
 }
 // true while a load is running.
@@ -80,7 +80,7 @@ function is_loading_fun(): boolean {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_GAME_STORE = {
+export const SHIT_1170_APP_PAGE_GAME_STORE = {
   load: app_page_game_store_load_fun,
   subscribe: subscribe_fun,
   get: get_fun,

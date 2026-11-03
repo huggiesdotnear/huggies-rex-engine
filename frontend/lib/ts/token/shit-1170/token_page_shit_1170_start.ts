@@ -17,15 +17,15 @@
 // --- WHY --- the page is for ONE token: the token id is a constant
 // (lib/ts/token_page_shit_1170_token.ts), so the start file needs no id
 // from the url.
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "./token_page_shit_1170_state";
-import { huggies_loading_bar_start_fun } from "../../shared/loading_bar_start";
+import { SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE } from "./token_page_shit_1170_state";
+import { shit_1170_loading_bar_start_fun } from "../../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // the loading bar's patch goes in before the page's first request.
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // begin the page's load.
-void HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.load();
+void SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

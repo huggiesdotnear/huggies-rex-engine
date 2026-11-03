@@ -20,7 +20,7 @@ import { useState as use_state } from "preact/hooks";
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_ID_JUMP_BOX_PROPS {
+export interface SHIT_1170_ID_JUMP_BOX_PROPS {
   // the id the page is currently showing. it seeds the input, so the
   // field starts out holding the id on screen.
   id: string | null;
@@ -39,8 +39,8 @@ export interface HUGGIES_ID_JUMP_BOX_PROPS {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_id_jump_box_fun(
-  props: HUGGIES_ID_JUMP_BOX_PROPS,
+export function shit_1170_id_jump_box_fun(
+  props: SHIT_1170_ID_JUMP_BOX_PROPS,
 ): preact.JSX.Element {
   const [input_id, set_input_id] = use_state<string>(props.id ?? "");
 

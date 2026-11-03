@@ -6,8 +6,8 @@
 // --- WHY --- this exists because they already did: each table had its own
 // copy of this markup, and the copies were why the tables still looked
 // different after the styling moved to a shared class.
-import type { HUGGIES_TOKEN_INFO } from "../../ts/shared/token_info";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import type { SHIT_1170_TOKEN_INFO } from "../../ts/shared/token_info";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
 import { token_amount_row_fun } from "../../ts/shared/token_amount_row";
 import { token_detail_href_fun } from "../../ts/shared/token_link";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
@@ -20,7 +20,7 @@ import { current_app_depth_fun } from "../../ts/shared/app_depth";
 // self-contained, so no extra request and no origin problem.
 // --- WHY --- the counted image: the bar counts the icons too, so it does
 // not sit at 100% while they are still arriving.
-function huggies_token_icon_fun(
+function shit_1170_token_icon_fun(
   icon: string | null,
   symbol: string,
 ): preact.JSX.Element {
@@ -44,10 +44,10 @@ function huggies_token_icon_fun(
 // --- ROW -------------------------------
 // --- WHY --- keyed by token id, not symbol: symbols are not unique (two
 // different tokens can share one, verified on live data).
-export function huggies_balance_row_fun(props: {
+export function shit_1170_balance_row_fun(props: {
   id: string;
   raw: string;
-  info: HUGGIES_TOKEN_INFO;
+  info: SHIT_1170_TOKEN_INFO;
   usd_value?: number;
   pinned?: boolean;
 }): preact.JSX.Element {
@@ -59,7 +59,7 @@ export function huggies_balance_row_fun(props: {
     <tr key={id} class={pinned === true ? "is-pinned" : undefined}>
       <td>
         <div class="row-head">
-          {huggies_token_icon_fun(info.icon, info.symbol)}
+          {shit_1170_token_icon_fun(info.icon, info.symbol)}
           <span class="ticker">{info.symbol}</span>
           {/* the full contract id sits on row one, clipped so a long id
               cannot push the row wider than the page. the title holds the
@@ -77,7 +77,7 @@ export function huggies_balance_row_fun(props: {
           <span class="usd">
             {usd_value === undefined
               ? amount.usd
-              : HUGGIES_AMOUNT_FORMAT.usd(usd_value)}
+              : SHIT_1170_AMOUNT_FORMAT.usd(usd_value)}
           </span>
         </div>
       </td>

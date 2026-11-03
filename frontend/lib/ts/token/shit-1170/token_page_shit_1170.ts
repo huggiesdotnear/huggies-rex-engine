@@ -17,13 +17,13 @@
 // --- WHY --- there is no separate price request: the summary asks for
 // `price_usd` and gets it, so asking again would fetch the same number
 // twice over the wire.
-import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
+import { SHIT_1170_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 import { fetch_shit_summary_fun } from "./token_page_shit_1170_summary";
 import { fetch_shit_holders_fun } from "./token_page_shit_1170_holders";
-import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
+import type { SHIT_1170_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
 import type {
-  HUGGIES_SHIT_HOLDER,
-  HUGGIES_SHIT_HOLDERS_PAGE,
+  SHIT_1170_SHIT_HOLDER,
+  SHIT_1170_SHIT_HOLDERS_PAGE,
 } from "./token_page_shit_1170_holders";
 // ========================================
 // ========================================
@@ -45,7 +45,7 @@ function bigint_or_zero_fun(value: string): bigint {
 // --- SUMMARY ---------------------------
 // fetch the token's summary: its decimals, its total supply and the
 // metadata the page shows.
-async function fetch_shit_summary_page_fun(): Promise<HUGGIES_SHIT_SUMMARY | null> {
+async function fetch_shit_summary_page_fun(): Promise<SHIT_1170_SHIT_SUMMARY | null> {
   return await fetch_shit_summary_fun();
 }
 // ========================================
@@ -56,7 +56,7 @@ async function fetch_shit_holders_page_fun(
   price_usd: number,
   decimals: number,
   total_supply_raw: bigint,
-): Promise<HUGGIES_SHIT_HOLDERS_PAGE> {
+): Promise<SHIT_1170_SHIT_HOLDERS_PAGE> {
   return await fetch_shit_holders_fun(
     cursor,
     price_usd,
@@ -67,8 +67,8 @@ async function fetch_shit_holders_page_fun(
 // ========================================
 // --- PUBLIC ---------------------------
 // the page's load surface. one call per thing the page loads.
-export const HUGGIES_TOKEN_PAGE_SHIT_1170 = {
-  token_id: HUGGIES_SHIT_TOKEN_ID,
+export const SHIT_1170_TOKEN_PAGE_SHIT_1170 = {
+  token_id: SHIT_1170_SHIT_TOKEN_ID,
   load_summary: fetch_shit_summary_page_fun,
   load_holders: fetch_shit_holders_page_fun,
   bigint_or_zero: bigint_or_zero_fun,
@@ -76,7 +76,7 @@ export const HUGGIES_TOKEN_PAGE_SHIT_1170 = {
 // ========================================
 // the shape of the loaded holder rows, re-exported so the components
 // that read them do not have to reach into the holders module.
-export type { HUGGIES_SHIT_HOLDER };
+export type { SHIT_1170_SHIT_HOLDER };
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

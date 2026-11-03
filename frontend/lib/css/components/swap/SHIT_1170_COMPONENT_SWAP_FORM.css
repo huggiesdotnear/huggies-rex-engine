@@ -1,0 +1,175 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_SWAP_FORM
+   the swap form: the two token cards, the two amount inputs and the
+   swap button.
+
+   the two sides are stacked, with the switch direction bar between them.
+   each side is a card: the token button on top, the amount input under
+   it, and the small note line under that.
+
+   the switch direction bar between the two sides is the swap page's
+   own component (swap/switch_direction.css), so it brings its own css
+   in with the @import below. */
+@import url(./switch_direction.css);
+/*==================================*/
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+/*==================================*/
+/* one side of the swap: the card, the input and the note.
+
+   --- WHY --- `box-sizing: border-box` MATTERS HERE: `main > *` sets it
+   for the page's own blocks, but this side is a CHILD of the swap form,
+   so it does not inherit it. without it, `width: 100%` plus `padding:
+   12px` renders the card 24px wider than the 500px column and the page
+   overflows sideways. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.16);
+}
+/* the output side is the one that shows a number the reader cannot
+   change, so it sits a little quieter than the input side. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-side:has(.swap-input.is-out) {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 198, 215, 0.35);
+}
+/*==================================*/
+/* the token card: the icon, the symbol and the balance. it is a
+   button, so it gets the app's button look, but a squarer one so it
+   reads as a field rather than an action. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  text-align: left;
+  border: 2px solid var(--color-middle);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--color-fontend);
+}
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token:hover {
+  background: rgba(0, 198, 215, 0.22);
+  border-color: #009aab;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token-icon.is-empty {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+}
+/* the symbol and the balance under it. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token-copy strong {
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the balance is the small line under the symbol. it is information,
+   not a label, so it is small and quiet. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-token-balance {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+/*==================================*/
+/* the amount inputs. the input is the big number, so it gets the big
+   type — the reader's number is the thing they are looking at. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 2px;
+  font-family: inherit;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: right;
+  color: var(--color-fontend);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0;
+}
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-middle);
+}
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+/* the output box can be typed into as well — the reader may fix the
+   amount they want OUT instead of the amount they sell — so it reads
+   as a field, not as a locked figure. it sits a little quieter than
+   the input side, because most readers fix the input. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-input.is-out {
+  color: rgba(255, 255, 255, 0.85);
+}
+/*==================================*/
+/* the small line under an input: the unit amount and the usd value.
+   it is deliberately tiny — it is a check, not the headline. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-note {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-note code {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+/*==================================*/
+/* the swap button itself. it is the page's one real action, so it is
+   the biggest button on the page. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-go {
+  width: 100%;
+  max-width: 100%;
+  margin: 4px 0 0;
+  padding: 14px 16px;
+  font-size: 18px;
+  border-width: 3px;
+}
+/* the hint under the button: why it is disabled. */
+#SHIT_1170_COMPONENT_SWAP_FORM .swap-hint {
+  margin: 2px 0 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+/*==================================*/

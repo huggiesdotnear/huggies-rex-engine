@@ -13,12 +13,12 @@
 // theirs: a shared file keeps its own plain name.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_TOKEN_CACHE } from "./token_cache";
+import { SHIT_1170_TOKEN_CACHE } from "./token_cache";
 import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 import {
-  HUGGIES_NEAR_ID,
-  HUGGIES_NEAR_SYMBOL,
-  HUGGIES_WRAP_ID,
+  SHIT_1170_NEAR_ID,
+  SHIT_1170_NEAR_SYMBOL,
+  SHIT_1170_WRAP_ID,
 } from "./token_near";
 // ========================================
 // ========================================
@@ -27,15 +27,15 @@ import {
 // icon field is a full inline data uri, and the hash is 16 characters
 // pointing at a content-addressed url the browser caches for a year.
 // see lib/ts/token_icon_url.ts.
-const HUGGIES_SYMBOL_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
+const SHIT_1170_SYMBOL_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
 // how many ids one request may ask for. the ids travel in the query
 // string, which the api limits, so they go in chunks.
-const HUGGIES_SYMBOL_BATCH_SIZE = 100;
+const SHIT_1170_SYMBOL_BATCH_SIZE = 100;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what the pool list needs to know about one token.
-export interface HUGGIES_POOL_TOKEN {
+export interface SHIT_1170_POOL_TOKEN {
   // the token's display symbol.
   symbol: string;
   // the token's icon url, or null when it has none.
@@ -63,8 +63,8 @@ function to_finite_number_fun(value: unknown): number {
 // limit is ~8KB, so a long token id list does not fit in one GET.
 async function fetch_pool_tokens_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_POOL_TOKEN>> {
-  const out = new Map<string, HUGGIES_POOL_TOKEN>();
+): Promise<Map<string, SHIT_1170_POOL_TOKEN>> {
+  const out = new Map<string, SHIT_1170_POOL_TOKEN>();
   const wanted = [...new Set(ids)];
   if (wanted.length === 0) return out;
 
@@ -73,12 +73,12 @@ async function fetch_pool_tokens_fun(
   // it can never be fetched and never cached. the 1:1 wrapper stands in for
   // it, exactly as it does everywhere else in the app (see token_info.ts):
   // wNEAR's icon IS the NEAR logo, not a lookalike.
-  const wants_near = wanted.includes(HUGGIES_NEAR_ID);
+  const wants_near = wanted.includes(SHIT_1170_NEAR_ID);
   const asked = wants_near
-    ? [...new Set([...wanted, HUGGIES_WRAP_ID])]
+    ? [...new Set([...wanted, SHIT_1170_WRAP_ID])]
     : wanted;
 
-  const cached = await HUGGIES_TOKEN_CACHE.get_many(asked);
+  const cached = await SHIT_1170_TOKEN_CACHE.get_many(asked);
   for (const [id, record] of cached) {
     out.set(id, {
       symbol: record.symbol,
@@ -90,18 +90,18 @@ async function fetch_pool_tokens_fun(
   // hash IS known — the api answered for it and it has no icon — so it is
   // not a miss.
   const missing = asked.filter(
-    (id) => id !== HUGGIES_NEAR_ID && !cached.has(id),
+    (id) => id !== SHIT_1170_NEAR_ID && !cached.has(id),
   );
   if (missing.length > 0) {
     for (
       let start = 0;
       start < missing.length;
-      start += HUGGIES_SYMBOL_BATCH_SIZE
+      start += SHIT_1170_SYMBOL_BATCH_SIZE
     ) {
-      const batch = missing.slice(start, start + HUGGIES_SYMBOL_BATCH_SIZE);
+      const batch = missing.slice(start, start + SHIT_1170_SYMBOL_BATCH_SIZE);
       try {
         const response = await api_intear_tokens_get({
-          fields: HUGGIES_SYMBOL_FIELDS,
+          fields: SHIT_1170_SYMBOL_FIELDS,
           ids: batch,
         });
         const columns = response.columns;
@@ -128,7 +128,7 @@ async function fetch_pool_tokens_fun(
             icon: token_icon_for_fun(id, record.icon_hash),
           });
         }
-        await HUGGIES_TOKEN_CACHE.put_many(records);
+        await SHIT_1170_TOKEN_CACHE.put_many(records);
       } catch {
         // a failed symbol request costs the labels, not the page: the rows
         // fall back to the token id.
@@ -139,9 +139,9 @@ async function fetch_pool_tokens_fun(
   // the chain's own token borrows wNEAR's icon, the same way it does in
   // the balance tables and the token pages.
   if (wants_near) {
-    const wrap = out.get(HUGGIES_WRAP_ID);
-    out.set(HUGGIES_NEAR_ID, {
-      symbol: HUGGIES_NEAR_SYMBOL,
+    const wrap = out.get(SHIT_1170_WRAP_ID);
+    out.set(SHIT_1170_NEAR_ID, {
+      symbol: SHIT_1170_NEAR_SYMBOL,
       icon: wrap?.icon ?? null,
     });
   }
@@ -150,7 +150,7 @@ async function fetch_pool_tokens_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_POOL_TOKENS = {
+export const SHIT_1170_POOL_TOKENS = {
   fetch: fetch_pool_tokens_fun,
 };
 // ========================================

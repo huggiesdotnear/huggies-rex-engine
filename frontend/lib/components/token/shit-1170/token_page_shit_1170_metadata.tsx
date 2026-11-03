@@ -5,11 +5,11 @@
 //
 // it reads the loaded summary from the page's store. it fetches nothing.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../../../ts/token/shit-1170/token_page_shit_1170_state";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE } from "../../../ts/token/shit-1170/token_page_shit_1170_state";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { shit_total_supply_formatted_fun } from "../../../ts/token/shit-1170/token_page_shit_1170_holders";
-import { huggies_token_meta_grid_fun } from "../../shared/token_meta_grid";
+import { shit_1170_token_meta_grid_fun } from "../../shared/token_meta_grid";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -22,8 +22,8 @@ function format_price_usd_fun(value: number): string {
 }
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
+function SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
+  const state = use_page_store_fun(SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE);
   const summary = state.summary;
   // no summary yet — there is nothing to show.
   if (summary === null) return null;
@@ -35,7 +35,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
   return (
     <section class="metadata">
       <h2>TOKEN METADATA</h2>
-      {huggies_token_meta_grid_fun([
+      {shit_1170_token_meta_grid_fun([
         { label: "PRICE", value: format_price_usd_fun(price_usd) },
         { label: "HOLDERS", value: summary.holders.toLocaleString() },
         {
@@ -69,11 +69,11 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN />, el);
+    render(<SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

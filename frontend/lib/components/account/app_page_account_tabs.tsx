@@ -9,10 +9,10 @@
 // it reads the tab from the page's tab state and writes to it when the
 // reader picks one. it fetches nothing.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/account/app_page_account_tab_state";
-import { HUGGIES_ACCOUNT_TABS } from "../../ts/account/app_page_account_tab_defs";
-import { HUGGIES_URL_TAB } from "../../ts/account/app_page_account_tab_url";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/account/app_page_account_tab_state";
+import { SHIT_1170_ACCOUNT_TABS } from "../../ts/account/app_page_account_tab_defs";
+import { SHIT_1170_URL_TAB } from "../../ts/account/app_page_account_tab_url";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 // ========================================
 // ========================================
@@ -23,16 +23,16 @@ import { use_page_store_fun } from "../../ts/shared/use_page_store";
 // has to be the url they get when they click it, so the href and the
 // written url are built by the same code.
 function tab_href_fun(name: string): string {
-  return HUGGIES_URL_TAB.href(name);
+  return SHIT_1170_URL_TAB.href(name);
 }
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
+export function SHIT_1170_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
   // --- WHY --- the tab comes from the state: it holds the tab on
   // screen, so the bar and the page's other components always agree on
   // which view is showing.
-  const tab = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE);
+  const tab = use_page_store_fun(SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE);
 
   return (
     // --- WHY --- IT IS NOT A `<nav>`: the app-wide nav rule
@@ -47,7 +47,7 @@ export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
     // showing — so a half-made tab role would tell a screen reader the
     // wrong thing.
     <div class="account-tabs" aria-label="account views">
-      {HUGGIES_ACCOUNT_TABS.map((item) => {
+      {SHIT_1170_ACCOUNT_TABS.map((item) => {
         const is_active = item.name === tab;
         return (
           <a
@@ -78,7 +78,7 @@ export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
                 return;
               }
               event.preventDefault();
-              HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.set_tab(item.name);
+              SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.set_tab(item.name);
             }}
           >
             {item.label}
@@ -91,10 +91,10 @@ export function HUGGIES_COMPONENT_ACCOUNT_TABS_FUN(): preact.JSX.Element {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_ACCOUNT_TABS;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_ACCOUNT_TABS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_ACCOUNT_TABS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_ACCOUNT_TABS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

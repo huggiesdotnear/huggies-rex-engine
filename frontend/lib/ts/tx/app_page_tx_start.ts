@@ -11,22 +11,22 @@
 // --- WHY --- the store owns the load and this file only asks for it:
 // the fetching itself lives in lib/ts/app_page_tx.ts, so the page's
 // request list is still knowable by reading one file.
-import { HUGGIES_APP_PAGE_TX_STORE } from "./app_page_tx_store";
-import { HUGGIES_TRANSFER_TOKENS_STORE } from "../shared/transfer_tokens_store";
-import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
+import { SHIT_1170_APP_PAGE_TX_STORE } from "./app_page_tx_store";
+import { SHIT_1170_TRANSFER_TOKENS_STORE } from "../shared/transfer_tokens_store";
+import { shit_1170_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // the loading bar's patch goes in before the page's first request.
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // begin the page's load for the transaction the url names.
-void HUGGIES_APP_PAGE_TX_STORE.load();
+void SHIT_1170_APP_PAGE_TX_STORE.load();
 // --- WHY THE TOKENS ARE WATCHED HERE: the transfers need the symbol,
 // the icon and the decimals of every token the transaction moved, and
 // the tokens come from the token indexer — a different api from the
 // one the transaction came from. the watch follows the transaction, so
 // a new transaction asks for its own tokens.
-HUGGIES_TRANSFER_TOKENS_STORE.watch(HUGGIES_APP_PAGE_TX_STORE);
+SHIT_1170_TRANSFER_TOKENS_STORE.watch(SHIT_1170_APP_PAGE_TX_STORE);
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

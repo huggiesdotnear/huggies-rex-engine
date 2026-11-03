@@ -14,7 +14,7 @@
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_STAT_TILE_PROPS {
+export interface SHIT_1170_STAT_TILE_PROPS {
   // the small label on top, e.g. "LAND".
   label: string;
   // the value in the middle. a number or a short string.
@@ -32,8 +32,8 @@ export interface HUGGIES_STAT_TILE_PROPS {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_stat_tile_fun(
-  props: HUGGIES_STAT_TILE_PROPS,
+export function shit_1170_stat_tile_fun(
+  props: SHIT_1170_STAT_TILE_PROPS,
 ): preact.JSX.Element {
   return (
     <>

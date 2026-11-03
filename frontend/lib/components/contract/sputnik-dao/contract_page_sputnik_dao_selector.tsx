@@ -10,15 +10,15 @@
 // — because the token page and the pumpopoly page have the same box with
 // different wording.
 //
-// mounts into <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR">.
+// mounts into <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR">.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_AUTH } from "../../../ts/shared/auth_status";
-import { HUGGIES_DAO_PAGE_STATE } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_AUTH } from "../../../ts/shared/auth_status";
+import { SHIT_1170_DAO_PAGE_STATE } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
-import { huggies_id_jump_box_fun } from "../../shared/id_jump_box";
-import { HUGGIES_URL_ID } from "../../../ts/shared/url_id";
+import { shit_1170_id_jump_box_fun } from "../../shared/id_jump_box";
+import { SHIT_1170_URL_ID } from "../../../ts/shared/url_id";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -32,14 +32,14 @@ function treasury_name_fun(treasury: {
 }
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
-  const page_state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
+function SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
+  const page_state = use_page_store_fun(SHIT_1170_DAO_PAGE_STATE);
 
   const state = page_state;
   // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim and
   // the blank-means-absent rule live there, so this box and the page's own
   // loader cannot drift apart on which dao is shown.
-  const dao_id = HUGGIES_URL_ID.read();
+  const dao_id = SHIT_1170_URL_ID.read();
 
   // --- WHY --- the dropdown only shows when there is a real choice to
   // make. one dao and the box is enough; none and there is nothing.
@@ -53,7 +53,7 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
 
   return (
     <>
-      {huggies_id_jump_box_fun({
+      {shit_1170_id_jump_box_fun({
         id: dao_id,
         label: "DAO ACCOUNT ID",
         placeholder: "dao.sputnik-dao.near",
@@ -85,12 +85,12 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    HUGGIES_AUTH.init();
-    render(<HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN />, el);
+    SHIT_1170_AUTH.init();
+    render(<SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR_FUN />, el);
   }
 }
 // ========================================

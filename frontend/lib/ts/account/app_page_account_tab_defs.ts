@@ -12,13 +12,13 @@
 // carries no `?tab=` for it, which is the cleanest url for the view
 // most readers want.
 // ========================================
-import type { HUGGIES_APP_PAGE_ACCOUNT_TAB } from "./app_page_account_tab_state";
+import type { SHIT_1170_APP_PAGE_ACCOUNT_TAB } from "./app_page_account_tab_state";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-export interface HUGGIES_ACCOUNT_TAB_DEF {
+export interface SHIT_1170_ACCOUNT_TAB_DEF {
   // the name the url carries. it is what `?tab=` holds.
-  name: HUGGIES_APP_PAGE_ACCOUNT_TAB;
+  name: SHIT_1170_APP_PAGE_ACCOUNT_TAB;
   // the label the tab bar shows.
   label: string;
 }
@@ -26,10 +26,11 @@ export interface HUGGIES_ACCOUNT_TAB_DEF {
 // ========================================
 // --- CONFIG -----------------------------
 // the tabs, in the order the bar shows them.
-export const HUGGIES_ACCOUNT_TABS: ReadonlyArray<HUGGIES_ACCOUNT_TAB_DEF> = [
-  { name: "balances", label: "BALANCES" },
-  { name: "transactions", label: "TRANSACTIONS" },
-];
+export const SHIT_1170_ACCOUNT_TABS: ReadonlyArray<SHIT_1170_ACCOUNT_TAB_DEF> =
+  [
+    { name: "balances", label: "BALANCES" },
+    { name: "transactions", label: "TRANSACTIONS" },
+  ];
 // ========================================
 // ========================================
 // --- DEFAULT ---------------------------
@@ -38,8 +39,8 @@ export const HUGGIES_ACCOUNT_TABS: ReadonlyArray<HUGGIES_ACCOUNT_TAB_DEF> = [
 // --- WHY --- it is the first tab in the list rather than a second
 // literal: the list is the one place the tabs are written down, and a
 // separate constant could name a tab that does not exist.
-export const HUGGIES_DEFAULT_ACCOUNT_TAB: HUGGIES_APP_PAGE_ACCOUNT_TAB =
-  HUGGIES_ACCOUNT_TABS[0].name;
+export const SHIT_1170_DEFAULT_ACCOUNT_TAB: SHIT_1170_APP_PAGE_ACCOUNT_TAB =
+  SHIT_1170_ACCOUNT_TABS[0].name;
 // ========================================
 // ========================================
 // --- LOOKUP ---------------------------
@@ -51,9 +52,9 @@ export const HUGGIES_DEFAULT_ACCOUNT_TAB: HUGGIES_APP_PAGE_ACCOUNT_TAB =
 // on an empty page.
 export function find_account_tab_fun(
   name: string | null,
-): HUGGIES_ACCOUNT_TAB_DEF | null {
+): SHIT_1170_ACCOUNT_TAB_DEF | null {
   if (name === null) return null;
-  for (const tab of HUGGIES_ACCOUNT_TABS) {
+  for (const tab of SHIT_1170_ACCOUNT_TABS) {
     if (tab.name === name) return tab;
   }
   return null;

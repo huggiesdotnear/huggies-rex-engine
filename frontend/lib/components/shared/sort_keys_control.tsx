@@ -14,16 +14,16 @@ import { ArrowDown, ArrowUp } from "lucide-preact";
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_SORT_OPTION<KEY extends string> {
+export interface SHIT_1170_SORT_OPTION<KEY extends string> {
   key: KEY;
   label: string;
 }
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_SORT_CONTROL_PROPS<KEY extends string> {
+export interface SHIT_1170_SORT_CONTROL_PROPS<KEY extends string> {
   // the sort keys, in the order they are offered.
-  options: ReadonlyArray<HUGGIES_SORT_OPTION<KEY>>;
+  options: ReadonlyArray<SHIT_1170_SORT_OPTION<KEY>>;
   // the chosen sort key.
   sort: KEY;
   // the chosen direction.
@@ -38,8 +38,8 @@ export interface HUGGIES_SORT_CONTROL_PROPS<KEY extends string> {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_sort_keys_control_fun<KEY extends string>(
-  props: HUGGIES_SORT_CONTROL_PROPS<KEY>,
+export function shit_1170_sort_keys_control_fun<KEY extends string>(
+  props: SHIT_1170_SORT_CONTROL_PROPS<KEY>,
 ): preact.JSX.Element {
   const Icon = props.direction === "desc" ? ArrowDown : ArrowUp;
   return (

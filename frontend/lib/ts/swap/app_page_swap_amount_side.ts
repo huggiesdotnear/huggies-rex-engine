@@ -12,11 +12,11 @@
 // quoting, but the SIDE is a fact about the reader's intent, and the
 // amount maths needs it. keeping it here means the store, the form and
 // the routes all read the same rule.
-import type { HUGGIES_TOKEN_INFO } from "../shared/token_info";
+import type { SHIT_1170_TOKEN_INFO } from "../shared/token_info";
 // ========================================
 // --- TYPES ------------------------------
 // which side of the swap the reader is fixing.
-export type HUGGIES_SWAP_AMOUNT_SIDE = "in" | "out";
+export type SHIT_1170_SWAP_AMOUNT_SIDE = "in" | "out";
 // ========================================
 // --- PUBLIC ---------------------------
 // the human amount that belongs on the given side.
@@ -25,7 +25,7 @@ export type HUGGIES_SWAP_AMOUNT_SIDE = "in" | "out";
 // amount is in the token being sold, and the "out" amount is in the
 // token being bought.
 export function swap_side_amount_fun(
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
   amount_in: string,
   amount_out: string,
 ): string {
@@ -34,9 +34,9 @@ export function swap_side_amount_fun(
 // ========================================
 // the decimals of the token on the given side.
 export function swap_side_decimals_fun(
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
-  token_in_info: HUGGIES_TOKEN_INFO | null,
-  token_out_info: HUGGIES_TOKEN_INFO | null,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
+  token_in_info: SHIT_1170_TOKEN_INFO | null,
+  token_out_info: SHIT_1170_TOKEN_INFO | null,
 ): number {
   const info = side === "in" ? token_in_info : token_out_info;
   return info?.decimals ?? 0;

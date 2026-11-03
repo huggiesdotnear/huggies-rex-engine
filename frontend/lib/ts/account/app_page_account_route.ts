@@ -4,8 +4,8 @@
 // account.html?id=<id>, signed out → auth.html. does NOT mount
 // components — the page's own import file brings those in.
 // ========================================
-import { HUGGIES_AUTH } from "../shared/auth_status";
-import { HUGGIES_URL_ID } from "../shared/url_id";
+import { SHIT_1170_AUTH } from "../shared/auth_status";
+import { SHIT_1170_URL_ID } from "../shared/url_id";
 // ========================================
 // ========================================
 // ========================================
@@ -46,14 +46,14 @@ function build_account_href_fun(account_id: string): string {
 }
 // ========================================
 // the page's own `?id=`, or null when absent/blank. read here rather
-// than through HUGGIES_APP_PAGE_ACCOUNT_ID because that module's state
+// than through SHIT_1170_APP_PAGE_ACCOUNT_ID because that module's state
 // is populated by components which run AFTER this routing decision.
 //
 // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim and
 // the blank-means-absent rule live there, so the routing decision and the
 // page's own id cannot drift.
 function read_url_account_id_fun(): string | null {
-  return HUGGIES_URL_ID.read();
+  return SHIT_1170_URL_ID.read();
 }
 // ========================================
 // ========================================
@@ -70,8 +70,8 @@ function read_url_account_id_fun(): string | null {
 function route_fun(): void {
   if (typeof window === "undefined") return;
   if (read_url_account_id_fun() !== null) return;
-  HUGGIES_AUTH.init();
-  const account_id = HUGGIES_AUTH.get_account_id();
+  SHIT_1170_AUTH.init();
+  const account_id = SHIT_1170_AUTH.get_account_id();
   const target =
     account_id === null
       ? build_login_href_fun()

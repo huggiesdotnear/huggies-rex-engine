@@ -11,18 +11,18 @@
 // --- WHY --- the store watches the auth state: the signed accounts can
 // change under the page — the reader signs in, signs out, or removes an
 // account — and the card has to follow by itself.
-import { HUGGIES_APP_PAGE_SKILL_SESSION_STORE } from "./app_page_skill_session_store";
-import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
+import { SHIT_1170_APP_PAGE_SKILL_SESSION_STORE } from "./app_page_skill_session_store";
+import { shit_1170_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // the loading bar's patch goes in before the page's first request.
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // the card follows the signed accounts, so the store watches the auth
 // state and reloads by itself when an account comes or goes.
-HUGGIES_APP_PAGE_SKILL_SESSION_STORE.watch();
+SHIT_1170_APP_PAGE_SKILL_SESSION_STORE.watch();
 // begin the page's load.
-void HUGGIES_APP_PAGE_SKILL_SESSION_STORE.load();
+void SHIT_1170_APP_PAGE_SKILL_SESSION_STORE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

@@ -8,7 +8,7 @@
 // single object meant signing in as a second account overwrote the
 // first one's signature. the active id says which one the UI is
 // currently acting as.
-// --- WHY --- the keys are prefixed with HUGGIES_ so they cannot
+// --- WHY --- the keys are prefixed with SHIT_1170_ so they cannot
 // collide with anything near-connect writes (it owns "selected-wallet").
 // --- WHY --- the legacy single-session key is folded into the map on
 // read so a signed-in user upgrading the app keeps their session
@@ -16,7 +16,7 @@
 // --- WHY --- the session still records its network even though the app
 // is mainnet-only, so a session left over from a testnet-era build
 // stays recognisable as such.
-export interface HUGGIES_AUTH_SESSION {
+export interface SHIT_1170_AUTH_SESSION {
   accountId: string;
   publicKey: string;
   signature: string;
@@ -30,12 +30,12 @@ export interface HUGGIES_AUTH_SESSION {
 // ========================================
 // --- CONFIG -----------------------------
 // map of account id -> session. one key per account.
-const HUGGIES_SESSIONS_STORAGE_KEY = "HUGGIES_AUTH_SESSIONS";
+const SHIT_1170_SESSIONS_STORAGE_KEY = "SHIT_1170_AUTH_SESSIONS";
 // which account the UI is currently acting as.
-const HUGGIES_ACTIVE_STORAGE_KEY = "HUGGIES_AUTH_ACTIVE";
+const SHIT_1170_ACTIVE_STORAGE_KEY = "SHIT_1170_AUTH_ACTIVE";
 // the pre-multi-account key. read once for migration, then removed —
 // see load_sessions_fun for why it must not stay.
-const HUGGIES_LEGACY_STORAGE_KEY = "HUGGIES_AUTH_SESSION";
+const SHIT_1170_LEGACY_STORAGE_KEY = "SHIT_1170_AUTH_SESSION";
 // ========================================
 // ========================================
 // ========================================
@@ -43,9 +43,9 @@ const HUGGIES_LEGACY_STORAGE_KEY = "HUGGIES_AUTH_SESSION";
 // a session is only usable when it carries the fields a server-side
 // NEP-413 verify needs: the account, the signature, and the exact
 // message + nonce + recipient that were signed.
-function is_valid_session_fun(value: unknown): value is HUGGIES_AUTH_SESSION {
+function is_valid_session_fun(value: unknown): value is SHIT_1170_AUTH_SESSION {
   if (typeof value !== "object" || value === null) return false;
-  const session = value as Partial<HUGGIES_AUTH_SESSION>;
+  const session = value as Partial<SHIT_1170_AUTH_SESSION>;
   return (
     typeof session.accountId === "string" &&
     typeof session.signature === "string" &&
@@ -58,7 +58,7 @@ function is_valid_session_fun(value: unknown): value is HUGGIES_AUTH_SESSION {
 // --- WHY --- localStorage is user-writable, so a hand-edited or
 // half-written entry must not be able to crash the app or be handed to
 // a verifier as if it were valid.
-function normalize_session_fun(value: unknown): HUGGIES_AUTH_SESSION | null {
+function normalize_session_fun(value: unknown): SHIT_1170_AUTH_SESSION | null {
   if (!is_valid_session_fun(value)) return null;
   return {
     accountId: value.accountId,
@@ -73,9 +73,9 @@ function normalize_session_fun(value: unknown): HUGGIES_AUTH_SESSION | null {
 }
 // ========================================
 // read the legacy single-session key, if it is still there.
-function read_legacy_session_fun(): HUGGIES_AUTH_SESSION | null {
+function read_legacy_session_fun(): SHIT_1170_AUTH_SESSION | null {
   if (typeof localStorage === "undefined") return null;
-  const raw = localStorage.getItem(HUGGIES_LEGACY_STORAGE_KEY);
+  const raw = localStorage.getItem(SHIT_1170_LEGACY_STORAGE_KEY);
   if (raw === null) return null;
   try {
     return normalize_session_fun(JSON.parse(raw));
@@ -87,10 +87,10 @@ function read_legacy_session_fun(): HUGGIES_AUTH_SESSION | null {
 // ========================================
 // --- STORAGE ----------------------------
 // read every stored session, migrating the legacy key on the way.
-function load_sessions_fun(): Record<string, HUGGIES_AUTH_SESSION> {
+function load_sessions_fun(): Record<string, SHIT_1170_AUTH_SESSION> {
   if (typeof localStorage === "undefined") return {};
-  let sessions: Record<string, HUGGIES_AUTH_SESSION> = {};
-  const raw = localStorage.getItem(HUGGIES_SESSIONS_STORAGE_KEY);
+  let sessions: Record<string, SHIT_1170_AUTH_SESSION> = {};
+  const raw = localStorage.getItem(SHIT_1170_SESSIONS_STORAGE_KEY);
   if (raw !== null) {
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
@@ -112,7 +112,7 @@ function load_sessions_fun(): Record<string, HUGGIES_AUTH_SESSION> {
     // read; leaving the key in place would resurrect it right after
     // the user removed it from the account list.
     if (typeof localStorage !== "undefined") {
-      localStorage.removeItem(HUGGIES_LEGACY_STORAGE_KEY);
+      localStorage.removeItem(SHIT_1170_LEGACY_STORAGE_KEY);
     }
   }
   return sessions;
@@ -120,14 +120,17 @@ function load_sessions_fun(): Record<string, HUGGIES_AUTH_SESSION> {
 // ========================================
 // write the whole map back.
 function write_sessions_fun(
-  sessions: Record<string, HUGGIES_AUTH_SESSION>,
+  sessions: Record<string, SHIT_1170_AUTH_SESSION>,
 ): void {
   if (typeof localStorage === "undefined") return;
-  localStorage.setItem(HUGGIES_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+  localStorage.setItem(
+    SHIT_1170_SESSIONS_STORAGE_KEY,
+    JSON.stringify(sessions),
+  );
 }
 // ========================================
 // store one session, replacing any previous one for that account.
-function save_session_fun(session: HUGGIES_AUTH_SESSION): void {
+function save_session_fun(session: SHIT_1170_AUTH_SESSION): void {
   const sessions = load_sessions_fun();
   sessions[session.accountId] = session;
   write_sessions_fun(sessions);
@@ -144,14 +147,14 @@ function remove_session_fun(account_id: string): void {
 // drop every session (full sign-out of all accounts).
 function clear_sessions_fun(): void {
   if (typeof localStorage === "undefined") return;
-  localStorage.removeItem(HUGGIES_SESSIONS_STORAGE_KEY);
-  localStorage.removeItem(HUGGIES_ACTIVE_STORAGE_KEY);
+  localStorage.removeItem(SHIT_1170_SESSIONS_STORAGE_KEY);
+  localStorage.removeItem(SHIT_1170_ACTIVE_STORAGE_KEY);
 }
 // ========================================
 // the account the UI is currently acting as, or null.
 function load_active_fun(): string | null {
   if (typeof localStorage === "undefined") return null;
-  const raw = localStorage.getItem(HUGGIES_ACTIVE_STORAGE_KEY);
+  const raw = localStorage.getItem(SHIT_1170_ACTIVE_STORAGE_KEY);
   if (raw === null) return null;
   const trimmed = raw.trim();
   return trimmed.length === 0 ? null : trimmed;
@@ -161,10 +164,10 @@ function load_active_fun(): string | null {
 function save_active_fun(account_id: string | null): void {
   if (typeof localStorage === "undefined") return;
   if (account_id === null) {
-    localStorage.removeItem(HUGGIES_ACTIVE_STORAGE_KEY);
+    localStorage.removeItem(SHIT_1170_ACTIVE_STORAGE_KEY);
     return;
   }
-  localStorage.setItem(HUGGIES_ACTIVE_STORAGE_KEY, account_id);
+  localStorage.setItem(SHIT_1170_ACTIVE_STORAGE_KEY, account_id);
 }
 // ========================================
 // ========================================
@@ -175,12 +178,12 @@ function list_account_ids_fun(): string[] {
 }
 // ========================================
 // one account's session, or null when it has none.
-function get_session_fun(account_id: string): HUGGIES_AUTH_SESSION | null {
+function get_session_fun(account_id: string): SHIT_1170_AUTH_SESSION | null {
   return load_sessions_fun()[account_id] ?? null;
 }
 // ========================================
 // public surface, in one place so callers have a single import.
-export const HUGGIES_AUTH_SESSIONS = {
+export const SHIT_1170_AUTH_SESSIONS = {
   load_sessions: load_sessions_fun,
   save_session: save_session_fun,
   remove_session: remove_session_fun,

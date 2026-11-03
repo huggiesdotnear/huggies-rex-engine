@@ -23,9 +23,9 @@
 // ft_total_supply would be one contract call PER TOKEN.
 import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_BURN_ADDRESSES } from "./app_page_burn_addresses";
+import { SHIT_1170_BURN_ADDRESSES } from "./app_page_burn_addresses";
 import { icon_hash_of_fun, token_icon_for_fun } from "../shared/token_icon_url";
-import { HUGGIES_SUPPLY_PERCENT } from "../shared/token_supply_percent";
+import { SHIT_1170_SUPPLY_PERCENT } from "../shared/token_supply_percent";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -36,7 +36,7 @@ import { HUGGIES_SUPPLY_PERCENT } from "../shared/token_supply_percent";
 // chain's own NEAR balance, and a burn address is locked and empty of
 // everything but a little gas. that gas is not burned supply, it is the
 // dust the account needs to exist.
-const HUGGIES_BURN_BALANCE_SOURCES = ["direct"] as const;
+const SHIT_1170_BURN_BALANCE_SOURCES = ["direct"] as const;
 // `icon_hash` and not `icon`: the icon field is a full inline svg data
 // uri and makes up almost the entire payload. the hash is 16
 // characters, and the icon itself is served from a content-addressed
@@ -44,7 +44,7 @@ const HUGGIES_BURN_BALANCE_SOURCES = ["direct"] as const;
 //
 // `total_supply` is the supply in the token's smallest unit, so the
 // percent math stays exact on big numbers.
-const HUGGIES_BURN_TOKEN_FIELDS = [
+const SHIT_1170_BURN_TOKEN_FIELDS = [
   "symbol",
   "decimals",
   "icon_hash",
@@ -53,7 +53,7 @@ const HUGGIES_BURN_TOKEN_FIELDS = [
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-export interface HUGGIES_APP_PAGE_BURN_TOKEN {
+export interface SHIT_1170_APP_PAGE_BURN_TOKEN {
   // the token's account id, e.g. "usdc.near".
   id: string;
   symbol: string;
@@ -71,10 +71,10 @@ export interface HUGGIES_APP_PAGE_BURN_TOKEN {
 }
 // ========================================
 // everything the burn page has loaded.
-export interface HUGGIES_APP_PAGE_BURN_DATA {
+export interface SHIT_1170_APP_PAGE_BURN_DATA {
   // one entry per token held by either burn account, biggest burned
   // amount first.
-  tokens: ReadonlyArray<HUGGIES_APP_PAGE_BURN_TOKEN>;
+  tokens: ReadonlyArray<SHIT_1170_APP_PAGE_BURN_TOKEN>;
   // one message per thing that failed.
   errors: ReadonlyArray<string>;
 }
@@ -119,7 +119,7 @@ async function fetch_burn_balances_fun(
   try {
     const response = await api_intear_balances_get({
       account: account_id,
-      sources: HUGGIES_BURN_BALANCE_SOURCES,
+      sources: SHIT_1170_BURN_BALANCE_SOURCES,
     });
     const balances = new Map<string, string>();
     for (const row of response.balances.rows) {
@@ -143,11 +143,11 @@ async function fetch_burn_balances_fun(
 // every card.
 async function fetch_burn_metadata_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_BURN_META>> {
-  const out = new Map<string, HUGGIES_BURN_META>();
+): Promise<Map<string, SHIT_1170_BURN_META>> {
+  const out = new Map<string, SHIT_1170_BURN_META>();
   if (ids.length === 0) return out;
   const response = await api_intear_tokens_get({
-    fields: HUGGIES_BURN_TOKEN_FIELDS,
+    fields: SHIT_1170_BURN_TOKEN_FIELDS,
     ids: [...ids],
   });
   // --- WHY --- the row is read by column NAME, not by index: the api
@@ -176,7 +176,7 @@ async function fetch_burn_metadata_fun(
 }
 // ========================================
 // --- META ------------------------------
-interface HUGGIES_BURN_META {
+interface SHIT_1170_BURN_META {
   symbol: string;
   decimals: number;
   icon_hash: string | null;
@@ -186,11 +186,11 @@ interface HUGGIES_BURN_META {
 // --- LOAD -------------------------------
 // the two accounts are read in parallel, so the page is as slow as its
 // slowest one.
-async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
+async function app_page_burn_load_fun(): Promise<SHIT_1170_APP_PAGE_BURN_DATA> {
   const errors: Array<string> = [];
 
   const per_account = await Promise.all(
-    HUGGIES_BURN_ADDRESSES.map(async (account_id) => ({
+    SHIT_1170_BURN_ADDRESSES.map(async (account_id) => ({
       account_id,
       result: await fetch_burn_balances_fun(account_id),
     })),
@@ -214,7 +214,7 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
   const ids = [...combined.keys()];
   if (ids.length === 0) return { tokens: [], errors };
 
-  let meta_map = new Map<string, HUGGIES_BURN_META>();
+  let meta_map = new Map<string, SHIT_1170_BURN_META>();
   try {
     meta_map = await fetch_burn_metadata_fun(ids);
   } catch (err) {
@@ -234,7 +234,7 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
     }
   }
 
-  const tokens: Array<HUGGIES_APP_PAGE_BURN_TOKEN> = [];
+  const tokens: Array<SHIT_1170_APP_PAGE_BURN_TOKEN> = [];
   for (const [id, raw] of combined) {
     const meta = meta_map.get(id);
     if (meta === undefined) continue;
@@ -245,7 +245,7 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
       icon: token_icon_for_fun(id, meta.icon_hash),
       raw,
       total_supply_raw: meta.total_supply_raw,
-      percent: HUGGIES_SUPPLY_PERCENT.percent(raw, meta.total_supply_raw),
+      percent: SHIT_1170_SUPPLY_PERCENT.percent(raw, meta.total_supply_raw),
     });
   }
 
@@ -272,7 +272,7 @@ async function app_page_burn_load_fun(): Promise<HUGGIES_APP_PAGE_BURN_DATA> {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_BURN = {
+export const SHIT_1170_APP_PAGE_BURN = {
   load: app_page_burn_load_fun,
 };
 // ========================================

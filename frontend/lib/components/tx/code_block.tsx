@@ -58,7 +58,7 @@ let highlighter_promise: Promise<HighlighterCore> | null = null;
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_code_block_fun(props: {
+export function shit_1170_code_block_fun(props: {
   // the code to show.
   code: string;
   // the language to highlight it as. "json" is the only one the app

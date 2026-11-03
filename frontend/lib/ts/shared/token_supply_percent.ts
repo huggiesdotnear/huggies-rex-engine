@@ -50,7 +50,7 @@ function format_supply_percent_fun(percent: number): string {
 // ========================================
 // --- PUBLIC -----------------------------
 // the whole supply-share surface, so every page reads it the same way.
-export const HUGGIES_SUPPLY_PERCENT = {
+export const SHIT_1170_SUPPLY_PERCENT = {
   percent: supply_percent_fun,
   format: format_supply_percent_fun,
 };

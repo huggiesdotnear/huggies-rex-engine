@@ -1,0 +1,127 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_TX_TRANSFERS
+   the transaction's transfers: what moved and where.
+
+   one row per transfer: the two ends with an arrow between them, the
+   amount, and the contract it came from.
+
+   the memo of a transfer is a json block or a line of text, and the
+   block's own look lives in its own file (tx/code_block.css). */
+/*==================================*/
+@import url(./code_block.css);
+/*==================================*/
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfers {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfers h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: monospace;
+  font-size: 12px;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-account {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-arrow {
+  opacity: 0.6;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-mint {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-amount {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+/* a token amount is in the token's own smallest unit, so it is shown
+   raw — and the standard beside it says what it is. */
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-raw {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-type {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+/* the token id of a multi token transfer — the label the token carries
+   inside its contract. */
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-token-id {
+  font-size: 10px;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-contract {
+  font-size: 10px;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/* the memo: what the sender wrote about the transfer.
+   it is a block of text under the row's amounts, so it reads from the
+   left — the app's column is centred, and a sentence reads badly down
+   the middle of the screen. */
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-memo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: left;
+}
+/* the label says what the line is. without it a reader cannot tell a
+   memo from another amount. */
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-memo-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+/* a plain memo is a sentence the sender wrote. it is set as text, not
+   coloured like code — a sentence is not code. */
+#SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfer-memo-text {
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/

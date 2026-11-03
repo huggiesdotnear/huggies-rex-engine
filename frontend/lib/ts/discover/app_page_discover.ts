@@ -29,20 +29,20 @@
 // cache every visible icon is already stored.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_DISCOVER_TOKEN_LIST } from "./app_page_discover_token_list";
+import { SHIT_1170_DISCOVER_TOKEN_LIST } from "./app_page_discover_token_list";
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { search_tokens_fun } from "./app_page_discover_token_search";
-import { HUGGIES_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
+import { SHIT_1170_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
 import { token_row_by_name_fun } from "../shared/token_row_by_name";
 import { token_sort_field_fun } from "./app_page_discover_token_sort_options";
-import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort_options";
-import type { HUGGIES_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
+import type { SHIT_1170_TOKEN_SORT } from "./app_page_discover_token_sort_options";
+import type { SHIT_1170_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-export interface HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST {
+export interface SHIT_1170_APP_PAGE_DISCOVER_TOKEN_LIST {
   // the rows on screen.
-  rows: HUGGIES_DISCOVER_TOKEN_ROW[];
+  rows: SHIT_1170_DISCOVER_TOKEN_ROW[];
   // true when the api has more rows behind this one.
   has_more: boolean;
   // how many rows the API has served so far. this is NOT the length of
@@ -53,11 +53,11 @@ export interface HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST {
 }
 // ========================================
 // everything the discover page has loaded.
-export interface HUGGIES_APP_PAGE_DISCOVER_DATA {
+export interface SHIT_1170_APP_PAGE_DISCOVER_DATA {
   // the token list, page by page.
-  token_list: HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST;
+  token_list: SHIT_1170_APP_PAGE_DISCOVER_TOKEN_LIST;
   // the search results, when the reader has typed something.
-  search: HUGGIES_DISCOVER_TOKEN_ROW[] | null;
+  search: SHIT_1170_DISCOVER_TOKEN_ROW[] | null;
   // the icons for the rows on screen, by token id.
   icons: Record<string, string>;
   // one message per thing that failed.
@@ -84,8 +84,8 @@ function to_finite_number_fun(value: unknown): number {
 // characters and a token id adds a label on top, so a list of ids does
 // not fit the api's ~8KB url limit. POST carries them in a body with a
 // 64KB limit.
-async function fetch_favourites_fun(): Promise<HUGGIES_DISCOVER_TOKEN_ROW[]> {
-  const ids = HUGGIES_MARKED_TOKENS.map((entry) => entry.id);
+async function fetch_favourites_fun(): Promise<SHIT_1170_DISCOVER_TOKEN_ROW[]> {
+  const ids = SHIT_1170_MARKED_TOKENS.map((entry) => entry.id);
   if (ids.length === 0) return [];
   const response = await api_intear_tokens_get({
     fields: [
@@ -144,12 +144,12 @@ async function fetch_favourites_fun(): Promise<HUGGIES_DISCOVER_TOKEN_ROW[]> {
 // --- WHY --- the favourites and the page are fetched together, so the
 // page is as slow as its slowest request, not the sum of the two.
 async function load_token_list_fun(
-  sort: HUGGIES_TOKEN_SORT,
+  sort: SHIT_1170_TOKEN_SORT,
   desc: boolean,
   offset: number,
-): Promise<HUGGIES_APP_PAGE_DISCOVER_TOKEN_LIST> {
+): Promise<SHIT_1170_APP_PAGE_DISCOVER_TOKEN_LIST> {
   const [page, favourites] = await Promise.all([
-    HUGGIES_DISCOVER_TOKEN_LIST.fetch(sort, desc, offset),
+    SHIT_1170_DISCOVER_TOKEN_LIST.fetch(sort, desc, offset),
     offset === 0 && sort === "default"
       ? fetch_favourites_fun()
       : Promise.resolve([]),
@@ -181,8 +181,8 @@ async function load_token_list_fun(
 // of the sort, so the sorted page would cover none of them and their
 // icons are asked for by id instead.
 async function load_icons_fun(
-  rows: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>,
-  sort?: HUGGIES_TOKEN_SORT,
+  rows: ReadonlyArray<SHIT_1170_DISCOVER_TOKEN_ROW>,
+  sort?: SHIT_1170_TOKEN_SORT,
   desc?: boolean,
 ): Promise<Record<string, string>> {
   const ids = rows.map((row) => row.id);
@@ -206,13 +206,13 @@ async function load_icons_fun(
 // to download, so a token outside that set was unfindable.
 async function load_search_fun(
   query: string,
-): Promise<HUGGIES_DISCOVER_TOKEN_ROW[]> {
+): Promise<SHIT_1170_DISCOVER_TOKEN_ROW[]> {
   return search_tokens_fun(query);
 }
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_DISCOVER = {
+export const SHIT_1170_APP_PAGE_DISCOVER = {
   load_token_list: load_token_list_fun,
   load_icons: load_icons_fun,
   load_favourites: fetch_favourites_fun,

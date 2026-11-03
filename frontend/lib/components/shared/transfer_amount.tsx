@@ -17,8 +17,8 @@
 // so a hover shows "1500000" and the row itself stays readable. the
 // raw number is never the primary figure — a bare integer in the
 // token's smallest unit is not a number a reader can read.
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
-import type { HUGGIES_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import type { SHIT_1170_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
 // ========================================
 // ========================================
 // --- ICON ------------------------------
@@ -27,8 +27,8 @@ import type { HUGGIES_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
 // --- WHY THE EMPTY DOT AND NOT NOTHING: every row keeps the same
 // alignment whether or not the token has an icon, so the amounts line
 // up down the page.
-export function huggies_transfer_icon_fun(
-  token: HUGGIES_TRANSFER_TOKEN | null,
+export function shit_1170_transfer_icon_fun(
+  token: SHIT_1170_TRANSFER_TOKEN | null,
 ): preact.JSX.Element {
   if (token === null || token.icon === null) {
     return <span class="tx-token-icon is-empty" aria-hidden="true" />;
@@ -59,9 +59,9 @@ export function huggies_transfer_icon_fun(
 // there is nothing to divide by, and dividing by a guessed number
 // would be a lie. the raw integer is shown with the contract id
 // beside it, so the reader knows exactly what the chain recorded.
-export function huggies_transfer_amount_fun(props: {
+export function shit_1170_transfer_amount_fun(props: {
   amount: string;
-  token: HUGGIES_TRANSFER_TOKEN | null;
+  token: SHIT_1170_TRANSFER_TOKEN | null;
   // the contract the amount came from, shown when the token is unknown.
   contract_id?: string;
 }): preact.JSX.Element {
@@ -77,11 +77,11 @@ export function huggies_transfer_amount_fun(props: {
       </span>
     );
   }
-  const display = HUGGIES_AMOUNT_FORMAT.balance(amount, {
+  const display = SHIT_1170_AMOUNT_FORMAT.balance(amount, {
     decimals: token.decimals,
   });
-  const usd = HUGGIES_AMOUNT_FORMAT.usd(
-    HUGGIES_AMOUNT_FORMAT.balance_usd(amount, {
+  const usd = SHIT_1170_AMOUNT_FORMAT.usd(
+    SHIT_1170_AMOUNT_FORMAT.balance_usd(amount, {
       decimals: token.decimals,
       price_usd: token.price_usd,
     }),

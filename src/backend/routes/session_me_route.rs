@@ -1,6 +1,6 @@
 // ========================================
 // SESSION_ME_ROUTE
-// GET /api/huggies/session/me — who does this session key belong to.
+// GET /api/shit-1170/session/me — who does this session key belong to.
 //
 // the first route that REQUIRES the session key. the reader sends the
 // key in the `x-session-token` header, the backend looks it up by its
@@ -26,17 +26,17 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::endpoint_huggies_sessions::session_key_fun::session_key_hash_fun;
-use crate::backend::logic::endpoint_huggies_sessions::sessions_store::session_get_by_key_hash_fun;
+use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::session_key_hash_fun;
+use crate::backend::logic::endpoint_shit_1170_sessions::sessions_store::session_get_by_key_hash_fun;
 // ========================================
 // the header the session key travels in.
-const HUGGIES_SESSION_TOKEN_HEADER: &str = "x-session-token";
+const SHIT_1170_SESSION_TOKEN_HEADER: &str = "x-session-token";
 // ========================================
 pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap) -> Response {
     // the key comes from the header, not from a query parameter: a url
     // ends up in logs and in the referer of the next page.
     let session_key = headers
-        .get(HUGGIES_SESSION_TOKEN_HEADER)
+        .get(SHIT_1170_SESSION_TOKEN_HEADER)
         .and_then(|value| value.to_str().ok())
         .map(|value| value.trim())
         .filter(|value| !value.is_empty());
@@ -44,7 +44,7 @@ pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap
     let session_key = match session_key {
         Some(session_key) => session_key,
         None => {
-            return huggies_error_fun(
+            return shit_1170_error_fun(
                 StatusCode::UNAUTHORIZED,
                 "no_session_key",
                 "the x-session-token header is missing",
@@ -58,7 +58,7 @@ pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap
         Ok(found) => found,
         Err(err) => {
             eprintln!("[session] could not read the session: {err}");
-            return huggies_error_fun(
+            return shit_1170_error_fun(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "db_unavailable",
                 "the session could not be read",
@@ -77,7 +77,7 @@ pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap
             })),
         )
             .into_response(),
-        None => huggies_error_fun(
+        None => shit_1170_error_fun(
             StatusCode::UNAUTHORIZED,
             "unknown_session_key",
             "the session key is not one of ours",
@@ -88,7 +88,7 @@ pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap
 // ========================================
 // --- HELPERS ----------------------------
 // the one json error shape every failure of this route answers with.
-fn huggies_error_fun(status: StatusCode, code: &str, message: &str) -> impl IntoResponse {
+fn shit_1170_error_fun(status: StatusCode, code: &str, message: &str) -> impl IntoResponse {
     (
         status,
         Json(serde_json::json!({

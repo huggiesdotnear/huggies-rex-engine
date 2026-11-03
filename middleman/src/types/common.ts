@@ -10,7 +10,7 @@
 // rust side), so the client side parsing stays trivial: it always gets
 // the same envelope, whether the failure came from our own route or
 // from the api we proxy.
-export interface HUGGIES_ERROR_RESPONSE {
+export interface SHIT_1170_ERROR_RESPONSE {
   error?: {
     code?: string;
     message?: string;

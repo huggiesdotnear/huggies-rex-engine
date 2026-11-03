@@ -16,24 +16,24 @@
 // that list takes the discover row. a picker row of its own shape
 // would have to be mapped into it, and the two shapes would drift.
 import { search_tokens_fun } from "../discover/app_page_discover_token_search";
-import { HUGGIES_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token_list";
-import { HUGGIES_APP_PAGE_DISCOVER } from "../discover/app_page_discover";
+import { SHIT_1170_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token_list";
+import { SHIT_1170_APP_PAGE_DISCOVER } from "../discover/app_page_discover";
 import { order_discover_tokens_fun } from "../discover/app_page_discover_token_sort_apply";
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
-import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
-import { HUGGIES_NEAR_ID, HUGGIES_NEAR_SYMBOL } from "../shared/token_near";
+import { SHIT_1170_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
+import { SHIT_1170_NEAR_ID, SHIT_1170_NEAR_SYMBOL } from "../shared/token_near";
 import {
-  HUGGIES_DEFAULT_TOKEN_SORT,
-  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-  type HUGGIES_TOKEN_SORT,
-  type HUGGIES_TOKEN_SORT_DIRECTION,
+  SHIT_1170_DEFAULT_TOKEN_SORT,
+  SHIT_1170_DEFAULT_TOKEN_SORT_DIRECTION,
+  type SHIT_1170_TOKEN_SORT,
+  type SHIT_1170_TOKEN_SORT_DIRECTION,
 } from "../discover/app_page_discover_token_sort_options";
-import type { HUGGIES_DISCOVER_TOKEN_ROW } from "../discover/app_page_discover_token_row";
+import type { SHIT_1170_DISCOVER_TOKEN_ROW } from "../discover/app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // the picker's whole state.
-export interface HUGGIES_SWAP_PICKER_STATE {
+export interface SHIT_1170_SWAP_PICKER_STATE {
   // is the popup open?
   open: boolean;
   // which side is picking: the token in or the token out.
@@ -41,13 +41,13 @@ export interface HUGGIES_SWAP_PICKER_STATE {
   // the heading on the popup.
   label: string;
   // the rows on screen.
-  tokens: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>;
+  tokens: ReadonlyArray<SHIT_1170_DISCOVER_TOKEN_ROW>;
   // true while the rows are being fetched.
   loading: boolean;
   // the sort the rows on screen are in.
-  sort: HUGGIES_TOKEN_SORT;
+  sort: SHIT_1170_TOKEN_SORT;
   // the direction the rows on screen are in.
-  direction: HUGGIES_TOKEN_SORT_DIRECTION;
+  direction: SHIT_1170_TOKEN_SORT_DIRECTION;
 }
 // ========================================
 // ========================================
@@ -57,19 +57,19 @@ export interface HUGGIES_SWAP_PICKER_STATE {
 // --- WHY --- the picker is not a paged list: it is a short list of the
 // most liquid tokens, and the search finds anything else. a reader who
 // wants to scroll through seven thousand tokens is not going to.
-const HUGGIES_PICKER_LIST_LIMIT = 50;
+const SHIT_1170_PICKER_LIST_LIMIT = 50;
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // the state the picker holds.
-let state: HUGGIES_SWAP_PICKER_STATE = {
+let state: SHIT_1170_SWAP_PICKER_STATE = {
   open: false,
   side: "in",
   label: "TOKEN",
   tokens: [],
   loading: false,
-  sort: HUGGIES_DEFAULT_TOKEN_SORT,
-  direction: HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  sort: SHIT_1170_DEFAULT_TOKEN_SORT,
+  direction: SHIT_1170_DEFAULT_TOKEN_SORT_DIRECTION,
 };
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
@@ -99,7 +99,7 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // write the state and tell everyone.
-function set_state_fun(next: HUGGIES_SWAP_PICKER_STATE): void {
+function set_state_fun(next: SHIT_1170_SWAP_PICKER_STATE): void {
   state = next;
   notify_fun();
 }
@@ -121,14 +121,15 @@ function set_state_fun(next: HUGGIES_SWAP_PICKER_STATE): void {
 // has no `near` entry to ask for the hash of, and the hash for wNEAR
 // is a fixed value — the icon it points at is content addressed, so it
 // never changes under a different hash.
-const HUGGIES_NEAR_ICON_URL = "https://api.intea.rs/icon/tKxD06CdiM_S80-L.webp";
-function near_row_fun(): HUGGIES_DISCOVER_TOKEN_ROW {
+const SHIT_1170_NEAR_ICON_URL =
+  "https://api.intea.rs/icon/tKxD06CdiM_S80-L.webp";
+function near_row_fun(): SHIT_1170_DISCOVER_TOKEN_ROW {
   return {
-    id: HUGGIES_NEAR_ID,
+    id: SHIT_1170_NEAR_ID,
     name: "Near Protocol",
-    symbol: HUGGIES_NEAR_SYMBOL,
+    symbol: SHIT_1170_NEAR_SYMBOL,
     decimals: 24,
-    icon: HUGGIES_NEAR_ICON_URL,
+    icon: SHIT_1170_NEAR_ICON_URL,
     price_usd: 0,
     reputation: "Reputable",
     holders: 0,
@@ -161,14 +162,14 @@ async function load_default_tokens_fun(): Promise<void> {
   try {
     const wants_marked = state.sort === "default";
     const [page, marked] = await Promise.all([
-      HUGGIES_DISCOVER_TOKEN_LIST.fetch(
+      SHIT_1170_DISCOVER_TOKEN_LIST.fetch(
         state.sort,
         state.direction === "desc",
         0,
-        HUGGIES_PICKER_LIST_LIMIT,
+        SHIT_1170_PICKER_LIST_LIMIT,
       ),
       wants_marked
-        ? HUGGIES_APP_PAGE_DISCOVER.load_favourites()
+        ? SHIT_1170_APP_PAGE_DISCOVER.load_favourites()
         : Promise.resolve([]),
     ]);
     const icons = await fetch_token_icons_fun([
@@ -184,7 +185,7 @@ async function load_default_tokens_fun(): Promise<void> {
     // likely to be reaching for.
     const with_near = [
       near_row_fun(),
-      ...tokens.filter((t) => t.id !== HUGGIES_NEAR_ID),
+      ...tokens.filter((t) => t.id !== SHIT_1170_NEAR_ID),
     ];
     // --- WHY --- THE MARKED TOKENS GO ON TOP: the order module is the
     // ONE place that puts them there, and it is the same module the
@@ -219,10 +220,10 @@ async function search_fun(query: string): Promise<void> {
     // the query is matched against the symbol and the name, so it only
     // joins the list when the reader was actually asking for it.
     const matches_near =
-      query.trim().toLowerCase() === HUGGIES_NEAR_ID ||
-      query.trim().toLowerCase() === HUGGIES_NEAR_SYMBOL.toLowerCase();
+      query.trim().toLowerCase() === SHIT_1170_NEAR_ID ||
+      query.trim().toLowerCase() === SHIT_1170_NEAR_SYMBOL.toLowerCase();
     const with_near =
-      matches_near && !tokens.some((t) => t.id === HUGGIES_NEAR_ID)
+      matches_near && !tokens.some((t) => t.id === SHIT_1170_NEAR_ID)
         ? [near_row_fun(), ...tokens]
         : tokens;
     set_state_fun({ ...state, tokens: with_near, loading: false });
@@ -259,7 +260,7 @@ function close_fun(): void {
 function pick_fun(token_id: string): void {
   const side = state.side;
   set_state_fun({ ...state, open: false });
-  void HUGGIES_APP_PAGE_SWAP_STORE.set_token(side, token_id);
+  void SHIT_1170_APP_PAGE_SWAP_STORE.set_token(side, token_id);
 }
 // ========================================
 // the reader cleared the search box: go back to the default list.
@@ -282,7 +283,7 @@ function clear_search_fun(): void {
 // token they already half-know the name of, so it wins — and the sort
 // they just picked applies to the list they get back when they clear
 // the box.
-async function set_sort_fun(sort: HUGGIES_TOKEN_SORT): Promise<void> {
+async function set_sort_fun(sort: SHIT_1170_TOKEN_SORT): Promise<void> {
   if (state.sort === sort) return;
   set_state_fun({ ...state, sort });
   await load_default_tokens_fun();
@@ -294,7 +295,7 @@ async function set_sort_fun(sort: HUGGIES_TOKEN_SORT): Promise<void> {
 // direction is half of the view, and flipping it is a different
 // request from picking a different key.
 async function set_direction_fun(
-  direction: HUGGIES_TOKEN_SORT_DIRECTION,
+  direction: SHIT_1170_TOKEN_SORT_DIRECTION,
 ): Promise<void> {
   if (state.direction === direction) return;
   set_state_fun({ ...state, direction });
@@ -303,13 +304,13 @@ async function set_direction_fun(
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_fun(): HUGGIES_SWAP_PICKER_STATE {
+function get_fun(): SHIT_1170_SWAP_PICKER_STATE {
   return state;
 }
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_SWAP_TOKEN_PICKER = {
+export const SHIT_1170_SWAP_TOKEN_PICKER = {
   open: open_fun,
   close: close_fun,
   pick: pick_fun,

@@ -21,33 +21,33 @@
 // of nfts does not push the rest of the page off screen.
 //
 // mounts into
-// <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST">.
+// <div id="SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST">.
 // ========================================
 import { render } from "preact";
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../../../ts/contract/pumpopoly/contract_page_pumpopoly_store";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE } from "../../../ts/contract/pumpopoly/contract_page_pumpopoly_store";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
-import { huggies_error_card_fun } from "./error_card";
-import { huggies_stat_tile_fun } from "./stat_tile";
-import type { HUGGIES_PUMPOPOLY_NFT } from "../../../ts/contract/pumpopoly/contract_page_pumpopoly_parse";
+import { shit_1170_error_card_fun } from "./error_card";
+import { shit_1170_stat_tile_fun } from "./stat_tile";
+import type { SHIT_1170_PUMPOPOLY_NFT } from "../../../ts/contract/pumpopoly/contract_page_pumpopoly_parse";
 // ========================================
 // ========================================
 // --- SORT ------------------------------
-type HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION = "asc" | "desc";
+type SHIT_1170_PUMPOPOLY_NFT_SORT_DIRECTION = "asc" | "desc";
 // ========================================
 // the default direction: smallest id first, the way an id list reads.
-const HUGGIES_DEFAULT_NFT_SORT_DIRECTION: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION =
+const SHIT_1170_DEFAULT_NFT_SORT_DIRECTION: SHIT_1170_PUMPOPOLY_NFT_SORT_DIRECTION =
   "asc";
 // ========================================
 // --- WHY --- the ids are compared as plain strings and not as numbers.
 // a nft token id is carried as a string and can be long enough to lose
 // precision as a number. strings keep the order stable.
 function sort_pumpopoly_nfts_fun(
-  nfts: ReadonlyArray<HUGGIES_PUMPOPOLY_NFT>,
-  direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION,
-): HUGGIES_PUMPOPOLY_NFT[] {
+  nfts: ReadonlyArray<SHIT_1170_PUMPOPOLY_NFT>,
+  direction: SHIT_1170_PUMPOPOLY_NFT_SORT_DIRECTION,
+): SHIT_1170_PUMPOPOLY_NFT[] {
   const sorted = [...nfts].sort((a, b) => {
     if (a.token_id === b.token_id) return 0;
     return a.token_id < b.token_id ? -1 : 1;
@@ -64,8 +64,8 @@ function sort_pumpopoly_nfts_fun(
 // picks one; the nft gallery has one thing to sort by — the token id —
 // so it needs only a direction.
 function nft_sort_control_fun(props: {
-  direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION;
-  on_direction: (direction: HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION) => void;
+  direction: SHIT_1170_PUMPOPOLY_NFT_SORT_DIRECTION;
+  on_direction: (direction: SHIT_1170_PUMPOPOLY_NFT_SORT_DIRECTION) => void;
 }): preact.JSX.Element {
   const Icon = props.direction === "desc" ? ArrowDown : ArrowUp;
   return (
@@ -94,7 +94,7 @@ function nft_sort_control_fun(props: {
 // player holding a few dozen of them would pull tens of megabytes for a
 // gallery most of which is below the fold.
 function nft_tile_fun(props: {
-  nft: HUGGIES_PUMPOPOLY_NFT;
+  nft: SHIT_1170_PUMPOPOLY_NFT;
 }): preact.JSX.Element {
   const nft = props.nft;
   return (
@@ -120,19 +120,19 @@ function nft_tile_fun(props: {
 }
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
+function SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
   // --- WHY --- a revision counter forces a re-render when the store lands;
   // preact doesn't re-render from external state changes alone.
   const [, set_revision] = use_state(0);
   const [direction, set_direction] =
-    use_state<HUGGIES_PUMPOPOLY_NFT_SORT_DIRECTION>(
-      HUGGIES_DEFAULT_NFT_SORT_DIRECTION,
+    use_state<SHIT_1170_PUMPOPOLY_NFT_SORT_DIRECTION>(
+      SHIT_1170_DEFAULT_NFT_SORT_DIRECTION,
     );
 
-  const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE);
+  const page_data = use_page_store_fun(SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE);
   // --- WHY --- the id comes from the store: it watches the id and
   // re-loads when it changes, so the id and the data change together.
-  const account_id = HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
+  const account_id = SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE.get_account_id();
 
   // no account id and nobody signed in — there is no player to show.
   if (account_id === null) return <></>;
@@ -142,14 +142,14 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
 
   return (
     <>
-      {huggies_error_card_fun({
+      {shit_1170_error_card_fun({
         error: page_data?.errors.nfts ?? null,
         label: "NFTS",
         class_prefix: "pumpopoly",
       })}
       <h2>nft.pumpopoly.near</h2>
       <div class="cards">
-        {huggies_stat_tile_fun({
+        {shit_1170_stat_tile_fun({
           label: "NFTS HELD",
           value: String(page_data?.nft.count ?? 0),
           sub: "PUMPOPOLY NFTS",
@@ -178,11 +178,11 @@ function HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST_FUN />, el);
   }
 }
 // ========================================

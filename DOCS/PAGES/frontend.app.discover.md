@@ -5,31 +5,31 @@ the page lists the supported contracts and a searchable, sortable list of tokens
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <main>
     <h1>DISCOVER</h1>
     <section>
       <h2>PAGES</h2>
-      <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS"></div>
+      <div id="SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS"></div>
     </section>
     <section>
       <h2>CONTRACTS</h2>
-      <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER"></div>
+      <div id="SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER"></div>
     </section>
     <section>
       <h2>TOKENS</h2>
-      <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER"></div>
+      <div id="SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER"></div>
     </section>
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS"></div>
+  <div id="SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_QUICK_LINKS"></div>
   <!--==========================================-->
   <!--script-->
   <script src="../lib/ts/import-discover.ts"></script>

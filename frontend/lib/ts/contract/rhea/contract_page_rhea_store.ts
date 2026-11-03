@@ -6,27 +6,27 @@
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 // ========================================
-import { HUGGIES_CONTRACT_PAGE_RHEA } from "./contract_page_rhea";
+import { SHIT_1170_CONTRACT_PAGE_RHEA } from "./contract_page_rhea";
 import {
-  HUGGIES_DEFAULT_RHEA_POOL_SORT,
-  HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
-  type HUGGIES_RHEA_POOL_SORT,
-  type HUGGIES_RHEA_POOL_SORT_DIRECTION,
+  SHIT_1170_DEFAULT_RHEA_POOL_SORT,
+  SHIT_1170_DEFAULT_RHEA_POOL_SORT_DIRECTION,
+  type SHIT_1170_RHEA_POOL_SORT,
+  type SHIT_1170_RHEA_POOL_SORT_DIRECTION,
 } from "./contract_page_rhea_pool_sort";
 import type {
-  HUGGIES_RHEA_PAGE_DATA,
-  HUGGIES_RHEA_POOL,
+  SHIT_1170_RHEA_PAGE_DATA,
+  SHIT_1170_RHEA_POOL,
 } from "./contract_page_rhea";
 import type { RHEA_POOL_SEARCH_TYPE } from "@sleet-js/middleman-rhea-api";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
-let data: HUGGIES_RHEA_PAGE_DATA | null = null;
+let data: SHIT_1170_RHEA_PAGE_DATA | null = null;
 // the view the current load was for: the sort, the direction, the pool
 // family and the search. they are one view — a load for one of them must
 // not overwrite the rows of another.
-let loaded_sort: HUGGIES_RHEA_POOL_SORT = HUGGIES_DEFAULT_RHEA_POOL_SORT;
-let loaded_desc = HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION === "desc";
+let loaded_sort: SHIT_1170_RHEA_POOL_SORT = SHIT_1170_DEFAULT_RHEA_POOL_SORT;
+let loaded_desc = SHIT_1170_DEFAULT_RHEA_POOL_SORT_DIRECTION === "desc";
 let loaded_type: RHEA_POOL_SEARCH_TYPE = "all";
 let loaded_search = "";
 let loading = false;
@@ -70,7 +70,7 @@ function subscribe_fun(listener: () => void): () => void {
 // nothing, which reads as broken. the old rows stay on screen under the
 // loading note until the new ones arrive.
 async function load_fun(
-  sort: HUGGIES_RHEA_POOL_SORT,
+  sort: SHIT_1170_RHEA_POOL_SORT,
   desc: boolean,
   type: RHEA_POOL_SEARCH_TYPE,
   search: string,
@@ -91,7 +91,7 @@ async function load_fun(
   loaded_search = search;
   notify_fun();
   try {
-    const result = await HUGGIES_CONTRACT_PAGE_RHEA.load(
+    const result = await SHIT_1170_CONTRACT_PAGE_RHEA.load(
       sort,
       desc,
       type,
@@ -152,7 +152,7 @@ async function load_more_fun(): Promise<void> {
   notify_fun();
   try {
     const offset = data.pools.length;
-    const result = await HUGGIES_CONTRACT_PAGE_RHEA.load(
+    const result = await SHIT_1170_CONTRACT_PAGE_RHEA.load(
       loaded_sort,
       loaded_desc,
       loaded_type,
@@ -187,7 +187,7 @@ async function load_more_fun(): Promise<void> {
 // ========================================
 // --- READ ------------------------------
 // the loaded data, or null while it is still loading.
-function get_fun(): HUGGIES_RHEA_PAGE_DATA | null {
+function get_fun(): SHIT_1170_RHEA_PAGE_DATA | null {
   return data;
 }
 // ========================================
@@ -196,12 +196,12 @@ function is_loading_fun(): boolean {
 }
 // ========================================
 // the pools on screen. read here so the component has one place to go.
-function get_pools_fun(): ReadonlyArray<HUGGIES_RHEA_POOL> {
+function get_pools_fun(): ReadonlyArray<SHIT_1170_RHEA_POOL> {
   return data?.pools ?? [];
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_PAGE_RHEA_STORE = {
+export const SHIT_1170_CONTRACT_PAGE_RHEA_STORE = {
   load: load_fun,
   load_more: load_more_fun,
   subscribe: subscribe_fun,

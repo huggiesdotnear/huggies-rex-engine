@@ -9,8 +9,8 @@
 // (lib/ts/app_page_burn_addresses.ts), and the page's loader reads their
 // balances.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_BURN_ADDRESSES } from "../../ts/burn/app_page_burn_addresses";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_BURN_ADDRESSES } from "../../ts/burn/app_page_burn_addresses";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
 // ========================================
 // ========================================
@@ -23,12 +23,12 @@ function account_href_fun(account_id: string): string {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES_FUN() {
+function SHIT_1170_COMPONENT_APP_PAGE_BURN_ADDRESSES_FUN() {
   return (
     <section>
       <h2>COMMUNITY BURN ADDRESSES</h2>
       <div>
-        {HUGGIES_BURN_ADDRESSES.map((account_id) => (
+        {SHIT_1170_BURN_ADDRESSES.map((account_id) => (
           <a href={account_href_fun(account_id)}>
             <span class="emoji">🔥</span>
             <span>
@@ -45,11 +45,11 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_BURN_ADDRESSES;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES_FUN />, el);
+    render(<SHIT_1170_COMPONENT_APP_PAGE_BURN_ADDRESSES_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

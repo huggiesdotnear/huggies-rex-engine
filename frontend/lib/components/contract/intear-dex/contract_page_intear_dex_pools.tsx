@@ -10,16 +10,16 @@
 // orders the rows the api already sent. picking a sort costs no request.
 //
 // mounts into
-// <div id="HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS">.
+// <div id="SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_POOLS">.
 // ========================================
 import { render } from "preact";
 import { useMemo as use_memo, useState as use_state } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../../../ts/contract/intear-dex/contract_page_intear_dex_store";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../../../ts/contract/intear-dex/contract_page_intear_dex_store";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
-import { HUGGIES_INTEAR_DEX_POOL_SORTS } from "../../../ts/contract/intear-dex/contract_page_intear_dex_pool_sort";
-import { huggies_sort_keys_control_fun } from "../../shared/sort_keys_control";
-import type { HUGGIES_INTEAR_DEX_POOL } from "../../../ts/contract/intear-dex/contract_page_intear_dex";
+import { SHIT_1170_INTEAR_DEX_POOL_SORTS } from "../../../ts/contract/intear-dex/contract_page_intear_dex_pool_sort";
+import { shit_1170_sort_keys_control_fun } from "../../shared/sort_keys_control";
+import type { SHIT_1170_INTEAR_DEX_POOL } from "../../../ts/contract/intear-dex/contract_page_intear_dex";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -35,7 +35,7 @@ function usd_fun(value: number): string {
 // --- WHY --- the row is not a link: there is no pool detail page in this
 // app yet, so a row that looks clickable and does nothing is worse than a
 // row that plainly is not one.
-function pool_row_fun(pool: HUGGIES_INTEAR_DEX_POOL): preact.JSX.Element {
+function pool_row_fun(pool: SHIT_1170_INTEAR_DEX_POOL): preact.JSX.Element {
   const symbols = pool.symbols.join(" / ");
   return (
     <div class="pool">
@@ -65,16 +65,18 @@ function pool_row_fun(pool: HUGGIES_INTEAR_DEX_POOL): preact.JSX.Element {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
+function SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
   const [query, set_query] = use_state("");
 
-  const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE);
+  const page_data = use_page_store_fun(
+    SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE,
+  );
 
   // the sort and the direction live in the store, so the header and the
   // list agree on the order.
-  const sort = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_sort();
-  const direction = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_direction();
-  const loading = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.is_loading();
+  const sort = SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.get_sort();
+  const direction = SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.get_direction();
+  const loading = SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.is_loading();
   const errors = page_data?.errors ?? [];
   // true while the reader has typed into the search box.
   const searching = query.trim().length > 0;
@@ -84,7 +86,7 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
   // all 303 of them are already on screen — so there is nothing to ask it
   // for. the filter runs over the rows we have.
   const pools = use_memo(() => {
-    const all = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.get_pools();
+    const all = SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.get_pools();
     const needle = query.trim().toLowerCase();
     if (needle.length === 0) return all;
     return all.filter((pool) => {
@@ -108,15 +110,15 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
           />
         </div>
         <div class="sort">
-          {huggies_sort_keys_control_fun({
-            options: HUGGIES_INTEAR_DEX_POOL_SORTS,
+          {shit_1170_sort_keys_control_fun({
+            options: SHIT_1170_INTEAR_DEX_POOL_SORTS,
             sort,
             direction,
             on_sort: (next) => {
-              HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.set_sort(next);
+              SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.set_sort(next);
             },
             on_direction: (next) => {
-              HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.set_direction(next);
+              SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.set_direction(next);
             },
           })}
         </div>
@@ -148,11 +150,11 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_POOLS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_POOLS_FUN />, el);
   }
 }
 // ========================================

@@ -11,17 +11,17 @@
 // with the description, each under its own label.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_page_token_state";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_page_token_state";
 import { format_price_usd_fun } from "../../../ts/token/index/token_page_token_price_format";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
-import { huggies_token_meta_grid_fun } from "../../shared/token_meta_grid";
-import { huggies_token_meta_row_fun } from "../../shared/token_meta_grid";
+import { shit_1170_token_meta_grid_fun } from "../../shared/token_meta_grid";
+import { shit_1170_token_meta_row_fun } from "../../shared/token_meta_grid";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
+function SHIT_1170_COMPONENT_TOKEN_DETAIL_FUN() {
+  const state = use_page_store_fun(SHIT_1170_TOKEN_PAGE_TOKEN_STATE);
   const detail = state.detail;
   if (detail === null) return null;
 
@@ -33,7 +33,7 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
           <h1>{detail.symbol}</h1>
         </div>
       </header>
-      {huggies_token_meta_grid_fun([
+      {shit_1170_token_meta_grid_fun([
         { label: "PRICE", value: format_price_usd_fun(detail.price_usd) },
         { label: "REPUTATION", value: detail.reputation },
         { label: "HOLDERS", value: detail.holders.toLocaleString() },
@@ -48,8 +48,8 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
         { label: "DECIMALS", value: String(detail.decimals) },
       ])}
       <section class="description-card">
-        {huggies_token_meta_row_fun("NAME", detail.name)}
-        {huggies_token_meta_row_fun("CA", detail.id)}
+        {shit_1170_token_meta_row_fun("NAME", detail.name)}
+        {shit_1170_token_meta_row_fun("CA", detail.id)}
         {detail.description !== null && (
           <>
             <h2>DESCRIPTION:</h2>
@@ -78,10 +78,10 @@ function HUGGIES_COMPONENT_TOKEN_DETAIL_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_DETAIL;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOKEN_DETAIL;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_TOKEN_DETAIL_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_TOKEN_DETAIL_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

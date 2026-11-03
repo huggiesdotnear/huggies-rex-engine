@@ -20,8 +20,8 @@
 // current; the cache saves the WORK of asking for the pages below it,
 // and covers the moment before the api answers.
 import { api_account } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_ACCOUNT_TX_CACHE } from "./app_page_account_transactions_cache";
-import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
+import { SHIT_1170_ACCOUNT_TX_CACHE } from "./app_page_account_transactions_cache";
+import type { SHIT_1170_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -30,7 +30,7 @@ import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transacti
 // --- WHY 50: the api takes up to 100, and the table shows the newest
 // rows first. 50 is enough to fill the scroll box several times over
 // without making the first answer slow.
-const HUGGIES_ACCOUNT_TX_PAGE_SIZE = 50;
+const SHIT_1170_ACCOUNT_TX_PAGE_SIZE = 50;
 // how many rows the cache keeps for one account.
 //
 // --- WHY --- THE CACHE IS CAPPED: the cache exists so the second visit
@@ -42,7 +42,7 @@ const HUGGIES_ACCOUNT_TX_PAGE_SIZE = 50;
 //
 // --- WHY --- THE NEWEST ROWS ARE THE ONES KEPT: they are the ones a
 // reader sees first, and the ones that change.
-const HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS = 500;
+const SHIT_1170_ACCOUNT_TX_CACHE_MAX_ROWS = 500;
 // how long a cached history is trusted as the whole answer.
 //
 // --- WHY ONE MINUTE: the cache is a HEAD start, not the answer. the
@@ -51,14 +51,14 @@ const HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS = 500;
 // page, and those change rarely. a minute is long enough that a reader
 // flipping between the tabs does not refetch, and short enough that
 // the cached history is never the only thing the reader sees.
-const HUGGIES_ACCOUNT_TX_CACHE_TTL_MS = 60_000;
+const SHIT_1170_ACCOUNT_TX_CACHE_TTL_MS = 60_000;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // one page of the history, plus what the cache knows about it.
-export interface HUGGIES_ACCOUNT_TX_PAGE {
+export interface SHIT_1170_ACCOUNT_TX_PAGE {
   // the rows, newest first.
-  rows: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>;
+  rows: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>;
   // the api's cursor for the NEXT page, or null when the history ends
   // here.
   resume_token: string | null;
@@ -85,16 +85,16 @@ function cache_age_ms_fun(entry: { fetched_at: number } | null): number | null {
 // first page afresh.
 function cached_page_fun(
   entry: {
-    rows: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>;
+    rows: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>;
     resume_token: string | null;
     txs_count: number;
     fetched_at: number;
   } | null,
   account_id: string,
-): HUGGIES_ACCOUNT_TX_PAGE | null {
+): SHIT_1170_ACCOUNT_TX_PAGE | null {
   if (entry === null) return null;
   const age = cache_age_ms_fun(entry);
-  const is_fresh = age !== null && age < HUGGIES_ACCOUNT_TX_CACHE_TTL_MS;
+  const is_fresh = age !== null && age < SHIT_1170_ACCOUNT_TX_CACHE_TTL_MS;
   return {
     rows: entry.rows,
     resume_token: is_fresh ? entry.resume_token : null,
@@ -116,11 +116,11 @@ function cached_page_fun(
 // is the one thing that says whether two rows are the same
 // transaction.
 function merge_rows_fun(
-  fresh: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>,
-  cached: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>,
-): ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW> {
+  fresh: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>,
+  cached: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>,
+): ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW> {
   const seen = new Set<string>();
-  const out: Array<HUGGIES_CACHED_ACCOUNT_TX_ROW> = [];
+  const out: Array<SHIT_1170_CACHED_ACCOUNT_TX_ROW> = [];
   for (const row of [...fresh, ...cached]) {
     if (seen.has(row.transaction_hash)) continue;
     seen.add(row.transaction_hash);
@@ -149,14 +149,14 @@ const txs_counts: Map<string, number> = new Map();
 async function load_account_tx_page_fun(
   account_id: string,
   resume_token: string | null,
-): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
+): Promise<SHIT_1170_ACCOUNT_TX_PAGE> {
   const response = await api_account({
     account_id,
-    limit: HUGGIES_ACCOUNT_TX_PAGE_SIZE,
+    limit: SHIT_1170_ACCOUNT_TX_PAGE_SIZE,
     desc: true,
     ...(resume_token === null ? {} : { resume_token }),
   });
-  const rows: Array<HUGGIES_CACHED_ACCOUNT_TX_ROW> = response.account_txs.map(
+  const rows: Array<SHIT_1170_CACHED_ACCOUNT_TX_ROW> = response.account_txs.map(
     (row) => ({
       account_id: row.account_id,
       transaction_hash: row.transaction_hash,
@@ -207,11 +207,11 @@ async function load_account_tx_page_fun(
 // cache is a HEAD start for the second visit, and the first few pages
 // are all it needs to be one.
 function cap_rows_fun(
-  rows: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>,
-): ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW> {
-  if (rows.length <= HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS) return rows;
+  rows: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>,
+): ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW> {
+  if (rows.length <= SHIT_1170_ACCOUNT_TX_CACHE_MAX_ROWS) return rows;
   // the rows are newest first, so the ones to keep are at the front.
-  return rows.slice(0, HUGGIES_ACCOUNT_TX_CACHE_MAX_ROWS);
+  return rows.slice(0, SHIT_1170_ACCOUNT_TX_CACHE_MAX_ROWS);
 }
 // ========================================
 // ========================================
@@ -228,8 +228,8 @@ function cap_rows_fun(
 // and those rows are still in the cache.
 export async function load_account_transactions_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
-  const cached = await HUGGIES_ACCOUNT_TX_CACHE.get(account_id);
+): Promise<SHIT_1170_ACCOUNT_TX_PAGE> {
+  const cached = await SHIT_1170_ACCOUNT_TX_CACHE.get(account_id);
   const fresh = await load_account_tx_page_fun(account_id, null);
   const cached_rows = cached === null ? [] : cached.rows;
   const rows = merge_rows_fun(fresh.rows, cached_rows);
@@ -252,12 +252,12 @@ export async function load_account_transactions_fun(
   // stale one can skip rows.
   const cache_age = cached === null ? null : Date.now() - cached.fetched_at;
   const cached_cursor_is_fresh =
-    cache_age !== null && cache_age < HUGGIES_ACCOUNT_TX_CACHE_TTL_MS;
+    cache_age !== null && cache_age < SHIT_1170_ACCOUNT_TX_CACHE_TTL_MS;
   const resume_token =
     cached_cursor_is_fresh && cached !== null && cached.resume_token !== null
       ? cached.resume_token
       : fresh.resume_token;
-  await HUGGIES_ACCOUNT_TX_CACHE.put({
+  await SHIT_1170_ACCOUNT_TX_CACHE.put({
     id: account_id,
     rows: cap_rows_fun(merged_rows),
     resume_token,
@@ -280,8 +280,8 @@ export async function load_account_transactions_fun(
 // there is nothing to show yet.
 export async function load_cached_account_transactions_fun(
   account_id: string,
-): Promise<HUGGIES_ACCOUNT_TX_PAGE | null> {
-  const entry = await HUGGIES_ACCOUNT_TX_CACHE.get(account_id);
+): Promise<SHIT_1170_ACCOUNT_TX_PAGE | null> {
+  const entry = await SHIT_1170_ACCOUNT_TX_CACHE.get(account_id);
   return cached_page_fun(entry, account_id);
 }
 // ========================================
@@ -294,11 +294,11 @@ export async function load_cached_account_transactions_fun(
 export async function load_more_account_transactions_fun(
   account_id: string,
   resume_token: string,
-): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
+): Promise<SHIT_1170_ACCOUNT_TX_PAGE> {
   const page = await load_account_tx_page_fun(account_id, resume_token);
-  const cached = await HUGGIES_ACCOUNT_TX_CACHE.get(account_id);
+  const cached = await SHIT_1170_ACCOUNT_TX_CACHE.get(account_id);
   const cached_rows = cached === null ? [] : cached.rows;
-  await HUGGIES_ACCOUNT_TX_CACHE.put({
+  await SHIT_1170_ACCOUNT_TX_CACHE.put({
     id: account_id,
     rows: cap_rows_fun(merge_rows_fun(cached_rows, page.rows)),
     resume_token: page.resume_token,

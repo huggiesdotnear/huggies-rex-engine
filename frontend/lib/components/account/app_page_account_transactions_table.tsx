@@ -12,9 +12,9 @@
 // the transactions tab.
 import { render } from "preact";
 import { useRef as use_ref } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "../../ts/account/app_page_account_tx_store";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/account/app_page_account_tab_state";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE } from "../../ts/account/app_page_account_tx_store";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/account/app_page_account_tab_state";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { use_scroll_load_fun } from "../../ts/shared/use_scroll_load";
 import { account_tx_row_fun } from "./app_page_account_tx_row";
@@ -24,13 +24,13 @@ import { account_tx_row_fun } from "./app_page_account_tx_row";
 // the css selector that matches ONE row of the transactions table. the
 // scroll hook is told what a row is, so it can count the rows that
 // have landed.
-const HUGGIES_ACCOUNT_TX_ROW_SELECTOR = "tbody tr";
+const SHIT_1170_ACCOUNT_TX_ROW_SELECTOR = "tbody tr";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN() {
-  const tab = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE);
-  const state = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TX_STORE);
+export function SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN() {
+  const tab = use_page_store_fun(SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE);
+  const state = use_page_store_fun(SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE);
   // the scroll box, so the reader's position at the bottom is
   // detectable.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
@@ -46,9 +46,9 @@ export function HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN() {
     // holds the cursor, so it is the only place that knows where the
     // next page starts. the component just says WHEN.
     () => {
-      void HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.load_more();
+      void SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.load_more();
     },
-    HUGGIES_ACCOUNT_TX_ROW_SELECTOR,
+    SHIT_1170_ACCOUNT_TX_ROW_SELECTOR,
   );
 
   // --- WHY THE CHECK IS HERE AND NOT AT THE TOP: a hook cannot be
@@ -108,11 +108,11 @@ export function HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN />, el);
+    render(<SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

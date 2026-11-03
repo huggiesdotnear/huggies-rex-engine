@@ -1,6 +1,6 @@
 // ========================================
 // SESSIONS_ROUTE
-// POST /api/huggies/sessions — turn signed messages into session keys.
+// POST /api/shit-1170/sessions — turn signed messages into session keys.
 //
 // the browser sends every account it holds a signature for. the backend
 // verifies each signature against the exact message + nonce + recipient
@@ -31,7 +31,7 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::endpoint_huggies_sessions::{
+use crate::backend::logic::endpoint_shit_1170_sessions::{
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
     session_key_fun::{session_key_generate_fun, session_key_hash_fun},
     sessions_store::{session_get_fun, session_upsert_fun},
@@ -45,7 +45,7 @@ pub async fn sessions_route(
     Json(body): Json<SESSIONS_REQUEST>,
 ) -> Response {
     if body.accounts.is_empty() {
-        return huggies_error_fun(
+        return shit_1170_error_fun(
             StatusCode::BAD_REQUEST,
             "no_accounts",
             "the request carried no signed accounts",
@@ -71,7 +71,7 @@ pub async fn sessions_route(
             recipient: account.recipient.clone(),
         };
         if let Err(reason) = nep413_verify_fun(&signed) {
-            return huggies_error_fun(
+            return shit_1170_error_fun(
                 StatusCode::BAD_REQUEST,
                 "signature_invalid",
                 &format!("{}: {}", account.account_id, verify_reason_fun(&reason)),
@@ -79,7 +79,7 @@ pub async fn sessions_route(
             .into_response();
         }
         if account_ids.contains(&account.account_id) {
-            return huggies_error_fun(
+            return shit_1170_error_fun(
                 StatusCode::BAD_REQUEST,
                 "duplicate_account",
                 &format!("{} was sent twice", account.account_id),
@@ -99,7 +99,7 @@ pub async fn sessions_route(
             Ok(entry) => entry,
             Err(err) => {
                 eprintln!("[sessions] could not make the key for {account_id}: {err}");
-                return huggies_error_fun(
+                return shit_1170_error_fun(
                     StatusCode::INTERNAL_SERVER_ERROR,
                     "db_unavailable",
                     "the session key could not be made",
@@ -148,7 +148,7 @@ async fn account_key_fun(
 //
 // --- WHY --- the same shape the trezu proxy uses, and not a new one: the
 // client parses one error envelope for the whole api.
-fn huggies_error_fun(status: StatusCode, code: &str, message: &str) -> impl IntoResponse {
+fn shit_1170_error_fun(status: StatusCode, code: &str, message: &str) -> impl IntoResponse {
     (
         status,
         Json(serde_json::json!({

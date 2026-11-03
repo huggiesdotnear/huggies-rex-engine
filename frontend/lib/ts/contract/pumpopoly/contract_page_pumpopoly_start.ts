@@ -20,19 +20,19 @@
 // page. with no id on the url, the signed-in account is the fallback, and a
 // later sign-in fills it in. the store watches that module and re-loads by
 // itself.
-import { HUGGIES_PAGE_ACCOUNT_ID } from "./contract_page_pumpopoly_account_id";
-import { HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE } from "./contract_page_pumpopoly_store";
-import { huggies_loading_bar_start_fun } from "../../shared/loading_bar_start";
+import { SHIT_1170_PAGE_ACCOUNT_ID } from "./contract_page_pumpopoly_account_id";
+import { SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE } from "./contract_page_pumpopoly_store";
+import { shit_1170_loading_bar_start_fun } from "../../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // the loading bar's patch goes in before the page's first request.
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // begin the page's load for the player the page is about, and watch the
 // id so a later change reloads the page by itself.
-HUGGIES_PAGE_ACCOUNT_ID.init();
-HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.watch();
-void HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.load();
+SHIT_1170_PAGE_ACCOUNT_ID.init();
+SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE.watch();
+void SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

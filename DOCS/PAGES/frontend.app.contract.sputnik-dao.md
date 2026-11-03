@@ -5,28 +5,28 @@ the page shows one Sputnik DAO: its name and purpose, its members and the roles 
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <main>
     <h1>DAO</h1>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_SELECTOR"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_HEADER"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_ROLES"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_BALANCES"></div>
     <!--==========================================-->
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
   <!--script-->
   <script src="../../lib/ts/import-contract-sputnik-dao.ts"></script>

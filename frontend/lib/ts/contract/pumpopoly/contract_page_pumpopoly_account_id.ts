@@ -14,8 +14,8 @@
 // module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 // ========================================
-import { HUGGIES_AUTH } from "../../shared/auth_status";
-import { HUGGIES_URL_ID } from "../../shared/url_id";
+import { SHIT_1170_AUTH } from "../../shared/auth_status";
+import { SHIT_1170_URL_ID } from "../../shared/url_id";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
@@ -65,7 +65,7 @@ function subscribe_fun(listener: () => void): () => void {
 // and the blank-means-absent rule live there, so this page and the
 // account page cannot drift apart on how the id is found.
 function read_url_account_id_fun(): string | null {
-  return HUGGIES_URL_ID.read();
+  return SHIT_1170_URL_ID.read();
 }
 // ========================================
 // --- INIT -------------------------------
@@ -73,7 +73,7 @@ function read_url_account_id_fun(): string | null {
 // fallback.
 // --- WHY --- the url wins over the signed-in account. a link to
 // someone else's account must show them, not the reader.
-// --- WHY --- HUGGIES_AUTH.init() runs here, before we read the
+// --- WHY --- SHIT_1170_AUTH.init() runs here, before we read the
 // account: init is what rehydrates the session from localStorage, so
 // without it a fresh page load always looks signed out even when a
 // session sits in storage.
@@ -93,14 +93,14 @@ function init_fun(): void {
     return;
   }
   // no `?id=` on the url — fall back to whoever is signed in.
-  HUGGIES_AUTH.init();
+  SHIT_1170_AUTH.init();
   adopt_signed_in_fun();
   // --- WHY --- listen for a later sign-in. the page opened signed out,
   // so it had no player to show; when the reader signs in, the page
   // should show them without a reload. the url id case returns above
   // and never subscribes, so a sign-in cannot steal the page's player.
   if (auth_unsubscribe === null) {
-    auth_unsubscribe = HUGGIES_AUTH.subscribe(() => {
+    auth_unsubscribe = SHIT_1170_AUTH.subscribe(() => {
       adopt_signed_in_fun();
     });
   }
@@ -111,7 +111,7 @@ function init_fun(): void {
 function adopt_signed_in_fun(): void {
   // a url id is final — never override it.
   if (has_url_id) return;
-  const signed_in = HUGGIES_AUTH.get_account_id();
+  const signed_in = SHIT_1170_AUTH.get_account_id();
   // --- WHY --- a sign-out clears the page. the id came from the
   // session, and the session is gone, so the page has no player to show
   // any more. without this the page kept showing the signed-out
@@ -139,7 +139,7 @@ function has_account_id_fun(): boolean {
 }
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_PAGE_ACCOUNT_ID = {
+export const SHIT_1170_PAGE_ACCOUNT_ID = {
   init: init_fun,
   subscribe: subscribe_fun,
   get_account_id: get_account_id_fun,

@@ -5,7 +5,7 @@
 // and the account page cannot drift apart on how the id is found. the
 // id is null when the url carries none.
 // ========================================
-import { HUGGIES_URL_ID } from "../../shared/url_id";
+import { SHIT_1170_URL_ID } from "../../shared/url_id";
 // ========================================
 // --- READ ------------------------------
 // the `?id=` off the current url, or null when there is none.
@@ -14,11 +14,11 @@ import { HUGGIES_URL_ID } from "../../shared/url_id";
 // nothing, and rendering the empty token would be worse than saying the
 // id is missing.
 function token_id_from_url_fun(): string | null {
-  return HUGGIES_URL_ID.read();
+  return SHIT_1170_URL_ID.read();
 }
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_TOKEN_PAGE_TOKEN_ID = {
+export const SHIT_1170_TOKEN_PAGE_TOKEN_ID = {
   get: token_id_from_url_fun,
 };
 // ========================================

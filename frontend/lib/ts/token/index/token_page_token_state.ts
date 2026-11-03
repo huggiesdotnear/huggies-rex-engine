@@ -10,13 +10,13 @@
 // throwing subscriber cannot break — the same shape as
 // lib/ts/contract/pumpopoly/contract_page_pumpopoly_account_id.ts.
 // ========================================
-import { HUGGIES_TOKEN_PAGE_TOKEN } from "./token_page_token";
-import { HUGGIES_TOKEN_PAGE_TOKEN_ID } from "./token_page_token_id";
-import type { HUGGIES_TOKEN_PAGE_STATE } from "./token_page_token_types";
+import { SHIT_1170_TOKEN_PAGE_TOKEN } from "./token_page_token";
+import { SHIT_1170_TOKEN_PAGE_TOKEN_ID } from "./token_page_token_id";
+import type { SHIT_1170_TOKEN_PAGE_STATE } from "./token_page_token_types";
 // ========================================
 // --- STATE ------------------------------
 // the empty state the page holds before the first load answers.
-let state: HUGGIES_TOKEN_PAGE_STATE = {
+let state: SHIT_1170_TOKEN_PAGE_STATE = {
   detail: null,
   holders: [],
   holder_total: 0,
@@ -52,7 +52,7 @@ function notify_fun(): void {
 }
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_TOKEN_PAGE_STATE): void {
+function set_state_fun(next: SHIT_1170_TOKEN_PAGE_STATE): void {
   state = next;
   notify_fun();
 }
@@ -84,7 +84,7 @@ async function token_page_token_state_load_more_fun(): Promise<void> {
   const cursor = state.next_cursor;
   set_state_fun({ ...state, loading_more: true });
   try {
-    const page = await HUGGIES_TOKEN_PAGE_TOKEN.load_holders(
+    const page = await SHIT_1170_TOKEN_PAGE_TOKEN.load_holders(
       load_token_id,
       cursor,
     );
@@ -108,7 +108,7 @@ async function token_page_token_state_load_more_fun(): Promise<void> {
 }
 // ========================================
 // --- READ ------------------------------
-function get_state_fun(): HUGGIES_TOKEN_PAGE_STATE {
+function get_state_fun(): SHIT_1170_TOKEN_PAGE_STATE {
   return state;
 }
 // ========================================
@@ -153,7 +153,7 @@ function reset_fun(): void {
 // holders request does not need them — it returns raw balances — so there
 // is nothing to wait for.
 async function token_page_token_state_load_fun(): Promise<void> {
-  const next_token_id = HUGGIES_TOKEN_PAGE_TOKEN_ID.get();
+  const next_token_id = SHIT_1170_TOKEN_PAGE_TOKEN_ID.get();
   // --- WHY --- the id is stored even when there is none: the components read
   // it to know there is nothing to show, and they read it through the store
   // so they follow it when it changes.
@@ -170,8 +170,8 @@ async function token_page_token_state_load_fun(): Promise<void> {
   notify_fun();
   try {
     const [detail, holder_page] = await Promise.all([
-      HUGGIES_TOKEN_PAGE_TOKEN.load_detail(load_token_id),
-      HUGGIES_TOKEN_PAGE_TOKEN.load_holders(load_token_id, null),
+      SHIT_1170_TOKEN_PAGE_TOKEN.load_detail(load_token_id),
+      SHIT_1170_TOKEN_PAGE_TOKEN.load_holders(load_token_id, null),
     ]);
     // a load for an older token id must not overwrite a newer one.
     if (loaded_token_id !== load_token_id) return;
@@ -211,7 +211,7 @@ function get_token_id_fun(): string | null {
 }
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_TOKEN_PAGE_TOKEN_STATE = {
+export const SHIT_1170_TOKEN_PAGE_TOKEN_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,

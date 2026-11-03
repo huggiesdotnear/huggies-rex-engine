@@ -16,13 +16,13 @@
 // height cap.
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp } from "lucide-preact";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
-import { HUGGIES_BALANCE_FILTER } from "../../ts/shared/balance_filter";
-import { HUGGIES_BALANCE_SORT } from "../../ts/shared/balance_sort";
-import { huggies_balance_row_fun } from "./balance_row";
-import type { HUGGIES_BALANCE_ENTRY } from "../../ts/shared/balance_filter";
-import type { HUGGIES_BALANCE_SORT_BY } from "../../ts/shared/balance_sort";
-import { HUGGIES_NEAR_ID } from "../../ts/shared/token_near";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import { SHIT_1170_BALANCE_FILTER } from "../../ts/shared/balance_filter";
+import { SHIT_1170_BALANCE_SORT } from "../../ts/shared/balance_sort";
+import { shit_1170_balance_row_fun } from "./balance_row";
+import type { SHIT_1170_BALANCE_ENTRY } from "../../ts/shared/balance_filter";
+import type { SHIT_1170_BALANCE_SORT_BY } from "../../ts/shared/balance_sort";
+import { SHIT_1170_NEAR_ID } from "../../ts/shared/token_near";
 // ========================================
 // --- CONFIG -----------------------------
 // the native NEAR row is pinned above the sorted list: it is the gas balance
@@ -32,13 +32,13 @@ import { HUGGIES_NEAR_ID } from "../../ts/shared/token_near";
 // the id itself lives in lib/ts/token_near.ts, next to the other facts
 // about the chain's own token.
 // the default order: biggest position first.
-const HUGGIES_DEFAULT_SORT_BY: HUGGIES_BALANCE_SORT_BY = "usd";
-const HUGGIES_DEFAULT_SORT_DESC = true;
+const SHIT_1170_DEFAULT_SORT_BY: SHIT_1170_BALANCE_SORT_BY = "usd";
+const SHIT_1170_DEFAULT_SORT_DESC = true;
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_BALANCE_TABLE_PROPS {
+export interface SHIT_1170_BALANCE_TABLE_PROPS {
   // the holdings to show, already carrying their token metadata.
-  rows: ReadonlyArray<HUGGIES_BALANCE_ENTRY>;
+  rows: ReadonlyArray<SHIT_1170_BALANCE_ENTRY>;
   // the heading above the table. null for no heading.
   title?: string | null;
   // shown while the page is still loading.
@@ -54,9 +54,9 @@ export interface HUGGIES_BALANCE_TABLE_PROPS {
 // --- WHY --- one control for both rather than clickable column headers:
 // with a single stacked column there is no header row to hang them on.
 function sort_toggle_fun(
-  sort_by: HUGGIES_BALANCE_SORT_BY,
+  sort_by: SHIT_1170_BALANCE_SORT_BY,
   sort_desc: boolean,
-  on_sort: (by: HUGGIES_BALANCE_SORT_BY) => void,
+  on_sort: (by: SHIT_1170_BALANCE_SORT_BY) => void,
 ): preact.JSX.Element {
   const Icon = sort_desc ? ArrowDown : ArrowUp;
   return (
@@ -131,19 +131,19 @@ function dust_toggle_fun(
 }
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_balance_table_fun(
-  props: HUGGIES_BALANCE_TABLE_PROPS,
+export function shit_1170_balance_table_fun(
+  props: SHIT_1170_BALANCE_TABLE_PROPS,
 ): preact.JSX.Element {
-  const [sort_by, set_sort_by] = use_state<HUGGIES_BALANCE_SORT_BY>(
-    HUGGIES_DEFAULT_SORT_BY,
+  const [sort_by, set_sort_by] = use_state<SHIT_1170_BALANCE_SORT_BY>(
+    SHIT_1170_DEFAULT_SORT_BY,
   );
-  const [sort_desc, set_sort_desc] = use_state(HUGGIES_DEFAULT_SORT_DESC);
+  const [sort_desc, set_sort_desc] = use_state(SHIT_1170_DEFAULT_SORT_DESC);
   // the dust is hidden until the reader asks for it, on every page.
   const [show_dust, set_show_dust] = use_state(false);
 
   // clicking the active key flips direction; clicking a new key switches to
   // it and starts descending, the useful default for both.
-  const on_sort_fun = (by: HUGGIES_BALANCE_SORT_BY) => {
+  const on_sort_fun = (by: SHIT_1170_BALANCE_SORT_BY) => {
     if (by === sort_by) {
       set_sort_desc(!sort_desc);
       return;
@@ -155,13 +155,13 @@ export function huggies_balance_table_fun(
   const all_rows = props.rows;
   // the native NEAR holding is pulled out of the sortable list and pinned
   // above it; everything else competes on usd or ticker.
-  const near_entry = all_rows.find((entry) => entry.id === HUGGIES_NEAR_ID);
-  const rest = all_rows.filter((entry) => entry.id !== HUGGIES_NEAR_ID);
+  const near_entry = all_rows.find((entry) => entry.id === SHIT_1170_NEAR_ID);
+  const rest = all_rows.filter((entry) => entry.id !== SHIT_1170_NEAR_ID);
   // the filter hides dust and spam. it runs here so the hidden count is
   // known for the toggle.
-  const kept = HUGGIES_BALANCE_FILTER.filter(rest, show_dust);
-  const hidden_count = HUGGIES_BALANCE_FILTER.hidden_count(rest, show_dust);
-  const sorted = HUGGIES_BALANCE_SORT.sort(kept, sort_by, sort_desc);
+  const kept = SHIT_1170_BALANCE_FILTER.filter(rest, show_dust);
+  const hidden_count = SHIT_1170_BALANCE_FILTER.hidden_count(rest, show_dust);
+  const sorted = SHIT_1170_BALANCE_SORT.sort(kept, sort_by, sort_desc);
   // the total covers the pinned row too, so it is not counted twice.
   const total_usd = all_rows.reduce((sum, entry) => sum + entry.usd_value, 0);
 
@@ -177,7 +177,7 @@ export function huggies_balance_table_fun(
         {/* the scroll box caps the height so a long token list never
             pushes the rest of the page off screen. */}
         <div class="scroll">
-          <table data-huggies-balance-account={props.account_id ?? undefined}>
+          <table data-shit-1170-balance-account={props.account_id ?? undefined}>
             <tbody>
               {is_loading && (
                 <tr>
@@ -185,7 +185,7 @@ export function huggies_balance_table_fun(
                 </tr>
               )}
               {near_entry !== undefined &&
-                huggies_balance_row_fun({
+                shit_1170_balance_row_fun({
                   id: near_entry.id,
                   raw: near_entry.raw,
                   info: near_entry.info,
@@ -193,7 +193,7 @@ export function huggies_balance_table_fun(
                   pinned: true,
                 })}
               {sorted.map((entry) =>
-                huggies_balance_row_fun({
+                shit_1170_balance_row_fun({
                   id: entry.id,
                   raw: entry.raw,
                   info: entry.info,
@@ -207,7 +207,7 @@ export function huggies_balance_table_fun(
                     <td>
                       {show_dust
                         ? (props.empty_text ?? "NO BALANCES")
-                        : `NO BALANCES OVER ${HUGGIES_BALANCE_FILTER.min_usd} USD`}
+                        : `NO BALANCES OVER ${SHIT_1170_BALANCE_FILTER.min_usd} USD`}
                     </td>
                   </tr>
                 )}
@@ -217,7 +217,7 @@ export function huggies_balance_table_fun(
                 <th scope="row">
                   TOTAL
                   <span class="total-usd">
-                    {HUGGIES_AMOUNT_FORMAT.usd(total_usd)}
+                    {SHIT_1170_AMOUNT_FORMAT.usd(total_usd)}
                   </span>
                 </th>
               </tr>

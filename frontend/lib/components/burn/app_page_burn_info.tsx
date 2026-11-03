@@ -8,11 +8,11 @@
 // two short ideas side by side, and a reader takes one of them in at a
 // time. a single paragraph of both would be a wall.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_APP_PAGE_BURN_INFO_FUN() {
+function SHIT_1170_COMPONENT_APP_PAGE_BURN_INFO_FUN() {
   return (
     <section>
       <h2>ABOUT BURNING ON NEAR</h2>
@@ -42,10 +42,10 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_INFO_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_BURN_INFO;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_BURN_INFO;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_APP_PAGE_BURN_INFO_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_APP_PAGE_BURN_INFO_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

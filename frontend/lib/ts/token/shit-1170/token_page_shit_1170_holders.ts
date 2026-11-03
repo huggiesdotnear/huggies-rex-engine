@@ -2,16 +2,16 @@
 // INTEAR all-holders fetch and display formatting for the SHIT page.
 // ========================================
 import { api_intear_holders_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
+import { SHIT_1170_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 import {
-  HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
+  SHIT_1170_SHIT_HOLDER_TYPE_REGULAR,
   shit_holder_type_fun,
-  type HUGGIES_SHIT_HOLDER_ROW_TYPE,
+  type SHIT_1170_SHIT_HOLDER_ROW_TYPE,
 } from "./token_page_shit_1170_known_holders";
-import { HUGGIES_SUPPLY_PERCENT } from "../../shared/token_supply_percent";
+import { SHIT_1170_SUPPLY_PERCENT } from "../../shared/token_supply_percent";
 // ========================================
 // one holder row, ready for display.
-export interface HUGGIES_SHIT_HOLDER {
+export interface SHIT_1170_SHIT_HOLDER {
   account_id: string;
   // the raw balance, in the token's smallest unit (18 decimals).
   balance: string;
@@ -22,18 +22,18 @@ export interface HUGGIES_SHIT_HOLDER {
   percent: number;
   percent_formatted: string;
   // the classified type of the row — a known type, or "regular".
-  type: HUGGIES_SHIT_HOLDER_ROW_TYPE;
+  type: SHIT_1170_SHIT_HOLDER_ROW_TYPE;
 }
 // ========================================
 // one page of holders.
-export interface HUGGIES_SHIT_HOLDERS_PAGE {
-  rows: HUGGIES_SHIT_HOLDER[];
+export interface SHIT_1170_SHIT_HOLDERS_PAGE {
+  rows: SHIT_1170_SHIT_HOLDER[];
   total: number;
   next_cursor: string | null;
 }
 // ========================================
 // how many holders the INTEAR holders endpoint returns per page.
-const HUGGIES_SHIT_HOLDERS_PAGE_SIZE = 100;
+const SHIT_1170_SHIT_HOLDERS_PAGE_SIZE = 100;
 // ========================================
 // --- HELPERS ----------------------------
 // scale a raw token amount down by its decimals.
@@ -65,7 +65,7 @@ function format_usd_fun(value: number): string {
 // ========================================
 // format the share of the total supply.
 function format_percent_fun(percent: number): string {
-  return HUGGIES_SUPPLY_PERCENT.format(percent);
+  return SHIT_1170_SUPPLY_PERCENT.format(percent);
 }
 // ========================================
 // the share of the total supply a raw balance holds, in percent.
@@ -73,7 +73,7 @@ function balance_percent_fun(
   balance: string,
   total_supply_raw: bigint,
 ): number {
-  return HUGGIES_SUPPLY_PERCENT.percent(balance, total_supply_raw.toString());
+  return SHIT_1170_SUPPLY_PERCENT.percent(balance, total_supply_raw.toString());
 }
 // ========================================
 // --- PUBLIC -----------------------------
@@ -87,10 +87,10 @@ export async function fetch_shit_holders_fun(
   price_usd: number,
   decimals: number,
   total_supply_raw: bigint,
-): Promise<HUGGIES_SHIT_HOLDERS_PAGE> {
+): Promise<SHIT_1170_SHIT_HOLDERS_PAGE> {
   const response = await api_intear_holders_get({
-    token: HUGGIES_SHIT_TOKEN_ID,
-    limit: HUGGIES_SHIT_HOLDERS_PAGE_SIZE,
+    token: SHIT_1170_SHIT_TOKEN_ID,
+    limit: SHIT_1170_SHIT_HOLDERS_PAGE_SIZE,
     cursor: cursor ?? undefined,
   });
   const rows = response.rows.map((row) => {
@@ -120,7 +120,7 @@ export async function fetch_shit_holders_fun(
 // ========================================
 // the icon each holder type is tagged with.
 export function shit_holder_icon_fun(
-  type: HUGGIES_SHIT_HOLDER_ROW_TYPE,
+  type: SHIT_1170_SHIT_HOLDER_ROW_TYPE,
 ): string {
   switch (type) {
     case "dev":
@@ -140,9 +140,9 @@ export function shit_holder_icon_fun(
 // ========================================
 // the human-readable label of one holder type.
 export function shit_holder_type_label_fun(
-  type: HUGGIES_SHIT_HOLDER_ROW_TYPE,
+  type: SHIT_1170_SHIT_HOLDER_ROW_TYPE,
 ): string {
-  if (type === HUGGIES_SHIT_HOLDER_TYPE_REGULAR) return "HOLDERS";
+  if (type === SHIT_1170_SHIT_HOLDER_TYPE_REGULAR) return "HOLDERS";
   return type.toUpperCase();
 }
 // ========================================

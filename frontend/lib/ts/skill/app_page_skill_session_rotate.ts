@@ -16,14 +16,14 @@
 //
 // --- WHY --- the session token rides along: the backend uses it to be
 // sure the rotation is for the account whose key it holds.
-import { api_huggies_session_rotate_post } from "@huggies/huggies-rex-engine-middleman";
-import { HUGGIES_AUTH_SESSIONS } from "../shared/auth_sessions";
-import { HUGGIES_BASE_URL } from "../shared/base_url";
+import { api_shit_1170_session_rotate_post } from "@huggies/shit_1170-middleman";
+import { SHIT_1170_AUTH_SESSIONS } from "../shared/auth_sessions";
+import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { session_options_fun } from "../shared/session_token";
 // ========================================
 // --- TYPES ------------------------------
 // the new key for one account.
-export interface HUGGIES_APP_PAGE_SKILL_ROTATED {
+export interface SHIT_1170_APP_PAGE_SKILL_ROTATED {
   account_id: string;
   session_key: string;
 }
@@ -32,9 +32,9 @@ export interface HUGGIES_APP_PAGE_SKILL_ROTATED {
 // rotate one account's key.
 export async function app_page_skill_session_rotate_fun(
   account_id: string,
-): Promise<HUGGIES_APP_PAGE_SKILL_ROTATED> {
+): Promise<SHIT_1170_APP_PAGE_SKILL_ROTATED> {
   // the browser's own signed message for this account.
-  const session = HUGGIES_AUTH_SESSIONS.get_session(account_id);
+  const session = SHIT_1170_AUTH_SESSIONS.get_session(account_id);
   if (session === null) {
     throw new Error(`${account_id} is not signed in on this device`);
   }
@@ -49,8 +49,8 @@ export async function app_page_skill_session_rotate_fun(
     },
   ];
   const options = await session_options_fun(true, account_id);
-  const result = await api_huggies_session_rotate_post(
-    HUGGIES_BASE_URL,
+  const result = await api_shit_1170_session_rotate_post(
+    SHIT_1170_BASE_URL,
     { accounts },
     options,
   );

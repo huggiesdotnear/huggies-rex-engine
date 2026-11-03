@@ -24,11 +24,11 @@
 // reader cannot tell a json memo from a plain one. a code block says
 // "this is json", shows it formatted, and can be copied.
 import { try_parse_json } from "@sleet-js/fastnear-explorer-api-client";
-import { huggies_code_block_fun } from "./code_block";
+import { shit_1170_code_block_fun } from "./code_block";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_transfer_memo_fun(props: {
+export function shit_1170_transfer_memo_fun(props: {
   // the memo the sender attached.
   memo: string;
 }): preact.JSX.Element {
@@ -42,7 +42,7 @@ export function huggies_transfer_memo_fun(props: {
         // --- WHY THE JSON IS RE-SERIALISED AND NOT SHOWN AS IT CAME:
         // the chain stores the memo as one line, and the pretty form
         // is the one a reader can read. the values are the same.
-        huggies_code_block_fun({
+        shit_1170_code_block_fun({
           code: JSON.stringify(parsed, null, 2),
         })
       ) : (

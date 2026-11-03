@@ -1,5 +1,5 @@
 # ========================================
-# huggies-rex-engine — Dockerfile
+# shit-1170 — Dockerfile
 # requires BuildKit for --mount=type=cache.
 #
 # two stages:
@@ -11,7 +11,7 @@
 # it was linked against.
 #
 # NOTE: the vault. the sqlite db lives OUTSIDE the image, in a volume
-# mounted at /home/huggies/.huggies-rex-engine — see DOCS/VAULT.md. the
+# mounted at /home/shit-1170/.shit-1170 — see DOCS/VAULT.md. the
 # image carries no db, so a rebuild never touches the data.
 # ========================================
 # syntax=docker/dockerfile:1.7
@@ -40,7 +40,7 @@ COPY build.ts ./build.ts
 #
 # --- WHY: the workspace install links the local package ---
 # the root package.json declares `workspaces: ["middleman"]`, so
-# `bun install` links `@huggies/huggies-rex-engine-middleman` from
+# `bun install` links `@huggies/shit_1170-middleman` from
 # node_modules/ to middleman/ — no registry round trip.
 RUN bun install
 
@@ -48,7 +48,7 @@ RUN bun install
 #
 # --- WHY: the frontend imports the package by name ---
 # the frontend does `import { api_trezu_treasuries_get } from
-# "@huggies/huggies-rex-engine-middleman"`, and that package's
+# "@huggies/shit_1170-middleman"`, and that package's
 # `exports` field points at `./dist/index.js`. the workspace link
 # alone is not enough: without dist/ the import does not resolve and
 # the frontend build fails with "Could not resolve".
@@ -146,7 +146,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     mkdir -p src \
     && echo "fn main() {}" > src/main.rs \
     && cargo build --release \
-    && rm -rf src target/release/deps/huggies_rex_engine* target/release/huggies-rex-engine
+    && rm -rf src target/release/deps/shit_1170* target/release/shit-1170
 
 # real build. NOTE: no `static/` copy here — `static/` is gitignored and
 # never exists in the build context, and the binary doesn't read it at
@@ -168,8 +168,8 @@ FROM debian:bookworm-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --system --uid 1000 --home /home/huggies \
-        --shell /usr/sbin/nologin huggies
+    && useradd --system --uid 1000 --home /home/shit-1170 \
+        --shell /usr/sbin/nologin shit1170
 
 # --- WHY: the vault folder is created in the image, owned by the app
 # user ---
@@ -179,12 +179,17 @@ RUN apt-get update \
 # exist is created empty and owned by root, and then the app (running
 # as uid 1000) cannot write the db into it.
 #
-# so the folder is created here, owned by the huggies user, and the
+# so the folder is created here, owned by the shit1170 user, and the
 # volume takes that ownership when it is first mounted.
-RUN mkdir -p /home/huggies/.huggies-rex-engine \
-    && chown -R huggies:huggies /home/huggies
+#
+# --- WHY the user is `shit1170` and not `shit-1170` ---
+# a LINUX USER NAME may not contain a hyphen. `useradd` refuses
+# `shit-1170`, and a `chown shit-1170:...` would not resolve. the
+# home FOLDER keeps the hyphen, because that is a path and not a name.
+RUN mkdir -p /home/shit-1170/.shit-1170 \
+    && chown -R shit1170:shit1170 /home/shit-1170
 
-COPY --from=rust-builder /build/target/release/huggies-rex-engine /usr/local/bin/huggies-backend
+COPY --from=rust-builder /build/target/release/shit-1170 /usr/local/bin/shit-1170-backend
 COPY --from=frontend /src/static /app/static
 
 # --- WHY: ServeDir::new("static") is a RELATIVE path ---
@@ -195,17 +200,17 @@ WORKDIR /app
 # defaults baked into the binary: 0.0.0.0:54733. 0.0.0.0 is required
 # inside a container — binding localhost inside the container would
 # make the published port unreachable from the host.
-ENV HUGGIES_HOST=0.0.0.0
-ENV HUGGIES_PORT=54733
-ENV RUST_LOG=huggies_rex_engine=info
+ENV SHIT_1170_HOST=0.0.0.0
+ENV SHIT_1170_PORT=54733
+ENV RUST_LOG=shit_1170=info
 # --- WHY --- the vault path is baked in as the default: the db lives
-# under the user's home, which is /home/huggies in the image, and the
+# under the user's home, which is /home/shit-1170 in the image, and the
 # volume is mounted exactly there. the app's own default is
-# `${HOME}/.huggies-rex-engine/huggies-rex-engine.db`, so it needs no
+# `${HOME}/.shit-1170/shit-1170.db`, so it needs no
 # env at all — this just says where that is.
-ENV HUGGIES_VAULT_DB_LOCATION=/home/huggies/.huggies-rex-engine/huggies-rex-engine.db
+ENV SHIT_1170_VAULT_DB_LOCATION=/home/shit-1170/.shit-1170/shit-1170.db
 EXPOSE 54733
 
-USER huggies
-ENTRYPOINT ["/usr/local/bin/huggies-backend"]
+USER shit1170
+ENTRYPOINT ["/usr/local/bin/shit-1170-backend"]
 # ========================================

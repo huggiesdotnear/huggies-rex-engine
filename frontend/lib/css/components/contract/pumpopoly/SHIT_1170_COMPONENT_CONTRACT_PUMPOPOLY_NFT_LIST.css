@@ -1,0 +1,118 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+   the player's nfts: the count, the sort control, and the gallery of
+   nft tiles. a grid of picture tiles, capped in height and scrolled, so
+   a player with hundreds of nfts does not push the page off. */
+@import url(./error_card.css);
+@import url(./stat_tile.css);
+
+/*==================================*/
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-scroll {
+  /* --- WHY --- taller than the old table's 420px: the tiles are now
+     pictures, and a land is twice as tall as it is wide, so two rows
+     need more room before the scroll starts. */
+  max-height: 620px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* the sort control sits above the gallery, so it needs a little space
+     between itself and the heading above it. */
+  margin-top: 0.5rem;
+}
+/* --- the gallery ---
+   two tiles across.
+   --- WHY --- two and not auto-fill: a pumpopoly land is a tall, narrow
+   picture (80x160 and 80x192 — a 1:2 and a 1:2.4 slice of a board
+   square), so a third column would squeeze them to nothing and a fifth
+   would make the picture unreadable. */
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 2px;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-tile {
+  margin: 0;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+/* --- the picture ---
+   the picture keeps its own shape and is never cropped.
+   --- WHY --- `contain` and not `cover`: the two kinds of nft have
+   different shapes and neither is a square. a land is 80x160 (1:2) and
+   a treasury bond is 1920x1080 (16:9). `cover` would crop the tall
+   land to a square and cut the bond's top and bottom off, so the
+   picture would not be the picture. `contain` shows all of it, and the
+   letterbox is the page background.
+   --- WHY --- the height is not fixed: the tile grows to whatever the
+   picture is, so a tall land and a wide bond both sit whole. */
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-media {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.18);
+}
+/* a token with no picture gets a placeholder box of the same shape as a
+   land, so the gallery keeps its rhythm. */
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-media.is-empty {
+  aspect-ratio: 1 / 2;
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .nft-tile figcaption {
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+}
+/*==================================*/
+/* --- the nft sort control ---
+   the nft list sorts by one thing, so its control is a single
+   full-width button rather than a row of sort keys.
+
+   the shared sort control is an inline-flex that shrinks to its
+   content, and its sort button sets `width:auto` so a row of them can
+   sit side by side. this is one button on its own row, so it is put
+   back to full width here. the fill is restated too: the shared sort
+   button is a small teal pill for a row of little toggles; stretched
+   across the page that same pill is a thin bar of 11px text. */
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .sort-control {
+  display: flex;
+  width: 100%;
+  max-width: 90vw;
+  margin-top: 0.5rem;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST .sort-control .sort-button {
+  width: 100%;
+  max-width: none;
+  flex: 1;
+  padding: 0.7rem 1.1rem;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: #2d2d2d;
+  background: #ffffff;
+  border: 0;
+  border-radius: 8px;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+  .sort-control
+  .sort-button:hover {
+  background: #e9e9e9;
+  color: #2d2d2d;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+  .sort-control
+  .sort-button.is-active,
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST
+  .sort-control
+  .sort-button.is-active:hover {
+  background: #ffffff;
+  color: #2d2d2d;
+}
+/*==================================*/

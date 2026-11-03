@@ -10,17 +10,17 @@
 // --- WHY IT IS ITS OWN STORE: the page shows ONE thing, so the store
 // holds one thing. the account page's store holds four balance tables
 // and the transaction page's holds one transaction.
-import { HUGGIES_APP_PAGE_TX } from "./app_page_tx";
-import { HUGGIES_URL_TX } from "./app_page_tx_url";
-import type { HUGGIES_APP_PAGE_TX_DATA } from "./app_page_tx";
+import { SHIT_1170_APP_PAGE_TX } from "./app_page_tx";
+import { SHIT_1170_URL_TX } from "./app_page_tx_url";
+import type { SHIT_1170_APP_PAGE_TX_DATA } from "./app_page_tx";
 import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what the store holds.
-export interface HUGGIES_APP_PAGE_TX_STATE {
+export interface SHIT_1170_APP_PAGE_TX_STATE {
   // the loaded transaction, or null while it is loading.
-  data: HUGGIES_APP_PAGE_TX_DATA | null;
+  data: SHIT_1170_APP_PAGE_TX_DATA | null;
   // true while a load is running.
   loading: boolean;
   // the error, or null when nothing failed.
@@ -30,12 +30,12 @@ export interface HUGGIES_APP_PAGE_TX_STATE {
 // ========================================
 // --- STATE ------------------------------
 // the empty state the page holds before the first load answers.
-const HUGGIES_EMPTY_STATE: HUGGIES_APP_PAGE_TX_STATE = {
+const SHIT_1170_EMPTY_STATE: SHIT_1170_APP_PAGE_TX_STATE = {
   data: null,
   loading: false,
   error: null,
 };
-let state: HUGGIES_APP_PAGE_TX_STATE = HUGGIES_EMPTY_STATE;
+let state: SHIT_1170_APP_PAGE_TX_STATE = SHIT_1170_EMPTY_STATE;
 // the hash the current load was for, so a second load for the same
 // hash does not start over.
 let loaded_tx_hash: string | null = null;
@@ -66,7 +66,7 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_APP_PAGE_TX_STATE): void {
+function set_state_fun(next: SHIT_1170_APP_PAGE_TX_STATE): void {
   state = next;
   notify_fun();
 }
@@ -83,7 +83,7 @@ function set_state_fun(next: HUGGIES_APP_PAGE_TX_STATE): void {
 // with no `?tx=` is a broken link, and saying so is more useful than
 // showing an empty page.
 async function load_fun(): Promise<void> {
-  const tx_hash = HUGGIES_URL_TX.read();
+  const tx_hash = SHIT_1170_URL_TX.read();
   if (tx_hash === null) {
     set_state_fun({
       data: null,
@@ -96,7 +96,7 @@ async function load_fun(): Promise<void> {
   loaded_tx_hash = tx_hash;
   set_state_fun({ data: null, loading: true, error: null });
   try {
-    const data = await HUGGIES_APP_PAGE_TX.load(tx_hash);
+    const data = await SHIT_1170_APP_PAGE_TX.load(tx_hash);
     // a load for an older hash must not overwrite a newer one.
     if (loaded_tx_hash !== tx_hash) return;
     if (data === null) {
@@ -120,7 +120,7 @@ async function load_fun(): Promise<void> {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_state_fun(): HUGGIES_APP_PAGE_TX_STATE {
+function get_state_fun(): SHIT_1170_APP_PAGE_TX_STATE {
   return state;
 }
 // ========================================
@@ -138,7 +138,7 @@ function get_parsed_fun(): PARSE_RESULT | null {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_TX_STORE = {
+export const SHIT_1170_APP_PAGE_TX_STORE = {
   get: get_state_fun,
   subscribe: subscribe_fun,
   load: load_fun,

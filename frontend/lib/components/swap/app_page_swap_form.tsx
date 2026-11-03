@@ -10,17 +10,17 @@
 // the thin bar between the two cards is the shared switch direction
 // bar, so the page that uses it does not carry its own.
 //
-// mounts into <div id="HUGGIES_COMPONENT_SWAP_FORM">.
+// mounts into <div id="SHIT_1170_COMPONENT_SWAP_FORM">.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
-import { HUGGIES_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
-import { HUGGIES_APP_PAGE_SWAP_EXECUTE } from "../../ts/swap/app_page_swap_execute";
-import { HUGGIES_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
-import { HUGGIES_AUTH } from "../../ts/shared/auth_status";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
+import { SHIT_1170_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
+import { SHIT_1170_APP_PAGE_SWAP_EXECUTE } from "../../ts/swap/app_page_swap_execute";
+import { SHIT_1170_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
+import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { huggies_switch_direction_fun } from "./switch_direction";
+import { shit_1170_switch_direction_fun } from "./switch_direction";
 import {
   human_to_unit_fun,
   human_usd_fun,
@@ -28,12 +28,12 @@ import {
   unit_to_raw_human_fun,
 } from "../../ts/swap/app_page_swap_amount";
 import { swap_box_amount_fun } from "../../ts/swap/app_page_swap_box_amount";
-import type { HUGGIES_TOKEN_INFO } from "../../ts/shared/token_info";
+import type { SHIT_1170_TOKEN_INFO } from "../../ts/shared/token_info";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what one token card shows.
-interface HUGGIES_SWAP_TOKEN_CARD {
+interface SHIT_1170_SWAP_TOKEN_CARD {
   // the token's id.
   id: string;
   // its symbol, or the id when the symbol is unknown.
@@ -59,7 +59,7 @@ interface HUGGIES_SWAP_TOKEN_CARD {
 // balance is information, not a label for the button. keeping them
 // apart means the balance can be small without the button being small.
 function token_card_fun(
-  card: HUGGIES_SWAP_TOKEN_CARD,
+  card: SHIT_1170_SWAP_TOKEN_CARD,
   side: "in" | "out",
 ): preact.JSX.Element {
   return (
@@ -67,7 +67,7 @@ function token_card_fun(
       type="button"
       class="swap-token"
       onClick={() => {
-        void HUGGIES_SWAP_TOKEN_PICKER.open(side);
+        void SHIT_1170_SWAP_TOKEN_PICKER.open(side);
       }}
       title={`choose the ${side === "in" ? "token in" : "token out"}`}
     >
@@ -79,7 +79,7 @@ function token_card_fun(
       <span class="swap-token-copy">
         <strong>{card.symbol}</strong>
         <span class="swap-token-balance">
-          {HUGGIES_AMOUNT_FORMAT.balance(card.balance, {
+          {SHIT_1170_AMOUNT_FORMAT.balance(card.balance, {
             decimals: card.decimals,
           })}
         </span>
@@ -109,7 +109,7 @@ function amount_note_fun(
   const usd =
     human.trim().length === 0
       ? "—"
-      : HUGGIES_AMOUNT_FORMAT.usd(human_usd_fun(human, { price_usd }));
+      : SHIT_1170_AMOUNT_FORMAT.usd(human_usd_fun(human, { price_usd }));
   return (
     <span class="swap-note">
       <code>{raw_human}</code>
@@ -120,36 +120,36 @@ function amount_note_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
+export function SHIT_1170_COMPONENT_SWAP_FORM_FUN() {
   // --- WHY --- the store is read through the shared hook: preact only
   // re-renders a component when its OWN state changes, so the form
   // subscribes to the store and re-renders when it changes.
-  const page = use_page_store_fun(HUGGIES_APP_PAGE_SWAP_STORE);
+  const page = use_page_store_fun(SHIT_1170_APP_PAGE_SWAP_STORE);
 
   const in_info = page.token_in_info;
   const out_info = page.token_out_info;
 
-  const in_card: HUGGIES_SWAP_TOKEN_CARD = {
+  const in_card: SHIT_1170_SWAP_TOKEN_CARD = {
     id: page.token_in,
     symbol: in_info?.symbol ?? page.token_in,
     name: in_info?.symbol ?? page.token_in,
     icon: in_info?.icon ?? null,
     decimals: in_info?.decimals ?? 0,
     price_usd: in_info?.price_usd ?? 0,
-    balance: HUGGIES_APP_PAGE_SWAP_STORE.get_balance(page.token_in),
+    balance: SHIT_1170_APP_PAGE_SWAP_STORE.get_balance(page.token_in),
   };
-  const out_card: HUGGIES_SWAP_TOKEN_CARD = {
+  const out_card: SHIT_1170_SWAP_TOKEN_CARD = {
     id: page.token_out,
     symbol: out_info?.symbol ?? page.token_out,
     name: out_info?.symbol ?? page.token_out,
     icon: out_info?.icon ?? null,
     decimals: out_info?.decimals ?? 0,
     price_usd: out_info?.price_usd ?? 0,
-    balance: HUGGIES_APP_PAGE_SWAP_STORE.get_balance(page.token_out),
+    balance: SHIT_1170_APP_PAGE_SWAP_STORE.get_balance(page.token_out),
   };
 
   // the route the page is showing.
-  const route = HUGGIES_APP_PAGE_SWAP_STORE.get_selected_route();
+  const route = SHIT_1170_APP_PAGE_SWAP_STORE.get_selected_route();
 
   // --- WHY --- THE SIDE THE READER IS FIXING DECIDES WHICH BOX IS
   // FILLED: the reader typed into one box, and the router answered that
@@ -207,7 +207,7 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
   // token. so the check reads the input box's unit amount, which is
   // the reader's number when they fixed the input and the router's
   // answer when they fixed the output.
-  const signed_in = HUGGIES_AUTH.is_signed_in();
+  const signed_in = SHIT_1170_AUTH.is_signed_in();
   const sold_unit = in_box.unit;
   const has_amount = sold_unit !== null && sold_unit !== "0";
   const has_balance =
@@ -218,16 +218,16 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
 
   const on_swap_fun = async () => {
     if (!can_swap || route === null) return;
-    const account_id = HUGGIES_AUTH.get_account_id();
+    const account_id = SHIT_1170_AUTH.get_account_id();
     if (account_id === null) return;
-    const result = await HUGGIES_APP_PAGE_SWAP_EXECUTE.execute(
+    const result = await SHIT_1170_APP_PAGE_SWAP_EXECUTE.execute(
       route.raw,
       page.token_in,
       page.token_out,
       account_id,
     );
     if (result.succeeded) {
-      HUGGIES_TOAST_STORE.show(
+      SHIT_1170_TOAST_STORE.show(
         "success",
         "SWAP DONE",
         result.amount_out === null
@@ -236,14 +236,14 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
         result.tx_hash,
       );
     } else if (result.unknown) {
-      HUGGIES_TOAST_STORE.show(
+      SHIT_1170_TOAST_STORE.show(
         "info",
         "SWAP SENT — CHECK IT",
         result.error,
         result.tx_hash,
       );
     } else {
-      HUGGIES_TOAST_STORE.show(
+      SHIT_1170_TOAST_STORE.show(
         "error",
         "SWAP FAILED",
         result.error,
@@ -264,8 +264,8 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
           placeholder="0.00"
           onInput={(event) => {
             const next = (event.currentTarget as HTMLInputElement).value;
-            HUGGIES_APP_PAGE_SWAP_STORE.set_amount("in", next);
-            void HUGGIES_APP_PAGE_SWAP_STORE.quote();
+            SHIT_1170_APP_PAGE_SWAP_STORE.set_amount("in", next);
+            void SHIT_1170_APP_PAGE_SWAP_STORE.quote();
           }}
         />
         {amount_note_fun(
@@ -276,9 +276,9 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
         )}
       </div>
 
-      {huggies_switch_direction_fun({
+      {shit_1170_switch_direction_fun({
         on_switch: () => {
-          void HUGGIES_APP_PAGE_SWAP_STORE.switch_direction();
+          void SHIT_1170_APP_PAGE_SWAP_STORE.switch_direction();
         },
       })}
 
@@ -292,8 +292,8 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
           placeholder="0.00"
           onInput={(event) => {
             const next = (event.currentTarget as HTMLInputElement).value;
-            HUGGIES_APP_PAGE_SWAP_STORE.set_amount("out", next);
-            void HUGGIES_APP_PAGE_SWAP_STORE.quote();
+            SHIT_1170_APP_PAGE_SWAP_STORE.set_amount("out", next);
+            void SHIT_1170_APP_PAGE_SWAP_STORE.quote();
           }}
         />
         {amount_note_fun(
@@ -328,10 +328,10 @@ export function HUGGIES_COMPONENT_SWAP_FORM_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SWAP_FORM;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_SWAP_FORM;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SWAP_FORM_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_SWAP_FORM_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

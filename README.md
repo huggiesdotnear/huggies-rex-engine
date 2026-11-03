@@ -1,4 +1,4 @@
-# huggies-rex-engine
+# shit-1170
 
 💩 shit-1170.near agentic and defi engine
 
@@ -20,7 +20,7 @@ cargo check
 cargo run
 # cargo build
 cargo build --release
-./target/release/huggies-rex-engine
+./target/release/shit-1170
 ```
 
 =====================

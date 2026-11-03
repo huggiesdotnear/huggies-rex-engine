@@ -10,8 +10,8 @@ import {
   format_near_with_unit,
   time_ago,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_TX_STORE } from "../../ts/tx/app_page_tx_store";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_TX_STORE } from "../../ts/tx/app_page_tx_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
 // ========================================
@@ -65,8 +65,8 @@ function status_fun(is_success: boolean | null): {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_TX_SUMMARY_FUN() {
-  const state = use_page_store_fun(HUGGIES_APP_PAGE_TX_STORE);
+export function SHIT_1170_COMPONENT_TX_SUMMARY_FUN() {
+  const state = use_page_store_fun(SHIT_1170_APP_PAGE_TX_STORE);
   const data = state.data;
   // no transaction yet — there is nothing to show.
   if (data === null) return null;
@@ -164,10 +164,10 @@ export function HUGGIES_COMPONENT_TX_SUMMARY_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TX_SUMMARY;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TX_SUMMARY;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_TX_SUMMARY_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_TX_SUMMARY_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

@@ -1,6 +1,7 @@
 # RULES
 
 GENERAL RULES
+
 - one function per file, clean clear snake_case naming for functions, and file name should match function name.
 - `========================================` comments at the top of the file between import statements, and at the bottom of the file, and in various places in the html files. never remove these comments.
 - please no camel case only snake_case or SCREAMING_SNAKE.
@@ -38,7 +39,6 @@ layout changes, GOLD.md changes, not this file.
 - i am sure i mentioned this somewhere but we have clean clear separation of logic, the middleman should never import from the frontend logic or have any frontend specific logic. when i am working on the frontend and i ask to add features we may need to add backend or middleman logic. if i ask to remove something from a page only stuff in the frontend should be touched, remove the css and logic for that feature. do not touch the middleman or backend logic for that unless i say or ask first.
 - if working on the UI and the human asks about working on something in the UI, be sure to be informative about what the component mount id is and such, as they may not be able to look at the code, and so they may not be clear when they tell you to fix something in the UI
 - always tell the user at the end of your work, very briefly, what files you touched and whether they were backend, frontend, or middleman
-
 
 =====================
 <br/>

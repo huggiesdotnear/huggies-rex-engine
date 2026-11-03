@@ -5,18 +5,18 @@ all commands below are run from the project root.
 ## build image
 
 ```sh
-docker build -t huggies-rex-engine -f DOCKER/Dockerfile .
+docker build -t shit-1170 -f DOCKER/Dockerfile .
 ```
 
 ## run container
 
 ```sh
 docker run --rm -it \
-  --name huggies-rex-engine-fullstack-backend \
+  --name shit-1170-fullstack-backend \
   -p 54733:54733 \
-  -e HUGGIES_HOST=0.0.0.0 \
-  -e HUGGIES_PORT=54733 \
-  huggies-rex-engine
+  -e SHIT_1170_HOST=0.0.0.0 \
+  -e SHIT_1170_PORT=54733 \
+  shit-1170
 ```
 
 ## docker compose
@@ -47,7 +47,7 @@ hostname you set up in the cloudflare dashboard.
 two cloudflare-side things have to match:
 
 1. the tunnel's **service URL** for the published route must be
-   `http://huggies-rex-engine-fullstack-backend:54733` — the container
+   `http://shit-1170-fullstack-backend:54733` — the container
    name, not `localhost`. cloudflared runs as its own container, so
    `localhost` there is a different machine.
 2. the token in `.env` is the one from the tunnel's docker install
@@ -56,7 +56,7 @@ two cloudflare-side things have to match:
    `docker-compose.yml` passes `.env` straight through.
 
 to debug over plain http instead, uncomment the `ports:` block on the
-`huggies-backend` service in `docker-compose.yml`, then open
+`shit-1170-backend` service in `docker-compose.yml`, then open
 `http://localhost:54733` (sign-in works there because localhost is a
 secure context).
 
@@ -64,11 +64,14 @@ secure context).
 
 - the frontend is baked into the image at `/app/static` — no host volume
   is needed for it.
-- the sqlite db lives in the named volume `huggies-vault`, mounted at
-  `/home/huggies/.huggies-rex-engine`. it survives `docker compose down`
+- the sqlite db lives in the named volume `shit-1170-vault`, mounted at
+  `/home/shit-1170/.shit-1170`. it survives `docker compose down`
   and a rebuild. **never delete it** — it holds the session keys.
-  the location can be moved with `HUGGIES_VAULT_DB_LOCATION`; see
+  the location can be moved with `SHIT_1170_VAULT_DB_LOCATION`; see
   [`DOCS/VAULT.md`](../DOCS/VAULT.md).
+  the volume is declared with an explicit `name:`, so it always resolves
+  to the one host volume that holds the data, whatever the compose
+  project is called.
 - the binary binds `0.0.0.0:54733` inside the container so cloudflared can
   reach it over the compose network by container name. no host port is
   published.

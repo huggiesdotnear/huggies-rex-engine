@@ -9,38 +9,39 @@
 // the shape is the same as lib/ts/token_page_token_state.ts: plain
 // module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
-import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "./token_page_shit_1170";
-import type { HUGGIES_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
-import type { HUGGIES_SHIT_HOLDER } from "./token_page_shit_1170_holders";
-import type { HUGGIES_SHIT_HOLDER_ROW_TYPE } from "./token_page_shit_1170_known_holders";
+import { SHIT_1170_TOKEN_PAGE_SHIT_1170 } from "./token_page_shit_1170";
+import type { SHIT_1170_SHIT_SUMMARY } from "./token_page_shit_1170_summary";
+import type { SHIT_1170_SHIT_HOLDER } from "./token_page_shit_1170_holders";
+import type { SHIT_1170_SHIT_HOLDER_ROW_TYPE } from "./token_page_shit_1170_known_holders";
 // ========================================
 // ========================================
 // --- TYPES -----------------------------
 // the filter currently applied to the holder list. it is a holder ROW
 // type ("dev"|"dex"|"vault"|"nft"|"burn"|"regular") or "all".
-export type HUGGIES_SHIT_ACTIVE_FILTER = HUGGIES_SHIT_HOLDER_ROW_TYPE | "all";
+export type SHIT_1170_SHIT_ACTIVE_FILTER =
+  SHIT_1170_SHIT_HOLDER_ROW_TYPE | "all";
 // ========================================
 // the page's state. the empty state is what the page holds before the
 // first load answers.
-export interface HUGGIES_SHIT_1170_STATE {
+export interface SHIT_1170_STATE {
   // the token's summary, once it has loaded. it carries the price, so
   // the page needs no separate price request.
-  summary: HUGGIES_SHIT_SUMMARY | null;
+  summary: SHIT_1170_SHIT_SUMMARY | null;
   // the holder rows loaded so far.
-  holders: HUGGIES_SHIT_HOLDER[];
+  holders: SHIT_1170_SHIT_HOLDER[];
   holder_total: number;
   // the cursor for the next holder page, or null when there is none.
   next_cursor: string | null;
   loading_more: boolean;
   // the filter the reader picked.
-  active_filter: HUGGIES_SHIT_ACTIVE_FILTER;
+  active_filter: SHIT_1170_SHIT_ACTIVE_FILTER;
   loading: boolean;
   error: string | null;
 }
 // ========================================
 // --- STATE ------------------------------
 // the empty state the page starts from.
-let state: HUGGIES_SHIT_1170_STATE = {
+let state: SHIT_1170_STATE = {
   summary: null,
   holders: [],
   holder_total: 0,
@@ -69,13 +70,13 @@ function notify_fun(): void {
 }
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_SHIT_1170_STATE): void {
+function set_state_fun(next: SHIT_1170_STATE): void {
   state = next;
   notify_fun();
 }
 // ========================================
 // --- READ ------------------------------
-function get_state_fun(): HUGGIES_SHIT_1170_STATE {
+function get_state_fun(): SHIT_1170_STATE {
   return state;
 }
 // ========================================
@@ -108,7 +109,7 @@ function reset_fun(): void {
 // --- WHY --- the filter lives in the store rather than in the filters
 // component's own state: the groups breakdown highlights the group of the
 // ACTIVE filter, so both components have to read the same filter.
-function set_active_filter_fun(filter: HUGGIES_SHIT_ACTIVE_FILTER): void {
+function set_active_filter_fun(filter: SHIT_1170_SHIT_ACTIVE_FILTER): void {
   if (state.active_filter === filter) return;
   set_state_fun({ ...state, active_filter: filter });
 }
@@ -127,12 +128,12 @@ async function token_page_shit_1170_state_load_fun(): Promise<void> {
   reset_fun();
   notify_fun();
   try {
-    const summary = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_summary();
+    const summary = await SHIT_1170_TOKEN_PAGE_SHIT_1170.load_summary();
     const price_usd = summary?.price_usd ?? 0;
-    const total_supply_raw = HUGGIES_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
+    const total_supply_raw = SHIT_1170_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
       summary?.total_supply_raw ?? "0",
     );
-    const page = await HUGGIES_TOKEN_PAGE_SHIT_1170.load_holders(
+    const page = await SHIT_1170_TOKEN_PAGE_SHIT_1170.load_holders(
       null,
       price_usd,
       summary?.decimals ?? 18,
@@ -161,7 +162,7 @@ async function token_page_shit_1170_state_load_fun(): Promise<void> {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_TOKEN_PAGE_SHIT_1170_STATE = {
+export const SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,

@@ -25,12 +25,12 @@
 // for the life of a token, so it belongs with the durable half.
 // ========================================
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
-import { HUGGIES_EMOJI_TOKENS } from "./app_page_game_emoji_tokens";
+import { SHIT_1170_EMOJI_TOKENS } from "./app_page_game_emoji_tokens";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // everything the game page has loaded.
-export interface HUGGIES_APP_PAGE_GAME_DATA {
+export interface SHIT_1170_APP_PAGE_GAME_DATA {
   // the token icons, by token id. a token with no icon is simply
   // absent, and its card falls back to the emoji.
   icons: Record<string, string>;
@@ -42,7 +42,7 @@ export interface HUGGIES_APP_PAGE_GAME_DATA {
 // --- WHY --- the meme-cooking entry is dropped: it is a dao and not a
 // token, so it has no token id and no icon.
 function game_token_ids_fun(): string[] {
-  return HUGGIES_EMOJI_TOKENS.map((token) => token.token_id).filter(
+  return SHIT_1170_EMOJI_TOKENS.map((token) => token.token_id).filter(
     (token_id): token_id is string => token_id !== null,
   );
 }
@@ -51,7 +51,7 @@ function game_token_ids_fun(): string[] {
 // --- WHY --- a failure here is not a broken page: the emoji IS the
 // fallback, so a failed load leaves the game fully playable with the
 // emoji alone. nothing on the board depends on the error.
-async function app_page_game_load_fun(): Promise<HUGGIES_APP_PAGE_GAME_DATA> {
+async function app_page_game_load_fun(): Promise<SHIT_1170_APP_PAGE_GAME_DATA> {
   const ids = game_token_ids_fun();
   if (ids.length === 0) return { icons: {}, errors: [] };
   try {
@@ -68,7 +68,7 @@ async function app_page_game_load_fun(): Promise<HUGGIES_APP_PAGE_GAME_DATA> {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_GAME = {
+export const SHIT_1170_APP_PAGE_GAME = {
   load: app_page_game_load_fun,
 };
 // ========================================

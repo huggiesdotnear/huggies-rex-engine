@@ -23,12 +23,12 @@
 // is in place BEFORE the page's load, not merely by the time the
 // component mounts — and a call cannot be dropped by the bundler the
 // way an unused import can.
-import { HUGGIES_LOADING_BAR } from "./loading_bar";
+import { SHIT_1170_LOADING_BAR } from "./loading_bar";
 // ========================================
 // ========================================
 // --- START -----------------------------
-export function huggies_loading_bar_start_fun(): void {
-  HUGGIES_LOADING_BAR.install();
+export function shit_1170_loading_bar_start_fun(): void {
+  SHIT_1170_LOADING_BAR.install();
 }
 // ========================================
 // copyright 2026 by sleet.near

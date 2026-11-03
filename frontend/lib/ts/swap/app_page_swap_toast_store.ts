@@ -21,7 +21,7 @@ import { tx_detail_href_fun } from "../shared/tx_link";
 // ========================================
 // --- TYPES ------------------------------
 // one toast.
-export interface HUGGIES_TOAST {
+export interface SHIT_1170_TOAST {
   // the toast's own id, so the same message twice is still two toasts.
   id: number;
   // what kind of toast this is: "success", "error" or "info".
@@ -41,13 +41,13 @@ export interface HUGGIES_TOAST {
 // --- WHY --- long enough to read a link, short enough that a pile of
 // them does not cover the page. a toast with a transaction link is
 // worth clicking, so it gets a moment longer than one without.
-const HUGGIES_TOAST_MS = 6000;
-const HUGGIES_TOAST_WITH_LINK_MS = 9000;
+const SHIT_1170_TOAST_MS = 6000;
+const SHIT_1170_TOAST_WITH_LINK_MS = 9000;
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // the toasts on the screen, oldest first.
-let toasts: HUGGIES_TOAST[] = [];
+let toasts: SHIT_1170_TOAST[] = [];
 // the counter behind the toast ids.
 let next_id = 1;
 // the plain array so subscribe/unsubscribe ordering is stable.
@@ -93,7 +93,7 @@ function dismiss_fun(id: number): void {
 // the toast can be dismissed the same way whether the reader closed it
 // or the timer ran out.
 function show_fun(
-  kind: HUGGIES_TOAST["kind"],
+  kind: SHIT_1170_TOAST["kind"],
   title: string,
   detail: string | null = null,
   tx_hash: string | null = null,
@@ -102,14 +102,15 @@ function show_fun(
   next_id += 1;
   toasts = [...toasts, { id, kind, title, detail, tx_hash }];
   notify_fun();
-  const life = tx_hash === null ? HUGGIES_TOAST_MS : HUGGIES_TOAST_WITH_LINK_MS;
+  const life =
+    tx_hash === null ? SHIT_1170_TOAST_MS : SHIT_1170_TOAST_WITH_LINK_MS;
   setTimeout(() => dismiss_fun(id), life);
   return id;
 }
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_fun(): ReadonlyArray<HUGGIES_TOAST> {
+function get_fun(): ReadonlyArray<SHIT_1170_TOAST> {
   return toasts;
 }
 // ========================================
@@ -124,7 +125,7 @@ function tx_link_fun(tx_hash: string): string {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_TOAST_STORE = {
+export const SHIT_1170_TOAST_STORE = {
   show: show_fun,
   dismiss: dismiss_fun,
   subscribe: subscribe_fun,

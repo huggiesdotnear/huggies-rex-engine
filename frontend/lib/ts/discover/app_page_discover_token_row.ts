@@ -15,7 +15,7 @@
 // --- SHAPE ------------------------------
 // `icon` is filled in separately — it is a full inline data uri and is
 // fetched only for the rows on screen, then cached durably.
-export interface HUGGIES_DISCOVER_TOKEN_ROW {
+export interface SHIT_1170_DISCOVER_TOKEN_ROW {
   id: string;
   name: string;
   symbol: string;

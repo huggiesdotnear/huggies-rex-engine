@@ -38,17 +38,17 @@ use std::time::Duration;
 //
 // --- WHY --- it is small: sqlite serializes writes anyway, and this app
 // has a handful of users. a big pool would only add lock contention.
-const HUGGIES_DB_MAX_CONNECTIONS: u32 = 5;
+const SHIT_1170_DB_MAX_CONNECTIONS: u32 = 5;
 // how long a connection waits for the pool to hand it out.
-const HUGGIES_DB_ACQUIRE_TIMEOUT: Duration = Duration::from_secs(10);
+const SHIT_1170_DB_ACQUIRE_TIMEOUT: Duration = Duration::from_secs(10);
 // how long a statement waits for the write lock before giving up.
-const HUGGIES_DB_BUSY_TIMEOUT: Duration = Duration::from_secs(5);
+const SHIT_1170_DB_BUSY_TIMEOUT: Duration = Duration::from_secs(5);
 // ========================================
 // --- OPEN -------------------------------
 // open the pool at the db file's path and bring the schema up to date.
 //
 // --- WHY --- the parent folder is created first: a fresh install has no
-// `${HOME}/.huggies-rex-engine/` yet, and sqlite cannot create it.
+// `${HOME}/.shit-1170/` yet, and sqlite cannot create it.
 pub async fn db_open_fun(path: &Path) -> Result<SqlitePool, sqlx::Error> {
     if let Some(parent) = path.parent()
         && !parent.as_os_str().is_empty()
@@ -66,11 +66,11 @@ pub async fn db_open_fun(path: &Path) -> Result<SqlitePool, sqlx::Error> {
         // sqlite leaves foreign keys off by default.
         .foreign_keys(true)
         // a write that finds the lock taken waits here instead of failing.
-        .busy_timeout(HUGGIES_DB_BUSY_TIMEOUT);
+        .busy_timeout(SHIT_1170_DB_BUSY_TIMEOUT);
 
     let pool = SqlitePoolOptions::new()
-        .max_connections(HUGGIES_DB_MAX_CONNECTIONS)
-        .acquire_timeout(HUGGIES_DB_ACQUIRE_TIMEOUT)
+        .max_connections(SHIT_1170_DB_MAX_CONNECTIONS)
+        .acquire_timeout(SHIT_1170_DB_ACQUIRE_TIMEOUT)
         .connect_with(options)
         .await?;
 

@@ -5,14 +5,14 @@ the page shows one random slogan in the middle of the screen, then sends the bro
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <!--==========================================-->
   <!--==========================================-->
   <!--==========================================-->
   <main>
-    <p id="HUGGIES_COMPONENT_RANDOM_SLOGAN_P"></p>
+    <p id="SHIT_1170_COMPONENT_RANDOM_SLOGAN_P"></p>
     <!--==========================================-->
   </main>
   <!--==========================================-->

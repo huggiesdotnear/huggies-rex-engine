@@ -5,25 +5,25 @@ the page shows one pumpopoly player account info, taken from the `?id=` url para
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <main>
     <h1>PUMPOPOLY</h1>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_ACCOUNT_SELECTOR"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_NFT_LIST"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_CONTRACT_PUMPOPOLY_INVITE"></div>
+    <div id="SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_INVITE"></div>
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
   <!--script-->
   <script src="../../lib/ts/import-contract-pumpopoly.ts"></script>

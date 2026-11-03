@@ -12,14 +12,14 @@
 // --- WHY --- the store subscribes to the page's account id: the id can
 // change under the page — the reader signs in, signs out, or the id in
 // the url changes. the store loads the new id by itself.
-import { HUGGIES_APP_PAGE_ACCOUNT } from "./app_page_account_balances";
-import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
-import type { HUGGIES_APP_PAGE_ACCOUNT_DATA } from "./app_page_account_balances";
+import { SHIT_1170_APP_PAGE_ACCOUNT } from "./app_page_account_balances";
+import { SHIT_1170_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
+import type { SHIT_1170_APP_PAGE_ACCOUNT_DATA } from "./app_page_account_balances";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // null until the load finishes. components render nothing until then.
-let data: HUGGIES_APP_PAGE_ACCOUNT_DATA | null = null;
+let data: SHIT_1170_APP_PAGE_ACCOUNT_DATA | null = null;
 // --- WHY --- the account id lives here as well as in the id module: the
 // components need it to build their links and to know whether there is
 // an account at all.
@@ -65,7 +65,7 @@ function subscribe_fun(listener: () => void): () => void {
 // account id itself and watches it, so the page loads whatever the id
 // says.
 async function app_page_account_store_load_fun(): Promise<void> {
-  const next_account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
+  const next_account_id = SHIT_1170_APP_PAGE_ACCOUNT_ID.get_account_id();
   // --- WHY --- the id is stored even when there is none: the
   // components read it to know there is nothing to show.
   if (account_id !== next_account_id) {
@@ -80,7 +80,7 @@ async function app_page_account_store_load_fun(): Promise<void> {
   data = null;
   notify_fun();
   try {
-    const result = await HUGGIES_APP_PAGE_ACCOUNT.load(load_account_id);
+    const result = await SHIT_1170_APP_PAGE_ACCOUNT.load(load_account_id);
     // a load for an older account id must not overwrite a newer one.
     if (loaded_account_id !== load_account_id) return;
     data = result;
@@ -107,8 +107,8 @@ async function app_page_account_store_load_fun(): Promise<void> {
 function app_page_account_store_watch_fun(): void {
   if (watching) return;
   watching = true;
-  const unsubscribe = HUGGIES_APP_PAGE_ACCOUNT_ID.subscribe(() => {
-    void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
+  const unsubscribe = SHIT_1170_APP_PAGE_ACCOUNT_ID.subscribe(() => {
+    void SHIT_1170_APP_PAGE_ACCOUNT_STORE.load();
   });
   // the subscription lives as long as the page does, so it is never
   // unsubscribed. the module is loaded once per document.
@@ -116,7 +116,7 @@ function app_page_account_store_watch_fun(): void {
 }
 // ========================================
 // --- READ ------------------------------
-function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_DATA | null {
+function get_fun(): SHIT_1170_APP_PAGE_ACCOUNT_DATA | null {
   return data;
 }
 // ========================================
@@ -134,7 +134,7 @@ function is_loading_fun(): boolean {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_ACCOUNT_STORE = {
+export const SHIT_1170_APP_PAGE_ACCOUNT_STORE = {
   load: app_page_account_store_load_fun,
   subscribe: subscribe_fun,
   get: get_fun,

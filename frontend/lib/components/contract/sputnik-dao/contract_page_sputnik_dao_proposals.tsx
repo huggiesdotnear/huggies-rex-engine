@@ -21,11 +21,11 @@
 // ========================================
 import { render } from "preact";
 import { useState as use_state } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_DAO_PAGE_STATE } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_DAO_PAGE_STATE } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao_state";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../../ts/shared/app_depth";
-import type { HUGGIES_DAO_PROPOSAL } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao";
+import type { SHIT_1170_DAO_PROPOSAL } from "../../../ts/contract/sputnik-dao/contract_page_sputnik_dao";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -101,7 +101,7 @@ function read_call_args_fun(args: string): string {
 // card stays a card, and each kind's own facts sit in the same place
 // whatever the kind is.
 function proposal_detail_fun(
-  proposal: HUGGIES_DAO_PROPOSAL,
+  proposal: SHIT_1170_DAO_PROPOSAL,
   depth: number,
 ): preact.JSX.Element | null {
   const detail = proposal.detail;
@@ -264,13 +264,13 @@ function proposal_detail_fun(
 }
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
+function SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
   // the proposals the reader has opened, and the status they are
   // filtering by. "all" shows every one.
   const [open_ids, set_open_ids] = use_state<number[]>([]);
   const [filter, set_filter] = use_state<string>("all");
 
-  const state = use_page_store_fun(HUGGIES_DAO_PAGE_STATE);
+  const state = use_page_store_fun(SHIT_1170_DAO_PAGE_STATE);
   const dao = state.dao;
   if (dao === null) return null;
 
@@ -438,11 +438,11 @@ function HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_SPUTNIK_DAO_PROPOSALS_FUN />, el);
   }
 }
 // ========================================

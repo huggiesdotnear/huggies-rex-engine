@@ -8,37 +8,37 @@ routes and pages
 every route under `/api/` is prefixed with the api it fronts, so the
 url alone says which backend the route belongs to:
 
-- `/api/huggies/*` - our own routes, nothing is proxied
+- `/api/shit-1170/*` - our own routes, nothing is proxied
 - `/api/trezu/*` - our proxy for the trezu api
 
 a route with more than one bullet point gets its own file in
 [`ROUTES/`](./ROUTES/).
 
-### `/api/huggies/` - huggies specifics
+### `/api/shit-1170/` - shit-1170 specifics
 
 user info and session managmnets
 
-- `/api/huggies/ping` - liveness check, returns `{ "ok": true, "app": "huggies-rex-engine" }`
+- `/api/shit-1170/ping` - liveness check, returns `{ "ok": true, "app": "shit-1170" }`
 
-  the typed client is `api_huggies_ping_get(base_url)`. it is named
+  the typed client is `api_shit_1170_ping_get(base_url)`. it is named
   after us because it is OUR route — nothing is proxied through it.
 
-- `/api/huggies/sessions` - turn signed messages into a session key.
+- `/api/shit-1170/sessions` - turn signed messages into a session key.
   `POST`. the browser sends every account it holds a signed message for,
   the backend verifies each one, and the answer is the ONE session key
   the user has.
 
-  see [`ROUTES/huggies-sessions.md`](./ROUTES/huggies-sessions.md)
+  see [`ROUTES/shit-1170-sessions.md`](./ROUTES/shit-1170-sessions.md)
 
-- `/api/huggies/session/me` - who does this session key belong to.
+- `/api/shit-1170/session/me` - who does this session key belong to.
   `GET`. the key travels in the `x-session-token` header.
 
-  see [`ROUTES/huggies-session-me.md`](./ROUTES/huggies-session-me.md)
+  see [`ROUTES/shit-1170-session-me.md`](./ROUTES/shit-1170-session-me.md)
 
-- `/api/huggies/session/rotate` - give an account a NEW session key.
+- `/api/shit-1170/session/rotate` - give an account a NEW session key.
   `POST`. the old key stops working at once.
 
-  see [`ROUTES/huggies-session-rotate.md`](./ROUTES/huggies-session-rotate.md)
+  see [`ROUTES/shit-1170-session-rotate.md`](./ROUTES/shit-1170-session-rotate.md)
 
 ### `/api/trezu/` - trezu specifics
 

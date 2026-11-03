@@ -15,15 +15,16 @@
 // ========================================
 // the holder types a KNOWN account can carry — the same five values the
 // source map uses.
-export type HUGGIES_SHIT_HOLDER_TYPE = "dev" | "dex" | "vault" | "nft" | "burn";
+export type SHIT_1170_SHIT_HOLDER_TYPE =
+  "dev" | "dex" | "vault" | "nft" | "burn";
 
 // the type shown for a holder that is not in the map below.
-export const HUGGIES_SHIT_HOLDER_TYPE_REGULAR = "regular" as const;
+export const SHIT_1170_SHIT_HOLDER_TYPE_REGULAR = "regular" as const;
 // the type of a holder ROW: a known type, or the regular fallback.
-export type HUGGIES_SHIT_HOLDER_ROW_TYPE =
-  HUGGIES_SHIT_HOLDER_TYPE | typeof HUGGIES_SHIT_HOLDER_TYPE_REGULAR;
+export type SHIT_1170_SHIT_HOLDER_ROW_TYPE =
+  SHIT_1170_SHIT_HOLDER_TYPE | typeof SHIT_1170_SHIT_HOLDER_TYPE_REGULAR;
 // ========================================
-const KNOWN_HOLDERS_ACCOUNTS: Record<string, HUGGIES_SHIT_HOLDER_TYPE> = {
+const KNOWN_HOLDERS_ACCOUNTS: Record<string, SHIT_1170_SHIT_HOLDER_TYPE> = {
   "sleet.near": "dev",
   "vault.huggies.near": "vault",
   "growth.huggies.near": "vault",
@@ -32,7 +33,7 @@ const KNOWN_HOLDERS_ACCOUNTS: Record<string, HUGGIES_SHIT_HOLDER_TYPE> = {
   "baby.huggies.near": "vault",
   "huggies.sputnik-dao.near": "vault",
   "ref.huggies.near": "vault",
-  // "shitbyhuggies.tipbot.intear.near": "vault",
+  // "shitbyshit-1170.tipbot.intear.near": "vault",
   "huggies.near": "vault",
   "sleet_mainnet_test_yes_doxing_myself_sorry_for_rugs.near": "dev",
   "nonresistant.near": "dev",
@@ -63,8 +64,10 @@ const KNOWN_HOLDERS_ACCOUNTS: Record<string, HUGGIES_SHIT_HOLDER_TYPE> = {
 // classify one account id, falling back to the regular holder type.
 export function shit_holder_type_fun(
   account_id: string,
-): HUGGIES_SHIT_HOLDER_ROW_TYPE {
-  return KNOWN_HOLDERS_ACCOUNTS[account_id] ?? HUGGIES_SHIT_HOLDER_TYPE_REGULAR;
+): SHIT_1170_SHIT_HOLDER_ROW_TYPE {
+  return (
+    KNOWN_HOLDERS_ACCOUNTS[account_id] ?? SHIT_1170_SHIT_HOLDER_TYPE_REGULAR
+  );
 }
 // ========================================
 // copyright 2026 by sleet.near

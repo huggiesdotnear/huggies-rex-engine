@@ -11,21 +11,21 @@
 // the amount it was asked about, and the balance belongs to the token
 // the card is showing. splitting them into separate stores would let
 // one show a route for a pair the others have already moved on from.
-import { HUGGIES_APP_PAGE_SWAP_URL } from "./app_page_swap_url";
-import { HUGGIES_APP_PAGE_SWAP_BALANCES } from "./app_page_swap_balances";
-import { HUGGIES_APP_PAGE_SWAP_ROUTES } from "./app_page_swap_routes";
-import { HUGGIES_TOKEN_INFO } from "../shared/token_info";
-import { HUGGIES_AUTH } from "../shared/auth_status";
-import { HUGGIES_NEAR_ID } from "../shared/token_near";
+import { SHIT_1170_APP_PAGE_SWAP_URL } from "./app_page_swap_url";
+import { SHIT_1170_APP_PAGE_SWAP_BALANCES } from "./app_page_swap_balances";
+import { SHIT_1170_APP_PAGE_SWAP_ROUTES } from "./app_page_swap_routes";
+import { SHIT_1170_TOKEN_INFO } from "../shared/token_info";
+import { SHIT_1170_AUTH } from "../shared/auth_status";
+import { SHIT_1170_NEAR_ID } from "../shared/token_near";
 import { human_to_unit_fun, unit_to_human_fun } from "./app_page_swap_amount";
-import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../shared/token_info";
-import type { HUGGIES_SWAP_ROUTE } from "./app_page_swap_routes";
-import type { HUGGIES_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
+import type { SHIT_1170_TOKEN_INFO as TOKEN_INFO } from "../shared/token_info";
+import type { SHIT_1170_SWAP_ROUTE } from "./app_page_swap_routes";
+import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // the whole state of the swap page.
-export interface HUGGIES_APP_PAGE_SWAP_STATE {
+export interface SHIT_1170_APP_PAGE_SWAP_STATE {
   // the token being sold.
   token_in: string;
   // the token being bought.
@@ -40,14 +40,14 @@ export interface HUGGIES_APP_PAGE_SWAP_STATE {
   // --- WHY --- the page quotes on ONE side at a time, because the
   // router answers one question at a time. the reader says which
   // question they are asking by typing into that side's box.
-  amount_side: HUGGIES_SWAP_AMOUNT_SIDE;
+  amount_side: SHIT_1170_SWAP_AMOUNT_SIDE;
   // the info for the two tokens, once they are known.
   token_in_info: TOKEN_INFO | null;
   token_out_info: TOKEN_INFO | null;
   // the raw balances of the two tokens, in their smallest units.
   balances: ReadonlyMap<string, string>;
   // the routes the aggregator quoted, best first.
-  routes: ReadonlyArray<HUGGIES_SWAP_ROUTE>;
+  routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>;
   // the route the reader picked, or null when the best one is in use.
   selected_dex_id: string | null;
   // true while a quote is in flight.
@@ -68,15 +68,15 @@ export interface HUGGIES_APP_PAGE_SWAP_STATE {
 // the one every wallet holds, so the pair a reader can actually trade
 // is the one the page opens on. the reader picks their own pair with
 // the token picker.
-const HUGGIES_SWAP_DEFAULT_TOKEN_IN = HUGGIES_NEAR_ID;
-const HUGGIES_SWAP_DEFAULT_TOKEN_OUT = "shit-1170.meme-cooking.near";
+const SHIT_1170_SWAP_DEFAULT_TOKEN_IN = SHIT_1170_NEAR_ID;
+const SHIT_1170_SWAP_DEFAULT_TOKEN_OUT = "shit-1170.meme-cooking.near";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // the state the page holds.
-let state: HUGGIES_APP_PAGE_SWAP_STATE = {
-  token_in: HUGGIES_SWAP_DEFAULT_TOKEN_IN,
-  token_out: HUGGIES_SWAP_DEFAULT_TOKEN_OUT,
+let state: SHIT_1170_APP_PAGE_SWAP_STATE = {
+  token_in: SHIT_1170_SWAP_DEFAULT_TOKEN_IN,
+  token_out: SHIT_1170_SWAP_DEFAULT_TOKEN_OUT,
   amount_in: "",
   amount_out: "",
   amount_side: "in",
@@ -99,7 +99,7 @@ let quoted_token_out: string | null = null;
 let quoted_amount_in: string | null = null;
 // the side the live quote was asked for. a quote on the other side is
 // about a different question, so it must not overwrite this one.
-let quoted_amount_side: HUGGIES_SWAP_AMOUNT_SIDE = "in";
+let quoted_amount_side: SHIT_1170_SWAP_AMOUNT_SIDE = "in";
 // the unit amount the url carried on the first load, waiting for the
 // token's decimals.
 //
@@ -110,7 +110,7 @@ let quoted_amount_side: HUGGIES_SWAP_AMOUNT_SIDE = "in";
 // info lands, and is turned into the human amount the box shows then.
 let pending_url_unit: string | null = null;
 // the side the pending unit amount belongs to.
-let pending_url_side: HUGGIES_SWAP_AMOUNT_SIDE = "in";
+let pending_url_side: SHIT_1170_SWAP_AMOUNT_SIDE = "in";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -137,7 +137,7 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // write the state and tell everyone.
-function set_state_fun(next: HUGGIES_APP_PAGE_SWAP_STATE): void {
+function set_state_fun(next: SHIT_1170_APP_PAGE_SWAP_STATE): void {
   state = next;
   notify_fun();
 }
@@ -151,8 +151,8 @@ function set_state_fun(next: HUGGIES_APP_PAGE_SWAP_STATE): void {
 // swaps, so a reader who shares or reloads the page gets the same pair
 // back.
 function read_tokens_fun(): { token_in: string; token_out: string } {
-  const from_url_in = HUGGIES_APP_PAGE_SWAP_URL.read_in();
-  const from_url_out = HUGGIES_APP_PAGE_SWAP_URL.read_out();
+  const from_url_in = SHIT_1170_APP_PAGE_SWAP_URL.read_in();
+  const from_url_out = SHIT_1170_APP_PAGE_SWAP_URL.read_out();
   return {
     token_in: from_url_in ?? state.token_in,
     token_out: from_url_out ?? state.token_out,
@@ -177,9 +177,9 @@ function read_tokens_fun(): { token_in: string; token_out: string } {
 // token's decimals once the token info has landed.
 function read_amount_fun(): {
   unit: string | null;
-  side: HUGGIES_SWAP_AMOUNT_SIDE;
+  side: SHIT_1170_SWAP_AMOUNT_SIDE;
 } {
-  const from_url = HUGGIES_APP_PAGE_SWAP_URL.read_amount();
+  const from_url = SHIT_1170_APP_PAGE_SWAP_URL.read_amount();
   return { unit: from_url.unit, side: from_url.side };
 }
 // ========================================
@@ -195,14 +195,14 @@ async function load_tokens_and_balances_fun(
   set_state_fun({ ...state, loading_balances: true });
   try {
     const ids = [token_in, token_out];
-    const info_map = await HUGGIES_TOKEN_INFO.get(ids);
-    const account_id = HUGGIES_AUTH.get_account_id();
+    const info_map = await SHIT_1170_TOKEN_INFO.get(ids);
+    const account_id = SHIT_1170_AUTH.get_account_id();
     // --- WHY --- no account means no balances: the reader is not
     // signed in, so there is nothing to show and nothing to check.
     const balances =
       account_id === null
         ? new Map<string, string>()
-        : await HUGGIES_APP_PAGE_SWAP_BALANCES.load(account_id, ids);
+        : await SHIT_1170_APP_PAGE_SWAP_BALANCES.load(account_id, ids);
     const token_in_info = info_map.get(token_in) ?? null;
     const token_out_info = info_map.get(token_out) ?? null;
     set_state_fun({
@@ -284,7 +284,7 @@ async function load_routes_fun(
   token_in: string,
   token_out: string,
   amount: string,
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
 ): Promise<void> {
   // a quote for a pair the page is no longer showing is not worth
   // asking for.
@@ -297,9 +297,9 @@ async function load_routes_fun(
   quoted_amount_in = amount;
   quoted_amount_side = side;
   set_state_fun({ ...state, loading_routes: true, error: null });
-  const trader_account_id = HUGGIES_AUTH.get_account_id();
+  const trader_account_id = SHIT_1170_AUTH.get_account_id();
   try {
-    const routes = await HUGGIES_APP_PAGE_SWAP_ROUTES.get(
+    const routes = await SHIT_1170_APP_PAGE_SWAP_ROUTES.get(
       token_in,
       token_out,
       amount,
@@ -342,7 +342,7 @@ function is_current_quote_fun(
   token_in: string,
   token_out: string,
   amount: string,
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
 ): boolean {
   return (
     quoted_token_in === token_in &&
@@ -368,7 +368,7 @@ function clear_routes_fun(): void {
   quoted_token_in = null;
   quoted_token_out = null;
   quoted_amount_in = null;
-  HUGGIES_APP_PAGE_SWAP_ROUTES.close_subscription();
+  SHIT_1170_APP_PAGE_SWAP_ROUTES.close_subscription();
   set_state_fun({
     ...state,
     routes: [],
@@ -386,10 +386,10 @@ function open_subscription_fun(
   token_in: string,
   token_out: string,
   amount: string,
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
 ): void {
-  const trader_account_id = HUGGIES_AUTH.get_account_id();
-  void HUGGIES_APP_PAGE_SWAP_ROUTES.subscribe(
+  const trader_account_id = SHIT_1170_AUTH.get_account_id();
+  void SHIT_1170_APP_PAGE_SWAP_ROUTES.subscribe(
     token_in,
     token_out,
     amount,
@@ -433,7 +433,7 @@ function open_subscription_fun(
 async function load_fun(): Promise<void> {
   const tokens = read_tokens_fun();
   const amounts = read_amount_fun();
-  HUGGIES_APP_PAGE_SWAP_URL.write(tokens.token_in, tokens.token_out);
+  SHIT_1170_APP_PAGE_SWAP_URL.write(tokens.token_in, tokens.token_out);
   // the unit amount the link carried, waiting for the token's decimals.
   pending_url_unit = amounts.unit;
   pending_url_side = amounts.side;
@@ -533,7 +533,7 @@ async function set_token_fun(
       amount_in: "",
       amount_out: "",
     });
-    HUGGIES_APP_PAGE_SWAP_URL.write(trimmed, state.token_out);
+    SHIT_1170_APP_PAGE_SWAP_URL.write(trimmed, state.token_out);
   } else {
     // the token is already on this side: nothing to do.
     if (state.token_out === trimmed) return;
@@ -548,7 +548,7 @@ async function set_token_fun(
       amount_in: "",
       amount_out: "",
     });
-    HUGGIES_APP_PAGE_SWAP_URL.write(state.token_in, trimmed);
+    SHIT_1170_APP_PAGE_SWAP_URL.write(state.token_in, trimmed);
   }
   clear_amount_from_url_fun();
   clear_routes_fun();
@@ -561,7 +561,7 @@ async function set_token_fun(
 // in three places — a token picked, the pair swapped and the page
 // reset — and each of them would otherwise write it out again.
 function clear_amount_from_url_fun(): void {
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount(state.amount_side, null);
+  SHIT_1170_APP_PAGE_SWAP_URL.write_amount(state.amount_side, null);
 }
 // ========================================
 // the two sides trade places: the token on one side becomes the token
@@ -582,7 +582,7 @@ async function swap_pair_fun(): Promise<void> {
     amount_in: "",
     amount_out: "",
   });
-  HUGGIES_APP_PAGE_SWAP_URL.write(old_token_out, old_token_in);
+  SHIT_1170_APP_PAGE_SWAP_URL.write(old_token_out, old_token_in);
   // --- WHY --- THE AMOUNT GOES OFF THE URL: the amount was typed for
   // the old pair, and the two sides have traded places, so the number
   // in the url would name a token that is no longer on that side.
@@ -619,7 +619,10 @@ async function swap_pair_fun(): Promise<void> {
 // still typing ("1." or "1.5e"), so there may be no unit amount yet.
 // writing nothing keeps the url from carrying a number the reader did
 // not finish typing.
-function set_amount_fun(side: HUGGIES_SWAP_AMOUNT_SIDE, amount: string): void {
+function set_amount_fun(
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
+  amount: string,
+): void {
   if (side === "in") {
     set_state_fun({
       ...state,
@@ -639,11 +642,11 @@ function set_amount_fun(side: HUGGIES_SWAP_AMOUNT_SIDE, amount: string): void {
   // the url carries.
   const info = side === "in" ? state.token_in_info : state.token_out_info;
   if (info === null) {
-    HUGGIES_APP_PAGE_SWAP_URL.write_amount(side, null);
+    SHIT_1170_APP_PAGE_SWAP_URL.write_amount(side, null);
     return;
   }
   const unit = human_to_unit_fun(amount, info.decimals);
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount(side, unit);
+  SHIT_1170_APP_PAGE_SWAP_URL.write_amount(side, unit);
 }
 // ========================================
 // the reader picked a route.
@@ -653,7 +656,7 @@ function select_route_fun(dex_id: string): void {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_fun(): HUGGIES_APP_PAGE_SWAP_STATE {
+function get_fun(): SHIT_1170_APP_PAGE_SWAP_STATE {
   return state;
 }
 // ========================================
@@ -662,7 +665,7 @@ function get_fun(): HUGGIES_APP_PAGE_SWAP_STATE {
 //
 // --- WHY --- the best route is the default: it is the one the router
 // put first, and the reader has to actively pick another to leave it.
-function selected_route_fun(): HUGGIES_SWAP_ROUTE | null {
+function selected_route_fun(): SHIT_1170_SWAP_ROUTE | null {
   if (state.selected_dex_id !== null) {
     const picked = state.routes.find(
       (route) => route.dex_id === state.selected_dex_id,
@@ -740,7 +743,8 @@ async function switch_direction_fun(): Promise<void> {
   const new_amount_out = fixed_side === "in" ? fixed_amount : answered_amount;
   // the side they are fixing flips: the box they typed into was the
   // side they were fixing, and it is now the OTHER side.
-  const new_side: HUGGIES_SWAP_AMOUNT_SIDE = fixed_side === "in" ? "out" : "in";
+  const new_side: SHIT_1170_SWAP_AMOUNT_SIDE =
+    fixed_side === "in" ? "out" : "in";
   set_state_fun({
     ...state,
     token_in: new_token_in,
@@ -749,7 +753,7 @@ async function switch_direction_fun(): Promise<void> {
     amount_out: new_amount_out,
     amount_side: new_side,
   });
-  HUGGIES_APP_PAGE_SWAP_URL.write(new_token_in, new_token_out);
+  SHIT_1170_APP_PAGE_SWAP_URL.write(new_token_in, new_token_out);
   // --- WHY --- THE URL FOLLOWS THE AMOUNTS: the two amounts traded
   // places with the two tokens, and the side they are fixing flipped
   // with them. so the url carries the amount the reader FIXED on the
@@ -769,7 +773,7 @@ async function switch_direction_fun(): Promise<void> {
     new_side_info === null
       ? null
       : human_to_unit_fun(new_fixed_human, new_side_info.decimals);
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount(new_side, new_fixed_unit);
+  SHIT_1170_APP_PAGE_SWAP_URL.write_amount(new_side, new_fixed_unit);
   clear_routes_fun();
   await load_tokens_and_balances_fun(new_token_in, new_token_out);
   // the amount the reader fixed is now the amount they SELL, and it has
@@ -803,11 +807,11 @@ function reset_fun(): void {
   pending_url_unit = null;
   // the amount goes off the url with the rest of the page, so a reload
   // after a reset opens the page the way it opens.
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount("in", null);
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount("out", null);
+  SHIT_1170_APP_PAGE_SWAP_URL.write_amount("in", null);
+  SHIT_1170_APP_PAGE_SWAP_URL.write_amount("out", null);
   set_state_fun({
-    token_in: HUGGIES_SWAP_DEFAULT_TOKEN_IN,
-    token_out: HUGGIES_SWAP_DEFAULT_TOKEN_OUT,
+    token_in: SHIT_1170_SWAP_DEFAULT_TOKEN_IN,
+    token_out: SHIT_1170_SWAP_DEFAULT_TOKEN_OUT,
     amount_in: "",
     amount_out: "",
     amount_side: "in",
@@ -825,7 +829,7 @@ function reset_fun(): void {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_SWAP_STORE = {
+export const SHIT_1170_APP_PAGE_SWAP_STORE = {
   load: load_fun,
   quote: quote_fun,
   set_token: set_token_fun,

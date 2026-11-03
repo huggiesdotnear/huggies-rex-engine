@@ -14,14 +14,14 @@
 // --- WHY --- the ACCOUNTS come from the browser and the KEYS come from
 // the backend: the browser knows which accounts it holds a signed
 // message for, and the backend knows the key each account has.
-import { HUGGIES_AUTH } from "../shared/auth_status";
-import { HUGGIES_AUTH_SESSIONS } from "../shared/auth_sessions";
-import { HUGGIES_SESSION } from "../shared/session";
+import { SHIT_1170_AUTH } from "../shared/auth_status";
+import { SHIT_1170_AUTH_SESSIONS } from "../shared/auth_sessions";
+import { SHIT_1170_SESSION } from "../shared/session";
 import { app_page_skill_session_rotate_fun } from "./app_page_skill_session_rotate";
 // ========================================
 // --- TYPES ------------------------------
 // one account's row in the card.
-export interface HUGGIES_APP_PAGE_SKILL_ACCOUNT {
+export interface SHIT_1170_APP_PAGE_SKILL_ACCOUNT {
   // the account id.
   account_id: string;
   // the account's session key, or null when the backend has not issued
@@ -32,9 +32,9 @@ export interface HUGGIES_APP_PAGE_SKILL_ACCOUNT {
 }
 
 // what the card shows.
-export interface HUGGIES_APP_PAGE_SKILL_SESSION_DATA {
+export interface SHIT_1170_APP_PAGE_SKILL_SESSION_DATA {
   // one row per signed-in account.
-  accounts: HUGGIES_APP_PAGE_SKILL_ACCOUNT[];
+  accounts: SHIT_1170_APP_PAGE_SKILL_ACCOUNT[];
   // true while the keys are being fetched.
   loading: boolean;
   // true while a rotation is running.
@@ -46,7 +46,7 @@ export interface HUGGIES_APP_PAGE_SKILL_SESSION_DATA {
 // --- STATE ------------------------------
 // null until the first load finishes. components render nothing until
 // then.
-let data: HUGGIES_APP_PAGE_SKILL_SESSION_DATA | null = null;
+let data: SHIT_1170_APP_PAGE_SKILL_SESSION_DATA | null = null;
 // true once the auth state is being watched.
 let watching = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
@@ -76,12 +76,12 @@ function subscribe_fun(listener: () => void): () => void {
 // fill the data: the accounts from the browser, the keys from the
 // backend.
 async function load_fun(): Promise<void> {
-  const account_ids = HUGGIES_AUTH_SESSIONS.list_account_ids();
-  const active_id = HUGGIES_AUTH.get_account_id();
+  const account_ids = SHIT_1170_AUTH_SESSIONS.list_account_ids();
+  const active_id = SHIT_1170_AUTH.get_account_id();
   data = {
     accounts: account_ids.map((account_id) => ({
       account_id,
-      session_key: HUGGIES_SESSION.get_session_key(account_id),
+      session_key: SHIT_1170_SESSION.get_session_key(account_id),
       is_active: account_id === active_id,
     })),
     loading: account_ids.length > 0,
@@ -105,11 +105,11 @@ async function load_fun(): Promise<void> {
   }
 
   try {
-    await HUGGIES_SESSION.load();
+    await SHIT_1170_SESSION.load();
     data = {
       accounts: account_ids.map((account_id) => ({
         account_id,
-        session_key: HUGGIES_SESSION.get_session_key(account_id),
+        session_key: SHIT_1170_SESSION.get_session_key(account_id),
         is_active: account_id === active_id,
       })),
       loading: false,
@@ -120,7 +120,7 @@ async function load_fun(): Promise<void> {
     data = {
       accounts: account_ids.map((account_id) => ({
         account_id,
-        session_key: HUGGIES_SESSION.get_session_key(account_id),
+        session_key: SHIT_1170_SESSION.get_session_key(account_id),
         is_active: account_id === active_id,
       })),
       loading: false,
@@ -149,7 +149,7 @@ async function rotate_fun(account_id: string): Promise<void> {
   try {
     const result = await app_page_skill_session_rotate_fun(account_id);
     // the new key replaces the old one in memory.
-    HUGGIES_SESSION.set_session_key(account_id, result.session_key);
+    SHIT_1170_SESSION.set_session_key(account_id, result.session_key);
     data = {
       ...data,
       accounts: data.accounts.map((account) =>
@@ -176,8 +176,8 @@ async function rotate_fun(account_id: string): Promise<void> {
 function watch_fun(): void {
   if (watching) return;
   watching = true;
-  const unsubscribe = HUGGIES_AUTH.subscribe(() => {
-    void HUGGIES_APP_PAGE_SKILL_SESSION_STORE.load();
+  const unsubscribe = SHIT_1170_AUTH.subscribe(() => {
+    void SHIT_1170_APP_PAGE_SKILL_SESSION_STORE.load();
   });
   // the subscription lives as long as the page does, so it is never
   // unsubscribed. the module is loaded once per document.
@@ -185,12 +185,12 @@ function watch_fun(): void {
 }
 // ========================================
 // --- READ ------------------------------
-function get_fun(): HUGGIES_APP_PAGE_SKILL_SESSION_DATA | null {
+function get_fun(): SHIT_1170_APP_PAGE_SKILL_SESSION_DATA | null {
   return data;
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_SKILL_SESSION_STORE = {
+export const SHIT_1170_APP_PAGE_SKILL_SESSION_STORE = {
   load: load_fun,
   rotate: rotate_fun,
   subscribe: subscribe_fun,

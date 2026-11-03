@@ -2,24 +2,27 @@
 // the holder-type filters offered on the SHIT page.
 // ========================================
 import {
-  HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
-  type HUGGIES_SHIT_HOLDER_ROW_TYPE,
+  SHIT_1170_SHIT_HOLDER_TYPE_REGULAR,
+  type SHIT_1170_SHIT_HOLDER_ROW_TYPE,
 } from "./token_page_shit_1170_known_holders";
-import type { HUGGIES_SHIT_ACTIVE_FILTER } from "./token_page_shit_1170_state";
+import type { SHIT_1170_SHIT_ACTIVE_FILTER } from "./token_page_shit_1170_state";
 // ========================================
 // one filter: a key, a label, an icon, and the tooltip that explains
 // what the type is.
-export interface HUGGIES_SHIT_FILTER {
+export interface SHIT_1170_SHIT_FILTER {
   // the key is the ACTIVE FILTER it applies — one type, so a tab key
   // can be handed to the store without a cast.
-  key: HUGGIES_SHIT_ACTIVE_FILTER;
+  key: SHIT_1170_SHIT_ACTIVE_FILTER;
   label: string;
   icon: string;
   description: string;
 }
 // ========================================
 // the icons the SHIT info app uses for each holder type.
-const HUGGIES_SHIT_TYPE_ICONS: Record<HUGGIES_SHIT_HOLDER_ROW_TYPE, string> = {
+const SHIT_1170_SHIT_TYPE_ICONS: Record<
+  SHIT_1170_SHIT_HOLDER_ROW_TYPE,
+  string
+> = {
   dev: "👨‍💻",
   dex: "🔄",
   nft: "🖼️",
@@ -30,20 +33,20 @@ const HUGGIES_SHIT_TYPE_ICONS: Record<HUGGIES_SHIT_HOLDER_ROW_TYPE, string> = {
 // ========================================
 // what each holder type means — the legend the old SHIT info page put
 // under its holder list, moved onto the tabs themselves.
-const HUGGIES_SHIT_TYPE_DESCRIPTIONS: Record<
-  HUGGIES_SHIT_HOLDER_ROW_TYPE,
+const SHIT_1170_SHIT_TYPE_DESCRIPTIONS: Record<
+  SHIT_1170_SHIT_HOLDER_ROW_TYPE,
   string
 > = {
   dev: 'all my "dev" accounts, shown for full transparency',
   dex: "dex accounts",
   nft: "these near accounts are/were available as NFTs",
-  vault: "huggies holding accounts",
+  vault: "shit-1170 holding accounts",
   burn: "burned tokens",
   regular: "regular holders",
 };
 // ========================================
 // the filter list, in display order: ALL first, then one per type.
-export const HUGGIES_SHIT_FILTERS: ReadonlyArray<HUGGIES_SHIT_FILTER> = [
+export const SHIT_1170_SHIT_FILTERS: ReadonlyArray<SHIT_1170_SHIT_FILTER> = [
   {
     key: "all",
     label: "ALL",
@@ -53,38 +56,38 @@ export const HUGGIES_SHIT_FILTERS: ReadonlyArray<HUGGIES_SHIT_FILTER> = [
   {
     key: "dev",
     label: "DEV",
-    icon: HUGGIES_SHIT_TYPE_ICONS.dev,
-    description: HUGGIES_SHIT_TYPE_DESCRIPTIONS.dev,
+    icon: SHIT_1170_SHIT_TYPE_ICONS.dev,
+    description: SHIT_1170_SHIT_TYPE_DESCRIPTIONS.dev,
   },
   {
     key: "dex",
     label: "DEX",
-    icon: HUGGIES_SHIT_TYPE_ICONS.dex,
-    description: HUGGIES_SHIT_TYPE_DESCRIPTIONS.dex,
+    icon: SHIT_1170_SHIT_TYPE_ICONS.dex,
+    description: SHIT_1170_SHIT_TYPE_DESCRIPTIONS.dex,
   },
   {
     key: "nft",
     label: "NFT",
-    icon: HUGGIES_SHIT_TYPE_ICONS.nft,
-    description: HUGGIES_SHIT_TYPE_DESCRIPTIONS.nft,
+    icon: SHIT_1170_SHIT_TYPE_ICONS.nft,
+    description: SHIT_1170_SHIT_TYPE_DESCRIPTIONS.nft,
   },
   {
     key: "vault",
     label: "VAULT",
-    icon: HUGGIES_SHIT_TYPE_ICONS.vault,
-    description: HUGGIES_SHIT_TYPE_DESCRIPTIONS.vault,
+    icon: SHIT_1170_SHIT_TYPE_ICONS.vault,
+    description: SHIT_1170_SHIT_TYPE_DESCRIPTIONS.vault,
   },
   {
     key: "burn",
     label: "BURN",
-    icon: HUGGIES_SHIT_TYPE_ICONS.burn,
-    description: HUGGIES_SHIT_TYPE_DESCRIPTIONS.burn,
+    icon: SHIT_1170_SHIT_TYPE_ICONS.burn,
+    description: SHIT_1170_SHIT_TYPE_DESCRIPTIONS.burn,
   },
   {
-    key: HUGGIES_SHIT_HOLDER_TYPE_REGULAR,
+    key: SHIT_1170_SHIT_HOLDER_TYPE_REGULAR,
     label: "HOLDERS",
-    icon: HUGGIES_SHIT_TYPE_ICONS.regular,
-    description: HUGGIES_SHIT_TYPE_DESCRIPTIONS.regular,
+    icon: SHIT_1170_SHIT_TYPE_ICONS.regular,
+    description: SHIT_1170_SHIT_TYPE_DESCRIPTIONS.regular,
   },
 ];
 // ========================================

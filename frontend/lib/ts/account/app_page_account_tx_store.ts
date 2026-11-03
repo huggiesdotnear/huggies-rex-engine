@@ -21,17 +21,17 @@ import {
   load_cached_account_transactions_fun,
   load_more_account_transactions_fun,
 } from "./app_page_account_transactions";
-import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
-import type { HUGGIES_ACCOUNT_TX_PAGE } from "./app_page_account_transactions";
-import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
+import { SHIT_1170_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
+import type { SHIT_1170_ACCOUNT_TX_PAGE } from "./app_page_account_transactions";
+import type { SHIT_1170_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what the store holds.
-export interface HUGGIES_APP_PAGE_ACCOUNT_TX_STATE {
+export interface SHIT_1170_APP_PAGE_ACCOUNT_TX_STATE {
   // the rows on screen, newest first.
-  rows: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>;
+  rows: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>;
   // the api's cursor for the next page, or null when the history ends
   // here.
   resume_token: string | null;
@@ -48,7 +48,7 @@ export interface HUGGIES_APP_PAGE_ACCOUNT_TX_STATE {
 // ========================================
 // --- STATE ------------------------------
 // the empty state the page holds before the first load answers.
-const HUGGIES_EMPTY_STATE: HUGGIES_APP_PAGE_ACCOUNT_TX_STATE = {
+const SHIT_1170_EMPTY_STATE: SHIT_1170_APP_PAGE_ACCOUNT_TX_STATE = {
   rows: [],
   resume_token: null,
   txs_count: 0,
@@ -56,7 +56,7 @@ const HUGGIES_EMPTY_STATE: HUGGIES_APP_PAGE_ACCOUNT_TX_STATE = {
   loading_more: false,
   error: null,
 };
-let state: HUGGIES_APP_PAGE_ACCOUNT_TX_STATE = HUGGIES_EMPTY_STATE;
+let state: SHIT_1170_APP_PAGE_ACCOUNT_TX_STATE = SHIT_1170_EMPTY_STATE;
 // the account id the current load was for, so a new account id starts a
 // new load and clears the old rows.
 let loaded_account_id: string | null = null;
@@ -68,7 +68,7 @@ let loaded_account_id: string | null = null;
 // without this the tab switch would fetch the page the prefetch had
 // just fetched, which is a request for nothing.
 let fetched_account_id: string | null = null;
-let fetched_page: HUGGIES_ACCOUNT_TX_PAGE | null = null;
+let fetched_page: SHIT_1170_ACCOUNT_TX_PAGE | null = null;
 // the fetch that is running right now, or null.
 //
 // --- WHY --- the prefetch and the load both go to the api, and they
@@ -76,7 +76,7 @@ let fetched_page: HUGGIES_ACCOUNT_TX_PAGE | null = null;
 // transactions tab while the background prefetch is still on its way.
 // one shared promise means the second caller waits for the first
 // answer instead of making a second request.
-let in_flight: Promise<HUGGIES_ACCOUNT_TX_PAGE> | null = null;
+let in_flight: Promise<SHIT_1170_ACCOUNT_TX_PAGE> | null = null;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
@@ -104,7 +104,7 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TX_STATE): void {
+function set_state_fun(next: SHIT_1170_APP_PAGE_ACCOUNT_TX_STATE): void {
   state = next;
   notify_fun();
 }
@@ -118,7 +118,7 @@ function set_state_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TX_STATE): void {
 // making it twice would mean two requests for one answer. one
 // promise is kept while it is on its way, and the second caller waits
 // for it.
-function fetch_fun(account_id: string): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
+function fetch_fun(account_id: string): Promise<SHIT_1170_ACCOUNT_TX_PAGE> {
   if (in_flight !== null) return in_flight;
   const promise = load_account_transactions_fun(account_id)
     .then((page) => {
@@ -145,13 +145,13 @@ function fetch_fun(account_id: string): Promise<HUGGIES_ACCOUNT_TX_PAGE> {
 // already on the reader's machine, so the table has rows on screen
 // while the api is still answering. the api's rows land on top of them.
 async function load_fun(): Promise<void> {
-  const account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
+  const account_id = SHIT_1170_APP_PAGE_ACCOUNT_ID.get_account_id();
   if (account_id === null) return;
   // --- WHY --- the load only runs on the transactions tab: the
   // balances tab is the view most readers want, and a reader who
   // never opens the transactions tab should never pay for the
   // history. the tab is watched, so opening the tab starts the load.
-  if (HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.get_tab() !== "transactions") {
+  if (SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.get_tab() !== "transactions") {
     return;
   }
   if (state.loading && loaded_account_id === account_id) return;
@@ -170,7 +170,7 @@ async function load_fun(): Promise<void> {
   // loading. there is nothing to do.
   if (!account_changed && state.rows.length > 0 && !state.loading) return;
   set_state_fun({
-    ...HUGGIES_EMPTY_STATE,
+    ...SHIT_1170_EMPTY_STATE,
     loading: true,
     // the rows stay on screen while the new page is on its way, unless
     // they belong to another account.
@@ -229,7 +229,7 @@ async function load_fun(): Promise<void> {
 // they scrolled to. a load that fails leaves the rows on screen alone
 // and records the error.
 async function load_more_fun(): Promise<void> {
-  const account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
+  const account_id = SHIT_1170_APP_PAGE_ACCOUNT_ID.get_account_id();
   if (account_id === null) return;
   if (state.loading || state.loading_more) return;
   if (state.resume_token === null) return;
@@ -260,7 +260,7 @@ async function load_more_fun(): Promise<void> {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_state_fun(): HUGGIES_APP_PAGE_ACCOUNT_TX_STATE {
+function get_state_fun(): SHIT_1170_APP_PAGE_ACCOUNT_TX_STATE {
   return state;
 }
 // ========================================
@@ -282,10 +282,10 @@ function get_state_fun(): HUGGIES_APP_PAGE_ACCOUNT_TX_STATE {
 // it is done only when the tab is the balances one and the account
 // has no cached history yet.
 async function prefetch_fun(): Promise<void> {
-  const account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
+  const account_id = SHIT_1170_APP_PAGE_ACCOUNT_ID.get_account_id();
   if (account_id === null) return;
   // the transactions tab is showing — the load is already running.
-  if (HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.get_tab() === "transactions") {
+  if (SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.get_tab() === "transactions") {
     return;
   }
   // the cache is already warm — there is nothing to fetch.
@@ -320,10 +320,10 @@ async function prefetch_fun(): Promise<void> {
 // the page loaded. without this the history would never be fetched
 // for that reader, and the tab would sit empty.
 function watch_fun(): void {
-  HUGGIES_APP_PAGE_ACCOUNT_ID.subscribe(() => {
+  SHIT_1170_APP_PAGE_ACCOUNT_ID.subscribe(() => {
     void load_fun();
   });
-  HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.subscribe(() => {
+  SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.subscribe(() => {
     void load_fun();
   });
   // the page's first load.
@@ -335,7 +335,7 @@ function watch_fun(): void {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_ACCOUNT_TX_STORE = {
+export const SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE = {
   get: get_state_fun,
   subscribe: subscribe_fun,
   load: load_fun,

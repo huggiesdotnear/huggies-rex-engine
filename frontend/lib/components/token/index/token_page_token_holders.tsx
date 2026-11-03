@@ -7,22 +7,22 @@
 // the next page is asked for when the reader nears the bottom of the list.
 import { render } from "preact";
 import { useRef as use_ref } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_page_token_state";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_page_token_state";
 import { token_holder_row_fun } from "./token_holder_row";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { use_scroll_load_fun } from "../../../ts/shared/use_scroll_load";
-import type { HUGGIES_TOKEN_DETAIL } from "../../../ts/token/index/token_page_token_types";
+import type { SHIT_1170_TOKEN_DETAIL } from "../../../ts/token/index/token_page_token_types";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // the css selector that matches ONE row of the holders table. the scroll
 // hook is told what a row is, so it can count the rows that have landed.
-const HUGGIES_TOKEN_HOLDERS_ROW_SELECTOR = "tr";
+const SHIT_1170_TOKEN_HOLDERS_ROW_SELECTOR = "tr";
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
+function SHIT_1170_COMPONENT_TOKEN_HOLDERS_FUN() {
+  const state = use_page_store_fun(SHIT_1170_TOKEN_PAGE_TOKEN_STATE);
   const detail = state.detail;
   // the scroll box, so the reader's position at the bottom is
   // detectable.
@@ -40,10 +40,10 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
     // the cursor and the rows, so it is the only place that knows where
     // the next page starts. the component just says WHEN.
     () => {
-      void HUGGIES_TOKEN_PAGE_TOKEN_STATE.load_more();
+      void SHIT_1170_TOKEN_PAGE_TOKEN_STATE.load_more();
     },
     // the rows are table rows.
-    HUGGIES_TOKEN_HOLDERS_ROW_SELECTOR,
+    SHIT_1170_TOKEN_HOLDERS_ROW_SELECTOR,
   );
 
   // --- WHY THE CHECK IS HERE AND NOT AT THE TOP: a hook cannot be
@@ -90,7 +90,7 @@ function HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN() {
 // --- WHY --- the metadata record already carries the price and the
 // decimals, so the rows price themselves from it and no second request is
 // needed.
-function holder_info_fun(detail: HUGGIES_TOKEN_DETAIL): {
+function holder_info_fun(detail: SHIT_1170_TOKEN_DETAIL): {
   id: string;
   symbol: string;
   decimals: number;
@@ -112,10 +112,10 @@ function holder_info_fun(detail: HUGGIES_TOKEN_DETAIL): {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_HOLDERS;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOKEN_HOLDERS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_TOKEN_HOLDERS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_TOKEN_HOLDERS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

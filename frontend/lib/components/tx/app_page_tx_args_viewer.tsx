@@ -25,13 +25,13 @@ import {
   bytes_to_hex,
   default_args_view_mode,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { huggies_code_block_fun } from "./code_block";
+import { shit_1170_code_block_fun } from "./code_block";
 import type { DECODED_ARGS } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // the mode the bytes are read in.
-export type HUGGIES_ARGS_VIEW_MODE = "json" | "raw" | "hex" | "base64";
+export type SHIT_1170_ARGS_VIEW_MODE = "json" | "raw" | "hex" | "base64";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -52,14 +52,14 @@ function ARGS_VIEWER_FUN(props: {
   const default_mode = default_args_view_mode(
     decoded.json !== null,
     decoded.is_printable,
-  ) as HUGGIES_ARGS_VIEW_MODE;
-  const [mode, set_mode] = use_state<HUGGIES_ARGS_VIEW_MODE>(default_mode);
+  ) as SHIT_1170_ARGS_VIEW_MODE;
+  const [mode, set_mode] = use_state<SHIT_1170_ARGS_VIEW_MODE>(default_mode);
   // --- WHY --- the modes come from the client: it offers the json view
   // only when there IS json, so a reader is never shown a mode that
   // cannot work.
   const modes = args_view_modes(
     decoded.json !== null,
-  ) as HUGGIES_ARGS_VIEW_MODE[];
+  ) as SHIT_1170_ARGS_VIEW_MODE[];
 
   if (decoded.bytes.length === 0) {
     return <div class="args-viewer is-empty">NO ARGUMENTS</div>;
@@ -89,22 +89,22 @@ function ARGS_VIEWER_FUN(props: {
             the same value and much easier to read. */}
         {mode === "json" &&
           decoded.json !== null &&
-          huggies_code_block_fun({
+          shit_1170_code_block_fun({
             code: JSON.stringify(decoded.json, null, 2),
           })}
         {mode === "raw" && (
           <div class="args-text">
-            {huggies_code_block_fun({ code: decoded.text })}
+            {shit_1170_code_block_fun({ code: decoded.text })}
           </div>
         )}
         {mode === "hex" && (
           <div class="args-text">
-            {huggies_code_block_fun({ code: bytes_to_hex(decoded.bytes) })}
+            {shit_1170_code_block_fun({ code: bytes_to_hex(decoded.bytes) })}
           </div>
         )}
         {mode === "base64" && (
           <div class="args-text">
-            {huggies_code_block_fun({ code: props.base64 })}
+            {shit_1170_code_block_fun({ code: props.base64 })}
           </div>
         )}
       </div>
@@ -114,7 +114,7 @@ function ARGS_VIEWER_FUN(props: {
 // ========================================
 // --- PUBLIC ---------------------------
 // the viewer, called the way the app calls its components.
-export function huggies_args_viewer_fun(props: {
+export function shit_1170_args_viewer_fun(props: {
   base64: string;
   decoded: DECODED_ARGS;
 }): preact.JSX.Element {

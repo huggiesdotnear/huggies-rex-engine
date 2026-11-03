@@ -11,7 +11,7 @@
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_ERROR_CARD_PROPS {
+export interface SHIT_1170_ERROR_CARD_PROPS {
   // the error message, or null when nothing failed.
   error: string | null;
   // what could not be loaded, e.g. "PLAYER DATA".
@@ -22,8 +22,8 @@ export interface HUGGIES_ERROR_CARD_PROPS {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_error_card_fun(
-  props: HUGGIES_ERROR_CARD_PROPS,
+export function shit_1170_error_card_fun(
+  props: SHIT_1170_ERROR_CARD_PROPS,
 ): preact.JSX.Element {
   if (props.error === null) return <></>;
 

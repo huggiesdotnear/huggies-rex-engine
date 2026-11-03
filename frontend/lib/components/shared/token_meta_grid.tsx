@@ -12,7 +12,7 @@
 // in the grid must see the same label above a value in the card. a
 // second row with its own class would be a second shape for the same
 // thing.
-export function huggies_token_meta_row_fun(
+export function shit_1170_token_meta_row_fun(
   label: string,
   value: string,
 ): preact.JSX.Element {
@@ -24,12 +24,12 @@ export function huggies_token_meta_row_fun(
   );
 }
 // ========================================
-export function huggies_token_meta_grid_fun(
+export function shit_1170_token_meta_grid_fun(
   rows: ReadonlyArray<{ label: string; value: string }>,
 ): preact.JSX.Element {
   return (
     <div class="token-meta">
-      {rows.map((row) => huggies_token_meta_row_fun(row.label, row.value))}
+      {rows.map((row) => shit_1170_token_meta_row_fun(row.label, row.value))}
     </div>
   );
 }

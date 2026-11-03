@@ -10,17 +10,17 @@
 // dao page shows a dao, and each has its own store.
 // ========================================
 import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_TOKEN_INFO } from "../../shared/token_info";
-import { HUGGIES_AMOUNT_FORMAT } from "../../shared/token_amount_format";
-import type { HUGGIES_TOKEN_INFO as TOKEN_INFO } from "../../shared/token_info";
+import { SHIT_1170_TOKEN_INFO } from "../../shared/token_info";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../shared/token_amount_format";
+import type { SHIT_1170_TOKEN_INFO as TOKEN_INFO } from "../../shared/token_info";
 // ========================================
 // "direct" is what the dao holds itself; "native" is the chain's own NEAR
 // balance, which intear reports as its own source. both come from the
 // SAME /balances request.
-const HUGGIES_DAO_BALANCE_SOURCES = ["direct", "native"] as const;
+const SHIT_1170_DAO_BALANCE_SOURCES = ["direct", "native"] as const;
 // ========================================
 // --- TYPES ------------------------------
-export interface HUGGIES_DAO_BALANCE {
+export interface SHIT_1170_DAO_BALANCE {
   id: string;
   raw: string;
   info: TOKEN_INFO;
@@ -28,9 +28,9 @@ export interface HUGGIES_DAO_BALANCE {
 }
 // ========================================
 // the dao page's balances.
-export interface HUGGIES_DAO_BALANCES {
+export interface SHIT_1170_DAO_BALANCES {
   // the holdings, direct and native.
-  rows: ReadonlyArray<HUGGIES_DAO_BALANCE>;
+  rows: ReadonlyArray<SHIT_1170_DAO_BALANCE>;
   errors: ReadonlyArray<string>;
 }
 // ========================================
@@ -38,13 +38,13 @@ export interface HUGGIES_DAO_BALANCES {
 // fetch the dao's balances and the token metadata for them.
 async function load_dao_balances_fun(
   dao_id: string,
-): Promise<HUGGIES_DAO_BALANCES> {
+): Promise<SHIT_1170_DAO_BALANCES> {
   const errors: Array<string> = [];
   let balances = new Map<string, string>();
   try {
     const response = await api_intear_balances_get({
       account: dao_id,
-      sources: HUGGIES_DAO_BALANCE_SOURCES,
+      sources: SHIT_1170_DAO_BALANCE_SOURCES,
     });
     for (const row of response.balances.rows) {
       // a 0 balance means the dao merely touched the token once; it is not
@@ -56,8 +56,8 @@ async function load_dao_balances_fun(
     errors.push(err instanceof Error ? err.message : String(err));
   }
 
-  const info_map = await HUGGIES_TOKEN_INFO.get([...balances.keys()]);
-  const rows: Array<HUGGIES_DAO_BALANCE> = [];
+  const info_map = await SHIT_1170_TOKEN_INFO.get([...balances.keys()]);
+  const rows: Array<SHIT_1170_DAO_BALANCE> = [];
   for (const [id, raw] of balances) {
     const info = info_map.get(id);
     if (info === undefined) continue;
@@ -65,14 +65,14 @@ async function load_dao_balances_fun(
       id,
       raw,
       info,
-      usd_value: HUGGIES_AMOUNT_FORMAT.balance_usd(raw, info),
+      usd_value: SHIT_1170_AMOUNT_FORMAT.balance_usd(raw, info),
     });
   }
   return { rows, errors };
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES = {
+export const SHIT_1170_CONTRACT_SPUTNIK_DAO_BALANCES = {
   load: load_dao_balances_fun,
 };
 // ========================================

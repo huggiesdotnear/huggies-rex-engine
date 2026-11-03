@@ -34,14 +34,14 @@
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
 import { api_intear_tokens_post } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_TOKEN_CACHE } from "../shared/token_cache";
-import type { HUGGIES_CACHED_TOKEN } from "../shared/token_cache";
+import { SHIT_1170_TOKEN_CACHE } from "../shared/token_cache";
+import type { SHIT_1170_CACHED_TOKEN } from "../shared/token_cache";
 import { icon_hash_of_fun, token_icon_for_fun } from "../shared/token_icon_url";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // how many icons one request may ask for.
-const HUGGIES_ICON_BATCH_SIZE = 300;
+const SHIT_1170_ICON_BATCH_SIZE = 300;
 // the POST body's limit is 64KB, and the ids are chunked so one request
 // stays well under it.
 //
@@ -49,13 +49,13 @@ const HUGGIES_ICON_BATCH_SIZE = 300;
 // a label on top, so a page of ids can be a long way from the limit.
 // the budget is half of it, so a normal page of 300 ids is still ONE
 // request and only a very long id list is split.
-const HUGGIES_ICON_POST_BODY_LIMIT = 32 * 1024;
+const SHIT_1170_ICON_POST_BODY_LIMIT = 32 * 1024;
 // the fields the icon request needs. the symbol and decimals come
 // along so the cached record is complete.
 //
 // `icon_hash` and not `icon`: the hash is 16 characters, the icon is
 // a couple of kilobytes.
-const HUGGIES_ICON_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
+const SHIT_1170_ICON_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
 // ========================================
 // ========================================
 // --- SOURCE -----------------------------
@@ -66,7 +66,7 @@ const HUGGIES_ICON_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
 // sorted page with no ids in the url at all. a caller that cannot
 // promise it — a search result, a later page of the list — leaves it
 // out and the ids are asked for by id.
-export interface HUGGIES_TOKEN_ICON_SOURCE {
+export interface SHIT_1170_TOKEN_ICON_SOURCE {
   // the sort field the ids are the top of.
   by: string;
   // true when the ids are the top of that sort. an ascending list
@@ -88,7 +88,7 @@ function chunk_ids_fun(ids: ReadonlyArray<string>): string[][] {
   let size = 0;
   for (const id of ids) {
     const cost = id.length + 3;
-    if (chunk.length > 0 && size + cost > HUGGIES_ICON_POST_BODY_LIMIT) {
+    if (chunk.length > 0 && size + cost > SHIT_1170_ICON_POST_BODY_LIMIT) {
       chunks.push(chunk);
       chunk = [];
       size = 0;
@@ -115,8 +115,8 @@ function to_finite_number_fun(value: unknown): number {
 function rows_to_records_fun(
   columns: ReadonlyArray<string>,
   rows: ReadonlyArray<readonly (string | number | null)[]>,
-): { records: HUGGIES_CACHED_TOKEN[]; icons: Map<string, string> } {
-  const records: HUGGIES_CACHED_TOKEN[] = [];
+): { records: SHIT_1170_CACHED_TOKEN[]; icons: Map<string, string> } {
+  const records: SHIT_1170_CACHED_TOKEN[] = [];
   const icons = new Map<string, string>();
   const id_at = columns.indexOf("account_id");
   const symbol_at = columns.indexOf("symbol");
@@ -127,7 +127,7 @@ function rows_to_records_fun(
     const symbol = symbol_at >= 0 ? row[symbol_at] : row[1];
     const decimals = decimals_at >= 0 ? row[decimals_at] : row[2];
     const hash = hash_at >= 0 ? row[hash_at] : row[3];
-    const record: HUGGIES_CACHED_TOKEN = {
+    const record: SHIT_1170_CACHED_TOKEN = {
       id,
       symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
       decimals: to_finite_number_fun(decimals),
@@ -159,14 +159,14 @@ function rows_to_records_fun(
 // of its own. otherwise the ids are asked for directly.
 export async function fetch_token_icons_fun(
   ids: ReadonlyArray<string>,
-  source?: HUGGIES_TOKEN_ICON_SOURCE,
+  source?: SHIT_1170_TOKEN_ICON_SOURCE,
 ): Promise<Map<string, string>> {
   const wanted = [...new Set(ids)];
   const out = new Map<string, string>();
   if (wanted.length === 0) return out;
 
   // the ids we already know about cost nothing to serve.
-  const cached = await HUGGIES_TOKEN_CACHE.get_many(wanted);
+  const cached = await SHIT_1170_TOKEN_CACHE.get_many(wanted);
   // a token that is NOT in the cache at all is missing. a token whose
   // cached icon hash is null was answered for by the api and has no
   // icon, so it is known, not missing — refetching it would cost a
@@ -198,12 +198,12 @@ export async function fetch_token_icons_fun(
   const page_matches =
     source !== undefined &&
     source.desc === true &&
-    wanted.length >= HUGGIES_ICON_BATCH_SIZE;
+    wanted.length >= SHIT_1170_ICON_BATCH_SIZE;
   if (page_matches && source !== undefined) {
     const response = await api_intear_tokens_get({
-      fields: HUGGIES_ICON_FIELDS,
+      fields: SHIT_1170_ICON_FIELDS,
       sort: { by: source.by as "volume_usd_24h", desc: source.desc },
-      limit: HUGGIES_ICON_BATCH_SIZE,
+      limit: SHIT_1170_ICON_BATCH_SIZE,
     });
     const { records, icons } = rows_to_records_fun(
       response.columns,
@@ -211,7 +211,7 @@ export async function fetch_token_icons_fun(
     );
     for (const id of records) covered.add(id.id);
     for (const [id, icon] of icons) out.set(id, icon);
-    await HUGGIES_TOKEN_CACHE.put_many(records);
+    await SHIT_1170_TOKEN_CACHE.put_many(records);
   }
 
   // 2. whatever the page did not cover — by id, over POST, in chunks
@@ -219,7 +219,7 @@ export async function fetch_token_icons_fun(
   const still_missing = missing.filter((id) => !covered.has(id));
   for (const chunk of chunk_ids_fun(still_missing)) {
     const response = await api_intear_tokens_post({
-      fields: HUGGIES_ICON_FIELDS,
+      fields: SHIT_1170_ICON_FIELDS,
       ids: chunk,
     });
     const { records, icons } = rows_to_records_fun(
@@ -228,7 +228,7 @@ export async function fetch_token_icons_fun(
     );
     for (const id of records) covered.add(id.id);
     for (const [id, icon] of icons) out.set(id, icon);
-    await HUGGIES_TOKEN_CACHE.put_many(records);
+    await SHIT_1170_TOKEN_CACHE.put_many(records);
   }
   return out;
 }

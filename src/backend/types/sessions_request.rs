@@ -1,6 +1,6 @@
 // ========================================
 // SESSIONS_REQUEST
-// the body our /api/huggies/sessions route accepts: the signed
+// the body our /api/shit-1170/sessions route accepts: the signed
 // messages of every account the browser holds.
 //
 // the browser sends ALL of its accounts at once, because the wallet

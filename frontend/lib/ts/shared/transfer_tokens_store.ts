@@ -29,22 +29,22 @@ import {
   fetch_transfer_tokens_by_ids_fun,
   transfer_contract_ids_fun,
 } from "./transfer_tokens";
-import type { HUGGIES_TRANSFER_TOKEN } from "./transfer_tokens";
+import type { SHIT_1170_TRANSFER_TOKEN } from "./transfer_tokens";
 import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what the store holds.
-export interface HUGGIES_TRANSFER_TOKENS_STATE {
+export interface SHIT_1170_TRANSFER_TOKENS_STATE {
   // the tokens on screen, by contract id.
-  tokens: Map<string, HUGGIES_TRANSFER_TOKEN>;
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
   // true while the tokens are loading.
   loading: boolean;
 }
 
 // the shape of a page store the tokens store can follow: it says what
 // its transaction is, and it announces when that changes.
-export interface HUGGIES_WATCHED_STORE {
+export interface SHIT_1170_WATCHED_STORE {
   // the parsed transaction on screen, or null when there is none.
   get_parsed: () => PARSE_RESULT | null;
   // register a callback that fires when the state changes.
@@ -53,7 +53,7 @@ export interface HUGGIES_WATCHED_STORE {
 
 // the shape of a page store that holds SEVERAL transactions: the
 // account page's transaction cards.
-export interface HUGGIES_WATCHED_LIST_STORE {
+export interface SHIT_1170_WATCHED_LIST_STORE {
   // the parsed transactions on screen.
   get_parsed_list: () => ReadonlyArray<PARSE_RESULT>;
   // register a callback that fires when the state changes.
@@ -63,11 +63,11 @@ export interface HUGGIES_WATCHED_LIST_STORE {
 // ========================================
 // --- STATE ------------------------------
 // the empty state the store holds before the first load answers.
-const HUGGIES_EMPTY_STATE: HUGGIES_TRANSFER_TOKENS_STATE = {
+const SHIT_1170_EMPTY_STATE: SHIT_1170_TRANSFER_TOKENS_STATE = {
   tokens: new Map(),
   loading: false,
 };
-let state: HUGGIES_TRANSFER_TOKENS_STATE = HUGGIES_EMPTY_STATE;
+let state: SHIT_1170_TRANSFER_TOKENS_STATE = SHIT_1170_EMPTY_STATE;
 // the transaction the current tokens belong to, so a load for the same
 // transaction does not start over.
 let loaded_for: PARSE_RESULT | null = null;
@@ -103,7 +103,7 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_TRANSFER_TOKENS_STATE): void {
+function set_state_fun(next: SHIT_1170_TRANSFER_TOKENS_STATE): void {
   state = next;
   notify_fun();
 }
@@ -126,7 +126,7 @@ async function load_fun(parsed: PARSE_RESULT | null): Promise<void> {
   if (parsed === null) {
     loaded_for = null;
     loaded_key = null;
-    set_state_fun(HUGGIES_EMPTY_STATE);
+    set_state_fun(SHIT_1170_EMPTY_STATE);
     return;
   }
   await load_many_fun([parsed]);
@@ -152,7 +152,7 @@ async function load_many_fun(
   loaded_key = key;
   loaded_for_list = parsed_list;
   set_state_fun({ tokens: new Map(), loading: true });
-  const tokens = new Map<string, HUGGIES_TRANSFER_TOKEN>();
+  const tokens = new Map<string, SHIT_1170_TRANSFER_TOKEN>();
   // --- WHY THE TRANSACTIONS ARE ASKED FOR ONE BY ONE: the token
   // reader takes a list of token ids, not a list of transactions. so
   // the ids are gathered from every transaction and asked for
@@ -172,7 +172,7 @@ async function load_many_fun(
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_state_fun(): HUGGIES_TRANSFER_TOKENS_STATE {
+function get_state_fun(): SHIT_1170_TRANSFER_TOKENS_STATE {
   return state;
 }
 // ========================================
@@ -189,7 +189,7 @@ function get_state_fun(): HUGGIES_TRANSFER_TOKENS_STATE {
 // --- WHY THE SUBSCRIPTION IS KEPT: without it the tokens would be
 // fetched once and never again, and a reader who opens a second
 // transaction in the same tab would see the first one's symbols.
-function watch_fun(page_store: HUGGIES_WATCHED_STORE): () => void {
+function watch_fun(page_store: SHIT_1170_WATCHED_STORE): () => void {
   const reload = (): void => {
     const parsed = page_store.get_parsed();
     void load_fun(parsed);
@@ -209,7 +209,7 @@ function watch_fun(page_store: HUGGIES_WATCHED_STORE): () => void {
 // transactions at once, and each one names its own tokens. the one
 // transaction watch would only ever look at the first, so the rest
 // would show raw amounts.
-function watch_many_fun(page_store: HUGGIES_WATCHED_LIST_STORE): () => void {
+function watch_many_fun(page_store: SHIT_1170_WATCHED_LIST_STORE): () => void {
   const reload = (): void => {
     const parsed = page_store.get_parsed_list();
     void load_many_fun(parsed);
@@ -222,7 +222,7 @@ function watch_many_fun(page_store: HUGGIES_WATCHED_LIST_STORE): () => void {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_TRANSFER_TOKENS_STORE = {
+export const SHIT_1170_TRANSFER_TOKENS_STORE = {
   get: get_state_fun,
   subscribe: subscribe_fun,
   load: load_fun,

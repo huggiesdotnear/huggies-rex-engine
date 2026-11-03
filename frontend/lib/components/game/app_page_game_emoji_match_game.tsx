@@ -13,12 +13,12 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_EMOJI_TOKENS } from "../../ts/game/app_page_game_emoji_tokens";
-import { HUGGIES_APP_PAGE_GAME_STORE } from "../../ts/game/app_page_game_store";
+import { SHIT_1170_EMOJI_TOKENS } from "../../ts/game/app_page_game_emoji_tokens";
+import { SHIT_1170_APP_PAGE_GAME_STORE } from "../../ts/game/app_page_game_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 // ========================================
-interface HUGGIES_EMOJI_CARD {
+interface SHIT_1170_EMOJI_CARD {
   id: number;
   emoji: string;
   token_id: string | null;
@@ -27,8 +27,8 @@ interface HUGGIES_EMOJI_CARD {
 }
 // ========================================
 // build a newly shuffled four-by-four card deck.
-function new_emoji_cards_fun(): HUGGIES_EMOJI_CARD[] {
-  const cards = HUGGIES_EMOJI_TOKENS.flatMap((token, token_index) =>
+function new_emoji_cards_fun(): SHIT_1170_EMOJI_CARD[] {
+  const cards = SHIT_1170_EMOJI_TOKENS.flatMap((token, token_index) =>
     [0, 1].map((copy_index) => ({
       id: token_index * 2 + copy_index,
       emoji: token.emoji,
@@ -44,12 +44,12 @@ function new_emoji_cards_fun(): HUGGIES_EMOJI_CARD[] {
   return cards;
 }
 // ========================================
-function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
+function SHIT_1170_COMPONENT_EMOJI_MATCH_GAME_FUN() {
   // the page's icons, by token id. the store owns the load, so this only
   // reads.
-  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_GAME_STORE);
+  const page_data = use_page_store_fun(SHIT_1170_APP_PAGE_GAME_STORE);
   const [cards, set_cards] =
-    use_state<HUGGIES_EMOJI_CARD[]>(new_emoji_cards_fun);
+    use_state<SHIT_1170_EMOJI_CARD[]>(new_emoji_cards_fun);
   const [first_id, set_first_id] = use_state<number | null>(null);
   const [board_locked, set_board_locked] = use_state(false);
   const [matched_pairs, set_matched_pairs] = use_state(0);
@@ -138,7 +138,7 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
     set_moves(0);
   };
 
-  const has_won = matched_pairs === HUGGIES_EMOJI_TOKENS.length;
+  const has_won = matched_pairs === SHIT_1170_EMOJI_TOKENS.length;
 
   return (
     <section>
@@ -149,7 +149,7 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
       <div class="stats">
         <div class="stat">
           <strong>
-            {matched_pairs}/{HUGGIES_EMOJI_TOKENS.length}
+            {matched_pairs}/{SHIT_1170_EMOJI_TOKENS.length}
           </strong>
           <span>PAIRS MATCHED</span>
         </div>
@@ -194,10 +194,10 @@ function HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_EMOJI_MATCH_GAME;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_EMOJI_MATCH_GAME;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_EMOJI_MATCH_GAME_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_EMOJI_MATCH_GAME_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

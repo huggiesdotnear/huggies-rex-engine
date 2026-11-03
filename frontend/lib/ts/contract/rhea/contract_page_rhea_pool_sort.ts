@@ -8,14 +8,14 @@
 // ========================================
 // --- TYPES ------------------------------
 // the sort direction of a pool list.
-export type HUGGIES_RHEA_POOL_SORT_DIRECTION = "asc" | "desc";
+export type SHIT_1170_RHEA_POOL_SORT_DIRECTION = "asc" | "desc";
 // ========================================
 // the sort keys the rhea api accepts.
-export type HUGGIES_RHEA_POOL_SORT = "tvl" | "24h" | "apy";
+export type SHIT_1170_RHEA_POOL_SORT = "tvl" | "24h" | "apy";
 // ========================================
 // the sort options in the order they are offered to the user.
-export const HUGGIES_RHEA_POOL_SORTS: ReadonlyArray<{
-  key: HUGGIES_RHEA_POOL_SORT;
+export const SHIT_1170_RHEA_POOL_SORTS: ReadonlyArray<{
+  key: SHIT_1170_RHEA_POOL_SORT;
   label: string;
 }> = [
   { key: "tvl", label: "TVL" },
@@ -24,9 +24,9 @@ export const HUGGIES_RHEA_POOL_SORTS: ReadonlyArray<{
 ];
 // ========================================
 // the default sort: the pools with the most money in them.
-export const HUGGIES_DEFAULT_RHEA_POOL_SORT: HUGGIES_RHEA_POOL_SORT = "tvl";
+export const SHIT_1170_DEFAULT_RHEA_POOL_SORT: SHIT_1170_RHEA_POOL_SORT = "tvl";
 // the default direction: biggest first.
-export const HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION: HUGGIES_RHEA_POOL_SORT_DIRECTION =
+export const SHIT_1170_DEFAULT_RHEA_POOL_SORT_DIRECTION: SHIT_1170_RHEA_POOL_SORT_DIRECTION =
   "desc";
 // ========================================
 // copyright 2026 by sleet.near

@@ -21,14 +21,14 @@
 // message + nonce + recipient that were signed. the user's NEAR
 // private key stays in the wallet and never reaches us or the backend.
 // ========================================
-import { api_huggies_sessions_post } from "@huggies/huggies-rex-engine-middleman";
-import type { HUGGIES_SIGNED_ACCOUNT } from "@huggies/huggies-rex-engine-middleman";
-import { HUGGIES_AUTH_SESSIONS } from "./auth_sessions";
-import { HUGGIES_BASE_URL } from "./base_url";
+import { api_shit_1170_sessions_post } from "@huggies/shit_1170-middleman";
+import type { SHIT_1170_SIGNED_ACCOUNT } from "@huggies/shit_1170-middleman";
+import { SHIT_1170_AUTH_SESSIONS } from "./auth_sessions";
+import { SHIT_1170_BASE_URL } from "./base_url";
 // ========================================
 // --- TYPES ------------------------------
 // one account's key.
-export interface HUGGIES_SESSION_KEY_ENTRY {
+export interface SHIT_1170_SESSION_KEY_ENTRY {
   account_id: string;
   session_key: string;
 }
@@ -40,7 +40,7 @@ const session_keys: Map<string, string> = new Map();
 // make two requests.
 let loading = false;
 // the keys we are waiting for, so a caller can wait on them.
-let pending: Promise<HUGGIES_SESSION_KEY_ENTRY[]> | null = null;
+let pending: Promise<SHIT_1170_SESSION_KEY_ENTRY[]> | null = null;
 // ========================================
 // --- HELPERS ----------------------------
 // every signed account the browser holds, in the shape the backend
@@ -50,9 +50,9 @@ let pending: Promise<HUGGIES_SESSION_KEY_ENTRY[]> | null = null;
 // the wallet: the wallet is not always available (a page opened without
 // the extension, a wallet that is locked), and the map is what the
 // browser already decided to keep.
-function collect_signed_accounts_fun(): HUGGIES_SIGNED_ACCOUNT[] {
-  const sessions = HUGGIES_AUTH_SESSIONS.load_sessions();
-  const out: HUGGIES_SIGNED_ACCOUNT[] = [];
+function collect_signed_accounts_fun(): SHIT_1170_SIGNED_ACCOUNT[] {
+  const sessions = SHIT_1170_AUTH_SESSIONS.load_sessions();
+  const out: SHIT_1170_SIGNED_ACCOUNT[] = [];
   for (const [account_id, session] of Object.entries(sessions)) {
     out.push({
       accountId: session.accountId,
@@ -73,7 +73,7 @@ function collect_signed_accounts_fun(): HUGGIES_SIGNED_ACCOUNT[] {
 // a key asks this module, and the module answers from memory when it
 // already has the keys. the browser's signed messages only go to the
 // backend when a key is missing.
-async function load_fun(): Promise<HUGGIES_SESSION_KEY_ENTRY[]> {
+async function load_fun(): Promise<SHIT_1170_SESSION_KEY_ENTRY[]> {
   if (session_keys.size > 0) return entries_fun();
   if (loading && pending !== null) return pending;
 
@@ -83,7 +83,7 @@ async function load_fun(): Promise<HUGGIES_SESSION_KEY_ENTRY[]> {
   loading = true;
   pending = (async () => {
     try {
-      const result = await api_huggies_sessions_post(HUGGIES_BASE_URL, {
+      const result = await api_shit_1170_sessions_post(SHIT_1170_BASE_URL, {
         accounts,
       });
       for (const entry of result.keys) {
@@ -107,7 +107,7 @@ async function load_fun(): Promise<HUGGIES_SESSION_KEY_ENTRY[]> {
 // ========================================
 // --- READ ------------------------------
 // the keys we have, as a list.
-function entries_fun(): HUGGIES_SESSION_KEY_ENTRY[] {
+function entries_fun(): SHIT_1170_SESSION_KEY_ENTRY[] {
   return [...session_keys.entries()].map(([account_id, session_key]) => ({
     account_id,
     session_key,
@@ -120,7 +120,7 @@ function get_session_key_fun(account_id: string): string | null {
 }
 
 // every account we hold a key for.
-function list_session_keys_fun(): HUGGIES_SESSION_KEY_ENTRY[] {
+function list_session_keys_fun(): SHIT_1170_SESSION_KEY_ENTRY[] {
   return entries_fun();
 }
 
@@ -162,7 +162,7 @@ function reset_account_fun(account_id: string): void {
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_SESSION = {
+export const SHIT_1170_SESSION = {
   load: load_fun,
   get_session_key: get_session_key_fun,
   list_session_keys: list_session_keys_fun,

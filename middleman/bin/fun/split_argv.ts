@@ -10,7 +10,7 @@
 // holds "true" or an empty string.
 //
 // --- WHY --- the boolean flags are per-bin, not one global set. the
-// huggies bins use --include-hidden, and a shared set would make one
+// shit-1170 bins use --include-hidden, and a shared set would make one
 // bin's flag swallow the next positional in another bin's argv.
 // ========================================
 

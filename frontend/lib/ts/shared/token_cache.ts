@@ -13,17 +13,17 @@
 //
 // the indexeddb mechanics live in lib/ts/indexed_db_store.ts — this
 // file only says WHICH store this cache is and what a row looks like.
-import { HUGGIES_INDEXED_DB_STORE } from "./indexed_db_store";
+import { SHIT_1170_INDEXED_DB_STORE } from "./indexed_db_store";
 // ========================================
-const HUGGIES_TOKEN_DB_NAME = "huggies_tokens";
-const HUGGIES_TOKEN_DB_VERSION = 1;
-const HUGGIES_TOKEN_STORE = "tokens";
+const SHIT_1170_TOKEN_DB_NAME = "shit_1170_tokens";
+const SHIT_1170_TOKEN_DB_VERSION = 1;
+const SHIT_1170_TOKEN_STORE = "tokens";
 // ========================================
 // the cache's identity, handed to the shared store module.
-const HUGGIES_TOKEN_STORE_CONFIG = {
-  db_name: HUGGIES_TOKEN_DB_NAME,
-  db_version: HUGGIES_TOKEN_DB_VERSION,
-  store_name: HUGGIES_TOKEN_STORE,
+const SHIT_1170_TOKEN_STORE_CONFIG = {
+  db_name: SHIT_1170_TOKEN_DB_NAME,
+  db_version: SHIT_1170_TOKEN_DB_VERSION,
+  store_name: SHIT_1170_TOKEN_STORE,
 };
 // ========================================
 // ========================================
@@ -33,7 +33,7 @@ const HUGGIES_TOKEN_STORE_CONFIG = {
 //
 // `icon_hash` is the api's icon hash, not an image. it is turned into a
 // url by lib/ts/token_icon_url.ts.
-export interface HUGGIES_CACHED_TOKEN {
+export interface SHIT_1170_CACHED_TOKEN {
   id: string;
   symbol: string;
   decimals: number;
@@ -50,11 +50,12 @@ export interface HUGGIES_CACHED_TOKEN {
 // the ui has to handle.
 async function get_cached_token_fun(
   id: string,
-): Promise<HUGGIES_CACHED_TOKEN | null> {
-  const found = await HUGGIES_INDEXED_DB_STORE.get_many<HUGGIES_CACHED_TOKEN>(
-    HUGGIES_TOKEN_STORE_CONFIG,
-    [id],
-  );
+): Promise<SHIT_1170_CACHED_TOKEN | null> {
+  const found =
+    await SHIT_1170_INDEXED_DB_STORE.get_many<SHIT_1170_CACHED_TOKEN>(
+      SHIT_1170_TOKEN_STORE_CONFIG,
+      [id],
+    );
   return found.get(id) ?? null;
 }
 // ========================================
@@ -62,9 +63,9 @@ async function get_cached_token_fun(
 // returned map, which is the caller's signal to fetch them.
 async function get_cached_tokens_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_CACHED_TOKEN>> {
-  return HUGGIES_INDEXED_DB_STORE.get_many<HUGGIES_CACHED_TOKEN>(
-    HUGGIES_TOKEN_STORE_CONFIG,
+): Promise<Map<string, SHIT_1170_CACHED_TOKEN>> {
+  return SHIT_1170_INDEXED_DB_STORE.get_many<SHIT_1170_CACHED_TOKEN>(
+    SHIT_1170_TOKEN_STORE_CONFIG,
     ids,
   );
 }
@@ -74,9 +75,12 @@ async function get_cached_tokens_fun(
 // upsert many tokens in one transaction. never throws: a failed cache write
 // only costs a refetch next time.
 async function put_cached_tokens_fun(
-  tokens: ReadonlyArray<HUGGIES_CACHED_TOKEN>,
+  tokens: ReadonlyArray<SHIT_1170_CACHED_TOKEN>,
 ): Promise<void> {
-  await HUGGIES_INDEXED_DB_STORE.put_many(HUGGIES_TOKEN_STORE_CONFIG, tokens);
+  await SHIT_1170_INDEXED_DB_STORE.put_many(
+    SHIT_1170_TOKEN_STORE_CONFIG,
+    tokens,
+  );
 }
 // ========================================
 // ========================================
@@ -84,7 +88,7 @@ async function put_cached_tokens_fun(
 // the cache surface. exported as one object so callers have a single
 // import; every function is safe to call in a non-browser (returns empty
 // / no-ops) so components never need to guard.
-export const HUGGIES_TOKEN_CACHE = {
+export const SHIT_1170_TOKEN_CACHE = {
   get: get_cached_token_fun,
   get_many: get_cached_tokens_fun,
   put_many: put_cached_tokens_fun,

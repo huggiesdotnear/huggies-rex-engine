@@ -1,7 +1,7 @@
 // ========================================
-// HUGGIES_BASE_URL
+// SHIT_1170_BASE_URL
 // the base url every frontend fetch to our own backend goes through.
-// the frontend is served by the same huggies backend (ServeDir on /),
+// the frontend is served by the same shit-1170 backend (ServeDir on /),
 // so the origin is the page itself.
 //
 // --- WHY --- resolved from `window.location.origin` at runtime so the
@@ -18,7 +18,7 @@
 // value it happens to pass.
 // ========================================
 
-export const HUGGIES_BASE_URL =
+export const SHIT_1170_BASE_URL =
   typeof window !== "undefined" && typeof window.location !== "undefined"
     ? window.location.origin
     : "";

@@ -32,14 +32,14 @@ import {
   type ROUTE_SUBSCRIPTION,
   type SUBSCRIPTION_SOCKET,
 } from "@sleet-js/intear-dex-aggregator-tool-box";
-import { HUGGIES_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
+import { SHIT_1170_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
 import { router_token_id_fun } from "./app_page_swap_router_token";
-import type { HUGGIES_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
+import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // one route, as the page shows it.
-export interface HUGGIES_SWAP_ROUTE {
+export interface SHIT_1170_SWAP_ROUTE {
   // which dex serves this route: "Rhea", "RheaDcl", "Plach", "Wrap".
   dex_id: string;
   // the quoted output amount, in the output token's smallest unit.
@@ -121,7 +121,7 @@ function route_tx_count_fun(route: ROUTE): number {
 }
 // ========================================
 // map the router's routes into the page's shape.
-function map_routes_fun(routes: ReadonlyArray<ROUTE>): HUGGIES_SWAP_ROUTE[] {
+function map_routes_fun(routes: ReadonlyArray<ROUTE>): SHIT_1170_SWAP_ROUTE[] {
   return routes.map((route) => ({
     dex_id: route.dex_id,
     amount_out: route_amount_out_fun(route),
@@ -150,7 +150,7 @@ function build_quote_params_fun(
   token_in: string,
   token_out: string,
   amount: string,
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
   trader_account_id: string | null,
 ): QUOTE_PARAMS {
   const token_in_id = router_token_id_fun(token_in);
@@ -173,9 +173,9 @@ async function get_swap_routes_fun(
   token_in: string,
   token_out: string,
   amount: string,
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
   trader_account_id: string | null,
-): Promise<HUGGIES_SWAP_ROUTE[]> {
+): Promise<SHIT_1170_SWAP_ROUTE[]> {
   const params = build_quote_params_fun(
     token_in,
     token_out,
@@ -183,7 +183,7 @@ async function get_swap_routes_fun(
     side,
     trader_account_id,
   );
-  const routes = await GET_ROUTES(HUGGIES_SWAP_AGGREGATOR.client, params);
+  const routes = await GET_ROUTES(SHIT_1170_SWAP_AGGREGATOR.client, params);
   return map_routes_fun(routes);
 }
 // ========================================
@@ -194,17 +194,17 @@ async function get_swap_routes_fun(
 // --- WHY --- the subscription id is the same for every one of them: each
 // call owns its own socket and its own request id, so the id only has
 // to be unique WITHIN a socket. a fixed id keeps it simple.
-const HUGGIES_SWAP_SUBSCRIPTION_ID = 1;
+const SHIT_1170_SWAP_SUBSCRIPTION_ID = 1;
 // how long a close waits for a socket to finish connecting before it
 // closes it anyway. a socket that cannot open must not hold the page
 // up, and a socket that opens quickly never waits at all.
-const HUGGIES_CLOSE_WAIT_MS = 1500;
+const SHIT_1170_CLOSE_WAIT_MS = 1500;
 // how often the close checks whether the socket has finished
 // connecting.
 //
 // --- WHY --- it is a POLL and not a callback: the tool box sets
 // `socket.onopen` itself, so a handler the page sets is overwritten.
-const HUGGIES_CLOSE_POLL_MS = 50;
+const SHIT_1170_CLOSE_POLL_MS = 50;
 // the WebSocket readyState that means "the handshake has not finished".
 //
 // --- WHY --- it is written out and not read off the socket: the number
@@ -297,11 +297,11 @@ function close_when_open_fun(
   const started_at = Date.now();
   const timer = setInterval(() => {
     const still_connecting = socket.readyState === SOCKET_CONNECTING;
-    const out_of_time = Date.now() - started_at >= HUGGIES_CLOSE_WAIT_MS;
+    const out_of_time = Date.now() - started_at >= SHIT_1170_CLOSE_WAIT_MS;
     if (still_connecting && !out_of_time) return;
     clearInterval(timer);
     close_now_fun();
-  }, HUGGIES_CLOSE_POLL_MS);
+  }, SHIT_1170_CLOSE_POLL_MS);
 }
 // ========================================
 // open a live subscription for one swap, replacing any open one.
@@ -329,9 +329,9 @@ async function subscribe_swap_routes_fun(
   token_in: string,
   token_out: string,
   amount: string,
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
   trader_account_id: string | null,
-  on_routes: (routes: HUGGIES_SWAP_ROUTE[]) => void,
+  on_routes: (routes: SHIT_1170_SWAP_ROUTE[]) => void,
   on_error: (message: string) => void,
 ): Promise<void> {
   // this subscribe is the newest one from now on.
@@ -358,10 +358,10 @@ async function subscribe_swap_routes_fun(
   let subscription: ROUTE_SUBSCRIPTION;
   try {
     subscription = await SUBSCRIBE_ROUTES(
-      HUGGIES_SWAP_AGGREGATOR.client,
+      SHIT_1170_SWAP_AGGREGATOR.client,
       params,
       {
-        id: HUGGIES_SWAP_SUBSCRIPTION_ID,
+        id: SHIT_1170_SWAP_SUBSCRIPTION_ID,
         // --- WHY --- THE FACTORY: the tool box's subscription does not
         // expose its socket, and the page needs the socket's readyState
         // to close it quietly. the factory hands the socket over.
@@ -406,7 +406,7 @@ async function subscribe_swap_routes_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_SWAP_ROUTES = {
+export const SHIT_1170_APP_PAGE_SWAP_ROUTES = {
   get: get_swap_routes_fun,
   subscribe: subscribe_swap_routes_fun,
   close_subscription: close_swap_subscription_fun,

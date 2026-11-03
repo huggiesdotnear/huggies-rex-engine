@@ -33,32 +33,32 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { huggies_sort_keys_control_fun } from "./sort_keys_control";
+import { shit_1170_sort_keys_control_fun } from "./sort_keys_control";
 import { token_detail_href_fun } from "../../ts/shared/token_link";
 import { use_scroll_load_fun } from "../../ts/shared/use_scroll_load";
 import {
-  HUGGIES_TOKEN_SORTS,
-  type HUGGIES_TOKEN_SORT,
-  type HUGGIES_TOKEN_SORT_DIRECTION,
+  SHIT_1170_TOKEN_SORTS,
+  type SHIT_1170_TOKEN_SORT,
+  type SHIT_1170_TOKEN_SORT_DIRECTION,
 } from "../../ts/discover/app_page_discover_token_sort_options";
-import type { HUGGIES_DISCOVER_TOKEN_ROW } from "../../ts/discover/app_page_discover_token_row";
+import type { SHIT_1170_DISCOVER_TOKEN_ROW } from "../../ts/discover/app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // how long to wait after a keystroke before asking the api. long enough
 // that typing a word is one request, not one per letter.
-const HUGGIES_TOKEN_LIST_SEARCH_DEBOUNCE_MS = 250;
+const SHIT_1170_TOKEN_LIST_SEARCH_DEBOUNCE_MS = 250;
 // the css selector that matches ONE row of the list. the rows are
 // links or buttons, not table rows, so the scroll hook is told what a
 // row is.
-const HUGGIES_TOKEN_LIST_ROW_SELECTOR = ".token-list-row";
+const SHIT_1170_TOKEN_LIST_ROW_SELECTOR = ".token-list-row";
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
 // what the list draws.
-export interface HUGGIES_TOKEN_LIST_PROPS {
+export interface SHIT_1170_TOKEN_LIST_PROPS {
   // the rows on screen.
-  tokens: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>;
+  tokens: ReadonlyArray<SHIT_1170_DISCOVER_TOKEN_ROW>;
   // the tokens the reader marked, so they can stand out wherever the
   // sort puts them.
   marked_ids?: ReadonlySet<string>;
@@ -75,13 +75,13 @@ export interface HUGGIES_TOKEN_LIST_PROPS {
   // true while a SEARCH is running.
   searching: boolean;
   // the chosen sort key.
-  sort: HUGGIES_TOKEN_SORT;
+  sort: SHIT_1170_TOKEN_SORT;
   // the chosen direction.
-  direction: HUGGIES_TOKEN_SORT_DIRECTION;
+  direction: SHIT_1170_TOKEN_SORT_DIRECTION;
   // called when the reader picks another sort key.
-  on_sort: (sort: HUGGIES_TOKEN_SORT) => void;
+  on_sort: (sort: SHIT_1170_TOKEN_SORT) => void;
   // called when the reader flips the direction.
-  on_direction: (direction: HUGGIES_TOKEN_SORT_DIRECTION) => void;
+  on_direction: (direction: SHIT_1170_TOKEN_SORT_DIRECTION) => void;
   // true when the api has more rows behind this one.
   has_more: boolean;
   // called when the reader nears the bottom of the list.
@@ -113,7 +113,7 @@ export interface HUGGIES_TOKEN_LIST_PROPS {
 // reader needs it to recognise a token they know, but it is the last
 // thing on the row so it never pushes the symbol out of view.
 function token_list_row_fun(
-  token: HUGGIES_DISCOVER_TOKEN_ROW,
+  token: SHIT_1170_DISCOVER_TOKEN_ROW,
   marked: boolean,
   on_pick: ((token_id: string) => void) | undefined,
 ): preact.JSX.Element {
@@ -174,8 +174,8 @@ function token_list_row_fun(
 // ========================================
 // --- COMPONENT --------------------------
 // the list: the controls on top, the rows in a scroll box.
-export function huggies_token_list_fun(
-  props: HUGGIES_TOKEN_LIST_PROPS,
+export function shit_1170_token_list_fun(
+  props: SHIT_1170_TOKEN_LIST_PROPS,
 ): preact.JSX.Element {
   // the scroll container, so the reader's position at the bottom is
   // detectable.
@@ -198,7 +198,7 @@ export function huggies_token_list_fun(
     }
     const timer = window.setTimeout(() => {
       props.on_search(needle);
-    }, HUGGIES_TOKEN_LIST_SEARCH_DEBOUNCE_MS);
+    }, SHIT_1170_TOKEN_LIST_SEARCH_DEBOUNCE_MS);
     return () => {
       window.clearTimeout(timer);
     };
@@ -212,7 +212,7 @@ export function huggies_token_list_fun(
     props.has_more && !props.searching,
     props.loading,
     () => props.on_load_more(),
-    HUGGIES_TOKEN_LIST_ROW_SELECTOR,
+    SHIT_1170_TOKEN_LIST_ROW_SELECTOR,
   );
 
   const errors = props.errors ?? [];
@@ -243,8 +243,8 @@ export function huggies_token_list_fun(
           />
         </div>
         <div class="sort">
-          {huggies_sort_keys_control_fun({
-            options: HUGGIES_TOKEN_SORTS,
+          {shit_1170_sort_keys_control_fun({
+            options: SHIT_1170_TOKEN_SORTS,
             sort: props.sort,
             direction: props.direction,
             on_sort: (next) => props.on_sort(next),

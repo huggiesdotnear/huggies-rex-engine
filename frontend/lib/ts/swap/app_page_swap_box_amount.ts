@@ -15,11 +15,11 @@
 // router answers with the full amount, so the box shows the full
 // amount. subtracting the reader's own number from it would be
 // arithmetic the router already did.
-import type { HUGGIES_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
+import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
 // ========================================
 // --- TYPES ------------------------------
 // what one box shows.
-export interface HUGGIES_SWAP_BOX_AMOUNT {
+export interface SHIT_1170_SWAP_BOX_AMOUNT {
   // the human amount the box shows.
   human: string;
   // the same amount in the token's smallest unit, or null when the box
@@ -41,14 +41,14 @@ export interface HUGGIES_SWAP_BOX_AMOUNT {
 // number it read, and it is used whether the number came from the
 // reader or from the router.
 export function swap_box_amount_fun(
-  side: HUGGIES_SWAP_AMOUNT_SIDE,
-  fixed_side: HUGGIES_SWAP_AMOUNT_SIDE,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
+  fixed_side: SHIT_1170_SWAP_AMOUNT_SIDE,
   fixed_human: string,
   fixed_unit: string | null,
   answered_unit: string | null,
   answered_decimals: number,
   unit_to_human: (unit: string, decimals: number) => string,
-): HUGGIES_SWAP_BOX_AMOUNT {
+): SHIT_1170_SWAP_BOX_AMOUNT {
   if (side === fixed_side) {
     return { human: fixed_human, unit: fixed_unit };
   }

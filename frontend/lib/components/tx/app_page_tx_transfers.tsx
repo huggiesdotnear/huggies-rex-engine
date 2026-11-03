@@ -14,17 +14,17 @@
 // nothing — the tokens come from the shared transfer tokens store.
 import { render } from "preact";
 import { format_near_with_unit } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_TX_STORE } from "../../ts/tx/app_page_tx_store";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_TX_STORE } from "../../ts/tx/app_page_tx_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
-import { HUGGIES_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
+import { SHIT_1170_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
 import { transfer_token_of_fun } from "../../ts/shared/transfer_tokens";
 import {
-  huggies_transfer_amount_fun,
-  huggies_transfer_icon_fun,
+  shit_1170_transfer_amount_fun,
+  shit_1170_transfer_icon_fun,
 } from "../shared/transfer_amount";
-import { huggies_transfer_memo_fun } from "./app_page_tx_transfer_memo";
+import { shit_1170_transfer_memo_fun } from "./app_page_tx_transfer_memo";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -57,9 +57,9 @@ function endpoint_fun(account_id: string | null): preact.JSX.Element {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_APP_PAGE_TX_STORE);
-  const token_state = use_page_store_fun(HUGGIES_TRANSFER_TOKENS_STORE);
+export function SHIT_1170_COMPONENT_TX_TRANSFERS_FUN() {
+  const state = use_page_store_fun(SHIT_1170_APP_PAGE_TX_STORE);
+  const token_state = use_page_store_fun(SHIT_1170_TRANSFER_TOKENS_STORE);
   const data = state.data;
   // no transaction yet — there is nothing to show.
   if (data === null) return null;
@@ -89,7 +89,7 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
                 {endpoint_fun(transfer.to)}
               </div>
               <div class="tx-transfer-amount">
-                {huggies_transfer_icon_fun(token)}
+                {shit_1170_transfer_icon_fun(token)}
                 {/* --- WHY --- a NEAR amount is formatted by the client
                     and a TOKEN amount by the shared token amount: the
                     native token has no registry entry, so its decimals
@@ -102,7 +102,7 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
                     </span>
                   </span>
                 ) : (
-                  huggies_transfer_amount_fun({
+                  shit_1170_transfer_amount_fun({
                     amount: transfer.amount,
                     token,
                     contract_id: transfer.contract_id,
@@ -122,7 +122,7 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
               </div>
               {transfer.memo !== undefined &&
                 transfer.memo.length > 0 &&
-                huggies_transfer_memo_fun({ memo: transfer.memo })}
+                shit_1170_transfer_memo_fun({ memo: transfer.memo })}
             </div>
           );
         })}
@@ -139,7 +139,7 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
                 {endpoint_fun(transfer.to)}
               </div>
               <div class="tx-transfer-amount">
-                {huggies_transfer_icon_fun(token)}
+                {shit_1170_transfer_icon_fun(token)}
                 <code class="tx-transfer-token-id">{transfer.token_id}</code>
                 {token !== null && (
                   <span class="tx-token-symbol">{token.symbol}</span>
@@ -149,7 +149,7 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
               </div>
               {transfer.memo !== undefined &&
                 transfer.memo.length > 0 &&
-                huggies_transfer_memo_fun({ memo: transfer.memo })}
+                shit_1170_transfer_memo_fun({ memo: transfer.memo })}
             </div>
           );
         })}
@@ -160,10 +160,10 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TX_TRANSFERS;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TX_TRANSFERS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_TX_TRANSFERS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_TX_TRANSFERS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

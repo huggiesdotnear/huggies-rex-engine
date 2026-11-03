@@ -14,12 +14,12 @@
 // sync with the formatter". the id the router gets is also the id
 // the route's `token_output` comes back as, so the two have to be
 // built the same way.
-import { HUGGIES_NEAR_ID } from "../shared/token_near";
+import { SHIT_1170_NEAR_ID } from "../shared/token_near";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // the prefix the router wants in front of a NEP-141 contract id.
-const HUGGIES_ROUTER_NEP141_PREFIX = "nep141:";
+const SHIT_1170_ROUTER_NEP141_PREFIX = "nep141:";
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
@@ -31,9 +31,9 @@ const HUGGIES_ROUTER_NEP141_PREFIX = "nep141:";
 export function router_token_id_fun(token_id: string): string {
   const trimmed = token_id.trim();
   if (trimmed.length === 0) return trimmed;
-  if (trimmed === HUGGIES_NEAR_ID) return HUGGIES_NEAR_ID;
+  if (trimmed === SHIT_1170_NEAR_ID) return SHIT_1170_NEAR_ID;
   if (trimmed.includes(":")) return trimmed;
-  return `${HUGGIES_ROUTER_NEP141_PREFIX}${trimmed}`;
+  return `${SHIT_1170_ROUTER_NEP141_PREFIX}${trimmed}`;
 }
 // ========================================
 // copyright 2026 by sleet.near

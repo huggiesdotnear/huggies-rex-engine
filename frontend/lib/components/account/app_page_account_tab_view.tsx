@@ -17,13 +17,13 @@
 //
 // this component does NOT fetch. it renders nothing when the tab on
 // screen is not the one it names.
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/account/app_page_account_tab_state";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE } from "../../ts/account/app_page_account_tab_state";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import type { ComponentChildren } from "preact";
 // ========================================
 // ========================================
 // --- PROPS ------------------------------
-export interface HUGGIES_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS {
+export interface SHIT_1170_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS {
   // the tab whose contents these are.
   tab: "balances" | "transactions";
   // what to render when that tab is the one on screen.
@@ -32,10 +32,10 @@ export interface HUGGIES_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function huggies_account_tab_view_fun(
-  props: HUGGIES_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS,
+export function shit_1170_account_tab_view_fun(
+  props: SHIT_1170_APP_PAGE_ACCOUNT_TAB_VIEW_PROPS,
 ): preact.JSX.Element {
-  const tab = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE);
+  const tab = use_page_store_fun(SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE);
   if (tab !== props.tab) return <></>;
   return <>{props.children}</>;
 }

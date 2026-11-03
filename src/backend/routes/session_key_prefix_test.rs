@@ -28,7 +28,7 @@ struct TEMP_DB {
 impl TEMP_DB {
     fn new_fun(name: &str) -> Self {
         let mut path = std::env::temp_dir();
-        path.push(format!("huggies-prefix-{name}-{:?}.db", std::process::id()));
+        path.push(format!("shit-1170-prefix-{name}-{:?}.db", std::process::id()));
         // a leftover from a previous run would make the test read old rows.
         let _ = std::fs::remove_file(&path);
         TEMP_DB { path }
@@ -53,8 +53,8 @@ impl Drop for TEMP_DB {
 // put a session into the db with the given key, the way the sessions
 // route would have.
 async fn put_session_fun(pool: &SqlitePool, account_id: &str, session_key: &str) {
-    use crate::backend::logic::endpoint_huggies_sessions::session_key_fun::session_key_hash_fun;
-    use crate::backend::logic::endpoint_huggies_sessions::sessions_store::session_upsert_fun;
+    use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::session_key_hash_fun;
+    use crate::backend::logic::endpoint_shit_1170_sessions::sessions_store::session_upsert_fun;
 
     let session_key_hash = session_key_hash_fun(session_key);
     session_upsert_fun(pool, account_id, session_key, &session_key_hash)
@@ -86,7 +86,7 @@ async fn serve_fun(pool: SqlitePool) -> String {
 // the body.
 async fn who_am_i_fun(base_url: &str, session_key: &str) -> (u16, String) {
     let response = reqwest::Client::new()
-        .get(format!("{base_url}/api/huggies/session/me"))
+        .get(format!("{base_url}/api/shit-1170/session/me"))
         .header("x-session-token", session_key)
         .send()
         .await
@@ -102,7 +102,7 @@ async fn a_new_key_carries_the_prefix_and_works() {
     let db = TEMP_DB::new_fun("new");
     let pool = db.pool_fun().await;
 
-    use crate::backend::logic::endpoint_huggies_sessions::session_key_fun::session_key_generate_fun;
+    use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::session_key_generate_fun;
     let key = session_key_generate_fun();
 
     assert!(

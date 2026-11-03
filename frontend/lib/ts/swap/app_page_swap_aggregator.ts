@@ -19,7 +19,7 @@
 // (https://router.intear.tech) and the per-request wait budget (2s).
 //
 // --- WHY THE REFERRER COMES FROM @huggies/shit-bin: the referral
-// account is the same constant the rest of the huggies tooling uses, so
+// account is the same constant the rest of the shit-1170 tooling uses, so
 // it is read from there instead of being written down a second time.
 //
 // --- WHY THE CONST AND NOT THE RESOLVER: the bin's barrel is
@@ -39,7 +39,7 @@ import { get_stored_network_id } from "@near-kit-tool-box/web";
 // the dexes that serve routes today. the package's KNOWN list also
 // names the ones that were removed upstream, and asking for them costs
 // nothing but earns nothing either.
-const HUGGIES_SWAP_DEXES = DEX_AGGREGATOR_ACTIVE_DEXES;
+const SHIT_1170_SWAP_DEXES = DEX_AGGREGATOR_ACTIVE_DEXES;
 // ========================================
 // ========================================
 // --- REFERRER --------------------------
@@ -64,22 +64,22 @@ function referral_id_fun(): string {
 // --- CLIENT ----------------------------
 // the one client. quoting is read-only, so it holds no signer and no
 // credentials.
-const HUGGIES_SWAP_REFERRER_ID = referral_id_fun();
+const SHIT_1170_SWAP_REFERRER_ID = referral_id_fun();
 const client = new DEX_AGGREGATOR_CLIENT({
   // The swap page needs a live view of the routes it receives, including
   // every socket update. `info` keeps the output useful without dumping
   // the complete route bodies; `debug` would add those bodies.
   level: "info",
 })
-  .WITH_REFERRER_ID(HUGGIES_SWAP_REFERRER_ID)
-  .WITH_DEFAULT_DEXES(HUGGIES_SWAP_DEXES);
+  .WITH_REFERRER_ID(SHIT_1170_SWAP_REFERRER_ID)
+  .WITH_DEFAULT_DEXES(SHIT_1170_SWAP_DEXES);
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_SWAP_AGGREGATOR = {
+export const SHIT_1170_SWAP_AGGREGATOR = {
   client,
-  referrer_id: HUGGIES_SWAP_REFERRER_ID,
-  dexes: HUGGIES_SWAP_DEXES,
+  referrer_id: SHIT_1170_SWAP_REFERRER_ID,
+  dexes: SHIT_1170_SWAP_DEXES,
 };
 // ========================================
 // copyright 2026 by sleet.near

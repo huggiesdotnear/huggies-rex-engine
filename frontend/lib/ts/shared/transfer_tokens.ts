@@ -26,15 +26,15 @@
 // `<img>` tags and the browser loads them itself. they are decoration
 // — the amounts read without them — so the bar measures the data, not
 // the pictures. same as everywhere else in the app.
-import { HUGGIES_TOKEN_INFO } from "./token_info";
-import type { HUGGIES_TOKEN_INFO as HUGGIES_TOKEN_INFO_TYPE } from "./token_info";
-import { HUGGIES_NEAR_ID } from "./token_near";
+import { SHIT_1170_TOKEN_INFO } from "./token_info";
+import type { SHIT_1170_TOKEN_INFO as SHIT_1170_TOKEN_INFO_TYPE } from "./token_info";
+import { SHIT_1170_NEAR_ID } from "./token_near";
 import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what one transfer's token looks like once the metadata is known.
-export interface HUGGIES_TRANSFER_TOKEN {
+export interface SHIT_1170_TRANSFER_TOKEN {
   // the token's display symbol.
   symbol: string;
   // the token's icon url, or null when it has none.
@@ -54,8 +54,8 @@ export interface HUGGIES_TRANSFER_TOKEN {
 // IS the wrap.near ft, and "nep245:other.near:42" means it holds
 // another multi token's token. the prefix says which lookup the id
 // belongs to, and the icon and symbol follow it.
-const HUGGIES_NEP141_PREFIX = "nep141:";
-const HUGGIES_NEP245_PREFIX = "nep245:";
+const SHIT_1170_NEP141_PREFIX = "nep141:";
+const SHIT_1170_NEP245_PREFIX = "nep245:";
 // ========================================
 // ========================================
 // --- HELPERS ---------------------------
@@ -75,19 +75,19 @@ function contract_of_fun(
   contract_id: string | undefined,
   token_id: string | undefined,
 ): string | null {
-  if (token_type === "near") return HUGGIES_NEAR_ID;
+  if (token_type === "near") return SHIT_1170_NEAR_ID;
   if (contract_id === undefined || contract_id.length === 0) return null;
   if (token_type !== "nep245") return contract_id;
   if (token_id === undefined) return contract_id;
-  if (token_id.startsWith(HUGGIES_NEP141_PREFIX)) {
-    const inner = token_id.slice(HUGGIES_NEP141_PREFIX.length);
+  if (token_id.startsWith(SHIT_1170_NEP141_PREFIX)) {
+    const inner = token_id.slice(SHIT_1170_NEP141_PREFIX.length);
     // the id can be "contract" or "contract:label" — the contract is
     // what is before the first colon.
     const colon_at = inner.indexOf(":");
     return colon_at >= 0 ? inner.slice(0, colon_at) : inner;
   }
-  if (token_id.startsWith(HUGGIES_NEP245_PREFIX)) {
-    const inner = token_id.slice(HUGGIES_NEP245_PREFIX.length);
+  if (token_id.startsWith(SHIT_1170_NEP245_PREFIX)) {
+    const inner = token_id.slice(SHIT_1170_NEP245_PREFIX.length);
     const colon_at = inner.indexOf(":");
     return colon_at >= 0 ? inner.slice(0, colon_at) : inner;
   }
@@ -136,7 +136,7 @@ export function transfer_contract_ids_fun(parsed: PARSE_RESULT): string[] {
 // because one of its tokens is unknown.
 export async function fetch_transfer_tokens_fun(
   parsed: PARSE_RESULT,
-): Promise<Map<string, HUGGIES_TRANSFER_TOKEN>> {
+): Promise<Map<string, SHIT_1170_TRANSFER_TOKEN>> {
   const ids = [...new Set(transfer_contract_ids_fun(parsed))];
   return fetch_transfer_tokens_by_ids_fun(ids);
 }
@@ -150,13 +150,13 @@ export async function fetch_transfer_tokens_fun(
 // over it.
 export async function fetch_transfer_tokens_by_ids_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_TRANSFER_TOKEN>> {
-  const out = new Map<string, HUGGIES_TRANSFER_TOKEN>();
+): Promise<Map<string, SHIT_1170_TRANSFER_TOKEN>> {
+  const out = new Map<string, SHIT_1170_TRANSFER_TOKEN>();
   const wanted = [...new Set(ids)];
   if (wanted.length === 0) return out;
-  let infos: Map<string, HUGGIES_TOKEN_INFO_TYPE>;
+  let infos: Map<string, SHIT_1170_TOKEN_INFO_TYPE>;
   try {
-    infos = await HUGGIES_TOKEN_INFO.get(wanted);
+    infos = await SHIT_1170_TOKEN_INFO.get(wanted);
   } catch {
     // --- WHY THE FAILURE IS SWALLOWED: the transfers are still worth
     // showing without their icons. a failure here costs the reader the
@@ -185,8 +185,8 @@ export function transfer_token_of_fun(
   token_type: string,
   contract_id: string | undefined,
   token_id: string | undefined,
-  tokens: Map<string, HUGGIES_TRANSFER_TOKEN>,
-): HUGGIES_TRANSFER_TOKEN | null {
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>,
+): SHIT_1170_TRANSFER_TOKEN | null {
   const id = contract_of_fun(token_type, contract_id, token_id);
   if (id === null) return null;
   return tokens.get(id) ?? null;

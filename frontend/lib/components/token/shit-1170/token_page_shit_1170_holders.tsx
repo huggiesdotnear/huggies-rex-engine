@@ -6,23 +6,23 @@
 // the next page is asked for when the reader nears the bottom of the list.
 import { render } from "preact";
 import { useRef as use_ref } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../../../ts/token/shit-1170/token_page_shit_1170_state";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170 } from "../../../ts/token/shit-1170/token_page_shit_1170";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE } from "../../../ts/token/shit-1170/token_page_shit_1170_state";
+import { SHIT_1170_TOKEN_PAGE_SHIT_1170 } from "../../../ts/token/shit-1170/token_page_shit_1170";
 import { current_app_depth_fun } from "../../../ts/shared/app_depth";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { use_scroll_load_fun } from "../../../ts/shared/use_scroll_load";
 import {
   shit_holder_icon_fun,
   shit_holder_type_label_fun,
-  type HUGGIES_SHIT_HOLDER,
+  type SHIT_1170_SHIT_HOLDER,
 } from "../../../ts/token/shit-1170/token_page_shit_1170_holders";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // the css selector that matches ONE row of the holders table. the scroll
 // hook is told what a row is, so it can count the rows that have landed.
-const HUGGIES_SHIT_HOLDERS_ROW_SELECTOR = "tr";
+const SHIT_1170_SHIT_HOLDERS_ROW_SELECTOR = "tr";
 // ========================================
 // --- HELPERS ----------------------------
 function holder_account_href_fun(account_id: string, depth: number): string {
@@ -31,7 +31,7 @@ function holder_account_href_fun(account_id: string, depth: number): string {
 }
 // ========================================
 function render_holder_fun(
-  holder: HUGGIES_SHIT_HOLDER,
+  holder: SHIT_1170_SHIT_HOLDER,
   rank: number,
   depth: number,
 ): preact.JSX.Element {
@@ -62,8 +62,8 @@ function render_holder_fun(
 }
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
+function SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
+  const state = use_page_store_fun(SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE);
   // the scroll box, so the reader's position at the bottom is
   // detectable.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
@@ -73,21 +73,21 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
     const cursor = state.next_cursor;
     if (cursor === null || state.loading_more) return;
     const price_usd = state.summary?.price_usd ?? 0;
-    HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
+    SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.set({
       ...state,
       loading_more: true,
     });
-    void HUGGIES_TOKEN_PAGE_SHIT_1170.load_holders(
+    void SHIT_1170_TOKEN_PAGE_SHIT_1170.load_holders(
       cursor,
       price_usd,
       state.summary?.decimals ?? 18,
-      HUGGIES_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
+      SHIT_1170_TOKEN_PAGE_SHIT_1170.bigint_or_zero(
         state.summary?.total_supply_raw ?? "0",
       ),
     )
       .then((page) => {
-        const current = HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.get();
-        HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
+        const current = SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.get();
+        SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.set({
           ...current,
           holders: [...current.holders, ...page.rows],
           holder_total: page.total,
@@ -96,8 +96,8 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
         });
       })
       .catch((err: unknown) => {
-        const current = HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.get();
-        HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set({
+        const current = SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.get();
+        SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.set({
           ...current,
           loading_more: false,
           error: err instanceof Error ? err.message : String(err),
@@ -121,7 +121,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
     state.loading_more,
     load_more_fun,
     // the rows are table rows.
-    HUGGIES_SHIT_HOLDERS_ROW_SELECTOR,
+    SHIT_1170_SHIT_HOLDERS_ROW_SELECTOR,
   );
 
   return (
@@ -163,11 +163,11 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN />, el);
+    render(<SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_HOLDERS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

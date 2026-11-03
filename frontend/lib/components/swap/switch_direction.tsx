@@ -25,7 +25,7 @@ import { ArrowDown, ArrowUp } from "lucide-preact";
 // --- WHY --- the caller owns the action: only the caller knows what
 // swapping means for its two sides, so the bar takes the click as a
 // prop and does not reach for a store of its own.
-export function huggies_switch_direction_fun(props: {
+export function shit_1170_switch_direction_fun(props: {
   // what the click does. the swap page swaps the two tokens.
   on_switch: () => void;
 }): preact.JSX.Element {

@@ -44,7 +44,7 @@ function read_url_tx_fun(): string | null {
 // --- PUBLIC ---------------------------
 // the reader surface. exported as one object so callers have a single
 // import.
-export const HUGGIES_URL_TX = {
+export const SHIT_1170_URL_TX = {
   read: read_url_tx_fun,
   normalize: normalize_tx_fun,
 };

@@ -8,14 +8,14 @@
 // fetch, and the patch has to be in place before the page's first
 // request — otherwise the page's own first load was never counted and
 // the bar sat dark through it.
-import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
-import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
+import { shit_1170_loading_bar_start_fun } from "../shared/loading_bar_start";
+import { SHIT_1170_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
 // ========================================
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // ========================================
 // the page's first load: the pair from the url, their info, their
 // balances and the first quote.
-void HUGGIES_APP_PAGE_SWAP_STORE.load();
+void SHIT_1170_APP_PAGE_SWAP_STORE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

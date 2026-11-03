@@ -8,15 +8,15 @@
 // ========================================
 // --- TYPES ------------------------------
 // the sort direction of a pool list.
-export type HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION = "asc" | "desc";
+export type SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION = "asc" | "desc";
 // ========================================
 // the sort keys a pool list can be ordered by.
-export type HUGGIES_INTEAR_DEX_POOL_SORT =
+export type SHIT_1170_INTEAR_DEX_POOL_SORT =
   "tvl" | "volume_24h" | "volume_7d" | "apy";
 // ========================================
 // the sort options in the order they are offered to the user.
-export const HUGGIES_INTEAR_DEX_POOL_SORTS: ReadonlyArray<{
-  key: HUGGIES_INTEAR_DEX_POOL_SORT;
+export const SHIT_1170_INTEAR_DEX_POOL_SORTS: ReadonlyArray<{
+  key: SHIT_1170_INTEAR_DEX_POOL_SORT;
   label: string;
 }> = [
   { key: "tvl", label: "TVL" },
@@ -26,10 +26,10 @@ export const HUGGIES_INTEAR_DEX_POOL_SORTS: ReadonlyArray<{
 ];
 // ========================================
 // the default sort: the pools with the most money in them.
-export const HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT: HUGGIES_INTEAR_DEX_POOL_SORT =
+export const SHIT_1170_DEFAULT_INTEAR_DEX_POOL_SORT: SHIT_1170_INTEAR_DEX_POOL_SORT =
   "tvl";
 // the default direction: biggest first.
-export const HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION: HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION =
+export const SHIT_1170_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION: SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION =
   "desc";
 // ========================================
 // copyright 2026 by sleet.near

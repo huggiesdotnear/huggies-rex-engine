@@ -1,0 +1,14 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER
+   the $SHIT page's heading: the token's own account id. */
+/*==================================*/
+#SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER header {
+  margin-bottom: 16px;
+}
+#SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_HEADER header h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+/*==================================*/

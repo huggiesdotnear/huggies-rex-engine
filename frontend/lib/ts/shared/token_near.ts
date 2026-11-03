@@ -15,10 +15,10 @@
 // the 1:1 wrapper stands in for NEAR's icon and supply: wNEAR tracks
 // NEAR one for one, so its supply is the same number and its icon IS
 // the NEAR logo (the green "N"), not a lookalike.
-export const HUGGIES_NEAR_ID = "near";
-export const HUGGIES_NEAR_SYMBOL = "NEAR";
-export const HUGGIES_NEAR_DECIMALS = 24;
-export const HUGGIES_WRAP_ID = "wrap.near";
+export const SHIT_1170_NEAR_ID = "near";
+export const SHIT_1170_NEAR_SYMBOL = "NEAR";
+export const SHIT_1170_NEAR_DECIMALS = 24;
+export const SHIT_1170_WRAP_ID = "wrap.near";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

@@ -1,7 +1,7 @@
 // ========================================
 // format a usd price for a metadata row.
 // ========================================
-import { HUGGIES_AMOUNT_FORMAT } from "../../shared/token_amount_format";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../shared/token_amount_format";
 // ========================================
 // format a usd price with two decimals, and "0.00" for one that is
 // real but rounds away.
@@ -14,7 +14,7 @@ export function format_price_usd_fun(value: number): string {
   if (!Number.isFinite(value) || value === 0) {
     return "—";
   }
-  return HUGGIES_AMOUNT_FORMAT.usd(value);
+  return SHIT_1170_AMOUNT_FORMAT.usd(value);
 }
 // ========================================
 // copyright 2026 by sleet.near

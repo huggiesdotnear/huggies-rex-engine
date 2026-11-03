@@ -5,14 +5,14 @@
 // is always refetched from intear. callers get one flat record per token
 // and never touch the cache or the api directly.
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_TOKEN_CACHE } from "./token_cache";
-import type { HUGGIES_CACHED_TOKEN } from "./token_cache";
+import { SHIT_1170_TOKEN_CACHE } from "./token_cache";
+import type { SHIT_1170_CACHED_TOKEN } from "./token_cache";
 import { icon_hash_of_fun, token_icon_for_fun } from "./token_icon_url";
 import {
-  HUGGIES_NEAR_DECIMALS,
-  HUGGIES_NEAR_ID,
-  HUGGIES_NEAR_SYMBOL,
-  HUGGIES_WRAP_ID,
+  SHIT_1170_NEAR_DECIMALS,
+  SHIT_1170_NEAR_ID,
+  SHIT_1170_NEAR_SYMBOL,
+  SHIT_1170_WRAP_ID,
 } from "./token_near";
 // ========================================
 // ========================================
@@ -21,19 +21,23 @@ import {
 // in sync with which fields land in the cache below.
 // volatile: changes constantly, never cached. fetched for every id on
 // every load, so it stays a small field set.
-const HUGGIES_VOLATILE_FIELDS = ["price_usd", "reputation", "holders"] as const;
+const SHIT_1170_VOLATILE_FIELDS = [
+  "price_usd",
+  "reputation",
+  "holders",
+] as const;
 // durable: fixed for a token's life, cached in indexeddb forever.
 //
 // --- WHY --- `icon_hash` and not `icon`: the icon field is a full inline
 // svg data uri and makes up almost the entire payload — 336KB for ~100
 // tokens with the icons, ~10KB without. see lib/ts/token_icon_url.ts.
-const HUGGIES_DURABLE_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
+const SHIT_1170_DURABLE_FIELDS = ["symbol", "decimals", "icon_hash"] as const;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // everything the ui needs to render a token. `decimals` and `icon` may
 // come from cache; the rest are always fresh.
-export interface HUGGIES_TOKEN_INFO {
+export interface SHIT_1170_TOKEN_INFO {
   id: string;
   symbol: string;
   decimals: number;
@@ -62,11 +66,11 @@ function to_number_fun(value: unknown): number {
 function near_info_fun(wnear: {
   price_usd: number;
   icon: string | null;
-}): HUGGIES_TOKEN_INFO {
+}): SHIT_1170_TOKEN_INFO {
   return {
-    id: HUGGIES_NEAR_ID,
-    symbol: HUGGIES_NEAR_SYMBOL,
-    decimals: HUGGIES_NEAR_DECIMALS,
+    id: SHIT_1170_NEAR_ID,
+    symbol: SHIT_1170_NEAR_SYMBOL,
+    decimals: SHIT_1170_NEAR_DECIMALS,
     // the chain token has no registry entry of its own, so it borrows
     // wNEAR's icon — which IS the NEAR logo (the green #00EC97 "N"), not
     // a lookalike.
@@ -89,16 +93,16 @@ function near_info_fun(wnear: {
 // fetches ~10KB of price/reputation instead.
 async function fetch_and_merge_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_TOKEN_INFO>> {
-  const out = new Map<string, HUGGIES_TOKEN_INFO>();
+): Promise<Map<string, SHIT_1170_TOKEN_INFO>> {
+  const out = new Map<string, SHIT_1170_TOKEN_INFO>();
   if (ids.length === 0) return out;
 
   // ask for wNEAR alongside the requested ids so the native NEAR row
   // can be priced without a second round trip.
-  const wants_near = ids.includes(HUGGIES_NEAR_ID);
-  const asked = wants_near ? [...new Set([...ids, HUGGIES_WRAP_ID])] : ids;
+  const wants_near = ids.includes(SHIT_1170_NEAR_ID);
+  const asked = wants_near ? [...new Set([...ids, SHIT_1170_WRAP_ID])] : ids;
 
-  const cached = await HUGGIES_TOKEN_CACHE.get_many(asked);
+  const cached = await SHIT_1170_TOKEN_CACHE.get_many(asked);
   // the ids whose symbol/decimals/icon we have never stored. on a warm
   // cache this is empty, so no durable request is made at all.
   //
@@ -108,7 +112,7 @@ async function fetch_and_merge_fun(
   // load, and every caller that wanted it fired its own durable request.
   // `near` is described locally and cached explicitly below.
   const uncached = asked.filter(
-    (id) => id !== HUGGIES_NEAR_ID && !cached.has(id),
+    (id) => id !== SHIT_1170_NEAR_ID && !cached.has(id),
   );
 
   // 1. durable fields, only for ids we have never stored. empty list
@@ -121,10 +125,10 @@ async function fetch_and_merge_fun(
   // back nothing — leaving every token with decimals 0 and the contract id
   // as its symbol, which renders balances like 1.23e+35. using the values
   // we just received makes the render correct either way.
-  const fetched = new Map<string, HUGGIES_CACHED_TOKEN>();
+  const fetched = new Map<string, SHIT_1170_CACHED_TOKEN>();
   if (uncached.length > 0) {
     const fresh = await api_intear_tokens_get({
-      fields: HUGGIES_DURABLE_FIELDS,
+      fields: SHIT_1170_DURABLE_FIELDS,
       ids: uncached,
     });
     // --- WHY --- the row is read by column NAME, not by index: the api
@@ -140,7 +144,7 @@ async function fetch_and_merge_fun(
       const symbol = symbol_at >= 0 ? row[symbol_at] : row[1];
       const decimals = decimals_at >= 0 ? row[decimals_at] : row[2];
       const hash = hash_at >= 0 ? row[hash_at] : row[3];
-      const record: HUGGIES_CACHED_TOKEN = {
+      const record: SHIT_1170_CACHED_TOKEN = {
         id,
         symbol: typeof symbol === "string" && symbol.length > 0 ? symbol : id,
         decimals: to_number_fun(decimals),
@@ -149,12 +153,12 @@ async function fetch_and_merge_fun(
       fetched.set(id, record);
       return record;
     });
-    await HUGGIES_TOKEN_CACHE.put_many(to_cache);
+    await SHIT_1170_TOKEN_CACHE.put_many(to_cache);
   }
 
   // 2. volatile fields for every id, so usd values are never stale.
   const live = await api_intear_tokens_get({
-    fields: HUGGIES_VOLATILE_FIELDS,
+    fields: SHIT_1170_VOLATILE_FIELDS,
     ids: asked,
   });
   // durable values: what we just fetched wins over the stored copy, so a
@@ -164,11 +168,11 @@ async function fetch_and_merge_fun(
   // `near` is described locally, so it never needs a durable request. it
   // goes into the durable map so the render below has its symbol and
   // decimals.
-  if (asked.includes(HUGGIES_NEAR_ID)) {
-    durable.set(HUGGIES_NEAR_ID, {
-      id: HUGGIES_NEAR_ID,
-      symbol: HUGGIES_NEAR_SYMBOL,
-      decimals: HUGGIES_NEAR_DECIMALS,
+  if (asked.includes(SHIT_1170_NEAR_ID)) {
+    durable.set(SHIT_1170_NEAR_ID, {
+      id: SHIT_1170_NEAR_ID,
+      symbol: SHIT_1170_NEAR_SYMBOL,
+      decimals: SHIT_1170_NEAR_DECIMALS,
       icon_hash: null,
     });
   }
@@ -176,7 +180,7 @@ async function fetch_and_merge_fun(
   for (const row of live.rows) {
     const [id, price_usd, reputation, holders] = row;
     const base = durable.get(id);
-    const record: HUGGIES_TOKEN_INFO = {
+    const record: SHIT_1170_TOKEN_INFO = {
       id,
       symbol: base?.symbol ?? id,
       decimals: base?.decimals ?? 0,
@@ -189,15 +193,15 @@ async function fetch_and_merge_fun(
   }
 
   // the registry has no `near`, so supply it ourselves from wNEAR.
-  const wnear = out.get(HUGGIES_WRAP_ID);
-  if (wants_near && !out.has(HUGGIES_NEAR_ID)) {
-    const wrap_durable = durable.get(HUGGIES_WRAP_ID);
+  const wnear = out.get(SHIT_1170_WRAP_ID);
+  if (wants_near && !out.has(SHIT_1170_NEAR_ID)) {
+    const wrap_durable = durable.get(SHIT_1170_WRAP_ID);
     out.set(
-      HUGGIES_NEAR_ID,
+      SHIT_1170_NEAR_ID,
       near_info_fun({
         price_usd: wnear?.price_usd ?? 0,
         icon: token_icon_for_fun(
-          HUGGIES_WRAP_ID,
+          SHIT_1170_WRAP_ID,
           wrap_durable?.icon_hash ?? null,
         ),
       }),
@@ -222,12 +226,12 @@ async function fetch_and_merge_fun(
   // `near` is written to the cache so later loads treat it as known.
   // `wrap.near` is a real token and the api response stores it too, but it
   // is written here too so the pair is kept together.
-  const to_store: Array<HUGGIES_CACHED_TOKEN> = [];
-  for (const id of [HUGGIES_NEAR_ID, HUGGIES_WRAP_ID]) {
+  const to_store: Array<SHIT_1170_CACHED_TOKEN> = [];
+  for (const id of [SHIT_1170_NEAR_ID, SHIT_1170_WRAP_ID]) {
     const record = durable.get(id);
     if (record !== undefined) to_store.push(record);
   }
-  await HUGGIES_TOKEN_CACHE.put_many(to_store);
+  await SHIT_1170_TOKEN_CACHE.put_many(to_store);
 
   return out;
 }
@@ -243,7 +247,7 @@ async function fetch_and_merge_fun(
 // and cost a second round trip.
 async function get_token_info_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_TOKEN_INFO>> {
+): Promise<Map<string, SHIT_1170_TOKEN_INFO>> {
   const unique_ids = [...new Set(ids)];
   if (unique_ids.length === 0) return new Map();
   return fetch_and_merge_fun(unique_ids);
@@ -251,7 +255,7 @@ async function get_token_info_fun(
 // ========================================
 // ========================================
 // public surface, one import for callers.
-export const HUGGIES_TOKEN_INFO = {
+export const SHIT_1170_TOKEN_INFO = {
   get: get_token_info_fun,
 };
 // ========================================

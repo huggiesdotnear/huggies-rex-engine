@@ -1,0 +1,164 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+   the account's transaction history table: the transaction, when it
+   happened, and whether it worked.
+
+   the row is its own component (app_page_account_tx_row.tsx), but it is
+   a plain `<tr>` with no markup of its own, so the rules that give it
+   its columns live here — with the table that owns the row. */
+/*==================================*/
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions .scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th,
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions td {
+  text-align: left;
+  padding: 6px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the row that carries a message — "LOADING TRANSACTIONS..." and
+   "NO TRANSACTIONS" — spans the whole table and is not a data row. */
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td[colspan] {
+  text-align: center;
+  padding: 16px 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/
+/* the row's columns.
+
+   the table has three columns, so the hash takes what it needs and the
+   other two share what is left. */
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  th.tx-hash,
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td.tx-hash {
+  width: 68%;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td.tx-hash
+  a {
+  display: block;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.3;
+  font-family: monospace;
+  font-size: 11px;
+  /*color: var(--color-middle);*/
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td.tx-hash
+  a:hover {
+  color: var(--color-fontend);
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  th.tx-time,
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td.tx-time {
+  width: 20%;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  th.tx-status,
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td.tx-status {
+  width: 12%;
+  text-align: right;
+}
+/* the status is an icon, so the cell holds it centred on its line. */
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  td.tx-status
+  svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  .tx-status
+  .is-success {
+  /* a green that clears the 4.5:1 contrast bar on the row's own
+     background. */
+  color: #9df7c0;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  .tx-status
+  .is-failed {
+  /* a light red tint of the app's own red — it clears the contrast bar
+     too. */
+  color: #ffe8e6;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE .account-transactions th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/
+/* the messages under and over the table. */
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  .tx-error {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #ffe8e6;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE
+  .account-transactions
+  .tx-loading-more {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  margin: 8px 0 0 0;
+}
+/*==================================*/

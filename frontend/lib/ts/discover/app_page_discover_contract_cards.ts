@@ -5,14 +5,14 @@
 // both rhea contracts, and the pumpopoly card carries the world and
 // the nft contract. the card shows every id, each on its own line.
 // ========================================
-export interface HUGGIES_CONTRACT_CARD {
+export interface SHIT_1170_CONTRACT_CARD {
   key: string;
   title: string;
   contract_ids: string[];
   page: string;
 }
 // ========================================
-export function list_contract_cards_fun(): HUGGIES_CONTRACT_CARD[] {
+export function list_contract_cards_fun(): SHIT_1170_CONTRACT_CARD[] {
   return [
     {
       key: "rhea",

@@ -1,6 +1,6 @@
 // ========================================
 // SESSION_ROTATE_ROUTE
-// POST /api/huggies/session/rotate — give an account a NEW session key.
+// POST /api/shit-1170/session/rotate — give an account a NEW session key.
 //
 // the reader asks for a new key for an account. the old key stops
 // working at once, and the new one takes its place.
@@ -32,7 +32,7 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::endpoint_huggies_sessions::{
+use crate::backend::logic::endpoint_shit_1170_sessions::{
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
     session_key_fun::{session_key_generate_fun, session_key_hash_fun},
     sessions_store::{session_get_fun, session_rotate_fun},
@@ -44,7 +44,7 @@ pub async fn session_rotate_route(
     Json(body): Json<SESSIONS_REQUEST>,
 ) -> Response {
     if body.accounts.is_empty() {
-        return huggies_error_fun(
+        return shit_1170_error_fun(
             StatusCode::BAD_REQUEST,
             "no_accounts",
             "the request carried no signed accounts",
@@ -57,7 +57,7 @@ pub async fn session_rotate_route(
     // the rest are ignored — no, better to refuse: a rotation that
     // silently rotates one of three is a surprise.
     if body.accounts.len() > 1 {
-        return huggies_error_fun(
+        return shit_1170_error_fun(
             StatusCode::BAD_REQUEST,
             "too_many_accounts",
             "a rotation is for one account at a time",
@@ -75,7 +75,7 @@ pub async fn session_rotate_route(
         recipient: account.recipient.clone(),
     };
     if let Err(reason) = nep413_verify_fun(&signed) {
-        return huggies_error_fun(
+        return shit_1170_error_fun(
             StatusCode::BAD_REQUEST,
             "signature_invalid",
             &format!("{}: {}", account.account_id, verify_reason_fun(&reason)),
@@ -88,7 +88,7 @@ pub async fn session_rotate_route(
     match session_get_fun(&pool, &account.account_id).await {
         Ok(Some(_)) => {}
         Ok(None) => {
-            return huggies_error_fun(
+            return shit_1170_error_fun(
                 StatusCode::NOT_FOUND,
                 "no_session",
                 &format!("{} has no session to rotate", account.account_id),
@@ -97,7 +97,7 @@ pub async fn session_rotate_route(
         }
         Err(err) => {
             eprintln!("[session] could not read the session: {err}");
-            return huggies_error_fun(
+            return shit_1170_error_fun(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "db_unavailable",
                 "the session could not be read",
@@ -114,7 +114,7 @@ pub async fn session_rotate_route(
         session_rotate_fun(&pool, &account.account_id, &session_key, &session_key_hash).await;
     if let Err(err) = rotated {
         eprintln!("[session] could not rotate the session: {err}");
-        return huggies_error_fun(
+        return shit_1170_error_fun(
             StatusCode::INTERNAL_SERVER_ERROR,
             "db_unavailable",
             "the session could not be rotated",
@@ -135,7 +135,7 @@ pub async fn session_rotate_route(
 // ========================================
 // --- HELPERS ----------------------------
 // the one json error shape every failure of this route answers with.
-fn huggies_error_fun(status: StatusCode, code: &str, message: &str) -> impl IntoResponse {
+fn shit_1170_error_fun(status: StatusCode, code: &str, message: &str) -> impl IntoResponse {
     (
         status,
         Json(serde_json::json!({

@@ -1,7 +1,7 @@
 // ========================================
 // auth state model: account_id, last_error, subscribers. UI
 // components (auth_button, app_page_account_route, etc.) read through
-// HUGGIES_AUTH; this file owns the wallet handshake.
+// SHIT_1170_AUTH; this file owns the wallet handshake.
 // ========================================
 // --- WHY --- @hot-labs/near-connect has no synchronous isSignedIn() —
 // its reads are async and can throw when no wallet is selected — so
@@ -18,14 +18,14 @@ import { near_connect_client } from "@near-kit-tool-box/web";
 import type { NearConnector } from "@hot-labs/near-connect";
 import { generateNonce } from "near-kit";
 import {
-  HUGGIES_SIGN_IN_MESSAGE,
-  HUGGIES_SIGN_IN_RECIPIENT,
+  SHIT_1170_SIGN_IN_MESSAGE,
+  SHIT_1170_SIGN_IN_RECIPIENT,
 } from "./sign_in_messages";
 import {
-  HUGGIES_AUTH_SESSIONS,
-  type HUGGIES_AUTH_SESSION,
+  SHIT_1170_AUTH_SESSIONS,
+  type SHIT_1170_AUTH_SESSION,
 } from "./auth_sessions";
-import { HUGGIES_SESSION } from "./session";
+import { SHIT_1170_SESSION } from "./session";
 // ========================================
 // ========================================
 // ========================================
@@ -123,17 +123,17 @@ function make_nonce_fun(): Uint8Array {
 // persist a completed sign-in for one account.
 // --- WHY --- one entry per account id, so signing in as a second
 // account cannot overwrite the first one's signature.
-function save_session_fun(session: HUGGIES_AUTH_SESSION): void {
-  HUGGIES_AUTH_SESSIONS.save_session(session);
+function save_session_fun(session: SHIT_1170_AUTH_SESSION): void {
+  SHIT_1170_AUTH_SESSIONS.save_session(session);
 }
 // ========================================
-function load_session_fun(account_id: string): HUGGIES_AUTH_SESSION | null {
-  return HUGGIES_AUTH_SESSIONS.get_session(account_id);
+function load_session_fun(account_id: string): SHIT_1170_AUTH_SESSION | null {
+  return SHIT_1170_AUTH_SESSIONS.get_session(account_id);
 }
 // ========================================
 // drop the stored sessions (sign-out or cross-network drift).
 function clear_session_fun(): void {
-  HUGGIES_AUTH_SESSIONS.clear_sessions();
+  SHIT_1170_AUTH_SESSIONS.clear_sessions();
 }
 // ========================================
 // ----------------------------------------
@@ -153,7 +153,7 @@ function get_error_fun(): string | null {
   return last_error;
 }
 // ========================================
-function get_session_fun(): HUGGIES_AUTH_SESSION | null {
+function get_session_fun(): SHIT_1170_AUTH_SESSION | null {
   if (account_id === null) return null;
   return load_session_fun(account_id);
 }
@@ -163,7 +163,7 @@ function get_session_fun(): HUGGIES_AUTH_SESSION | null {
 // user is currently acting as belongs at the top, the rest keep the
 // order the wallet returned them in.
 function list_accounts_fun(): string[] {
-  const ids = HUGGIES_AUTH_SESSIONS.list_account_ids();
+  const ids = SHIT_1170_AUTH_SESSIONS.list_account_ids();
   if (account_id === null || !ids.includes(account_id)) return ids;
   return [account_id, ...ids.filter((id) => id !== account_id)];
 }
@@ -171,7 +171,7 @@ function list_accounts_fun(): string[] {
 // true when the account already holds a signature we can verify later,
 // so selecting it needs no wallet popup.
 function has_session_fun(account_id: string): boolean {
-  return HUGGIES_AUTH_SESSIONS.get_session(account_id) !== null;
+  return SHIT_1170_AUTH_SESSIONS.get_session(account_id) !== null;
 }
 // ========================================
 // ----------------------------------------
@@ -242,8 +242,8 @@ async function sign_in_fun(): Promise<void> {
   try {
     await connector.connect({
       signMessageParams: {
-        message: HUGGIES_SIGN_IN_MESSAGE,
-        recipient: HUGGIES_SIGN_IN_RECIPIENT,
+        message: SHIT_1170_SIGN_IN_MESSAGE,
+        recipient: SHIT_1170_SIGN_IN_RECIPIENT,
         nonce,
       },
     });
@@ -271,16 +271,16 @@ async function sign_in_fun(): Promise<void> {
         accountId: result.accountId,
         publicKey: result.publicKey,
         signature: result.signature,
-        message: HUGGIES_SIGN_IN_MESSAGE,
+        message: SHIT_1170_SIGN_IN_MESSAGE,
         nonce: encoded_nonce,
-        recipient: HUGGIES_SIGN_IN_RECIPIENT,
+        recipient: SHIT_1170_SIGN_IN_RECIPIENT,
         network,
         createdAt: Date.now(),
       });
     }
 
     account_id = results[0].accountId;
-    HUGGIES_AUTH_SESSIONS.save_active(account_id);
+    SHIT_1170_AUTH_SESSIONS.save_active(account_id);
     notify_fun();
     console.info(
       `[auth] signed in as ${account_id} (${results.length} account(s))`,
@@ -330,7 +330,7 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
   const existing = load_session_fun(next_account_id);
   if (existing !== null) {
     account_id = next_account_id;
-    HUGGIES_AUTH_SESSIONS.save_active(next_account_id);
+    SHIT_1170_AUTH_SESSIONS.save_active(next_account_id);
     sync_url_account_fun(next_account_id);
     notify_fun();
     console.info(`[auth] switched to ${next_account_id} (stored session)`);
@@ -342,8 +342,8 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
   try {
     const wallet = await connector.wallet();
     const signed_message = await wallet.signMessage({
-      message: HUGGIES_SIGN_IN_MESSAGE,
-      recipient: HUGGIES_SIGN_IN_RECIPIENT,
+      message: SHIT_1170_SIGN_IN_MESSAGE,
+      recipient: SHIT_1170_SIGN_IN_RECIPIENT,
       nonce,
       network,
       signerId: next_account_id,
@@ -358,14 +358,14 @@ async function switch_account_fun(next_account_id: string): Promise<void> {
       accountId: signed_account_id,
       publicKey: signed_message.publicKey,
       signature: signed_message.signature,
-      message: HUGGIES_SIGN_IN_MESSAGE,
+      message: SHIT_1170_SIGN_IN_MESSAGE,
       nonce: bytes_to_base64_fun(nonce),
-      recipient: HUGGIES_SIGN_IN_RECIPIENT,
+      recipient: SHIT_1170_SIGN_IN_RECIPIENT,
       network,
       createdAt: Date.now(),
     });
     account_id = signed_account_id;
-    HUGGIES_AUTH_SESSIONS.save_active(signed_account_id);
+    SHIT_1170_AUTH_SESSIONS.save_active(signed_account_id);
     sync_url_account_fun(signed_account_id);
     notify_fun();
     console.info(`[auth] switched to ${signed_account_id} (fresh signature)`);
@@ -396,7 +396,7 @@ async function sign_out_fun(): Promise<void> {
     clear_session_fun();
     // the backend session key belongs to the user, and the user is
     // gone — so the key is forgotten here and not left in memory.
-    HUGGIES_SESSION.reset();
+    SHIT_1170_SESSION.reset();
     account_id = null;
     set_error_fun(null);
     notify_fun();
@@ -404,7 +404,7 @@ async function sign_out_fun(): Promise<void> {
 }
 // ========================================
 function pick_fallback_account_fun(): string | null {
-  return HUGGIES_AUTH_SESSIONS.list_account_ids()[0] ?? null;
+  return SHIT_1170_AUTH_SESSIONS.list_account_ids()[0] ?? null;
 }
 // ========================================
 // ========================================
@@ -416,17 +416,17 @@ function pick_fallback_account_fun(): string | null {
 // removed. the wallet-side disconnect is deliberately NOT called: it
 // would end the shared wallet session for every account.
 function remove_account_fun(target_account_id: string): void {
-  HUGGIES_AUTH_SESSIONS.remove_session(target_account_id);
+  SHIT_1170_AUTH_SESSIONS.remove_session(target_account_id);
   if (account_id === target_account_id) {
     // the active one went away — fall back to any remaining account so
     // the UI is never left pointing at nothing.
     account_id = pick_fallback_account_fun();
-    HUGGIES_AUTH_SESSIONS.save_active(account_id);
+    SHIT_1170_AUTH_SESSIONS.save_active(account_id);
     if (account_id !== null) sync_url_account_fun(account_id);
   }
   // --- WHY --- the account's backend session key is forgotten with it:
   // the key belongs to the account, and the account is gone.
-  HUGGIES_SESSION.reset_account(target_account_id);
+  SHIT_1170_SESSION.reset_account(target_account_id);
   notify_fun();
 }
 // ========================================
@@ -454,16 +454,16 @@ function init_fun(): void {
   // the sessions, so switching accounts does not rewrite any signature.
   // fall back to the first stored account when the pointer is missing
   // (fresh install, or cleared by an older build).
-  const sessions = HUGGIES_AUTH_SESSIONS.load_sessions();
+  const sessions = SHIT_1170_AUTH_SESSIONS.load_sessions();
   const stored_ids = Object.keys(sessions);
-  const active = HUGGIES_AUTH_SESSIONS.load_active();
+  const active = SHIT_1170_AUTH_SESSIONS.load_active();
   const chosen =
     active !== null && sessions[active] !== undefined
       ? active
       : (stored_ids[0] ?? null);
   if (chosen !== null) {
     account_id = chosen;
-    HUGGIES_AUTH_SESSIONS.save_active(chosen);
+    SHIT_1170_AUTH_SESSIONS.save_active(chosen);
   }
 
   const connector = near_connect_client();
@@ -496,7 +496,7 @@ function init_fun(): void {
       clear_session_fun();
       // the user is gone, so the backend session key is forgotten here
       // too — same as our own sign out.
-      HUGGIES_SESSION.reset();
+      SHIT_1170_SESSION.reset();
       account_id = null;
       notify_fun();
     });
@@ -506,7 +506,7 @@ function init_fun(): void {
 }
 // ========================================
 // public surface, in one place so the component has a single import.
-export const HUGGIES_AUTH = {
+export const SHIT_1170_AUTH = {
   sign_in: sign_in_fun,
   sign_out: sign_out_fun,
   switch_account: switch_account_fun,

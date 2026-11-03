@@ -12,9 +12,9 @@
 // field, not as text it has to parse.
 // ========================================
 
-import type { HUGGIES_ERROR_RESPONSE } from "../types/common";
+import type { SHIT_1170_ERROR_RESPONSE } from "../types/common";
 
-export interface HUGGIES_API_ERROR extends Error {
+export interface SHIT_1170_API_ERROR extends Error {
   status: number;
   code: string;
 }
@@ -32,7 +32,7 @@ export async function parse_error(
   res: Response,
   fallback: string,
   context: PARSE_ERROR_CONTEXT = {},
-): Promise<HUGGIES_API_ERROR> {
+): Promise<SHIT_1170_API_ERROR> {
   let detail = "";
   let response_json: unknown;
   let response_text = "";
@@ -41,7 +41,7 @@ export async function parse_error(
     response_text = text;
     if (text) {
       try {
-        const parsed = JSON.parse(text) as HUGGIES_ERROR_RESPONSE;
+        const parsed = JSON.parse(text) as SHIT_1170_ERROR_RESPONSE;
         const envelope = parsed?.error;
         if (
           envelope &&
@@ -86,8 +86,8 @@ export async function parse_error(
   const code = extract_code_fun(response_json, res.status);
   const error = new Error(
     `${fallback} (${res.status} ${res.statusText})${detail}`,
-  ) as HUGGIES_API_ERROR;
-  error.name = "HUGGIES_API_ERROR";
+  ) as SHIT_1170_API_ERROR;
+  error.name = "SHIT_1170_API_ERROR";
   error.status = res.status;
   error.code = code;
   return error;
@@ -98,7 +98,7 @@ export async function parse_error(
 // from the status when the body carried no code, so the field is never
 // empty.
 function extract_code_fun(response_json: unknown, status: number): string {
-  const envelope = (response_json as HUGGIES_ERROR_RESPONSE | null)?.error;
+  const envelope = (response_json as SHIT_1170_ERROR_RESPONSE | null)?.error;
   if (
     envelope &&
     typeof envelope.code === "string" &&

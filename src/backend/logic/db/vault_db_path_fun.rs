@@ -1,8 +1,8 @@
 // VAULT_DB_PATH_FUN
 // where the sqlite db file lives.
 //
-// the default is `${HOME}/.huggies-rex-engine/huggies-rex-engine.db`, and
-// `HUGGIES_VAULT_DB_LOCATION` overrides it. the folder is created if it
+// the default is `${HOME}/.shit-1170/shit-1170.db`, and
+// `SHIT_1170_VAULT_DB_LOCATION` overrides it. the folder is created if it
 // is not there yet, so a fresh install does not need a manual mkdir.
 //
 // --- WHY --- the path is resolved ONCE, at startup, and the pool is
@@ -13,19 +13,19 @@ use std::path::PathBuf;
 // ========================================
 // --- CONFIG -----------------------------
 // the env var that overrides the db location.
-const HUGGIES_VAULT_DB_LOCATION_ENV: &str = "HUGGIES_VAULT_DB_LOCATION";
+const SHIT_1170_VAULT_DB_LOCATION_ENV: &str = "SHIT_1170_VAULT_DB_LOCATION";
 // the folder under the home dir that holds the db.
-const HUGGIES_VAULT_DIR_NAME: &str = ".huggies-rex-engine";
+const SHIT_1170_VAULT_DIR_NAME: &str = ".shit-1170";
 // the db file's name inside that folder.
-const HUGGIES_VAULT_DB_FILE_NAME: &str = "huggies-rex-engine.db";
+const SHIT_1170_VAULT_DB_FILE_NAME: &str = "shit-1170.db";
 // ========================================
 // --- HELPERS ----------------------------
-// the default location: `${HOME}/.huggies-rex-engine/huggies-rex-engine.db`.
+// the default location: `${HOME}/.shit-1170/shit-1170.db`.
 fn default_db_path_fun() -> PathBuf {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
     PathBuf::from(home)
-        .join(HUGGIES_VAULT_DIR_NAME)
-        .join(HUGGIES_VAULT_DB_FILE_NAME)
+        .join(SHIT_1170_VAULT_DIR_NAME)
+        .join(SHIT_1170_VAULT_DB_FILE_NAME)
 }
 // ========================================
 // --- PATH -------------------------------
@@ -37,7 +37,7 @@ fn default_db_path_fun() -> PathBuf {
 // a file named after the process, and a `""` value is almost always a
 // mistake rather than an intent.
 pub fn vault_db_path_fun() -> PathBuf {
-    match std::env::var(HUGGIES_VAULT_DB_LOCATION_ENV) {
+    match std::env::var(SHIT_1170_VAULT_DB_LOCATION_ENV) {
         Ok(value) => {
             let trimmed = value.trim();
             if trimmed.is_empty() {

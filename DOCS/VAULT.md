@@ -2,11 +2,11 @@
 
 the backend db storage location will be hardcoded to this location for simplicity.
 
-LOCATION: `${HOME}/.huggies-rex-engine/huggies-rex-engine.db`
+LOCATION: `${HOME}/.shit-1170/shit-1170.db`
 
 that will be the default location that we use to store the sqlite db file.
 
-can be overridden with a an `HUGGIES_VAULT_DB_LOCATION` env but the defualt is not to use that env or set that.
+can be overridden with a an `SHIT_1170_VAULT_DB_LOCATION` env but the defualt is not to use that env or set that.
 
 we will mount this location in docker.
 
@@ -45,9 +45,17 @@ the db is ours and it holds nothing that cannot be made again.
 
 ## IN DOCKER
 
-the db lives in the named volume `huggies-vault`, mounted at
-`/home/huggies/.huggies-rex-engine` — the app's default path inside the
-image, since `HOME` is `/home/huggies` there.
+the db lives in the named volume `shit-1170-vault`, mounted at
+`/home/shit-1170/.shit-1170` — the app's default path inside the
+image, since `HOME` is `/home/shit-1170` there.
+
+the volume is declared in `docker-compose.yml` with an explicit `name:`,
+so it resolves to ONE fixed name on the host no matter what the compose
+project is called. the host name it points at is
+`huggies-rex-engine-fullstack-backend_huggies-vault` — the volume the
+live deployment has been writing to since before the rename. the pin is
+what keeps every session key alive across a rename of the project, the
+service or the app.
 
 `docker compose down` keeps the volume. `docker compose down -v`
 DELETES it, and with it every session key.

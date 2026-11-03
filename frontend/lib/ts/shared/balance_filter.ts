@@ -5,34 +5,34 @@
 //
 // the filter is shared by every page that shows token balances, so a
 // dao and an account read the same way.
-import type { HUGGIES_TOKEN_INFO } from "./token_info";
+import type { SHIT_1170_TOKEN_INFO } from "./token_info";
 // ========================================
 // --- CONFIG -----------------------------
 // usd worth below which a holding is dust and is hidden regardless of
 // reputation. $0.10 keeps a real position visible without letting the
 // hundreds of near-worthless tokens a busy account holds swamp the
 // table.
-const HUGGIES_MIN_USD_BALANCE = 0.1;
+const SHIT_1170_MIN_USD_BALANCE = 0.1;
 // the one reputation intear reports that is hidden outright. "Unknown"
 // tokens still pass if they clear the usd floor, because a
 // low-reputation token can still be worth holding.
-const HUGGIES_SPAM_REPUTATION = "Spam";
+const SHIT_1170_SPAM_REPUTATION = "Spam";
 // the chain's own token. never hidden: it is the balance an account is
 // most likely to care about, and its usd price is derived rather than
 // reported, so the floor below could hide a real holding.
 //
 // the id itself lives in lib/ts/token_near.ts, next to the other facts
 // about the chain's own token.
-import { HUGGIES_NEAR_ID } from "./token_near";
+import { SHIT_1170_NEAR_ID } from "./token_near";
 // ========================================
 // --- TYPES ------------------------------
 // one row ready to render: the raw balance plus the info needed to show
 // it.
-export interface HUGGIES_BALANCE_ENTRY {
+export interface SHIT_1170_BALANCE_ENTRY {
   id: string;
   raw: string;
   usd_value: number;
-  info: HUGGIES_TOKEN_INFO;
+  info: SHIT_1170_TOKEN_INFO;
 }
 // ========================================
 // --- FILTER ----------------------------
@@ -47,22 +47,22 @@ export interface HUGGIES_BALANCE_ENTRY {
 // token is a scam by the api's own reckoning; showing it as a holding a
 // reader asked for would be showing them a liability they asked to see. the
 // dust toggle is about worthlessness, not scams.
-function keep_entry_fun(entry: HUGGIES_BALANCE_ENTRY): boolean {
-  if (entry.info.reputation === HUGGIES_SPAM_REPUTATION) return false;
-  if (entry.id === HUGGIES_NEAR_ID) return true;
-  return entry.usd_value >= HUGGIES_MIN_USD_BALANCE;
+function keep_entry_fun(entry: SHIT_1170_BALANCE_ENTRY): boolean {
+  if (entry.info.reputation === SHIT_1170_SPAM_REPUTATION) return false;
+  if (entry.id === SHIT_1170_NEAR_ID) return true;
+  return entry.usd_value >= SHIT_1170_MIN_USD_BALANCE;
 }
 // ========================================
 // apply the policy to a list of entries.
 // `show_dust` is the reader's choice from the table's control: with it
 // off the usd floor applies, with it on only the spam rule applies.
 function filter_entries_fun(
-  entries: ReadonlyArray<HUGGIES_BALANCE_ENTRY>,
+  entries: ReadonlyArray<SHIT_1170_BALANCE_ENTRY>,
   show_dust: boolean,
-): ReadonlyArray<HUGGIES_BALANCE_ENTRY> {
+): ReadonlyArray<SHIT_1170_BALANCE_ENTRY> {
   if (show_dust) {
     return entries.filter(
-      (entry) => entry.info.reputation !== HUGGIES_SPAM_REPUTATION,
+      (entry) => entry.info.reputation !== SHIT_1170_SPAM_REPUTATION,
     );
   }
   return entries.filter(keep_entry_fun);
@@ -70,17 +70,17 @@ function filter_entries_fun(
 // ========================================
 // how many entries the filter would hide, so the table can say so.
 function hidden_count_fun(
-  entries: ReadonlyArray<HUGGIES_BALANCE_ENTRY>,
+  entries: ReadonlyArray<SHIT_1170_BALANCE_ENTRY>,
   show_dust: boolean,
 ): number {
   return entries.length - filter_entries_fun(entries, show_dust).length;
 }
 // ========================================
 // the filter policy in one object.
-export const HUGGIES_BALANCE_FILTER = {
+export const SHIT_1170_BALANCE_FILTER = {
   filter: filter_entries_fun,
   hidden_count: hidden_count_fun,
-  min_usd: HUGGIES_MIN_USD_BALANCE,
+  min_usd: SHIT_1170_MIN_USD_BALANCE,
 };
 // ========================================
 // copyright 2026 by sleet.near

@@ -3,7 +3,7 @@
 // user is signed in (on load or after a click). does NOT mount
 // components — the page's own import file brings those in.
 // ========================================
-import { HUGGIES_AUTH } from "../shared/auth_status";
+import { SHIT_1170_AUTH } from "../shared/auth_status";
 // ========================================
 // ========================================
 // ========================================
@@ -45,7 +45,7 @@ function build_account_href_fun(account_id: string): string {
 // unsigned, so safe to call on every state change.
 function redirect_if_signed_in_fun(): void {
   if (typeof window === "undefined") return;
-  const account_id = HUGGIES_AUTH.get_account_id();
+  const account_id = SHIT_1170_AUTH.get_account_id();
   if (account_id === null) return;
   window.location.replace(build_account_href_fun(account_id));
 }
@@ -57,12 +57,12 @@ function redirect_if_signed_in_fun(): void {
 // self-run on import. init() is synchronous + idempotent, so safe to call
 // alongside auth_button.tsx's own init.
 if (typeof window !== "undefined") {
-  HUGGIES_AUTH.init();
+  SHIT_1170_AUTH.init();
   redirect_if_signed_in_fun();
   // --- WHY --- the subscription is what catches the "clicked LOGIN → wallet
   // signed in → bounce" path. the beforeunload cleanup prevents a leaked
   // listener in auth_status's array after navigation.
-  const unsubscribe = HUGGIES_AUTH.subscribe(() => {
+  const unsubscribe = SHIT_1170_AUTH.subscribe(() => {
     redirect_if_signed_in_fun();
   });
   window.addEventListener("beforeunload", () => {

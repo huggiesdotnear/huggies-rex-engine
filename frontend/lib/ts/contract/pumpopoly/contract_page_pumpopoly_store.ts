@@ -11,13 +11,13 @@
 // the url changes. the store loads the new id by itself, so no component
 // has to watch for it and no component has to call load().
 import { load_pumpopoly_page_fun } from "./contract_page_pumpopoly";
-import { HUGGIES_PAGE_ACCOUNT_ID } from "./contract_page_pumpopoly_account_id";
-import type { HUGGIES_PUMPOPOLY_DATA } from "./contract_page_pumpopoly_parse";
+import { SHIT_1170_PAGE_ACCOUNT_ID } from "./contract_page_pumpopoly_account_id";
+import type { SHIT_1170_PUMPOPOLY_DATA } from "./contract_page_pumpopoly_parse";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // null until the load finishes. components render nothing until then.
-let data: HUGGIES_PUMPOPOLY_DATA | null = null;
+let data: SHIT_1170_PUMPOPOLY_DATA | null = null;
 // the account id the page is about.
 //
 // --- WHY --- the id lives here as well as in the id module: the components
@@ -74,7 +74,7 @@ function subscribe_fun(listener: () => void): () => void {
 // id itself and watches it, so the page loads whatever the id says at that
 // moment and re-loads when the id changes.
 async function contract_page_pumpopoly_store_load_fun(): Promise<void> {
-  const next_account_id = HUGGIES_PAGE_ACCOUNT_ID.get_account_id();
+  const next_account_id = SHIT_1170_PAGE_ACCOUNT_ID.get_account_id();
   // --- WHY --- the id is stored even when there is no player: the
   // components read it to know there is nothing to show, and they read
   // it through the store so they follow it when it changes.
@@ -125,11 +125,11 @@ function contract_page_pumpopoly_store_watch_fun(): void {
   // a second listener, and the id would then load twice for every change.
   if (watching) return;
   watching = true;
-  const unsubscribe = HUGGIES_PAGE_ACCOUNT_ID.subscribe(() => {
+  const unsubscribe = SHIT_1170_PAGE_ACCOUNT_ID.subscribe(() => {
     // --- WHY --- the public load and not the internal one: the public one is
     // what the page and the tests go through, so it is the one that must be
     // called.
-    void HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE.load();
+    void SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE.load();
   });
   // the subscription lives as long as the page does, so it is never
   // unsubscribed. the module is loaded once per document.
@@ -138,7 +138,7 @@ function contract_page_pumpopoly_store_watch_fun(): void {
 // ========================================
 // --- READ ------------------------------
 // the loaded data, or null while it is still loading.
-function get_fun(): HUGGIES_PUMPOPOLY_DATA | null {
+function get_fun(): SHIT_1170_PUMPOPOLY_DATA | null {
   return data;
 }
 // ========================================
@@ -158,7 +158,7 @@ function is_loading_fun(): boolean {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_PAGE_PUMPOPOLY_STORE = {
+export const SHIT_1170_CONTRACT_PAGE_PUMPOPOLY_STORE = {
   load: contract_page_pumpopoly_store_load_fun,
   subscribe: subscribe_fun,
   get: get_fun,

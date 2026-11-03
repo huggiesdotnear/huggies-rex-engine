@@ -1,0 +1,79 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_LOADING_BAR
+   the loading progress bar pinned to the top of the screen.
+
+   it is fixed at the very top and spans the full width of the
+   viewport, so it reads as a page-wide line rather than a piece of
+   the app's column.
+
+   two parts, and they are the only two:
+   - the TRACK is the mount div itself (#SHIT_1170_COMPONENT_LOADING_BAR).
+     it is a dark grey. it says "this is the bar" and nothing more. it
+     is never bright, so it can never be mistaken for progress.
+   - the FILL is the bright middle colour at FULL strength, with no
+     transparency at all. it is the bar itself.
+
+   --- WHY THE FILL IS ABSOLUTELY POSITIONED: the fill is a direct
+   child of the track, so it would normally be laid out INSIDE the
+   track's box and push it around. absolutely positioning it pins it
+   to the track's own left edge and lets it grow over the track
+   without moving anything else.
+
+   --- WHY THE FILL'S HEIGHT IS A PIXEL VALUE AND NOT 100%: the track
+   is 6px tall, so 100% would work — but the fill is absolutely
+   positioned, and a percentage height on an absolutely positioned
+   element resolves against its CONTAINING BLOCK's padding box. a
+   pixel value says exactly how tall the lit part is and cannot
+   collapse.
+
+   --- WHY THE BAR IS ALWAYS VISIBLE: the dark track is a constant
+   line across the top of every page, so the app looks the same on
+   every page and the reader always knows where the progress appears.
+   a page that fetches nothing shows the dark track alone. a page that
+   has finished shows the track with the blue fill at the end. a page
+   that is loading shows the fill sweeping across it.
+
+   the bar is never hidden, so it never has to fade in or out and it
+   never leaves a gap at the top of the page. */
+/*==================================*/
+#SHIT_1170_COMPONENT_LOADING_BAR {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  width: 100vw;
+  height: 6px;
+  /* the bar sits above everything else, including the bottom nav. */
+  z-index: 9999;
+  pointer-events: none;
+  /* the track: a flat dark grey. fully opaque, so nothing shows
+     through it and it never reads as a washed-out bright colour. */
+  background-color: #474747;
+}
+/*==================================*/
+/* the filled part. the width is set inline from the progress.
+   it is FULLY OPAQUE — no transparency at all — so the bright cyan
+   is the exact #00c6d7 and nothing bleeds through it. */
+#SHIT_1170_COMPONENT_LOADING_BAR .loading-bar-fill {
+  /* the fill sits ON the track, pinned to its left edge. */
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  /* the exact height of the track, so the lit part covers it fully. */
+  height: 6px;
+  width: 0%;
+  /* the bright cyan, at full strength, fully opaque. */
+  background-color: var(--color-middle);
+  border-radius: 0 6px 6px 0;
+  /* the motion is done by CSS, not by javascript: the width is the
+     animated property and the transition eases it. the component only
+     sets the new width and the browser does the rest.
+
+     cubic-bezier(0.4, 0, 0.2, 1) is the standard "ease in, then ease
+     out" curve: the bar starts slow, speeds up, and settles down, so
+     a fast load never looks like a jump and a slow one still creeps
+     forward. */
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/*==================================*/
+/*==================================*/

@@ -15,8 +15,8 @@
 // ========================================
 // --- CONFIG -----------------------------
 // the figures at and above these are shortened.
-const HUGGIES_COMPACT_MILLION = 1_000_000;
-const HUGGIES_COMPACT_THOUSAND = 1_000;
+const SHIT_1170_COMPACT_MILLION = 1_000_000;
+const SHIT_1170_COMPACT_THOUSAND = 1_000;
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
@@ -25,11 +25,11 @@ export function compact_usd_fun(value: number): string {
   if (!Number.isFinite(value)) return "$0";
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  if (abs >= HUGGIES_COMPACT_MILLION) {
-    return `${sign}$${(abs / HUGGIES_COMPACT_MILLION).toFixed(1)}M`;
+  if (abs >= SHIT_1170_COMPACT_MILLION) {
+    return `${sign}$${(abs / SHIT_1170_COMPACT_MILLION).toFixed(1)}M`;
   }
-  if (abs >= HUGGIES_COMPACT_THOUSAND) {
-    return `${sign}$${(abs / HUGGIES_COMPACT_THOUSAND).toFixed(1)}K`;
+  if (abs >= SHIT_1170_COMPACT_THOUSAND) {
+    return `${sign}$${(abs / SHIT_1170_COMPACT_THOUSAND).toFixed(1)}K`;
   }
   return `${sign}$${Math.round(abs).toLocaleString()}`;
 }

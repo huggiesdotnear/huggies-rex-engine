@@ -17,12 +17,12 @@ import { api_intear_balances_get } from "@sleet-js/middleman-intear-api";
 // --- CONFIG -----------------------------
 // "direct" is what the account holds itself; "native" is the chain's
 // own NEAR balance. both come from the SAME /balances request.
-const HUGGIES_SWAP_BALANCE_SOURCES = ["direct", "native"] as const;
+const SHIT_1170_SWAP_BALANCE_SOURCES = ["direct", "native"] as const;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // the raw balance of one token, in its smallest unit.
-export type HUGGIES_SWAP_BALANCES = ReadonlyMap<string, string>;
+export type SHIT_1170_SWAP_BALANCES = ReadonlyMap<string, string>;
 // ========================================
 // ========================================
 // --- LOAD -------------------------------
@@ -34,12 +34,12 @@ export type HUGGIES_SWAP_BALANCES = ReadonlyMap<string, string>;
 async function load_swap_balances_fun(
   account_id: string,
   token_ids: ReadonlyArray<string>,
-): Promise<HUGGIES_SWAP_BALANCES> {
+): Promise<SHIT_1170_SWAP_BALANCES> {
   const unique = [...new Set(token_ids)];
   if (unique.length === 0) return new Map();
   const response = await api_intear_balances_get({
     account: account_id,
-    sources: HUGGIES_SWAP_BALANCE_SOURCES,
+    sources: SHIT_1170_SWAP_BALANCE_SOURCES,
     tokens: unique,
   });
   const balances = new Map<string, string>();
@@ -54,7 +54,7 @@ async function load_swap_balances_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_SWAP_BALANCES = {
+export const SHIT_1170_APP_PAGE_SWAP_BALANCES = {
   load: load_swap_balances_fun,
 };
 // ========================================

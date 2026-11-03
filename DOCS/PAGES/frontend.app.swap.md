@@ -5,7 +5,7 @@ the swap page trades one token for another over the intear dex-aggregator. it is
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <!--==========================================-->
@@ -14,17 +14,17 @@ the swap page trades one token for another over the intear dex-aggregator. it is
   <main>
     <h1>SWAP</h1>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_SWAP_FORM"></div>
+    <div id="SHIT_1170_COMPONENT_SWAP_FORM"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_SWAP_ROUTES"></div>
+    <div id="SHIT_1170_COMPONENT_SWAP_ROUTES"></div>
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_SWAP_TOASTS"></div>
+  <div id="SHIT_1170_COMPONENT_SWAP_TOASTS"></div>
   <!--==========================================-->
   <!--<footer>COPYRIGHT 2026</footer>-->
   <!--==========================================-->
@@ -33,7 +33,7 @@ the swap page trades one token for another over the intear dex-aggregator. it is
   <script src="../lib/ts/import-swap.ts"></script>
   <!--script-->
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_SWAP_TOKEN_PICKER"></div>
+  <div id="SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER"></div>
   <!--==========================================-->
 </body>
 ```

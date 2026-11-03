@@ -31,15 +31,15 @@ import {
   token_icon_for_fun,
 } from "../../shared/token_icon_url";
 import type {
-  HUGGIES_TOKEN_DETAIL,
-  HUGGIES_TOKEN_HOLDERS_PAGE,
+  SHIT_1170_TOKEN_DETAIL,
+  SHIT_1170_TOKEN_HOLDERS_PAGE,
 } from "./token_page_token_types";
 // ========================================
 // the fields the metadata request asks for.
 //
 // --- WHY --- no `main_pool` / `main_pool_url`: they were fetched and
 // never rendered. a field nobody reads is payload for nothing.
-const HUGGIES_TOKEN_DETAIL_FIELDS = [
+const SHIT_1170_TOKEN_DETAIL_FIELDS = [
   "name",
   "symbol",
   "decimals",
@@ -55,7 +55,7 @@ const HUGGIES_TOKEN_DETAIL_FIELDS = [
 ] as const;
 // ========================================
 // how many holder rows one request asks for.
-const HUGGIES_TOKEN_HOLDERS_LIMIT = 100;
+const SHIT_1170_TOKEN_HOLDERS_LIMIT = 100;
 // ========================================
 // --- HELPERS ----------------------------
 // parse a numeric API value without rendering NaN or Infinity.
@@ -85,10 +85,10 @@ function to_decimal_string_fun(value: unknown, fallback: string): string {
 // slot, so the icon never rendered.
 async function fetch_token_detail_fun(
   token_id: string,
-): Promise<HUGGIES_TOKEN_DETAIL | null> {
+): Promise<SHIT_1170_TOKEN_DETAIL | null> {
   const response = await api_intear_tokens_get({
     ids: [token_id],
-    fields: HUGGIES_TOKEN_DETAIL_FIELDS,
+    fields: SHIT_1170_TOKEN_DETAIL_FIELDS,
   });
   const row = response.rows[0];
   if (row === undefined) return null;
@@ -124,10 +124,10 @@ async function fetch_token_detail_fun(
 async function fetch_token_holders_fun(
   token_id: string,
   cursor: string | null,
-): Promise<HUGGIES_TOKEN_HOLDERS_PAGE> {
+): Promise<SHIT_1170_TOKEN_HOLDERS_PAGE> {
   const response = await api_intear_holders_get({
     token: token_id,
-    limit: HUGGIES_TOKEN_HOLDERS_LIMIT,
+    limit: SHIT_1170_TOKEN_HOLDERS_LIMIT,
     cursor: cursor ?? undefined,
   });
   return {
@@ -142,7 +142,7 @@ async function fetch_token_holders_fun(
 // ========================================
 // --- PUBLIC ---------------------------
 // the page's load surface. one call per thing the page loads.
-export const HUGGIES_TOKEN_PAGE_TOKEN = {
+export const SHIT_1170_TOKEN_PAGE_TOKEN = {
   load_detail: fetch_token_detail_fun,
   load_holders: fetch_token_holders_fun,
 };

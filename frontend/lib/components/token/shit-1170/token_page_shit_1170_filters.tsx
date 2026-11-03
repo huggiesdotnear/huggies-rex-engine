@@ -7,20 +7,20 @@
 // the tooltip on each tab is what the legend used to say — hovering the
 // emoji explains what that group of holders is.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_TOKEN_PAGE_SHIT_1170_STATE } from "../../../ts/token/shit-1170/token_page_shit_1170_state";
-import { HUGGIES_SHIT_FILTERS } from "../../../ts/token/shit-1170/token_page_shit_1170_filters";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE } from "../../../ts/token/shit-1170/token_page_shit_1170_state";
+import { SHIT_1170_SHIT_FILTERS } from "../../../ts/token/shit-1170/token_page_shit_1170_filters";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
-  const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_SHIT_1170_STATE);
+function SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
+  const state = use_page_store_fun(SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE);
   const active_filter = state.active_filter;
 
   return (
     <div class="tabs" role="tablist" aria-label="holder types">
-      {HUGGIES_SHIT_FILTERS.map((filter) => (
+      {SHIT_1170_SHIT_FILTERS.map((filter) => (
         <button
           type="button"
           role="tab"
@@ -29,7 +29,7 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
           aria-label={filter.label}
           title={`${filter.label} — ${filter.description}`}
           onClick={() =>
-            HUGGIES_TOKEN_PAGE_SHIT_1170_STATE.set_active_filter(filter.key)
+            SHIT_1170_TOKEN_PAGE_SHIT_1170_STATE.set_active_filter(filter.key)
           }
         >
           {filter.icon !== "" ? filter.icon : "💩"}
@@ -42,11 +42,11 @@ function HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN />, el);
+    render(<SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_FILTERS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

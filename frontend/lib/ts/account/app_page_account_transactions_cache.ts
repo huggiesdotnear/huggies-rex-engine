@@ -15,17 +15,17 @@
 //
 // the indexeddb mechanics live in lib/ts/indexed_db_store.ts — this
 // file only says WHICH store this cache is and what a row looks like.
-import { HUGGIES_INDEXED_DB_STORE } from "../shared/indexed_db_store";
+import { SHIT_1170_INDEXED_DB_STORE } from "../shared/indexed_db_store";
 // ========================================
-const HUGGIES_ACCOUNT_TX_DB_NAME = "huggies_account_transactions";
-const HUGGIES_ACCOUNT_TX_DB_VERSION = 1;
-const HUGGIES_ACCOUNT_TX_STORE = "account_transactions";
+const SHIT_1170_ACCOUNT_TX_DB_NAME = "shit_1170_account_transactions";
+const SHIT_1170_ACCOUNT_TX_DB_VERSION = 1;
+const SHIT_1170_ACCOUNT_TX_STORE = "account_transactions";
 // ========================================
 // the cache's identity, handed to the shared store module.
-const HUGGIES_ACCOUNT_TX_STORE_CONFIG = {
-  db_name: HUGGIES_ACCOUNT_TX_DB_NAME,
-  db_version: HUGGIES_ACCOUNT_TX_DB_VERSION,
-  store_name: HUGGIES_ACCOUNT_TX_STORE,
+const SHIT_1170_ACCOUNT_TX_STORE_CONFIG = {
+  db_name: SHIT_1170_ACCOUNT_TX_DB_NAME,
+  db_version: SHIT_1170_ACCOUNT_TX_DB_VERSION,
+  store_name: SHIT_1170_ACCOUNT_TX_STORE,
 };
 // ========================================
 // ========================================
@@ -43,9 +43,9 @@ const HUGGIES_ACCOUNT_TX_STORE_CONFIG = {
 // resume token points at a position in a history that has moved on.
 // the age of the cache says whether the cursor is still worth sending
 // or whether the list should be fetched afresh.
-export interface HUGGIES_CACHED_ACCOUNT_TRANSACTIONS {
+export interface SHIT_1170_CACHED_ACCOUNT_TRANSACTIONS {
   id: string;
-  rows: ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>;
+  rows: ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>;
   resume_token: string | null;
   txs_count: number;
   fetched_at: number;
@@ -56,7 +56,7 @@ export interface HUGGIES_CACHED_ACCOUNT_TRANSACTIONS {
 // it is the api's own row, kept field for field. the cache stores the
 // api's shape rather than a shape of our own so a cached row and a
 // fresh row are the same thing and the table cannot tell them apart.
-export interface HUGGIES_CACHED_ACCOUNT_TX_ROW {
+export interface SHIT_1170_CACHED_ACCOUNT_TX_ROW {
   account_id: string;
   transaction_hash: string;
   tx_block_height: number;
@@ -84,10 +84,10 @@ export interface HUGGIES_CACHED_ACCOUNT_TX_ROW {
 // refetch instead of an error the ui has to handle.
 async function get_cached_account_transactions_fun(
   id: string,
-): Promise<HUGGIES_CACHED_ACCOUNT_TRANSACTIONS | null> {
+): Promise<SHIT_1170_CACHED_ACCOUNT_TRANSACTIONS | null> {
   const found =
-    await HUGGIES_INDEXED_DB_STORE.get_many<HUGGIES_CACHED_ACCOUNT_TRANSACTIONS>(
-      HUGGIES_ACCOUNT_TX_STORE_CONFIG,
+    await SHIT_1170_INDEXED_DB_STORE.get_many<SHIT_1170_CACHED_ACCOUNT_TRANSACTIONS>(
+      SHIT_1170_ACCOUNT_TX_STORE_CONFIG,
       [id],
     );
   return found.get(id) ?? null;
@@ -98,9 +98,9 @@ async function get_cached_account_transactions_fun(
 // upsert one account's history. never throws: a failed cache write
 // only costs a refetch next time.
 async function put_cached_account_transactions_fun(
-  entry: HUGGIES_CACHED_ACCOUNT_TRANSACTIONS,
+  entry: SHIT_1170_CACHED_ACCOUNT_TRANSACTIONS,
 ): Promise<void> {
-  await HUGGIES_INDEXED_DB_STORE.put_many(HUGGIES_ACCOUNT_TX_STORE_CONFIG, [
+  await SHIT_1170_INDEXED_DB_STORE.put_many(SHIT_1170_ACCOUNT_TX_STORE_CONFIG, [
     entry,
   ]);
 }
@@ -110,7 +110,7 @@ async function put_cached_account_transactions_fun(
 // the cache surface. exported as one object so callers have a single
 // import; every function is safe to call in a non-browser (returns null
 // / no-ops) so components never need to guard.
-export const HUGGIES_ACCOUNT_TX_CACHE = {
+export const SHIT_1170_ACCOUNT_TX_CACHE = {
   get: get_cached_account_transactions_fun,
   put: put_cached_account_transactions_fun,
 };

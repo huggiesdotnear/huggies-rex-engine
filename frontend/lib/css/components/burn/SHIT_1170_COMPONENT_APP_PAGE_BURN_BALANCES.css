@@ -1,0 +1,120 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES
+   the burned tokens, as cards. a grid, not one card per row: there can
+   be many. the two figures inside a card are stacked, not side by
+   side: both are long and would wrap in a narrow card. */
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES {
+  text-align: left;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .note {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  text-align: left;
+  margin: 0.5rem 0;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.5rem;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-list > a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-list > a:hover,
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-list > a:focus-visible {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.22);
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .icon-wrap {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .icon-placeholder {
+  font-family: "Lilita One", sans-serif;
+  font-size: 16px;
+  color: #474747;
+  line-height: 1;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-label {
+  font-family: "Lilita One", sans-serif;
+  font-size: 15px;
+  line-height: 1.2;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-id {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .token-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .detail-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .detail-value {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES .errors {
+  margin-top: 0.5rem;
+}
+/*==================================*/

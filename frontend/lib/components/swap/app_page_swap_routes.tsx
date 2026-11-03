@@ -10,14 +10,14 @@
 // point of a route picker. a dropdown hides the comparison the reader
 // is making.
 //
-// mounts into <div id="HUGGIES_COMPONENT_SWAP_ROUTES">.
+// mounts into <div id="SHIT_1170_COMPONENT_SWAP_ROUTES">.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
 import { human_to_unit_fun } from "../../ts/swap/app_page_swap_amount";
-import type { HUGGIES_SWAP_ROUTE } from "../../ts/swap/app_page_swap_routes";
+import type { SHIT_1170_SWAP_ROUTE } from "../../ts/swap/app_page_swap_routes";
 // ========================================
 // ========================================
 // --- CARD ------------------------------
@@ -44,7 +44,7 @@ import type { HUGGIES_SWAP_ROUTE } from "../../ts/swap/app_page_swap_routes";
 // they are getting, so the card names it, and the line under it says
 // what it costs.
 function route_card_fun(
-  route: HUGGIES_SWAP_ROUTE,
+  route: SHIT_1170_SWAP_ROUTE,
   amount: string,
   worst_case: string,
   decimals: number,
@@ -63,7 +63,7 @@ function route_card_fun(
       type="button"
       class={classes.join(" ")}
       onClick={() => {
-        HUGGIES_APP_PAGE_SWAP_STORE.select_route(route.dex_id);
+        SHIT_1170_APP_PAGE_SWAP_STORE.select_route(route.dex_id);
       }}
       title={`trade on ${route.dex_id}`}
     >
@@ -72,12 +72,12 @@ function route_card_fun(
         {is_best && <span class="swap-route-badge">BEST</span>}
       </span>
       <span class="swap-route-amount">
-        {HUGGIES_AMOUNT_FORMAT.balance(amount, { decimals })} {symbol}
+        {SHIT_1170_AMOUNT_FORMAT.balance(amount, { decimals })} {symbol}
       </span>
       {guaranteed_out_unit !== null && (
         <span class="swap-route-get">
           GET{" "}
-          {HUGGIES_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
+          {SHIT_1170_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
             decimals: out_decimals,
           })}{" "}
           {out_symbol}
@@ -85,7 +85,8 @@ function route_card_fun(
       )}
       <span class="swap-route-detail">
         <span>
-          MIN {HUGGIES_AMOUNT_FORMAT.balance(worst_case, { decimals })} {symbol}
+          MIN {SHIT_1170_AMOUNT_FORMAT.balance(worst_case, { decimals })}{" "}
+          {symbol}
         </span>
         <span>{route.tx_count} TX</span>
       </span>
@@ -95,12 +96,12 @@ function route_card_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
-  const page = use_page_store_fun(HUGGIES_APP_PAGE_SWAP_STORE);
+export function SHIT_1170_COMPONENT_SWAP_ROUTES_FUN() {
+  const page = use_page_store_fun(SHIT_1170_APP_PAGE_SWAP_STORE);
 
   const out_info = page.token_out_info;
   const in_info = page.token_in_info;
-  const selected = HUGGIES_APP_PAGE_SWAP_STORE.get_selected_route();
+  const selected = SHIT_1170_APP_PAGE_SWAP_STORE.get_selected_route();
 
   // --- WHY --- THE CARDS READ THE SIDE THE READER IS FIXING: when they
   // fix the output, the router answers with the amount IN, so the card
@@ -116,9 +117,9 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
     ? (in_info?.decimals ?? 0)
     : (out_info?.decimals ?? 0);
   // the number on the card, and its floor.
-  const card_amount = (route: HUGGIES_SWAP_ROUTE): string =>
+  const card_amount = (route: SHIT_1170_SWAP_ROUTE): string =>
     fixed_out ? route.amount_in : route.amount_out;
-  const card_worst_case = (route: HUGGIES_SWAP_ROUTE): string =>
+  const card_worst_case = (route: SHIT_1170_SWAP_ROUTE): string =>
     fixed_out ? route.worst_case_in : route.worst_case_out;
 
   // --- WHY --- THE SUMMARY READS THE SIDE THE READER IS FIXING: when
@@ -202,14 +203,14 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
       {selected !== null && summary_amount !== null && (
         <p class="swap-routes-note">
           {summary_word}{" "}
-          {HUGGIES_AMOUNT_FORMAT.balance(summary_amount, {
+          {SHIT_1170_AMOUNT_FORMAT.balance(summary_amount, {
             decimals: summary_decimals,
           })}{" "}
           {summary_symbol}
           {guaranteed_out_unit !== null && (
             <>
               {" · GET "}
-              {HUGGIES_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
+              {SHIT_1170_AMOUNT_FORMAT.balance(guaranteed_out_unit, {
                 decimals: guaranteed_out_decimals,
               })}{" "}
               {guaranteed_out_symbol}
@@ -224,10 +225,10 @@ export function HUGGIES_COMPONENT_SWAP_ROUTES_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SWAP_ROUTES;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_SWAP_ROUTES;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SWAP_ROUTES_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_SWAP_ROUTES_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

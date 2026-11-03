@@ -8,23 +8,23 @@ address is the dust the account needs to exist, not burned supply.
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <main>
     <h1>JUST BURN IT</h1>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_ADDRESSES"></div>
+    <div id="SHIT_1170_COMPONENT_APP_PAGE_BURN_ADDRESSES"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES"></div>
+    <div id="SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES"></div>
     <!--==========================================-->
-    <div id="HUGGIES_COMPONENT_APP_PAGE_BURN_INFO"></div>
+    <div id="SHIT_1170_COMPONENT_APP_PAGE_BURN_INFO"></div>
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
   <!--script-->
   <script src="../lib/ts/import-burn.ts"></script>

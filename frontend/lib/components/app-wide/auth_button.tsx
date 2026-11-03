@@ -11,8 +11,8 @@ import {
   useEffect as use_effect,
   useRef as use_ref,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_AUTH } from "../../ts/shared/auth_status";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
 // ========================================
 // ========================================
 // ========================================
@@ -30,7 +30,7 @@ function shorten_account_id_fun(account_id: string): string {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
+function SHIT_1170_COMPONENT_AUTH_BUTTON_FUN() {
   // ========================================
   // --- WHY --- a revision counter forces a re-render on every auth_status
   // notify; preact doesn't re-render from external state changes alone.
@@ -46,7 +46,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
   // subscribe to auth changes; return the unsubscribe so the effect cleans
   // up on unmount.
   use_effect(() => {
-    const unsubscribe = HUGGIES_AUTH.subscribe(() => {
+    const unsubscribe = SHIT_1170_AUTH.subscribe(() => {
       set_revision((revision) => revision + 1);
     });
     return unsubscribe;
@@ -70,10 +70,10 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
     };
   }, [open]);
 
-  const account_id = HUGGIES_AUTH.get_account_id();
-  const error = HUGGIES_AUTH.get_error();
-  const is_signed_in = HUGGIES_AUTH.is_signed_in();
-  const accounts = HUGGIES_AUTH.list_accounts();
+  const account_id = SHIT_1170_AUTH.get_account_id();
+  const error = SHIT_1170_AUTH.get_error();
+  const is_signed_in = SHIT_1170_AUTH.is_signed_in();
+  const accounts = SHIT_1170_AUTH.list_accounts();
 
   const on_click_fun = () => {
     if (busy) return;
@@ -82,7 +82,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
       return;
     }
     set_busy(true);
-    void HUGGIES_AUTH.sign_in().finally(() => set_busy(false));
+    void SHIT_1170_AUTH.sign_in().finally(() => set_busy(false));
   };
 
   const on_pick_account_fun = (next_account_id: string) => {
@@ -90,7 +90,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
     set_open(false);
     if (next_account_id === account_id) return;
     set_busy(true);
-    void HUGGIES_AUTH.switch_account(next_account_id).finally(() =>
+    void SHIT_1170_AUTH.switch_account(next_account_id).finally(() =>
       set_busy(false),
     );
   };
@@ -98,21 +98,21 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
   const on_remove_account_fun = (target_account_id: string) => {
     if (busy) return;
     set_open(false);
-    HUGGIES_AUTH.remove_account(target_account_id);
+    SHIT_1170_AUTH.remove_account(target_account_id);
   };
 
   const on_add_account_fun = () => {
     if (busy) return;
     set_open(false);
     set_busy(true);
-    void HUGGIES_AUTH.sign_in().finally(() => set_busy(false));
+    void SHIT_1170_AUTH.sign_in().finally(() => set_busy(false));
   };
 
   const on_sign_out_fun = () => {
     if (busy) return;
     set_open(false);
     set_busy(true);
-    void HUGGIES_AUTH.sign_out().finally(() => set_busy(false));
+    void SHIT_1170_AUTH.sign_out().finally(() => set_busy(false));
   };
 
   const label = busy
@@ -146,7 +146,7 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
                 onClick={() => on_pick_account_fun(id)}
                 disabled={busy}
                 title={
-                  HUGGIES_AUTH.has_session(id)
+                  SHIT_1170_AUTH.has_session(id)
                     ? `switch to ${id}`
                     : `switch to ${id} — the wallet will ask you to sign a message`
                 }
@@ -193,12 +193,12 @@ function HUGGIES_COMPONENT_AUTH_BUTTON_FUN() {
 // --- WHY --- init() runs BEFORE the first render / connect so
 // the wallet's autoConnect can't emit a sign-in we have no
 // listener for.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_AUTH_BUTTON;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_AUTH_BUTTON;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    HUGGIES_AUTH.init();
-    render(<HUGGIES_COMPONENT_AUTH_BUTTON_FUN />, el);
+    SHIT_1170_AUTH.init();
+    render(<SHIT_1170_COMPONENT_AUTH_BUTTON_FUN />, el);
   }
 }
 // ========================================

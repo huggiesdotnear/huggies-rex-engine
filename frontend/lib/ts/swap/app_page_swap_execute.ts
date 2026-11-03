@@ -25,13 +25,13 @@ import {
   type ROUTE,
 } from "@sleet-js/intear-dex-aggregator-tool-box";
 import { near_connect_client } from "@near-kit-tool-box/web";
-import { HUGGIES_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
+import { SHIT_1170_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
 import { router_token_id_fun } from "./app_page_swap_router_token";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what happened to the swap.
-export interface HUGGIES_SWAP_EXECUTION {
+export interface SHIT_1170_SWAP_EXECUTION {
   // true when the swap went through.
   succeeded: boolean;
   // the transaction hash of the first swap transaction, for the link
@@ -84,12 +84,12 @@ async function execute_swap_fun(
   token_in: string,
   token_out: string,
   signer_id: string,
-): Promise<HUGGIES_SWAP_EXECUTION> {
+): Promise<SHIT_1170_SWAP_EXECUTION> {
   try {
     const connector = near_connect_client();
     const wallet = await connector.wallet();
     const result = await EXECUTE_ROUTE_FULL_BATCHED(wallet, route, {
-      client: HUGGIES_SWAP_AGGREGATOR.client,
+      client: SHIT_1170_SWAP_AGGREGATOR.client,
       signer_id,
       token_in: router_token_id_fun(token_in),
       token_out: router_token_id_fun(token_out),
@@ -153,7 +153,7 @@ async function execute_swap_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_SWAP_EXECUTE = {
+export const SHIT_1170_APP_PAGE_SWAP_EXECUTE = {
   execute: execute_swap_fun,
 };
 // ========================================

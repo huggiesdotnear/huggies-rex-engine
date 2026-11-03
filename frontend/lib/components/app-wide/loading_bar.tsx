@@ -24,24 +24,24 @@
 // stutter while the page's own fetches are hogging the main thread.
 import { render } from "preact";
 import { useEffect as use_effect, useState as use_state } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_LOADING_BAR } from "../../ts/shared/loading_bar";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_LOADING_BAR } from "../../ts/shared/loading_bar";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
+function SHIT_1170_COMPONENT_LOADING_BAR_FUN() {
   // --- WHY THE INITIAL VALUE IS READ RIGHT AWAY: the page's start
   // script fires the first request BEFORE this component mounts, so
   // the bar may already have moved by the time the component first
   // paints. starting at zero would show a dark bar for one frame and
   // then jump, which reads as a glitch.
   const [progress, set_progress] = use_state(
-    HUGGIES_LOADING_BAR.get_progress(),
+    SHIT_1170_LOADING_BAR.get_progress(),
   );
   // the bar's state: idle, loading or done. it is on the element as
   // data-state, so the css and the browser's dev tools can tell the
   // three apart — the track looks the same in all of them.
-  const [state, set_state] = use_state(HUGGIES_LOADING_BAR.get_state());
+  const [state, set_state] = use_state(SHIT_1170_LOADING_BAR.get_state());
 
   // --- WHY THE PATCH IS NOT INSTALLED HERE: the module installs
   // itself when it is imported, and the page's start script calls it
@@ -49,9 +49,9 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
   // effect would be too late — the first request would already be
   // flying and would never be counted.
   use_effect(() => {
-    return HUGGIES_LOADING_BAR.subscribe(() => {
-      set_progress(HUGGIES_LOADING_BAR.get_progress());
-      set_state(HUGGIES_LOADING_BAR.get_state());
+    return SHIT_1170_LOADING_BAR.subscribe(() => {
+      set_progress(SHIT_1170_LOADING_BAR.get_progress());
+      set_state(SHIT_1170_LOADING_BAR.get_state());
     });
   }, []);
 
@@ -59,7 +59,7 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
 
   return (
     // --- WHY THE FILL IS THE ROOT AND NOT WRAPPED: the mount div
-    // (#HUGGIES_COMPONENT_LOADING_BAR) IS the track. the css gives IT
+    // (#SHIT_1170_COMPONENT_LOADING_BAR) IS the track. the css gives IT
     // the height, the position and the dark background. when the
     // component rendered its own wrapper div inside it, that wrapper
     // had no height of its own and collapsed to zero — so the fill's
@@ -90,10 +90,10 @@ function HUGGIES_COMPONENT_LOADING_BAR_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_LOADING_BAR;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_LOADING_BAR;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_LOADING_BAR_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_LOADING_BAR_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

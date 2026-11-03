@@ -21,23 +21,23 @@
 //
 // --- WHY --- an unknown tab falls back to the default: a stale link or
 // a typo should land on the page, not on an empty page.
-import { HUGGIES_URL_TAB } from "./app_page_account_tab_url";
+import { SHIT_1170_URL_TAB } from "./app_page_account_tab_url";
 import {
   find_account_tab_fun,
-  HUGGIES_DEFAULT_ACCOUNT_TAB,
+  SHIT_1170_DEFAULT_ACCOUNT_TAB,
 } from "./app_page_account_tab_defs";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // the names of the account page's tabs. it is the union of the names in
 // lib/ts/app_page_account_tab_defs.ts.
-export type HUGGIES_APP_PAGE_ACCOUNT_TAB = "balances" | "transactions";
+export type SHIT_1170_APP_PAGE_ACCOUNT_TAB = "balances" | "transactions";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // the tab on screen. it starts as the default so the first render is
 // right even before the url has been read.
-let tab: HUGGIES_APP_PAGE_ACCOUNT_TAB = HUGGIES_DEFAULT_ACCOUNT_TAB;
+let tab: SHIT_1170_APP_PAGE_ACCOUNT_TAB = SHIT_1170_DEFAULT_ACCOUNT_TAB;
 // plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
 // ========================================
@@ -68,9 +68,9 @@ function subscribe_fun(listener: () => void): () => void {
 // --- READ ------------------------------
 // resolve a raw url value to a tab name, falling back to the default
 // when the url names nothing or names a tab that does not exist.
-function resolve_tab_fun(raw: string | null): HUGGIES_APP_PAGE_ACCOUNT_TAB {
+function resolve_tab_fun(raw: string | null): SHIT_1170_APP_PAGE_ACCOUNT_TAB {
   const found = find_account_tab_fun(raw);
-  return found === null ? HUGGIES_DEFAULT_ACCOUNT_TAB : found.name;
+  return found === null ? SHIT_1170_DEFAULT_ACCOUNT_TAB : found.name;
 }
 // ========================================
 // ========================================
@@ -91,7 +91,7 @@ function init_fun(): void {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return;
   }
-  const next = resolve_tab_fun(HUGGIES_URL_TAB.read());
+  const next = resolve_tab_fun(SHIT_1170_URL_TAB.read());
   if (next === tab) return;
   tab = next;
   notify_fun();
@@ -100,7 +100,7 @@ function init_fun(): void {
 // ========================================
 // --- READ ------------------------------
 // the tab on screen.
-function get_tab_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
+function get_tab_fun(): SHIT_1170_APP_PAGE_ACCOUNT_TAB {
   return tab;
 }
 // ========================================
@@ -112,7 +112,7 @@ function get_tab_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
 // store and it reads the state through `get()`. the tab state is a
 // store like any other, so it carries that name too — `get_tab` stays
 // as the plainer name for the callers that read the tab directly.
-function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
+function get_fun(): SHIT_1170_APP_PAGE_ACCOUNT_TAB {
   return tab;
 }
 // ========================================
@@ -133,8 +133,8 @@ function get_fun(): HUGGIES_APP_PAGE_ACCOUNT_TAB {
 // --- WHY --- THE SWITCH DOES NOT RELOAD THE PAGE: a tab bar switches a
 // view of the page that is already loaded, so the switch is instant and
 // the page does not fetch everything again.
-function set_tab_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TAB): void {
-  HUGGIES_URL_TAB.write(next);
+function set_tab_fun(next: SHIT_1170_APP_PAGE_ACCOUNT_TAB): void {
+  SHIT_1170_URL_TAB.write(next);
   if (next === tab) return;
   tab = next;
   notify_fun();
@@ -163,7 +163,7 @@ function watch_fun(): void {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE = {
+export const SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE = {
   init: init_fun,
   subscribe: subscribe_fun,
   get: get_fun,

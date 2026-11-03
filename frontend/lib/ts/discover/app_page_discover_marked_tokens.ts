@@ -16,14 +16,14 @@
 // --- SHAPE ------------------------------
 // `weight` orders the marked block among itself, lowest first — so our
 // own token reads as the lead one.
-export interface HUGGIES_MARKED_TOKEN {
+export interface SHIT_1170_MARKED_TOKEN {
   id: string;
   reason: string;
   weight: number;
 }
 // ========================================
 // --- LIST -------------------------------
-export const HUGGIES_MARKED_TOKENS: ReadonlyArray<HUGGIES_MARKED_TOKEN> = [
+export const SHIT_1170_MARKED_TOKENS: ReadonlyArray<SHIT_1170_MARKED_TOKEN> = [
   {
     id: "shit-1170.meme-cooking.near",
     reason: "our own token",
@@ -63,7 +63,7 @@ export const HUGGIES_MARKED_TOKENS: ReadonlyArray<HUGGIES_MARKED_TOKEN> = [
 // ========================================
 // --- GET -------------------------------
 export function marked_token_ids_fun(): Set<string> {
-  return new Set(HUGGIES_MARKED_TOKENS.map((entry) => entry.id));
+  return new Set(SHIT_1170_MARKED_TOKENS.map((entry) => entry.id));
 }
 // ========================================
 // copyright 2026 by sleet.near

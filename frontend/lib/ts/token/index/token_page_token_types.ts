@@ -4,7 +4,7 @@
 // the metadata record carries the price and the decimals, so the
 // holders table can price a balance without asking for them again.
 // ========================================
-export interface HUGGIES_TOKEN_DETAIL {
+export interface SHIT_1170_TOKEN_DETAIL {
   id: string;
   name: string;
   symbol: string;
@@ -22,21 +22,21 @@ export interface HUGGIES_TOKEN_DETAIL {
   socials: Record<string, string>;
   description: string | null;
 }
-export interface HUGGIES_TOKEN_HOLDER {
+export interface SHIT_1170_TOKEN_HOLDER {
   account_id: string;
   balance: string;
 }
-export interface HUGGIES_TOKEN_HOLDERS_PAGE {
-  rows: HUGGIES_TOKEN_HOLDER[];
+export interface SHIT_1170_TOKEN_HOLDERS_PAGE {
+  rows: SHIT_1170_TOKEN_HOLDER[];
   total: number;
   next_cursor: string | null;
 }
-export interface HUGGIES_TOKEN_PAGE_STATE {
+export interface SHIT_1170_TOKEN_PAGE_STATE {
   // the token's metadata, or null while it is loading or when the
   // token id is missing.
-  detail: HUGGIES_TOKEN_DETAIL | null;
+  detail: SHIT_1170_TOKEN_DETAIL | null;
   // the holder rows loaded so far.
-  holders: HUGGIES_TOKEN_HOLDER[];
+  holders: SHIT_1170_TOKEN_HOLDER[];
   holder_total: number;
   // the cursor for the next holder page, or null when there is none.
   next_cursor: string | null;

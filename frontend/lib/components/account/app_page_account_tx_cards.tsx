@@ -21,21 +21,21 @@ import {
   time_ago,
 } from "@sleet-js/fastnear-explorer-api-client";
 import { CircleCheck, CircleX } from "lucide-preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "../../ts/account/app_page_account_tx_details_store";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "../../ts/account/app_page_account_tx_details_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
 import { tx_detail_href_fun } from "../../ts/shared/tx_link";
 import { transfer_token_of_fun } from "../../ts/shared/transfer_tokens";
-import type { HUGGIES_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
-import { HUGGIES_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
-import { huggies_account_tab_view_fun } from "./app_page_account_tab_view";
-import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE } from "../../ts/account/app_page_account_tx_details_store";
+import type { SHIT_1170_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
+import { SHIT_1170_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
+import { shit_1170_account_tab_view_fun } from "./app_page_account_tab_view";
+import type { SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE } from "../../ts/account/app_page_account_tx_details_store";
 import {
-  huggies_transfer_amount_fun,
-  huggies_transfer_icon_fun,
+  shit_1170_transfer_amount_fun,
+  shit_1170_transfer_icon_fun,
 } from "../shared/transfer_amount";
-import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "../../ts/account/app_page_account_tx_details";
+import type { SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL } from "../../ts/account/app_page_account_tx_details";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -73,8 +73,8 @@ function action_label_fun(type: string, method_name?: string): string {
 // tokens are gathered for the whole set and handed in, so the card
 // renders without reaching for anything.
 function detail_card_fun(
-  detail: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL,
-  tokens: Map<string, HUGGIES_TRANSFER_TOKEN>,
+  detail: SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL,
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>,
 ): preact.JSX.Element {
   const parsed = detail.parsed;
   const depth = current_app_depth_fun();
@@ -150,13 +150,13 @@ function detail_card_fun(
               );
               return (
                 <span class="tx-card-transfer">
-                  {huggies_transfer_icon_fun(token)}
+                  {shit_1170_transfer_icon_fun(token)}
                   {transfer.token_type === "near" ? (
                     <span class="tx-token-value">
                       {format_near_with_unit(transfer.amount)}
                     </span>
                   ) : (
-                    huggies_transfer_amount_fun({
+                    shit_1170_transfer_amount_fun({
                       amount: transfer.amount,
                       token,
                     })
@@ -179,9 +179,9 @@ function detail_card_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
-  const state = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE);
-  const token_state = use_page_store_fun(HUGGIES_TRANSFER_TOKENS_STORE);
+export function SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
+  const state = use_page_store_fun(SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STORE);
+  const token_state = use_page_store_fun(SHIT_1170_TRANSFER_TOKENS_STORE);
   // --- WHY THE CARDS BELONG TO THE TRANSACTIONS TAB: the account
   // page's tab decides what the page shows, and the balances and the
   // transactions are two views of the same account. without this gate
@@ -193,9 +193,9 @@ export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
   // the page decide the same way.
   return (
     <>
-      {huggies_account_tab_view_fun({
+      {shit_1170_account_tab_view_fun({
         tab: "transactions",
-        children: huggies_tx_cards_fun(state, token_state.tokens),
+        children: shit_1170_tx_cards_fun(state, token_state.tokens),
       })}
     </>
   );
@@ -207,9 +207,9 @@ export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
 // --- WHY THIS IS ITS OWN FUNCTION: the gate takes children, so the
 // cards are built as a value and handed to it. that keeps the gate
 // the single thing that decides what is on screen.
-function huggies_tx_cards_fun(
-  state: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE,
-  tokens: Map<string, HUGGIES_TRANSFER_TOKEN>,
+function shit_1170_tx_cards_fun(
+  state: SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE,
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>,
 ): preact.JSX.Element | null {
   // nothing loaded yet — the section says so and shows nothing else.
   if (state.details.length === 0) {
@@ -245,10 +245,10 @@ function huggies_tx_cards_fun(
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_ACCOUNT_TX_CARDS;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

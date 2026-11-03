@@ -1,12 +1,12 @@
 {
-  "name": "@huggies/huggies-rex-engine-middleman",
+  "name": "@huggies/shit_1170-middleman",
   "version": "0.0.1",
-  "description": "Clean TypeScript middleman for the huggies-rex-engine backend routes (/api/huggies/*, /api/trezu/*).",
+  "description": "Clean TypeScript middleman for the shit-1170 backend routes (/api/shit-1170/*, /api/trezu/*).",
   "license": "MIT",
   "homepage": "https://sleet-js.near.page",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sleet-js/huggies-rex-engine.git",
+    "url": "https://github.com/huggiesdotnear/huggies-rex-engine.git",
     "directory": "middleman"
   },
   "type": "module",

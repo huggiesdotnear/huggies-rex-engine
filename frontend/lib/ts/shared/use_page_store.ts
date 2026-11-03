@@ -9,7 +9,7 @@
 // a component that uses it only displays. it never loads and it never
 // subscribes:
 //
-//   const state = use_page_store_fun(HUGGIES_TOKEN_PAGE_TOKEN_STATE);
+//   const state = use_page_store_fun(SHIT_1170_TOKEN_PAGE_TOKEN_STATE);
 //
 // --- WHY --- this lives in lib/ts and not in lib/components: a hook
 // does not need jsx. it is plain ts that happens to call preact's
@@ -24,7 +24,7 @@ import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 // (an id, a sort, nothing at all), so putting it here would either
 // force every page's load to have the same signature or hide the
 // difference behind a type that accepts anything.
-export interface HUGGIES_PAGE_STORE<STATE> {
+export interface SHIT_1170_PAGE_STORE<STATE> {
   // the current state.
   get: () => STATE;
   // register a callback that fires when the state changes. returns an
@@ -48,7 +48,7 @@ export interface HUGGIES_PAGE_STORE<STATE> {
 // in place asks for a fresh render, and the fresh render reads the
 // store's current state.
 export function use_page_store_fun<STATE>(
-  store: HUGGIES_PAGE_STORE<STATE>,
+  store: SHIT_1170_PAGE_STORE<STATE>,
 ): STATE {
   const [, set_revision] = use_state(0);
 

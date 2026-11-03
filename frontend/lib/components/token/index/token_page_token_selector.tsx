@@ -6,24 +6,24 @@
 // different wording. this component supplies the token wording.
 //
 // mounts into
-// <div id="HUGGIES_COMPONENT_TOKEN_SELECTOR">.
+// <div id="SHIT_1170_COMPONENT_TOKEN_SELECTOR">.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_page_token_state";
-import { huggies_id_jump_box_fun } from "../../shared/id_jump_box";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_TOKEN_PAGE_TOKEN_STATE } from "../../../ts/token/index/token_page_token_state";
+import { shit_1170_id_jump_box_fun } from "../../shared/id_jump_box";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_TOKEN_SELECTOR_FUN() {
+function SHIT_1170_COMPONENT_TOKEN_SELECTOR_FUN() {
   // --- WHY --- the id is read once, with no subscription. the jump box
   // writes a new id to the url and the browser navigates, so the page is
   // a fresh document with a fresh id — there is nothing to watch.
-  const token_id = HUGGIES_TOKEN_PAGE_TOKEN_STATE.get_token_id();
+  const token_id = SHIT_1170_TOKEN_PAGE_TOKEN_STATE.get_token_id();
 
   return (
     <>
-      {huggies_id_jump_box_fun({
+      {shit_1170_id_jump_box_fun({
         id: token_id,
         label: "TOKEN ACCOUNT ID",
         placeholder: "token.near",
@@ -37,11 +37,11 @@ function HUGGIES_COMPONENT_TOKEN_SELECTOR_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_TOKEN_SELECTOR;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOKEN_SELECTOR;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_TOKEN_SELECTOR_FUN />, el);
+    render(<SHIT_1170_COMPONENT_TOKEN_SELECTOR_FUN />, el);
   }
 }
 // ========================================

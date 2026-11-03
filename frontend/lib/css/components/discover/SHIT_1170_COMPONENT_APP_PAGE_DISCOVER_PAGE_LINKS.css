@@ -1,0 +1,40 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS
+   the discover page's PAGES section: one link card per app page, each
+   carrying the lucide icon the nav uses for that page.
+
+   a row of cards, the same look as the contract cards above: a bordered
+   tile with the icon over the label. */
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS > div {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS a {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 14px 10px;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.14);
+  transition: border-color 0.2s ease;
+}
+#SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS a:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+#SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_PAGE_LINKS span {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+/*==================================*/

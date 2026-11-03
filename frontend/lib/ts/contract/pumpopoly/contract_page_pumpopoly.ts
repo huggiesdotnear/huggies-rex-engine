@@ -16,10 +16,10 @@ import {
   pumpopoly_credit_score_fun,
 } from "./contract_page_pumpopoly_parse";
 import type {
-  HUGGIES_PUMPOPOLY_DATA,
-  HUGGIES_PUMPOPOLY_ERRORS,
-  HUGGIES_PUMPOPOLY_NFT,
-  HUGGIES_PUMPOPOLY_PLAYER,
+  SHIT_1170_PUMPOPOLY_DATA,
+  SHIT_1170_PUMPOPOLY_ERRORS,
+  SHIT_1170_PUMPOPOLY_NFT,
+  SHIT_1170_PUMPOPOLY_PLAYER,
 } from "./contract_page_pumpopoly_parse";
 // ========================================
 // ========================================
@@ -39,11 +39,11 @@ import type {
 // load Pumpopoly player information and NFT holdings for one account.
 export async function load_pumpopoly_page_fun(
   account_id: string | null,
-): Promise<HUGGIES_PUMPOPOLY_DATA> {
-  const errors: HUGGIES_PUMPOPOLY_ERRORS = { player: null, nfts: null };
+): Promise<SHIT_1170_PUMPOPOLY_DATA> {
+  const errors: SHIT_1170_PUMPOPOLY_ERRORS = { player: null, nfts: null };
   const near = near_kit_client();
-  let player: HUGGIES_PUMPOPOLY_PLAYER | null = null;
-  let nfts: HUGGIES_PUMPOPOLY_NFT[] = [];
+  let player: SHIT_1170_PUMPOPOLY_PLAYER | null = null;
+  let nfts: SHIT_1170_PUMPOPOLY_NFT[] = [];
 
   if (account_id !== null) {
     try {

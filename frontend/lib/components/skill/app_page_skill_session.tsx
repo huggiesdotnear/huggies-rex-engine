@@ -27,13 +27,13 @@
 import { render } from "preact";
 import { useState as use_state } from "preact/hooks";
 import { Copy, Check, RefreshCw } from "lucide-preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { HUGGIES_APP_PAGE_SKILL_SESSION_STORE } from "../../ts/skill/app_page_skill_session_store";
+import { SHIT_1170_APP_PAGE_SKILL_SESSION_STORE } from "../../ts/skill/app_page_skill_session_store";
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
-  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_SKILL_SESSION_STORE);
+function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
+  const page_data = use_page_store_fun(SHIT_1170_APP_PAGE_SKILL_SESSION_STORE);
   // whether the key was just copied, so the button can say so.
   const [copied, set_copied] = use_state("");
 
@@ -70,7 +70,7 @@ function HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
   };
 
   const rotate_fun = (account_id: string) => {
-    void HUGGIES_APP_PAGE_SKILL_SESSION_STORE.rotate(account_id);
+    void SHIT_1170_APP_PAGE_SKILL_SESSION_STORE.rotate(account_id);
   };
 
   return (
@@ -159,10 +159,12 @@ function HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION;
+const SELF_MOUNT_ID =
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION_FUN />, el);
+  if (el !== null)
+    render(<SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

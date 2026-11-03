@@ -1,12 +1,12 @@
 /*==================================*/
 /* the account page's css: the components it mounts. */
 @import url(./components/shared/transfer_amount.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_ID_H1.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_TABS.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_TX_CARDS.css);
-@import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_ID_H1.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_TABS.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_RHEA_AMM_BALANCE_TABLE.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_RHEA_DCL_BALANCE_TABLE.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_INTEAR_BALANCE_TABLE.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS.css);
+@import url(./components/account/SHIT_1170_COMPONENT_ACCOUNT_TRANSACTIONS_TABLE.css);
 /*==================================*/

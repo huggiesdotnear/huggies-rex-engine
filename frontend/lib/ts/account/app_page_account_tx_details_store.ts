@@ -13,11 +13,11 @@
 // the other asks the details endpoint.
 import { api_account } from "@sleet-js/fastnear-explorer-api-client";
 import { load_tx_details_fun } from "./app_page_account_tx_details";
-import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
-import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
-import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "./app_page_account_tx_details";
-import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
+import { SHIT_1170_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
+import type { SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL } from "./app_page_account_tx_details";
+import type { SHIT_1170_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
 import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -28,14 +28,14 @@ import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // --- WHY --- IT IS SHORT: the table is fetching the same rows at the
 // same time, so it lands in about a second. the wait is there so the
 // page makes ONE request for the history and not two.
-const HUGGIES_TABLE_ROWS_WAIT_MS = 1500;
+const SHIT_1170_TABLE_ROWS_WAIT_MS = 1500;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // what the store holds.
-export interface HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE {
+export interface SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE {
   // the full transactions, newest first.
-  details: ReadonlyArray<HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL>;
+  details: ReadonlyArray<SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL>;
   // true while the details are loading.
   loading: boolean;
   // the error, or null when nothing failed.
@@ -45,12 +45,12 @@ export interface HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE {
 // ========================================
 // --- STATE ------------------------------
 // the empty state the page holds before the first load answers.
-const HUGGIES_EMPTY_STATE: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE = {
+const SHIT_1170_EMPTY_STATE: SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE = {
   details: [],
   loading: false,
   error: null,
 };
-let state: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE = HUGGIES_EMPTY_STATE;
+let state: SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE = SHIT_1170_EMPTY_STATE;
 // the account id the current load was for, so a new account id starts a
 // new load and clears the old details.
 let loaded_account_id: string | null = null;
@@ -83,7 +83,7 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE): void {
+function set_state_fun(next: SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE): void {
   state = next;
   notify_fun();
 }
@@ -101,14 +101,14 @@ function set_state_fun(next: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE): void {
 // belong to that tab, and a reader who never opens it should not pay
 // for the details.
 async function load_fun(): Promise<void> {
-  const account_id = HUGGIES_APP_PAGE_ACCOUNT_ID.get_account_id();
+  const account_id = SHIT_1170_APP_PAGE_ACCOUNT_ID.get_account_id();
   if (account_id === null) return;
-  if (HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.get_tab() !== "transactions") {
+  if (SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.get_tab() !== "transactions") {
     return;
   }
   if (loading && loaded_account_id === account_id) return;
   loaded_account_id = account_id;
-  set_state_fun({ ...HUGGIES_EMPTY_STATE, loading: true });
+  set_state_fun({ ...SHIT_1170_EMPTY_STATE, loading: true });
   try {
     const hashes = await newest_hashes_fun(account_id);
     if (loaded_account_id !== account_id) return;
@@ -141,7 +141,7 @@ async function load_fun(): Promise<void> {
 // different account, or it might have failed. the fallback then asks
 // for the newest few on its own.
 function wait_for_table_rows_fun(): Promise<
-  ReadonlyArray<HUGGIES_CACHED_ACCOUNT_TX_ROW>
+  ReadonlyArray<SHIT_1170_CACHED_ACCOUNT_TX_ROW>
 > {
   return new Promise((resolve) => {
     let is_settled = false;
@@ -150,17 +150,17 @@ function wait_for_table_rows_fun(): Promise<
       is_settled = true;
       unsubscribe();
       clearTimeout(timer);
-      resolve(HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows);
+      resolve(SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.get().rows);
     };
-    const unsubscribe = HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.subscribe(() => {
+    const unsubscribe = SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.subscribe(() => {
       // the rows have landed.
-      if (HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows.length > 0) {
+      if (SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.get().rows.length > 0) {
         finish();
       }
     });
-    const timer = setTimeout(finish, HUGGIES_TABLE_ROWS_WAIT_MS);
+    const timer = setTimeout(finish, SHIT_1170_TABLE_ROWS_WAIT_MS);
     // the rows may already be there.
-    if (HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows.length > 0) {
+    if (SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.get().rows.length > 0) {
       finish();
     }
   });
@@ -181,7 +181,7 @@ function wait_for_table_rows_fun(): Promise<
 // fallback asks for the newest few on their own, which is one small
 // request.
 async function newest_hashes_fun(account_id: string): Promise<string[]> {
-  const rows = HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.get().rows;
+  const rows = SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.get().rows;
   if (rows.length > 0) {
     return rows.map((row) => row.transaction_hash);
   }
@@ -204,7 +204,7 @@ async function newest_hashes_fun(account_id: string): Promise<string[]> {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_state_fun(): HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE {
+function get_state_fun(): SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STATE {
   return state;
 }
 // ========================================
@@ -230,10 +230,10 @@ function get_parsed_list_fun(): ReadonlyArray<PARSE_RESULT> {
 // page loaded. without this the cards would never be fetched for that
 // reader, and the section would sit empty.
 function watch_fun(): void {
-  HUGGIES_APP_PAGE_ACCOUNT_ID.subscribe(() => {
+  SHIT_1170_APP_PAGE_ACCOUNT_ID.subscribe(() => {
     void load_fun();
   });
-  HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.subscribe(() => {
+  SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.subscribe(() => {
     void load_fun();
   });
   void load_fun();
@@ -241,7 +241,7 @@ function watch_fun(): void {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE = {
+export const SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STORE = {
   get: get_state_fun,
   subscribe: subscribe_fun,
   load: load_fun,

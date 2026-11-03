@@ -11,20 +11,20 @@
 // a subscribe/unsubscribe pair, and a notify that a throwing subscriber
 // cannot break.
 // ========================================
-import { HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE } from "./contract_page_sputnik_dao";
-import { HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES } from "./contract_page_sputnik_dao_balances";
-import { HUGGIES_AUTH } from "../../shared/auth_status";
-import { HUGGIES_URL_ID } from "../../shared/url_id";
-import type { HUGGIES_DAO_INFO } from "./contract_page_sputnik_dao";
-import type { HUGGIES_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
-import type { TREZU_TREASURY } from "@huggies/huggies-rex-engine-middleman";
+import { SHIT_1170_CONTRACT_SPUTNIK_DAO_PAGE } from "./contract_page_sputnik_dao";
+import { SHIT_1170_CONTRACT_SPUTNIK_DAO_BALANCES } from "./contract_page_sputnik_dao_balances";
+import { SHIT_1170_AUTH } from "../../shared/auth_status";
+import { SHIT_1170_URL_ID } from "../../shared/url_id";
+import type { SHIT_1170_DAO_INFO } from "./contract_page_sputnik_dao";
+import type { SHIT_1170_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
+import type { TREZU_TREASURY } from "@huggies/shit_1170-middleman";
 // ========================================
 // --- TYPES ------------------------------
-export interface HUGGIES_DAO_PAGE_STATE {
+export interface SHIT_1170_DAO_PAGE_STATE {
   // the dao being shown, or null while it loads.
-  dao: HUGGIES_DAO_INFO | null;
+  dao: SHIT_1170_DAO_INFO | null;
   // the dao's own token holdings.
-  balances: ReadonlyArray<HUGGIES_DAO_BALANCE>;
+  balances: ReadonlyArray<SHIT_1170_DAO_BALANCE>;
   // the daos the signed-in account is a member of.
   treasuries: TREZU_TREASURY[];
   // the account whose daos are listed. null when nobody is signed in.
@@ -36,7 +36,7 @@ export interface HUGGIES_DAO_PAGE_STATE {
 // --- STATE ------------------------------
 // the page's state. the empty state is what the page holds before the
 // first load answers.
-let state: HUGGIES_DAO_PAGE_STATE = {
+let state: SHIT_1170_DAO_PAGE_STATE = {
   dao: null,
   balances: [],
   treasuries: [],
@@ -61,14 +61,14 @@ function notify_fun(): void {
 }
 // ========================================
 // --- WRITE ------------------------------
-function set_state_fun(next: HUGGIES_DAO_PAGE_STATE): void {
+function set_state_fun(next: SHIT_1170_DAO_PAGE_STATE): void {
   state = next;
   notify_fun();
 }
 // ========================================
 // --- READ ------------------------------
 // the page's state, as it is right now.
-function get_state_fun(): HUGGIES_DAO_PAGE_STATE {
+function get_state_fun(): SHIT_1170_DAO_PAGE_STATE {
   return state;
 }
 // ========================================
@@ -94,16 +94,16 @@ function subscribe_fun(listener: () => void): () => void {
 // --- WHY --- the dao and its balances are asked for together, so the page is
 // as slow as its slowest one rather than the sum of the two.
 async function dao_page_state_load_fun(): Promise<void> {
-  HUGGIES_AUTH.init();
+  SHIT_1170_AUTH.init();
 
   // --- WHY --- the shared lib/ts/url_id.ts does the reading: the trim and
   // the blank-means-absent rule live there, so this loader and the selector
   // box cannot drift apart on which dao is shown. a padded id used to reach
   // load_dao untrimmed and match nothing.
-  const url_dao_id = HUGGIES_URL_ID.read();
-  const account_id = HUGGIES_AUTH.get_account_id();
+  const url_dao_id = SHIT_1170_URL_ID.read();
+  const account_id = SHIT_1170_AUTH.get_account_id();
 
-  HUGGIES_DAO_PAGE_STATE.set({
+  SHIT_1170_DAO_PAGE_STATE.set({
     dao: null,
     balances: [],
     treasuries: [],
@@ -114,14 +114,16 @@ async function dao_page_state_load_fun(): Promise<void> {
 
   // the daos the reader is a member of.
   let treasuries: Awaited<
-    ReturnType<typeof HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.list_dao_treasuries>
+    ReturnType<typeof SHIT_1170_CONTRACT_SPUTNIK_DAO_PAGE.list_dao_treasuries>
   > = [];
   if (account_id !== null) {
     try {
       treasuries =
-        await HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.list_dao_treasuries(account_id);
+        await SHIT_1170_CONTRACT_SPUTNIK_DAO_PAGE.list_dao_treasuries(
+          account_id,
+        );
     } catch (err: unknown) {
-      HUGGIES_DAO_PAGE_STATE.set({
+      SHIT_1170_DAO_PAGE_STATE.set({
         dao: null,
         balances: [],
         treasuries: [],
@@ -134,7 +136,7 @@ async function dao_page_state_load_fun(): Promise<void> {
     }
   }
 
-  HUGGIES_DAO_PAGE_STATE.set({
+  SHIT_1170_DAO_PAGE_STATE.set({
     dao: null,
     balances: [],
     treasuries,
@@ -165,7 +167,7 @@ async function dao_page_state_load_fun(): Promise<void> {
 
   if (dao_id === null) {
     // nothing to show: the reader has to pick one.
-    HUGGIES_DAO_PAGE_STATE.set({
+    SHIT_1170_DAO_PAGE_STATE.set({
       dao: null,
       balances: [],
       treasuries,
@@ -179,10 +181,10 @@ async function dao_page_state_load_fun(): Promise<void> {
   // the dao and its balances.
   try {
     const [dao, balances] = await Promise.all([
-      HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE.load_dao(dao_id),
-      HUGGIES_CONTRACT_SPUTNIK_DAO_BALANCES.load(dao_id),
+      SHIT_1170_CONTRACT_SPUTNIK_DAO_PAGE.load_dao(dao_id),
+      SHIT_1170_CONTRACT_SPUTNIK_DAO_BALANCES.load(dao_id),
     ]);
-    HUGGIES_DAO_PAGE_STATE.set({
+    SHIT_1170_DAO_PAGE_STATE.set({
       dao,
       balances: balances.rows,
       treasuries,
@@ -191,7 +193,7 @@ async function dao_page_state_load_fun(): Promise<void> {
       errors: [...dao.errors, ...balances.errors],
     });
   } catch (err: unknown) {
-    HUGGIES_DAO_PAGE_STATE.set({
+    SHIT_1170_DAO_PAGE_STATE.set({
       dao: null,
       balances: [],
       treasuries,
@@ -203,7 +205,7 @@ async function dao_page_state_load_fun(): Promise<void> {
 }
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_DAO_PAGE_STATE = {
+export const SHIT_1170_DAO_PAGE_STATE = {
   get: get_state_fun,
   set: set_state_fun,
   subscribe: subscribe_fun,

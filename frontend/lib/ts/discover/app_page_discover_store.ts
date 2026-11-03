@@ -8,17 +8,17 @@
 // the store has the same shape as lib/ts/app_page_account_store.ts: plain
 // module state, a subscribe/unsubscribe pair, and a notify a throwing
 // subscriber cannot break.
-import { HUGGIES_APP_PAGE_DISCOVER } from "./app_page_discover";
-import type { HUGGIES_APP_PAGE_DISCOVER_DATA } from "./app_page_discover";
-import type { HUGGIES_TOKEN_SORT } from "./app_page_discover_token_sort_options";
+import { SHIT_1170_APP_PAGE_DISCOVER } from "./app_page_discover";
+import type { SHIT_1170_APP_PAGE_DISCOVER_DATA } from "./app_page_discover";
+import type { SHIT_1170_TOKEN_SORT } from "./app_page_discover_token_sort_options";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
 // the loaded data, or null while it is still loading.
-let data: HUGGIES_APP_PAGE_DISCOVER_DATA | null = null;
+let data: SHIT_1170_APP_PAGE_DISCOVER_DATA | null = null;
 // the sort the current load was for, so a new sort starts a new load
 // and clears the old rows.
-let loaded_sort: HUGGIES_TOKEN_SORT | null = null;
+let loaded_sort: SHIT_1170_TOKEN_SORT | null = null;
 // the direction the current load was for. the sort and the direction
 // are one view: a load for one direction must not overwrite the rows
 // of the other.
@@ -72,7 +72,7 @@ function subscribe_fun(listener: () => void): () => void {
 // the other: the reader can flip the direction twice while a request is
 // in flight, and the last answer has to win.
 async function load_fun(
-  sort: HUGGIES_TOKEN_SORT,
+  sort: SHIT_1170_TOKEN_SORT,
   desc: boolean,
 ): Promise<void> {
   if (loading_list && loaded_sort === sort && loaded_desc === desc) return;
@@ -81,7 +81,7 @@ async function load_fun(
   loaded_desc = desc;
   notify_fun();
   try {
-    const token_list = await HUGGIES_APP_PAGE_DISCOVER.load_token_list(
+    const token_list = await SHIT_1170_APP_PAGE_DISCOVER.load_token_list(
       sort,
       desc,
       0,
@@ -97,7 +97,7 @@ async function load_fun(
     // page with no ids in the url. the later pages and the search
     // results are not the top of a sort, and their icons are asked for
     // by id.
-    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(
+    const icons = await SHIT_1170_APP_PAGE_DISCOVER.load_icons(
       token_list.rows,
       sort,
       desc,
@@ -129,7 +129,7 @@ async function load_fun(
 // they scrolled to. a load that fails leaves the rows on screen alone
 // and records the error.
 async function load_more_fun(
-  sort: HUGGIES_TOKEN_SORT,
+  sort: SHIT_1170_TOKEN_SORT,
   desc: boolean,
 ): Promise<void> {
   if (loading_list || data === null) return;
@@ -145,7 +145,7 @@ async function load_more_fun(
     // of the api's paging, so counting them would skip rows at the
     // start of the next page.
     const offset = data.token_list.fetched;
-    const next = await HUGGIES_APP_PAGE_DISCOVER.load_token_list(
+    const next = await SHIT_1170_APP_PAGE_DISCOVER.load_token_list(
       sort,
       desc,
       offset,
@@ -157,7 +157,7 @@ async function load_more_fun(
     // of the list, so they start where the top of the sort ended and
     // the api's sorted page would cover none of them. their icons are
     // asked for by id.
-    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(next.rows);
+    const icons = await SHIT_1170_APP_PAGE_DISCOVER.load_icons(next.rows);
     if (loaded_sort !== sort || loaded_desc !== desc) return;
     data = {
       ...data,
@@ -193,12 +193,12 @@ async function search_fun(query: string): Promise<void> {
   loading_search = true;
   notify_fun();
   try {
-    const rows = await HUGGIES_APP_PAGE_DISCOVER.search(query);
+    const rows = await SHIT_1170_APP_PAGE_DISCOVER.search(query);
     // --- WHY --- no sort is passed here. the search results are a
     // handful of arbitrary tokens — they are NOT the top of any sort,
     // so the api's sorted page would cover none of them and would cost
     // a page of icons for nothing. their icons are asked for by id.
-    const icons = await HUGGIES_APP_PAGE_DISCOVER.load_icons(rows);
+    const icons = await SHIT_1170_APP_PAGE_DISCOVER.load_icons(rows);
     // --- WHY --- the list rows are KEPT. the search results live in
     // their own field, and the component shows whichever one applies.
     // clearing the list meant clearing the search box left an empty
@@ -243,7 +243,7 @@ function clear_search_fun(): void {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-function get_fun(): HUGGIES_APP_PAGE_DISCOVER_DATA | null {
+function get_fun(): SHIT_1170_APP_PAGE_DISCOVER_DATA | null {
   return data;
 }
 // ========================================
@@ -259,7 +259,7 @@ function is_searching_fun(): boolean {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_DISCOVER_STORE = {
+export const SHIT_1170_APP_PAGE_DISCOVER_STORE = {
   load: load_fun,
   load_more: load_more_fun,
   search: search_fun,

@@ -1,6 +1,6 @@
-# @huggies/huggies-rex-engine-middleman
+# @huggies/shit_1170-middleman
 
-clean ts library for interacting with the huggies-rex-engine backend routes.
+clean ts library for interacting with the shit-1170 backend routes.
 
 ```sh
 bun i
@@ -16,7 +16,7 @@ bunx prettier . --write
 
 ---
 
-huggies-rex-engine
+shit-1170
 <br/>
 https://shit-1170.com
 
@@ -26,7 +26,7 @@ was told to talk to (`--base-url`).
 
 the routes covered here are the ones this backend owns:
 
-- `/api/huggies/*` - our own routes, nothing is proxied
+- `/api/shit-1170/*` - our own routes, nothing is proxied
 - `/api/trezu/*` - our proxy for the trezu api
 
 the third-party apis the app talks to are NOT here. the intear api, the

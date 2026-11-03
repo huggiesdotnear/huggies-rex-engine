@@ -11,25 +11,26 @@
 // plain module state, a subscribe/unsubscribe pair, and a notify that a
 // throwing subscriber cannot break.
 // ========================================
-import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX } from "./contract_page_intear_dex";
+import { SHIT_1170_CONTRACT_PAGE_INTEAR_DEX } from "./contract_page_intear_dex";
 import {
-  HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT,
-  HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION,
-  type HUGGIES_INTEAR_DEX_POOL_SORT,
-  type HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION,
+  SHIT_1170_DEFAULT_INTEAR_DEX_POOL_SORT,
+  SHIT_1170_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION,
+  type SHIT_1170_INTEAR_DEX_POOL_SORT,
+  type SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION,
 } from "./contract_page_intear_dex_pool_sort";
 import type {
-  HUGGIES_INTEAR_DEX_PAGE_DATA,
-  HUGGIES_INTEAR_DEX_POOL,
+  SHIT_1170_INTEAR_DEX_PAGE_DATA,
+  SHIT_1170_INTEAR_DEX_POOL,
 } from "./contract_page_intear_dex";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
-let data: HUGGIES_INTEAR_DEX_PAGE_DATA | null = null;
+let data: SHIT_1170_INTEAR_DEX_PAGE_DATA | null = null;
 // the sort the reader has chosen. the dex api does not sort.
-let sort: HUGGIES_INTEAR_DEX_POOL_SORT = HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT;
-let direction: HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION =
-  HUGGIES_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION;
+let sort: SHIT_1170_INTEAR_DEX_POOL_SORT =
+  SHIT_1170_DEFAULT_INTEAR_DEX_POOL_SORT;
+let direction: SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION =
+  SHIT_1170_DEFAULT_INTEAR_DEX_POOL_SORT_DIRECTION;
 let loading = false;
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
@@ -61,8 +62,8 @@ function subscribe_fun(listener: () => void): () => void {
 // ========================================
 // --- ORDER -----------------------------
 function pool_sort_value_fun(
-  pool: HUGGIES_INTEAR_DEX_POOL,
-  key: HUGGIES_INTEAR_DEX_POOL_SORT,
+  pool: SHIT_1170_INTEAR_DEX_POOL,
+  key: SHIT_1170_INTEAR_DEX_POOL_SORT,
 ): number {
   if (key === "volume_24h") return pool.volume_24h_usd;
   if (key === "volume_7d") return pool.volume_7d_usd;
@@ -76,10 +77,10 @@ function pool_sort_value_fun(
 // with the same tvl must keep the order the api sent them in, so
 // flipping the direction does not shuffle them.
 function order_pools_fun(
-  pools: ReadonlyArray<HUGGIES_INTEAR_DEX_POOL>,
-  key: HUGGIES_INTEAR_DEX_POOL_SORT,
-  dir: HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION,
-): HUGGIES_INTEAR_DEX_POOL[] {
+  pools: ReadonlyArray<SHIT_1170_INTEAR_DEX_POOL>,
+  key: SHIT_1170_INTEAR_DEX_POOL_SORT,
+  dir: SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION,
+): SHIT_1170_INTEAR_DEX_POOL[] {
   const sorted = [...pools];
   sorted.sort((a, b) => {
     const left = pool_sort_value_fun(a, key);
@@ -106,7 +107,7 @@ async function load_fun(): Promise<void> {
   loading = true;
   notify_fun();
   try {
-    const result = await HUGGIES_CONTRACT_PAGE_INTEAR_DEX.load();
+    const result = await SHIT_1170_CONTRACT_PAGE_INTEAR_DEX.load();
     data = result;
   } catch (err) {
     data = {
@@ -123,14 +124,16 @@ async function load_fun(): Promise<void> {
 // ========================================
 // set the sort. the rows are already loaded, so this only re-orders
 // them — it costs no request.
-function set_sort_fun(next: HUGGIES_INTEAR_DEX_POOL_SORT): void {
+function set_sort_fun(next: SHIT_1170_INTEAR_DEX_POOL_SORT): void {
   sort = next;
   notify_fun();
 }
 // ========================================
 // set the direction. the rows are already loaded, so this only
 // re-orders them — it costs no request.
-function set_direction_fun(next: HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION): void {
+function set_direction_fun(
+  next: SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION,
+): void {
   direction = next;
   notify_fun();
 }
@@ -138,7 +141,7 @@ function set_direction_fun(next: HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION): void {
 // ========================================
 // --- READ ------------------------------
 // the loaded data, or null while it is still loading.
-function get_fun(): HUGGIES_INTEAR_DEX_PAGE_DATA | null {
+function get_fun(): SHIT_1170_INTEAR_DEX_PAGE_DATA | null {
   return data;
 }
 // ========================================
@@ -147,24 +150,24 @@ function is_loading_fun(): boolean {
 }
 // ========================================
 // the pools on screen, in the order the reader chose.
-function get_pools_fun(): ReadonlyArray<HUGGIES_INTEAR_DEX_POOL> {
+function get_pools_fun(): ReadonlyArray<SHIT_1170_INTEAR_DEX_POOL> {
   const pools = data?.pools ?? [];
   return order_pools_fun(pools, sort, direction);
 }
 // ========================================
 // the chosen sort, so a component can show it as the active button.
-function get_sort_fun(): HUGGIES_INTEAR_DEX_POOL_SORT {
+function get_sort_fun(): SHIT_1170_INTEAR_DEX_POOL_SORT {
   return sort;
 }
 // ========================================
 // the chosen direction, so a component can show it as the active
 // button.
-function get_direction_fun(): HUGGIES_INTEAR_DEX_POOL_SORT_DIRECTION {
+function get_direction_fun(): SHIT_1170_INTEAR_DEX_POOL_SORT_DIRECTION {
   return direction;
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE = {
+export const SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE = {
   load: load_fun,
   set_sort: set_sort_fun,
   set_direction: set_direction_fun,

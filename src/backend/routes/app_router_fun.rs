@@ -1,5 +1,5 @@
 // APP_ROUTER_FUN
-// route map: api (/api/huggies/* + /api/trezu/*) + the static folder
+// route map: api (/api/shit-1170/* + /api/trezu/*) + the static folder
 // served from `/` via ServeDir (gitignored, filled by `bun build`).
 //
 // SECURITY: the CORS layer is deliberately permissive (any origin, any
@@ -84,14 +84,14 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         .max_age(std::time::Duration::from_secs(86400));
     // --------------------------------------------------------
     // api router: every /api/* route lives here, each under the api it
-    // fronts. /api/huggies/* is our own (ping); /api/trezu/* fronts
+    // fronts. /api/shit-1170/* is our own (ping); /api/trezu/* fronts
     // the trezu api.
     // --------------------------------------------------------
     let api_router = Router::new()
-        .route("/api/huggies/ping", get(ping_route))
-        .route("/api/huggies/sessions", post(sessions_route))
-        .route("/api/huggies/session/me", get(session_me_route))
-        .route("/api/huggies/session/rotate", post(session_rotate_route))
+        .route("/api/shit-1170/ping", get(ping_route))
+        .route("/api/shit-1170/sessions", post(sessions_route))
+        .route("/api/shit-1170/session/me", get(session_me_route))
+        .route("/api/shit-1170/session/rotate", post(session_rotate_route))
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
     // static ServeDir is the FALLBACK at `/`, so any unmatched GET

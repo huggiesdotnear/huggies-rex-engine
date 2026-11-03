@@ -42,18 +42,18 @@ import type {
   SPUTNIK_DAO_ROLE_KIND_TYPE,
 } from "@near-kit-tool-box/fun";
 import { list_trezu_treasuries_fun } from "./contract_page_sputnik_dao_trezu_treasuries";
-import { HUGGIES_TOKEN_INFO } from "../../shared/token_info";
-import type { TREZU_TREASURY } from "@huggies/huggies-rex-engine-middleman";
+import { SHIT_1170_TOKEN_INFO } from "../../shared/token_info";
+import type { TREZU_TREASURY } from "@huggies/shit_1170-middleman";
 // ========================================
 // --- TYPES ------------------------------
 // how a role is open. `Group` names the accounts in it; `Everyone`
 // means any account can act in it, so it has no member list.
-export type HUGGIES_DAO_ROLE_KIND = "group" | "everyone";
+export type SHIT_1170_DAO_ROLE_KIND = "group" | "everyone";
 // ========================================
 // one role in the policy.
-export interface HUGGIES_DAO_ROLE {
+export interface SHIT_1170_DAO_ROLE {
   name: string;
-  kind: HUGGIES_DAO_ROLE_KIND;
+  kind: SHIT_1170_DAO_ROLE_KIND;
   // the accounts in the role. empty for an `everyone` role.
   members: string[];
   // what the role may do, e.g. `call:AddProposal`.
@@ -61,7 +61,7 @@ export interface HUGGIES_DAO_ROLE {
 }
 // ========================================
 // one account in the dao, and the roles it is in.
-export interface HUGGIES_DAO_MEMBER {
+export interface SHIT_1170_DAO_MEMBER {
   account_id: string;
   // the roles this account is in, in the policy's own order.
   roles: string[];
@@ -70,7 +70,7 @@ export interface HUGGIES_DAO_MEMBER {
 }
 // ========================================
 // one proposal on the dao.
-export interface HUGGIES_DAO_PROPOSAL {
+export interface SHIT_1170_DAO_PROPOSAL {
   id: number;
   proposer: string;
   description: string;
@@ -89,7 +89,7 @@ export interface HUGGIES_DAO_PROPOSAL {
   // the details of the kind, for the kinds that carry their own content:
   // a Transfer's token, amount and receiver; a ChangeConfig's new name and
   // purpose.
-  detail: HUGGIES_DAO_PROPOSAL_DETAIL;
+  detail: SHIT_1170_DAO_PROPOSAL_DETAIL;
   // the block heights the proposal's actions landed in, when the contract
   // logged them.
   block_heights: string[];
@@ -101,7 +101,7 @@ export interface HUGGIES_DAO_PROPOSAL {
 // shows the detail the proposal has, and a proposal of a kind the page
 // does not know about shows nothing rather than breaking. each field is
 // empty when the kind does not have it.
-export interface HUGGIES_DAO_PROPOSAL_DETAIL {
+export interface SHIT_1170_DAO_PROPOSAL_DETAIL {
   // the token a Transfer moves. empty for every other kind.
   token_id: string;
   // the token's display symbol, when the registry knows it.
@@ -133,19 +133,19 @@ export interface HUGGIES_DAO_PROPOSAL_DETAIL {
 }
 // ========================================
 // the page's DAO record: what it is called and what it holds.
-export interface HUGGIES_DAO_INFO {
+export interface SHIT_1170_DAO_INFO {
   // the dao account, e.g. `huggies.sputnik-dao.near`.
   id: string;
   // the dao's display name, from trezu when it has one.
   name: string;
   // the dao's purpose, from the contract.
   purpose: string;
-  roles: HUGGIES_DAO_ROLE[];
+  roles: SHIT_1170_DAO_ROLE[];
   // every account the policy names, with the roles it is in.
-  members: HUGGIES_DAO_MEMBER[];
+  members: SHIT_1170_DAO_MEMBER[];
   // the roles that are open to everyone.
-  open_roles: HUGGIES_DAO_ROLE[];
-  proposals: HUGGIES_DAO_PROPOSAL[];
+  open_roles: SHIT_1170_DAO_ROLE[];
+  proposals: SHIT_1170_DAO_PROPOSAL[];
   // the NEAR the dao can spend, in yoctoNEAR.
   available_amount: string;
   // the NEAR it holds for storage, in yoctoNEAR.
@@ -169,7 +169,7 @@ function to_finite_number_fun(value: unknown): number {
 //
 // --- WHY --- NEAR is 24 decimals and most other tokens are 18, so
 // guessing would read a $SHIT amount as twenty million times too small.
-interface HUGGIES_DAO_TOKEN_SCALES {
+interface SHIT_1170_DAO_TOKEN_SCALES {
   // the decimals and the display symbol, per token id.
   decimals: Map<string, number>;
   symbols: Map<string, string>;
@@ -179,9 +179,9 @@ interface HUGGIES_DAO_TOKEN_SCALES {
 // described here. the id, the symbol and the decimals live in
 // lib/ts/token_near.ts.
 import {
-  HUGGIES_NEAR_DECIMALS as HUGGIES_DAO_NEAR_DECIMALS,
-  HUGGIES_NEAR_ID,
-  HUGGIES_NEAR_SYMBOL as HUGGIES_DAO_NEAR_SYMBOL,
+  SHIT_1170_NEAR_DECIMALS as SHIT_1170_DAO_NEAR_DECIMALS,
+  SHIT_1170_NEAR_ID,
+  SHIT_1170_NEAR_SYMBOL as SHIT_1170_DAO_NEAR_SYMBOL,
 } from "../../shared/token_near";
 // ========================================
 // format a raw token amount as a short human figure.
@@ -227,9 +227,9 @@ function member_treasuries_fun(
 // their real types and there is no cast.
 function parse_roles_fun(
   policy: SPUTNIK_DAO_POLICY_TYPE | null,
-): HUGGIES_DAO_ROLE[] {
+): SHIT_1170_DAO_ROLE[] {
   if (policy === null) return [];
-  const parsed: HUGGIES_DAO_ROLE[] = [];
+  const parsed: SHIT_1170_DAO_ROLE[] = [];
   for (const role of policy.roles) {
     // the role's members live under `kind`, which is an enum. `Group`
     // holds the accounts; `Everyone` is a bare string and means any
@@ -260,12 +260,12 @@ function parse_roles_fun(
 // --- WHY --- the roles that are open to everyone are not rows: they name no
 // accounts, so there is nothing to put in one. they are kept apart so the
 // page can say they exist.
-function fold_members_fun(roles: ReadonlyArray<HUGGIES_DAO_ROLE>): {
-  members: HUGGIES_DAO_MEMBER[];
-  open_roles: HUGGIES_DAO_ROLE[];
+function fold_members_fun(roles: ReadonlyArray<SHIT_1170_DAO_ROLE>): {
+  members: SHIT_1170_DAO_MEMBER[];
+  open_roles: SHIT_1170_DAO_ROLE[];
 } {
   const open_roles = roles.filter((role) => role.kind === "everyone");
-  const by_account = new Map<string, HUGGIES_DAO_MEMBER>();
+  const by_account = new Map<string, SHIT_1170_DAO_MEMBER>();
   for (const role of roles) {
     for (const account_id of role.members) {
       const member = by_account.get(account_id);
@@ -305,19 +305,19 @@ function fold_members_fun(roles: ReadonlyArray<HUGGIES_DAO_ROLE>): {
 // the fields are read with their real types. no guesswork and no cast.
 function kind_summary_fun(
   kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
-  scales: HUGGIES_DAO_TOKEN_SCALES,
+  scales: SHIT_1170_DAO_TOKEN_SCALES,
 ): string {
   if (!is_object_kind_fun(kind)) return "signal vote";
   if ("Transfer" in kind) {
     const body = kind.Transfer;
     // --- WHY --- an empty token id means NEAR. the contract uses "" for the
     // chain's own token.
-    const token = body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
-    const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
+    const token = body.token_id.length > 0 ? body.token_id : SHIT_1170_NEAR_ID;
+    const decimals = scales.decimals.get(token) ?? SHIT_1170_DAO_NEAR_DECIMALS;
     const symbol =
       scales.symbols.get(token) ??
-      (token === HUGGIES_NEAR_ID
-        ? HUGGIES_DAO_NEAR_SYMBOL
+      (token === SHIT_1170_NEAR_ID
+        ? SHIT_1170_DAO_NEAR_SYMBOL
         : token.split(".")[0]);
     const amount_text = format_amount_fun(body.amount, decimals);
     return `${amount_text} ${symbol} → ${body.receiver_id}`;
@@ -383,7 +383,7 @@ function kind_summary_fun(
 // ========================================
 // --- DETAIL ----------------------------
 // an empty detail, for the kinds that carry nothing of their own.
-function empty_detail_fun(): HUGGIES_DAO_PROPOSAL_DETAIL {
+function empty_detail_fun(): SHIT_1170_DAO_PROPOSAL_DETAIL {
   return {
     token_id: "",
     token_symbol: "",
@@ -443,8 +443,8 @@ function read_config_theme_fun(metadata: unknown): {
 // detail empty.
 function kind_detail_fun(
   kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE,
-  scales: HUGGIES_DAO_TOKEN_SCALES,
-): HUGGIES_DAO_PROPOSAL_DETAIL {
+  scales: SHIT_1170_DAO_TOKEN_SCALES,
+): SHIT_1170_DAO_PROPOSAL_DETAIL {
   const detail = empty_detail_fun();
   if (!is_object_kind_fun(kind)) return detail;
 
@@ -452,12 +452,12 @@ function kind_detail_fun(
     const body = kind.Transfer;
     // --- WHY --- an empty token id means NEAR. the contract uses "" for the
     // chain's own token.
-    const token = body.token_id.length > 0 ? body.token_id : HUGGIES_NEAR_ID;
-    const decimals = scales.decimals.get(token) ?? HUGGIES_DAO_NEAR_DECIMALS;
+    const token = body.token_id.length > 0 ? body.token_id : SHIT_1170_NEAR_ID;
+    const decimals = scales.decimals.get(token) ?? SHIT_1170_DAO_NEAR_DECIMALS;
     const symbol =
       scales.symbols.get(token) ??
-      (token === HUGGIES_NEAR_ID
-        ? HUGGIES_DAO_NEAR_SYMBOL
+      (token === SHIT_1170_NEAR_ID
+        ? SHIT_1170_DAO_NEAR_SYMBOL
         : token.split(".")[0]);
     detail.token_id = body.token_id;
     detail.token_symbol = symbol;
@@ -563,9 +563,9 @@ function parse_block_heights_fun(
 // computes — the summary and the detail. nothing to re-derive, no cast.
 function parse_proposals_fun(
   proposals: ReadonlyArray<SPUTNIK_DAO_PROPOSAL_TYPE>,
-  scales: HUGGIES_DAO_TOKEN_SCALES,
-): HUGGIES_DAO_PROPOSAL[] {
-  const parsed: HUGGIES_DAO_PROPOSAL[] = [];
+  scales: SHIT_1170_DAO_TOKEN_SCALES,
+): SHIT_1170_DAO_PROPOSAL[] {
+  const parsed: SHIT_1170_DAO_PROPOSAL[] = [];
   for (const proposal of proposals) {
     // the vote counts are `[yes, no, spam]` per role. the contract sends
     // them as strings, so they are read as numbers here.
@@ -625,7 +625,7 @@ function proposal_kind_name_fun(kind: SPUTNIK_DAO_PROPOSAL_KIND_TYPE): string {
 // ========================================
 // --- LOAD -------------------------------
 // read one dao's config, policy and proposals.
-async function load_dao_fun(dao_id: string): Promise<HUGGIES_DAO_INFO> {
+async function load_dao_fun(dao_id: string): Promise<SHIT_1170_DAO_INFO> {
   const errors: string[] = [];
   const near = near_kit_client();
 
@@ -709,7 +709,7 @@ async function load_dao_fun(dao_id: string): Promise<HUGGIES_DAO_INFO> {
 // does, so it is asked once for every token the proposals touch.
 async function load_token_scales_fun(
   proposals: ReadonlyArray<SPUTNIK_DAO_PROPOSAL_TYPE>,
-): Promise<HUGGIES_DAO_TOKEN_SCALES> {
+): Promise<SHIT_1170_DAO_TOKEN_SCALES> {
   const decimals = new Map<string, number>();
   const symbols = new Map<string, string>();
 
@@ -722,13 +722,13 @@ async function load_token_scales_fun(
     const token =
       kind.Transfer.token_id.length > 0
         ? kind.Transfer.token_id
-        : HUGGIES_NEAR_ID;
+        : SHIT_1170_NEAR_ID;
     token_ids.add(token);
   }
   if (token_ids.size === 0) return { decimals, symbols };
 
   try {
-    const info_map = await HUGGIES_TOKEN_INFO.get([...token_ids]);
+    const info_map = await SHIT_1170_TOKEN_INFO.get([...token_ids]);
     for (const [id, info] of info_map) {
       decimals.set(id, info.decimals);
       symbols.set(id, info.symbol);
@@ -737,7 +737,7 @@ async function load_token_scales_fun(
     // --- WHY --- the amounts are shown with a guess if the registry cannot
     // be read. a wrong scale is better than no proposals.
     for (const id of token_ids) {
-      decimals.set(id, HUGGIES_DAO_NEAR_DECIMALS);
+      decimals.set(id, SHIT_1170_DAO_NEAR_DECIMALS);
       symbols.set(id, id.split(".")[0]);
     }
   }
@@ -745,7 +745,7 @@ async function load_token_scales_fun(
 }
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_SPUTNIK_DAO_PAGE = {
+export const SHIT_1170_CONTRACT_SPUTNIK_DAO_PAGE = {
   load_dao: load_dao_fun,
   list_dao_treasuries: async (account_id: string): Promise<TREZU_TREASURY[]> =>
     member_treasuries_fun(await list_trezu_treasuries_fun(account_id)),

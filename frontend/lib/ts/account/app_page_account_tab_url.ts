@@ -106,7 +106,7 @@ function write_url_tab_fun(tab: string): void {
 // --- PUBLIC ---------------------------
 // the reader/writer surface. exported as one object so callers have a
 // single import.
-export const HUGGIES_URL_TAB = {
+export const SHIT_1170_URL_TAB = {
   read: read_url_tab_fun,
   write: write_url_tab_fun,
   href: build_url_tab_fun,

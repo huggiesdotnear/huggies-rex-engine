@@ -23,9 +23,9 @@
 // a call that acts for one account carries that account's key. the
 // default is the ACTIVE account, which is what a page means when it
 // does not say otherwise.
-import { HUGGIES_AUTH } from "./auth_status";
-import { HUGGIES_SESSION } from "./session";
-import type { REQUEST_OPTIONS } from "@huggies/huggies-rex-engine-middleman";
+import { SHIT_1170_AUTH } from "./auth_status";
+import { SHIT_1170_SESSION } from "./session";
+import type { REQUEST_OPTIONS } from "@huggies/shit_1170-middleman";
 // ========================================
 // --- TOKEN -----------------------------
 // the session key for an account, fetched if it is not known yet.
@@ -38,7 +38,7 @@ export async function session_token_fun(
   required: boolean,
   account_id?: string,
 ): Promise<string | undefined> {
-  const target = account_id ?? HUGGIES_AUTH.get_account_id();
+  const target = account_id ?? SHIT_1170_AUTH.get_account_id();
   if (target === null) {
     if (required) {
       throw new Error(
@@ -47,7 +47,7 @@ export async function session_token_fun(
     }
     return undefined;
   }
-  const session_key = await HUGGIES_SESSION.get_or_fetch_session_key(target);
+  const session_key = await SHIT_1170_SESSION.get_or_fetch_session_key(target);
   if (session_key !== null) return session_key;
   if (required) {
     throw new Error(

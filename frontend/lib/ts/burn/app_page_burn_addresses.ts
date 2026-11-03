@@ -9,7 +9,7 @@
 // balances loader read from, so they cannot drift apart.
 // ========================================
 // each account has no access keys, so anything sent to it is locked forever.
-export const HUGGIES_BURN_ADDRESSES: ReadonlyArray<string> = [
+export const SHIT_1170_BURN_ADDRESSES: ReadonlyArray<string> = [
   "burn.sleet.near",
   "burn.huggies.near",
 ];

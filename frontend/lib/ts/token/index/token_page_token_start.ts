@@ -17,15 +17,15 @@
 // --- WHY --- the token id comes from the url: the page shows the token
 // named by `?id=`, and the components read the same id from the same
 // place, so there is one source for it.
-import { HUGGIES_TOKEN_PAGE_TOKEN_STATE } from "./token_page_token_state";
-import { huggies_loading_bar_start_fun } from "../../shared/loading_bar_start";
+import { SHIT_1170_TOKEN_PAGE_TOKEN_STATE } from "./token_page_token_state";
+import { shit_1170_loading_bar_start_fun } from "../../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // the loading bar's patch goes in before the page's first request.
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // begin the page's load for the token the url names.
-void HUGGIES_TOKEN_PAGE_TOKEN_STATE.load();
+void SHIT_1170_TOKEN_PAGE_TOKEN_STATE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

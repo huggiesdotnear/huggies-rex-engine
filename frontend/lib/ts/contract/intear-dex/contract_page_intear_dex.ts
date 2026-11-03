@@ -33,12 +33,12 @@ import type {
   INTEAR_DEX_POOL,
   INTEAR_DEX_POOL_BODY,
 } from "@sleet-js/middleman-intear-dex-api";
-import { HUGGIES_POOL_TOKENS } from "../../shared/pool_tokens";
+import { SHIT_1170_POOL_TOKENS } from "../../shared/pool_tokens";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // one pool as the page shows it.
-export interface HUGGIES_INTEAR_DEX_POOL {
+export interface SHIT_1170_INTEAR_DEX_POOL {
   id: number;
   // the kind of pool: Public, Private, Launch or LaunchV2.
   kind: string;
@@ -59,8 +59,8 @@ export interface HUGGIES_INTEAR_DEX_POOL {
 }
 // ========================================
 // everything the intear dex page has loaded.
-export interface HUGGIES_INTEAR_DEX_PAGE_DATA {
-  pools: ReadonlyArray<HUGGIES_INTEAR_DEX_POOL>;
+export interface SHIT_1170_INTEAR_DEX_PAGE_DATA {
+  pools: ReadonlyArray<SHIT_1170_INTEAR_DEX_POOL>;
   tvl_usd: number;
   volume_24h_usd: number;
   errors: ReadonlyArray<string>;
@@ -132,7 +132,7 @@ function pool_tokens_fun(body: INTEAR_DEX_POOL_BODY): {
 }
 // ========================================
 // map one api pool row into the display record.
-function map_pool_fun(pool: INTEAR_DEX_POOL): HUGGIES_INTEAR_DEX_POOL {
+function map_pool_fun(pool: INTEAR_DEX_POOL): SHIT_1170_INTEAR_DEX_POOL {
   const kind = Object.keys(pool.pool)[0] ?? "Public";
   const tokens = pool_tokens_fun(pool.pool);
   return {
@@ -190,7 +190,7 @@ async function fetch_volume_fun(): Promise<number> {
 // --- WHY --- a failed stat does not take the pools down with it. the
 // pools are the page; the tvl and the volume are two numbers in the
 // header. so each is caught on its own.
-async function load_pools_fun(): Promise<HUGGIES_INTEAR_DEX_PAGE_DATA> {
+async function load_pools_fun(): Promise<SHIT_1170_INTEAR_DEX_PAGE_DATA> {
   const [pools_result, tvl_result, volume_result] = await Promise.all([
     api_intear_dex_pools_all(),
     fetch_tvl_fun().then(
@@ -220,7 +220,7 @@ async function load_pools_fun(): Promise<HUGGIES_INTEAR_DEX_PAGE_DATA> {
   // --- WHY --- the symbols come last: one request covers the whole
   // list, so asking for them first would only delay the pools.
   const token_ids = pools.flatMap((pool) => pool.token_ids);
-  const tokens = await HUGGIES_POOL_TOKENS.fetch(token_ids);
+  const tokens = await SHIT_1170_POOL_TOKENS.fetch(token_ids);
   for (const pool of pools) {
     pool.symbols = pool.token_ids.map((id) => {
       const token = tokens.get(id);
@@ -239,7 +239,7 @@ async function load_pools_fun(): Promise<HUGGIES_INTEAR_DEX_PAGE_DATA> {
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_PAGE_INTEAR_DEX = {
+export const SHIT_1170_CONTRACT_PAGE_INTEAR_DEX = {
   load: load_pools_fun,
 };
 // ========================================

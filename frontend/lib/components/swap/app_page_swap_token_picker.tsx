@@ -18,22 +18,22 @@
 // be made twice. the shared list draws the rows, and the picker only
 // owns the popup around it.
 //
-// mounts into <div id="HUGGIES_COMPONENT_SWAP_TOKEN_PICKER">.
+// mounts into <div id="SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER">.
 import { render } from "preact";
 import {
   useEffect as use_effect,
   useMemo as use_memo,
   useRef as use_ref,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { huggies_token_list_fun } from "../shared/token_list";
+import { shit_1170_token_list_fun } from "../shared/token_list";
 import { marked_token_ids_fun } from "../../ts/discover/app_page_discover_marked_tokens";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
+function SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
   // the picker's own root, so a click outside it can close it.
   const root_ref = use_ref<HTMLDivElement | null>(null);
 
@@ -44,7 +44,7 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
   // opened by the swap FORM, which is a different component. preact
   // only re-renders a component when its OWN state changes, so without
   // a subscription the picker would never learn that it was opened.
-  const picker = use_page_store_fun(HUGGIES_SWAP_TOKEN_PICKER);
+  const picker = use_page_store_fun(SHIT_1170_SWAP_TOKEN_PICKER);
   const tokens = use_memo(() => picker.tokens, [picker.tokens]);
 
   // close the picker when the reader clicks anywhere else.
@@ -54,7 +54,7 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
       const root = root_ref.current;
       if (root === null) return;
       if (event.target instanceof Node && root.contains(event.target)) return;
-      HUGGIES_SWAP_TOKEN_PICKER.close();
+      SHIT_1170_SWAP_TOKEN_PICKER.close();
     };
     document.addEventListener("mousedown", on_document_click_fun);
     return () => {
@@ -66,7 +66,7 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
   use_effect(() => {
     if (!picker.open) return;
     const on_key_fun = (event: KeyboardEvent) => {
-      if (event.key === "Escape") HUGGIES_SWAP_TOKEN_PICKER.close();
+      if (event.key === "Escape") SHIT_1170_SWAP_TOKEN_PICKER.close();
     };
     document.addEventListener("keydown", on_key_fun);
     return () => {
@@ -84,35 +84,35 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
           <button
             type="button"
             class="picker-close"
-            onClick={() => HUGGIES_SWAP_TOKEN_PICKER.close()}
+            onClick={() => SHIT_1170_SWAP_TOKEN_PICKER.close()}
             title="close"
           >
             ✕
           </button>
         </div>
-        {huggies_token_list_fun({
+        {shit_1170_token_list_fun({
           tokens: tokens,
           marked_ids: marked_token_ids_fun(),
           on_search: (query) => {
-            void HUGGIES_SWAP_TOKEN_PICKER.search(query);
+            void SHIT_1170_SWAP_TOKEN_PICKER.search(query);
           },
           on_clear: () => {
-            HUGGIES_SWAP_TOKEN_PICKER.clear_search();
+            SHIT_1170_SWAP_TOKEN_PICKER.clear_search();
           },
           loading: picker.loading,
           searching: picker.loading,
           sort: picker.sort,
           direction: picker.direction,
           on_sort: (next) => {
-            void HUGGIES_SWAP_TOKEN_PICKER.set_sort(next);
+            void SHIT_1170_SWAP_TOKEN_PICKER.set_sort(next);
           },
           on_direction: (next) => {
-            void HUGGIES_SWAP_TOKEN_PICKER.set_direction(next);
+            void SHIT_1170_SWAP_TOKEN_PICKER.set_direction(next);
           },
           has_more: false,
           on_load_more: () => {},
           on_pick: (token_id) => {
-            HUGGIES_SWAP_TOKEN_PICKER.pick(token_id);
+            SHIT_1170_SWAP_TOKEN_PICKER.pick(token_id);
           },
           empty_text: "NO TOKENS FOUND",
           searching_text: "SEARCHING...",
@@ -125,10 +125,10 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SWAP_TOKEN_PICKER;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

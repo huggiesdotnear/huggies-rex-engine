@@ -4,9 +4,9 @@
 // renders through the same amount display the account balance rows use,
 // so the two tables cannot drift apart.
 import { token_amount_row_fun } from "../../../ts/shared/token_amount_row";
-import { HUGGIES_SUPPLY_PERCENT } from "../../../ts/shared/token_supply_percent";
+import { SHIT_1170_SUPPLY_PERCENT } from "../../../ts/shared/token_supply_percent";
 import { current_app_depth_fun } from "../../../ts/shared/app_depth";
-import type { HUGGIES_TOKEN_INFO } from "../../../ts/shared/token_info";
+import type { SHIT_1170_TOKEN_INFO } from "../../../ts/shared/token_info";
 // ========================================
 
 // ========================================
@@ -16,7 +16,7 @@ export function token_holder_row_fun(props: {
   rank: number;
   account_id: string;
   balance: string;
-  info: HUGGIES_TOKEN_INFO;
+  info: SHIT_1170_TOKEN_INFO;
   // the token's total supply, in the token's smallest unit, as the raw
   // decimal string the api reports.
   total_supply_raw: string;
@@ -29,7 +29,7 @@ export function token_holder_row_fun(props: {
   // table: the row is the one place that has the raw balance AND the
   // raw supply, and the math is the shared one the $SHIT page and the
   // burn page use.
-  const percent = HUGGIES_SUPPLY_PERCENT.percent(balance, total_supply_raw);
+  const percent = SHIT_1170_SUPPLY_PERCENT.percent(balance, total_supply_raw);
   return (
     <tr key={key}>
       <td class="holder-rank">{rank}</td>
@@ -38,7 +38,7 @@ export function token_holder_row_fun(props: {
       </td>
       <td class="holder-amount">{amount.decimal}</td>
       <td class="holder-usd">{amount.usd}</td>
-      <td class="holder-percent">{HUGGIES_SUPPLY_PERCENT.format(percent)}</td>
+      <td class="holder-percent">{SHIT_1170_SUPPLY_PERCENT.format(percent)}</td>
     </tr>
   );
 }

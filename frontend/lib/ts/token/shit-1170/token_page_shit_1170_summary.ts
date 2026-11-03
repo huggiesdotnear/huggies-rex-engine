@@ -2,7 +2,7 @@
 // token summary fetch for the dedicated SHIT page.
 // ========================================
 import { api_intear_tokens_get } from "@sleet-js/middleman-intear-api";
-import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
+import { SHIT_1170_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 // ========================================
 // the metadata fields the summary shows.
 //
@@ -10,7 +10,7 @@ import { HUGGIES_SHIT_TOKEN_ID } from "../../shared/shit_1170_token";
 // icon, the socials, the description and the main pool are not shown
 // on the $SHIT page, so asking for them only makes the response
 // bigger.
-const HUGGIES_SHIT_SUMMARY_FIELDS = [
+const SHIT_1170_SHIT_SUMMARY_FIELDS = [
   "name",
   "symbol",
   "decimals",
@@ -24,7 +24,7 @@ const HUGGIES_SHIT_SUMMARY_FIELDS = [
 ] as const;
 // ========================================
 // the token summary shown at the top of the page.
-export interface HUGGIES_SHIT_SUMMARY {
+export interface SHIT_1170_SHIT_SUMMARY {
   id: string;
   name: string;
   symbol: string;
@@ -60,10 +60,10 @@ function to_decimal_string_fun(value: unknown, fallback: string): string {
 }
 // ========================================
 // fetch the SHIT token summary from the intear api.
-export async function fetch_shit_summary_fun(): Promise<HUGGIES_SHIT_SUMMARY | null> {
+export async function fetch_shit_summary_fun(): Promise<SHIT_1170_SHIT_SUMMARY | null> {
   const response = await api_intear_tokens_get({
-    ids: [HUGGIES_SHIT_TOKEN_ID],
-    fields: HUGGIES_SHIT_SUMMARY_FIELDS,
+    ids: [SHIT_1170_SHIT_TOKEN_ID],
+    fields: SHIT_1170_SHIT_SUMMARY_FIELDS,
   });
   const row = response.rows[0];
   if (row === undefined) return null;
@@ -85,9 +85,9 @@ export async function fetch_shit_summary_fun(): Promise<HUGGIES_SHIT_SUMMARY | n
     total_supply_with_decimals,
   ] = row;
   return {
-    id: HUGGIES_SHIT_TOKEN_ID,
-    name: typeof name === "string" ? name : HUGGIES_SHIT_TOKEN_ID,
-    symbol: typeof symbol === "string" ? symbol : HUGGIES_SHIT_TOKEN_ID,
+    id: SHIT_1170_SHIT_TOKEN_ID,
+    name: typeof name === "string" ? name : SHIT_1170_SHIT_TOKEN_ID,
+    symbol: typeof symbol === "string" ? symbol : SHIT_1170_SHIT_TOKEN_ID,
     decimals: to_finite_number_fun(decimals),
     price_usd: to_finite_number_fun(price_usd),
     reputation: typeof reputation === "string" ? reputation : "Unknown",

@@ -1,0 +1,13 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER
+   the searchable token list on the discover page.
+
+   the list itself is the SHARED one (components/shared/token_list.css),
+   so the swap page's token picker draws the same rows. this file holds
+   only what the DISCOVER page adds around it.
+
+   the page's CONTRACTS and TOKENS sections are plain <section>
+   elements in the page column, styled by base/main.css. */
+@import url(../shared/token_list.css);
+
+/*==================================*/

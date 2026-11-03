@@ -48,9 +48,9 @@
 // "done" look the same on screen. the state is what tells them apart
 // for the code: idle means nothing has been asked for yet, and done
 // means the work finished and the bar is resting at the end.
-export type HUGGIES_LOADING_BAR_STATE = "idle" | "loading" | "done";
+export type SHIT_1170_LOADING_BAR_STATE = "idle" | "loading" | "done";
 // the bar's state right now.
-let state: HUGGIES_LOADING_BAR_STATE = "idle";
+let state: SHIT_1170_LOADING_BAR_STATE = "idle";
 // how many requests are in flight right now.
 let in_flight = 0;
 // how many requests have ANSWERED in this batch.
@@ -389,7 +389,7 @@ function is_loading_fun(): boolean {
 }
 // ========================================
 // the bar's state, so the component knows whether to show it at all.
-function get_state_fun(): HUGGIES_LOADING_BAR_STATE {
+function get_state_fun(): SHIT_1170_LOADING_BAR_STATE {
   return state;
 }
 // ========================================
@@ -464,7 +464,7 @@ install_fun();
 // page's start script calls it to make the ORDERING explicit — the
 // patch is in place before the page's load, not merely by the time the
 // component mounts.
-export const HUGGIES_LOADING_BAR = {
+export const SHIT_1170_LOADING_BAR = {
   install: install_fun,
   subscribe: subscribe_fun,
   get_state: get_state_fun,

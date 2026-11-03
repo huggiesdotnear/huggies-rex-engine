@@ -28,7 +28,7 @@ import type {
 // ========================================
 // --- TYPES ------------------------------
 // what the page holds about one transaction.
-export interface HUGGIES_APP_PAGE_TX_DATA {
+export interface SHIT_1170_APP_PAGE_TX_DATA {
   // the parsed transaction — the flat shape the page renders.
   parsed: PARSE_RESULT;
   // the untouched transaction, so nothing is ever lost.
@@ -45,7 +45,7 @@ export interface HUGGIES_APP_PAGE_TX_DATA {
 // result as "there is no transaction to show".
 async function app_page_tx_load_fun(
   tx_hash: string,
-): Promise<HUGGIES_APP_PAGE_TX_DATA | null> {
+): Promise<SHIT_1170_APP_PAGE_TX_DATA | null> {
   const trimmed = tx_hash.trim();
   if (trimmed.length === 0) return null;
   const response = await api_transactions({
@@ -63,7 +63,7 @@ async function app_page_tx_load_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_APP_PAGE_TX = {
+export const SHIT_1170_APP_PAGE_TX = {
   load: app_page_tx_load_fun,
 };
 // ========================================

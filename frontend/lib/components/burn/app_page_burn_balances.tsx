@@ -16,17 +16,17 @@
 //
 // this component does not fetch. it reads the page's store and renders.
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_APP_PAGE_BURN_STORE } from "../../ts/burn/app_page_burn_store";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_BURN_STORE } from "../../ts/burn/app_page_burn_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { HUGGIES_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
-import { HUGGIES_SUPPLY_PERCENT } from "../../ts/shared/token_supply_percent";
+import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
+import { SHIT_1170_SUPPLY_PERCENT } from "../../ts/shared/token_supply_percent";
 import { token_detail_href_fun } from "../../ts/shared/token_link";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
-  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_BURN_STORE);
+function SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
+  const page_data = use_page_store_fun(SHIT_1170_APP_PAGE_BURN_STORE);
   const tokens = page_data?.tokens ?? [];
   const is_loading = page_data === null;
 
@@ -57,7 +57,7 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
               <div class="token-detail">
                 <span class="detail-label">BURNED</span>
                 <span class="detail-value">
-                  {HUGGIES_AMOUNT_FORMAT.balance(token.raw, {
+                  {SHIT_1170_AMOUNT_FORMAT.balance(token.raw, {
                     decimals: token.decimals,
                   })}{" "}
                   {token.symbol}
@@ -66,7 +66,7 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
               <div class="token-detail">
                 <span class="detail-label">OF TOTAL SUPPLY</span>
                 <span class="detail-value">
-                  {HUGGIES_SUPPLY_PERCENT.format(token.percent)}
+                  {SHIT_1170_SUPPLY_PERCENT.format(token.percent)}
                 </span>
               </div>
             </div>
@@ -86,10 +86,12 @@ function HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES;
+const SELF_MOUNT_ID =
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_APP_PAGE_BURN_BALANCES_FUN />, el);
+  if (el !== null)
+    render(<SHIT_1170_COMPONENT_APP_PAGE_BURN_BALANCES_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

@@ -20,7 +20,7 @@
 // --- SHAPE ------------------------------
 // a cache's identity. the store's key path is `id` for every cache in
 // the app, so `key_path` is fixed here rather than per-cache.
-export interface HUGGIES_INDEXED_DB_STORE_CONFIG {
+export interface SHIT_1170_INDEXED_DB_STORE_CONFIG {
   // the database name.
   db_name: string;
   // the schema version. bump it to add or drop a store.
@@ -50,7 +50,7 @@ const db_promises: Map<string, Promise<IDBDatabase>> = new Map();
 // only when MISSING, so a later version bump that adds stores does not
 // throw on the ones already there.
 function open_db_fun(
-  config: HUGGIES_INDEXED_DB_STORE_CONFIG,
+  config: SHIT_1170_INDEXED_DB_STORE_CONFIG,
 ): Promise<IDBDatabase> {
   const existing = db_promises.get(config.db_name);
   if (existing !== undefined) return existing;
@@ -88,7 +88,7 @@ function open_db_fun(
 // resolves empty rather than throwing: a cache problem must degrade
 // to a refetch, never to an error the ui has to handle.
 async function get_many_fun<row>(
-  config: HUGGIES_INDEXED_DB_STORE_CONFIG,
+  config: SHIT_1170_INDEXED_DB_STORE_CONFIG,
   ids: ReadonlyArray<string>,
 ): Promise<Map<string, row>> {
   const found = new Map<string, row>();
@@ -125,7 +125,7 @@ async function get_many_fun<row>(
 // upsert many rows in one transaction. never throws: a failed cache
 // write only costs a refetch next time.
 async function put_many_fun<row>(
-  config: HUGGIES_INDEXED_DB_STORE_CONFIG,
+  config: SHIT_1170_INDEXED_DB_STORE_CONFIG,
   rows: ReadonlyArray<row>,
 ): Promise<void> {
   if (rows.length === 0) return;
@@ -149,7 +149,7 @@ async function put_many_fun<row>(
 // empty a store. used when a cache's contents are no longer valid and
 // must be refetched from scratch.
 async function clear_fun(
-  config: HUGGIES_INDEXED_DB_STORE_CONFIG,
+  config: SHIT_1170_INDEXED_DB_STORE_CONFIG,
 ): Promise<void> {
   try {
     const db = await open_db_fun(config);
@@ -170,7 +170,7 @@ async function clear_fun(
 // the store surface. one call per operation, each one carrying the
 // cache's own config, so two caches over the same database share the
 // connection without sharing a store.
-export const HUGGIES_INDEXED_DB_STORE = {
+export const SHIT_1170_INDEXED_DB_STORE = {
   get_many: get_many_fun,
   put_many: put_many_fun,
   clear: clear_fun,

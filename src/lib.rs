@@ -1,4 +1,4 @@
-// huggies_rex_engine
+// shit_1170
 // ====================================
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -6,7 +6,7 @@
 pub mod backend {
     pub mod logic {
         pub mod db;
-        pub mod endpoint_huggies_sessions;
+        pub mod endpoint_shit_1170_sessions;
         pub mod endpoint_trezu;
         pub mod server;
     }

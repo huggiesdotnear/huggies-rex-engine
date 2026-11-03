@@ -12,7 +12,7 @@
 // --- SHAPE ------------------------------
 // `token_id` is null for the meme cooking label, which is a dao and not
 // a token.
-export interface HUGGIES_EMOJI_TOKEN {
+export interface SHIT_1170_EMOJI_TOKEN {
   emoji: string;
   token_id: string | null;
   label: string;
@@ -20,7 +20,7 @@ export interface HUGGIES_EMOJI_TOKEN {
 }
 // ========================================
 // --- LIST -------------------------------
-export const HUGGIES_EMOJI_TOKENS: ReadonlyArray<HUGGIES_EMOJI_TOKEN> = [
+export const SHIT_1170_EMOJI_TOKENS: ReadonlyArray<SHIT_1170_EMOJI_TOKEN> = [
   {
     emoji: "🐶",
     token_id: "token.0xshitzu.near",

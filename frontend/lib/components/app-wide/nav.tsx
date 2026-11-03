@@ -1,26 +1,26 @@
 // ========================================
 // top-level nav on every app/* page (except the two redirect pages,
 // which never stay on screen long enough to host a nav).
-// mounts into <nav id="HUGGIES_COMPONENT_NAV">; hrefs are resolved at
+// mounts into <nav id="SHIT_1170_COMPONENT_NAV">; hrefs are resolved at
 // render time so a nav on a nested page still points back at the bare
 // filenames under /app/.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { Home, ArrowLeftRight, User, LayoutGrid } from "lucide-preact";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // `href` is a bare filename; resolve_href_fun prefixes ../.
 import type { ComponentType } from "preact";
-interface HUGGIES_NAV_LINK {
+interface SHIT_1170_NAV_LINK {
   href: string;
   label: string;
   Icon: ComponentType<{ size?: number }>;
 }
 // PROFILE points at the router, not account.html directly, so a logged-out
 // user lands on auth.html instead of a blank account.html with no ?id=.
-const HUGGIES_NAV_LINKS: ReadonlyArray<HUGGIES_NAV_LINK> = [
+const SHIT_1170_NAV_LINKS: ReadonlyArray<SHIT_1170_NAV_LINK> = [
   { href: "index.html", label: "FEED", Icon: Home },
   { href: "swap.html", label: "SWAP", Icon: ArrowLeftRight },
   { href: "account.html", label: "PROFILE", Icon: User },
@@ -70,14 +70,14 @@ function is_active_link_fun(href: string, current_base: string): boolean {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_NAV_FUN() {
+function SHIT_1170_COMPONENT_NAV_FUN() {
   // ========================================
   const depth = current_depth_after_app_fun();
   const current_base = current_basename_fun();
 
   return (
     <>
-      {HUGGIES_NAV_LINKS.map((link) => {
+      {SHIT_1170_NAV_LINKS.map((link) => {
         const resolved = resolve_href_fun(link.href, depth);
         const is_active = is_active_link_fun(link.href, current_base);
         return (
@@ -96,9 +96,9 @@ function HUGGIES_COMPONENT_NAV_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check so re-imports don't double-render.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_NAV;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_NAV;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_NAV_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_NAV_FUN />, el);
 }
 // ========================================

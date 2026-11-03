@@ -9,18 +9,18 @@ as rounded cards, each one linking to that token's page.
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <main>
-    <div id="HUGGIES_COMPONENT_EMOJI_MATCH_GAME"></div>
-    <div id="HUGGIES_COMPONENT_GAME_MEME_TOKENS"></div>
+    <div id="SHIT_1170_COMPONENT_EMOJI_MATCH_GAME"></div>
+    <div id="SHIT_1170_COMPONENT_GAME_MEME_TOKENS"></div>
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
   <!--script-->
   <script src="../lib/ts/import-game.ts"></script>

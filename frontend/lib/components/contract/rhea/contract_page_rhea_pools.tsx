@@ -11,7 +11,7 @@
 // reader scrolls to the bottom.
 //
 // mounts into
-// <div id="HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS">.
+// <div id="SHIT_1170_COMPONENT_CONTRACT_RHEA_POOLS">.
 // ========================================
 import { render } from "preact";
 import {
@@ -19,31 +19,31 @@ import {
   useRef as use_ref,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_RHEA_STORE } from "../../../ts/contract/rhea/contract_page_rhea_store";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_CONTRACT_PAGE_RHEA_STORE } from "../../../ts/contract/rhea/contract_page_rhea_store";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import {
-  HUGGIES_DEFAULT_RHEA_POOL_SORT,
-  HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
-  HUGGIES_RHEA_POOL_SORTS,
-  type HUGGIES_RHEA_POOL_SORT,
-  type HUGGIES_RHEA_POOL_SORT_DIRECTION,
+  SHIT_1170_DEFAULT_RHEA_POOL_SORT,
+  SHIT_1170_DEFAULT_RHEA_POOL_SORT_DIRECTION,
+  SHIT_1170_RHEA_POOL_SORTS,
+  type SHIT_1170_RHEA_POOL_SORT,
+  type SHIT_1170_RHEA_POOL_SORT_DIRECTION,
 } from "../../../ts/contract/rhea/contract_page_rhea_pool_sort";
-import { huggies_sort_keys_control_fun } from "../../shared/sort_keys_control";
-import type { HUGGIES_RHEA_POOL } from "../../../ts/contract/rhea/contract_page_rhea";
+import { shit_1170_sort_keys_control_fun } from "../../shared/sort_keys_control";
+import type { SHIT_1170_RHEA_POOL } from "../../../ts/contract/rhea/contract_page_rhea";
 import type { RHEA_POOL_SEARCH_TYPE } from "@sleet-js/middleman-rhea-api";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // how long to wait after a keystroke before asking the api. long enough
 // that typing a word is one request, not one per letter.
-const HUGGIES_SEARCH_DEBOUNCE_MS = 250;
+const SHIT_1170_SEARCH_DEBOUNCE_MS = 250;
 // how close to the bottom of the list the reader has to scroll before the
 // next page is asked for. a little early, so the next page is usually there
 // by the time they reach the end.
-const HUGGIES_LOAD_MORE_THRESHOLD_PX = 600;
+const SHIT_1170_LOAD_MORE_THRESHOLD_PX = 600;
 // the pool families the reader can pick between, with their labels.
-const HUGGIES_POOL_TYPE_OPTIONS: ReadonlyArray<{
+const SHIT_1170_POOL_TYPE_OPTIONS: ReadonlyArray<{
   key: RHEA_POOL_SEARCH_TYPE;
   label: string;
 }> = [
@@ -81,17 +81,17 @@ function usd_fun(value: number): string {
 //
 // --- WHY --- a pool with no family at all falls back to its pool kind,
 // so the chip is never blank.
-const HUGGIES_POOL_TYPE_LABELS: Readonly<Record<string, string>> = {
+const SHIT_1170_POOL_TYPE_LABELS: Readonly<Record<string, string>> = {
   classic: "CLASSIC",
   dcl: "DCL",
   stable: "STABLE",
   degen: "DEGEN",
 };
 // ========================================
-function pool_type_label_fun(pool: HUGGIES_RHEA_POOL): string {
+function pool_type_label_fun(pool: SHIT_1170_RHEA_POOL): string {
   const type = pool.type.trim();
   if (type.length > 0) {
-    const label = HUGGIES_POOL_TYPE_LABELS[type.toLowerCase()];
+    const label = SHIT_1170_POOL_TYPE_LABELS[type.toLowerCase()];
     return label ?? type.toUpperCase();
   }
   const kind = pool.kind.trim();
@@ -103,7 +103,7 @@ function pool_type_label_fun(pool: HUGGIES_RHEA_POOL): string {
 // --- WHY --- the row is not a link: rhea has no pool detail page in this
 // app yet, so a row that looks clickable and does nothing is worse than a
 // row that plainly is not one.
-function pool_row_fun(pool: HUGGIES_RHEA_POOL): preact.JSX.Element {
+function pool_row_fun(pool: SHIT_1170_RHEA_POOL): preact.JSX.Element {
   const symbols = pool.symbols.join(" / ");
   return (
     <div class="pool">
@@ -146,27 +146,27 @@ function pool_row_fun(pool: HUGGIES_RHEA_POOL): preact.JSX.Element {
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
+function SHIT_1170_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
   const [query, set_query] = use_state("");
-  const [sort, set_sort] = use_state<HUGGIES_RHEA_POOL_SORT>(
-    HUGGIES_DEFAULT_RHEA_POOL_SORT,
+  const [sort, set_sort] = use_state<SHIT_1170_RHEA_POOL_SORT>(
+    SHIT_1170_DEFAULT_RHEA_POOL_SORT,
   );
   const [direction, set_direction] =
-    use_state<HUGGIES_RHEA_POOL_SORT_DIRECTION>(
-      HUGGIES_DEFAULT_RHEA_POOL_SORT_DIRECTION,
+    use_state<SHIT_1170_RHEA_POOL_SORT_DIRECTION>(
+      SHIT_1170_DEFAULT_RHEA_POOL_SORT_DIRECTION,
     );
   const [type, set_type] = use_state<RHEA_POOL_SEARCH_TYPE>("all");
   // the scroll container, so the reader's position at the bottom is
   // detectable.
   const scroll_ref = use_ref<HTMLDivElement | null>(null);
 
-  const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_RHEA_STORE);
+  const page_data = use_page_store_fun(SHIT_1170_CONTRACT_PAGE_RHEA_STORE);
 
   // --- WHY --- the page's start script loads the list with the default
   // sort. this effect is for the reader's OWN choices: when they pick a
   // different sort or family, the list is loaded again with it.
   use_effect(() => {
-    void HUGGIES_CONTRACT_PAGE_RHEA_STORE.load(
+    void SHIT_1170_CONTRACT_PAGE_RHEA_STORE.load(
       sort,
       direction === "desc",
       type,
@@ -184,19 +184,19 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
     const needle = query.trim();
     if (needle.length === 0) return;
     const timer = window.setTimeout(() => {
-      void HUGGIES_CONTRACT_PAGE_RHEA_STORE.load(
+      void SHIT_1170_CONTRACT_PAGE_RHEA_STORE.load(
         sort,
         direction === "desc",
         type,
         needle,
       );
-    }, HUGGIES_SEARCH_DEBOUNCE_MS);
+    }, SHIT_1170_SEARCH_DEBOUNCE_MS);
     return () => {
       window.clearTimeout(timer);
     };
   }, [query, sort, direction, type]);
 
-  const loading = HUGGIES_CONTRACT_PAGE_RHEA_STORE.is_loading();
+  const loading = SHIT_1170_CONTRACT_PAGE_RHEA_STORE.is_loading();
   const pools = page_data?.pools ?? [];
   const has_more = page_data?.has_more ?? false;
   const errors = page_data?.errors ?? [];
@@ -212,8 +212,8 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
     const on_scroll_fun = (): void => {
       const distance =
         element.scrollHeight - element.scrollTop - element.clientHeight;
-      if (distance > HUGGIES_LOAD_MORE_THRESHOLD_PX) return;
-      void HUGGIES_CONTRACT_PAGE_RHEA_STORE.load_more();
+      if (distance > SHIT_1170_LOAD_MORE_THRESHOLD_PX) return;
+      void SHIT_1170_CONTRACT_PAGE_RHEA_STORE.load_more();
     };
     element.addEventListener("scroll", on_scroll_fun);
     return () => {
@@ -235,7 +235,7 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
           />
         </div>
         <div class="types">
-          {HUGGIES_POOL_TYPE_OPTIONS.map((option) => (
+          {SHIT_1170_POOL_TYPE_OPTIONS.map((option) => (
             <button
               type="button"
               class={
@@ -249,8 +249,8 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
           ))}
         </div>
         <div class="sort">
-          {huggies_sort_keys_control_fun({
-            options: HUGGIES_RHEA_POOL_SORTS,
+          {shit_1170_sort_keys_control_fun({
+            options: SHIT_1170_RHEA_POOL_SORTS,
             sort,
             direction,
             on_sort: (next) => set_sort(next),
@@ -285,11 +285,12 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS;
+const SELF_MOUNT_ID =
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_RHEA_POOLS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_RHEA_POOLS_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_RHEA_POOLS_FUN />, el);
   }
 }
 // ========================================

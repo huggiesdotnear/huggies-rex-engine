@@ -4,15 +4,15 @@
 import {
   api_trezu_treasuries_get,
   type TREZU_TREASURY,
-} from "@huggies/huggies-rex-engine-middleman";
-import { HUGGIES_BASE_URL } from "../../shared/base_url";
+} from "@huggies/shit_1170-middleman";
+import { SHIT_1170_BASE_URL } from "../../shared/base_url";
 export type { TREZU_TREASURY };
 // ========================================
 // list DAOs associated with an account through the Trezu proxy.
 export async function list_trezu_treasuries_fun(
   account_id: string,
 ): Promise<TREZU_TREASURY[]> {
-  return api_trezu_treasuries_get(HUGGIES_BASE_URL, {
+  return api_trezu_treasuries_get(SHIT_1170_BASE_URL, {
     accountId: account_id,
   });
 }

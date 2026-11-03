@@ -2,13 +2,13 @@
 // discover links for supported smart contracts.
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import {
   contract_page_href_fun,
   list_contract_cards_fun,
 } from "../../ts/discover/app_page_discover_contract_cards";
 // ========================================
-function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
+function SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
   return (
     <div>
       {list_contract_cards_fun().map((card) => (
@@ -26,11 +26,11 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN />, el);
+    render(<SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_CONTRACT_DISCOVER_FUN />, el);
   }
 }
 // ========================================

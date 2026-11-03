@@ -38,8 +38,8 @@ import {
   parse_transaction,
   TRANSACTIONS_BATCH_SIZE,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { HUGGIES_TX_DETAIL_CACHE } from "./app_page_account_tx_details_cache";
-import type { HUGGIES_CACHED_TX_DETAIL } from "./app_page_account_tx_details_cache";
+import { SHIT_1170_TX_DETAIL_CACHE } from "./app_page_account_tx_details_cache";
+import type { SHIT_1170_CACHED_TX_DETAIL } from "./app_page_account_tx_details_cache";
 import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -49,12 +49,12 @@ import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // --- WHY FIVE: the details endpoint takes twenty hashes per call, so
 // five is one request, and five cards is enough to show what the
 // account has been doing without the section taking over the page.
-const HUGGIES_TX_DETAIL_COUNT = 5;
+const SHIT_1170_TX_DETAIL_COUNT = 5;
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
 // one transaction, parsed and ready to render.
-export interface HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL {
+export interface SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL {
   // the transaction's hash.
   hash: string;
   // the parsed transaction — the flat shape the card renders.
@@ -89,15 +89,15 @@ function is_settled_fun(parsed: PARSE_RESULT): boolean {
 // already moved on.
 export async function load_tx_details_fun(
   hashes: ReadonlyArray<string>,
-): Promise<HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL[]> {
+): Promise<SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL[]> {
   if (hashes.length === 0) return [];
-  const wanted = hashes.slice(0, HUGGIES_TX_DETAIL_COUNT);
+  const wanted = hashes.slice(0, SHIT_1170_TX_DETAIL_COUNT);
   // the ones the cache already has.
-  const cached = await HUGGIES_TX_DETAIL_CACHE.get_many(wanted);
+  const cached = await SHIT_1170_TX_DETAIL_CACHE.get_many(wanted);
   const missing: string[] = [];
   // the cached ones, by hash, so the answer can be put back in the
   // order it was asked for.
-  const by_hash: Map<string, HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL> = new Map();
+  const by_hash: Map<string, SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL> = new Map();
   for (const hash of wanted) {
     const entry = cached.get(hash);
     if (entry === undefined) {
@@ -111,12 +111,12 @@ export async function load_tx_details_fun(
     return wanted
       .map((hash) => by_hash.get(hash))
       .filter(
-        (item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL =>
+        (item): item is SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL =>
           item !== undefined,
       );
   }
 
-  const to_cache: HUGGIES_CACHED_TX_DETAIL[] = [];
+  const to_cache: SHIT_1170_CACHED_TX_DETAIL[] = [];
   for (
     let index = 0;
     index < missing.length;
@@ -138,7 +138,7 @@ export async function load_tx_details_fun(
       }
     }
   }
-  await HUGGIES_TX_DETAIL_CACHE.put_many(to_cache);
+  await SHIT_1170_TX_DETAIL_CACHE.put_many(to_cache);
   // --- WHY --- THE ANSWER IS PUT BACK IN THE ORDER IT WAS ASKED FOR:
   // the hashes come from the history newest first, and the cached ones
   // and the fetched ones have to go back in that same order. adding
@@ -147,7 +147,8 @@ export async function load_tx_details_fun(
   return wanted
     .map((hash) => by_hash.get(hash))
     .filter(
-      (item): item is HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL => item !== undefined,
+      (item): item is SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL =>
+        item !== undefined,
     );
 }
 // ========================================

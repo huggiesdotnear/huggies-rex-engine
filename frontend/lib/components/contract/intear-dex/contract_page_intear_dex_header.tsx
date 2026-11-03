@@ -9,8 +9,8 @@
 // (lib/ts/contract_page_intear_dex_store.ts).
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../../../ts/contract/intear-dex/contract_page_intear_dex_store";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE } from "../../../ts/contract/intear-dex/contract_page_intear_dex_store";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { compact_usd_fun } from "../../../ts/shared/compact_usd";
 // ========================================
@@ -18,13 +18,15 @@ import { compact_usd_fun } from "../../../ts/shared/compact_usd";
 // --- CONFIG -----------------------------
 // --- WHY --- this id is a constant and not a fetched value: it is the
 // contract the page is ABOUT, not something the api reports.
-const HUGGIES_INTEAR_DEX_CONTRACT_ID = "dex.intear.near";
+const SHIT_1170_INTEAR_DEX_CONTRACT_ID = "dex.intear.near";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN() {
-  const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE);
-  const loading = HUGGIES_CONTRACT_PAGE_INTEAR_DEX_STORE.is_loading();
+function SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN() {
+  const page_data = use_page_store_fun(
+    SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE,
+  );
+  const loading = SHIT_1170_CONTRACT_PAGE_INTEAR_DEX_STORE.is_loading();
 
   const pools = page_data?.pools ?? [];
   const pool_count = pools.length;
@@ -40,7 +42,7 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN() {
         <article>
           <span class="contract-label">DEX ENGINE</span>
           <strong class="contract-title">INTEAR DEX</strong>
-          <code class="contract-id">{HUGGIES_INTEAR_DEX_CONTRACT_ID}</code>
+          <code class="contract-id">{SHIT_1170_INTEAR_DEX_CONTRACT_ID}</code>
         </article>
       </section>
       <section class="stats">
@@ -70,11 +72,11 @@ function HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_HEADER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_INTEAR_DEX_HEADER_FUN />, el);
   }
 }
 // ========================================

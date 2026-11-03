@@ -1,0 +1,62 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS
+   the player's balance and the six world cards. the tile's own shape is
+   the pumpopoly page's own component
+   (contract/pumpopoly/stat_tile.css); this file holds the page's parts. */
+@import url(./error_card.css);
+@import url(./stat_tile.css);
+
+/*==================================*/
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .pumpopoly-value {
+  font-size: 26px;
+  line-height: 1.1;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .sub {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  opacity: 0.65;
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .pumpopoly-text {
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the in-game balance leads the world section, full width above the
+   cards. it is the number a player came for, so it gets its own row
+   instead of one cell in a grid of six. */
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .balance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(0, 198, 215, 0.5);
+  border-radius: 12px;
+  background: rgba(0, 198, 215, 0.16);
+}
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .balance-value {
+  font-size: 30px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+/* the raw balance under the big number. it is smaller than the
+   number, but the same color — the size tells it apart. */
+#SHIT_1170_COMPONENT_CONTRACT_PUMPOPOLY_PLAYER_STATS .raw {
+  font-size: 10px;
+}
+/*==================================*/

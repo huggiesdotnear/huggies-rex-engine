@@ -23,7 +23,7 @@
 // rasterises svg icons, so a token with an svg icon gets a webp here too.
 // the original svg is still available as the `icon` field when a caller
 // genuinely wants the source.
-const HUGGIES_INTEAR_BASE_URL = "https://api.intea.rs";
+const SHIT_1170_INTEAR_BASE_URL = "https://api.intea.rs";
 
 // ========================================
 // --- FALLBACKS -------------------------
@@ -50,7 +50,7 @@ const HUGGIES_INTEAR_BASE_URL = "https://api.intea.rs";
 //
 // to add a token: put its account id here and the url of an image that
 // shows it.
-const HUGGIES_ICON_FALLBACKS: Readonly<Record<string, string>> = {
+const SHIT_1170_ICON_FALLBACKS: Readonly<Record<string, string>> = {
   "pussy.laboratory.jumpfinance.near": "https://i.imgur.com/zjkBYpA.jpeg",
   "ftv2.nekotoken.near": "https://i.imgur.com/glVxMOD.png",
 };
@@ -70,7 +70,7 @@ export function token_icon_for_fun(
 ): string | null {
   const url = token_icon_url_fun(icon_hash);
   if (url !== null) return url;
-  return HUGGIES_ICON_FALLBACKS[token_id] ?? null;
+  return SHIT_1170_ICON_FALLBACKS[token_id] ?? null;
 }
 // ========================================
 // the icon url for an icon hash, or null when there is no hash.
@@ -85,7 +85,7 @@ export function token_icon_url_fun(
   // migration. old records have `icon`, not `icon_hash`, so they must
   // keep working instead of crashing on an undefined hash.
   if (typeof icon_hash === "string" && icon_hash.length > 0) {
-    return `${HUGGIES_INTEAR_BASE_URL}/icon/${encodeURIComponent(icon_hash)}.webp`;
+    return `${SHIT_1170_INTEAR_BASE_URL}/icon/${encodeURIComponent(icon_hash)}.webp`;
   }
   return null;
 }

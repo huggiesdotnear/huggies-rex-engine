@@ -10,7 +10,7 @@
 // renders an amount for a human to READ. this one converts an amount
 // for the chain and the router to USE, and it has to be exact in a way
 // a display formatter never is.
-import type { HUGGIES_TOKEN_INFO } from "../shared/token_info";
+import type { SHIT_1170_TOKEN_INFO } from "../shared/token_info";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -104,7 +104,7 @@ export function unit_to_raw_human_fun(unit: string, decimals: number): string {
 // off by 10**decimals.
 export function human_usd_fun(
   human: string,
-  info: Pick<HUGGIES_TOKEN_INFO, "price_usd">,
+  info: Pick<SHIT_1170_TOKEN_INFO, "price_usd">,
 ): number {
   const value = Number(human);
   if (!Number.isFinite(value)) return 0;

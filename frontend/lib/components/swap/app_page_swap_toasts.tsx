@@ -14,29 +14,29 @@
 // to report. a toast layer on a page that never writes to it is a
 // layer of nothing.
 //
-// mounts into <div id="HUGGIES_COMPONENT_SWAP_TOASTS">.
+// mounts into <div id="SHIT_1170_COMPONENT_SWAP_TOASTS">.
 import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { HUGGIES_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
-import type { HUGGIES_TOAST } from "../../ts/swap/app_page_swap_toast_store";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
+import type { SHIT_1170_TOAST } from "../../ts/swap/app_page_swap_toast_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_SWAP_TOASTS_FUN() {
+function SHIT_1170_COMPONENT_SWAP_TOASTS_FUN() {
   // --- WHY --- a revision counter forces a re-render on every store
   // notify; preact does not re-render from external state changes
   // alone.
   const [, set_revision] = use_state(0);
 
   use_effect(() => {
-    const unsubscribe = HUGGIES_TOAST_STORE.subscribe(() => {
+    const unsubscribe = SHIT_1170_TOAST_STORE.subscribe(() => {
       set_revision((revision) => revision + 1);
     });
     return unsubscribe;
   }, []);
 
-  const toasts = HUGGIES_TOAST_STORE.get();
+  const toasts = SHIT_1170_TOAST_STORE.get();
 
   if (toasts.length === 0) return <></>;
 
@@ -51,7 +51,7 @@ function HUGGIES_COMPONENT_SWAP_TOASTS_FUN() {
           {toast.tx_hash !== null && (
             <a
               class="toast-link"
-              href={HUGGIES_TOAST_STORE.tx_link(toast.tx_hash)}
+              href={SHIT_1170_TOAST_STORE.tx_link(toast.tx_hash)}
             >
               VIEW TX
             </a>
@@ -59,7 +59,7 @@ function HUGGIES_COMPONENT_SWAP_TOASTS_FUN() {
           <button
             type="button"
             class="toast-close"
-            onClick={() => HUGGIES_TOAST_STORE.dismiss(toast.id)}
+            onClick={() => SHIT_1170_TOAST_STORE.dismiss(toast.id)}
             title="dismiss"
           >
             ✕
@@ -73,10 +73,10 @@ function HUGGIES_COMPONENT_SWAP_TOASTS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_SWAP_TOASTS;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_SWAP_TOASTS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<HUGGIES_COMPONENT_SWAP_TOASTS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_SWAP_TOASTS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

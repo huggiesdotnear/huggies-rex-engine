@@ -6,7 +6,7 @@
 // the api. everything else about the token (decimals, total supply)
 // is fetched from the intear api.
 // ========================================
-export const HUGGIES_SHIT_TOKEN_ID = "shit-1170.meme-cooking.near";
+export const SHIT_1170_SHIT_TOKEN_ID = "shit-1170.meme-cooking.near";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

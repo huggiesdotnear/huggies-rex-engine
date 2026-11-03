@@ -136,7 +136,7 @@ import "../components/discover/app_page_discover_token_discover"; // the compone
 the pin lands first, because the pin has to be in place before anything
 reads the network. the start comes next, so the page fires its first
 request before the bar's component has even mounted. every start script
-therefore calls `huggies_loading_bar_start_fun()` as its first line,
+therefore calls `shit_1170_loading_bar_start_fun()` as its first line,
 which puts the patch on the global fetch in place before the page's load
 runs. without that line the page's FIRST load was never counted and the
 bar sat dark through it. the components come last, so they mount against
@@ -210,10 +210,10 @@ happens when a filter narrows the rows.
 ## a component
 
 ```tsx
-function HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
-  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_STORE);
+function SHIT_1170_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE_FUN() {
+  const page_data = use_page_store_fun(SHIT_1170_APP_PAGE_ACCOUNT_STORE);
   if (page_data === null) return null;
-  return <>{huggies_balance_table_fun({ rows: page_data.direct })}</>;
+  return <>{shit_1170_balance_table_fun({ rows: page_data.direct })}</>;
 }
 ```
 
@@ -223,7 +223,7 @@ one line to read the data, then jsx. that is the whole pattern.
 
 ```ts
 // the store subscribes to the page's id, so it re-loads by itself.
-export const HUGGIES_APP_PAGE_ACCOUNT_STORE = {
+export const SHIT_1170_APP_PAGE_ACCOUNT_STORE = {
   get: get_fun,
   subscribe: subscribe_fun,
   load: load_fun,
@@ -234,14 +234,14 @@ export const HUGGIES_APP_PAGE_ACCOUNT_STORE = {
 
 ```ts
 // the page's first load.
-void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
+void SHIT_1170_APP_PAGE_ACCOUNT_STORE.load();
 ```
 
 ## the html
 
 ```html
 <main>
-  <div id="HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
+  <div id="SHIT_1170_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE"></div>
 </main>
 <script src="../lib/ts/import-account.ts"></script>
 ```

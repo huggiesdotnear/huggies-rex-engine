@@ -44,7 +44,7 @@ function read_url_id_fun(): string | null {
 }
 // ========================================
 // public surface, in one place so callers have a single import.
-export const HUGGIES_URL_ID = {
+export const SHIT_1170_URL_ID = {
   read: read_url_id_fun,
   normalize: normalize_id_fun,
 };

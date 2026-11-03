@@ -24,18 +24,18 @@
 //
 // the indexeddb mechanics live in lib/ts/indexed_db_store.ts — this
 // file only says WHICH store this cache is and what a row looks like.
-import { HUGGIES_INDEXED_DB_STORE } from "../shared/indexed_db_store";
+import { SHIT_1170_INDEXED_DB_STORE } from "../shared/indexed_db_store";
 import type { TRANSACTION_DETAIL } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
-const HUGGIES_TX_DETAIL_DB_NAME = "huggies_tx_details";
-const HUGGIES_TX_DETAIL_DB_VERSION = 1;
-const HUGGIES_TX_DETAIL_STORE = "tx_details";
+const SHIT_1170_TX_DETAIL_DB_NAME = "shit_1170_tx_details";
+const SHIT_1170_TX_DETAIL_DB_VERSION = 1;
+const SHIT_1170_TX_DETAIL_STORE = "tx_details";
 // ========================================
 // the cache's identity, handed to the shared store module.
-const HUGGIES_TX_DETAIL_STORE_CONFIG = {
-  db_name: HUGGIES_TX_DETAIL_DB_NAME,
-  db_version: HUGGIES_TX_DETAIL_DB_VERSION,
-  store_name: HUGGIES_TX_DETAIL_STORE,
+const SHIT_1170_TX_DETAIL_STORE_CONFIG = {
+  db_name: SHIT_1170_TX_DETAIL_DB_NAME,
+  db_version: SHIT_1170_TX_DETAIL_DB_VERSION,
+  store_name: SHIT_1170_TX_DETAIL_STORE,
 };
 // ========================================
 // ========================================
@@ -48,7 +48,7 @@ const HUGGIES_TX_DETAIL_STORE_CONFIG = {
 // is good forever and the age is not consulted for it. a transaction
 // that has NOT settled can still change, so it is not cached at all —
 // and the age is what would decide if that ever changed.
-export interface HUGGIES_CACHED_TX_DETAIL {
+export interface SHIT_1170_CACHED_TX_DETAIL {
   id: string;
   // the api's own answer for that hash, kept whole. it is the NESTED
   // shape, not the parsed one: the parser is pure and cheap, so the
@@ -69,9 +69,9 @@ export interface HUGGIES_CACHED_TX_DETAIL {
 // refetch instead of an error the ui has to handle.
 async function get_cached_tx_details_fun(
   ids: ReadonlyArray<string>,
-): Promise<Map<string, HUGGIES_CACHED_TX_DETAIL>> {
-  return HUGGIES_INDEXED_DB_STORE.get_many<HUGGIES_CACHED_TX_DETAIL>(
-    HUGGIES_TX_DETAIL_STORE_CONFIG,
+): Promise<Map<string, SHIT_1170_CACHED_TX_DETAIL>> {
+  return SHIT_1170_INDEXED_DB_STORE.get_many<SHIT_1170_CACHED_TX_DETAIL>(
+    SHIT_1170_TX_DETAIL_STORE_CONFIG,
     ids,
   );
 }
@@ -81,10 +81,10 @@ async function get_cached_tx_details_fun(
 // upsert some transactions' details. never throws: a failed cache
 // write only costs a refetch next time.
 async function put_cached_tx_details_fun(
-  entries: ReadonlyArray<HUGGIES_CACHED_TX_DETAIL>,
+  entries: ReadonlyArray<SHIT_1170_CACHED_TX_DETAIL>,
 ): Promise<void> {
-  await HUGGIES_INDEXED_DB_STORE.put_many(
-    HUGGIES_TX_DETAIL_STORE_CONFIG,
+  await SHIT_1170_INDEXED_DB_STORE.put_many(
+    SHIT_1170_TX_DETAIL_STORE_CONFIG,
     entries,
   );
 }
@@ -94,7 +94,7 @@ async function put_cached_tx_details_fun(
 // the cache surface. exported as one object so callers have a single
 // import; every function is safe to call in a non-browser (returns an
 // empty map / no-ops) so components never need to guard.
-export const HUGGIES_TX_DETAIL_CACHE = {
+export const SHIT_1170_TX_DETAIL_CACHE = {
   get_many: get_cached_tx_details_fun,
   put_many: put_cached_tx_details_fun,
 };

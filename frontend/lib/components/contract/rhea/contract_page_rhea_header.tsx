@@ -15,8 +15,8 @@
 // (lib/ts/contract_page_rhea_store.ts).
 // ========================================
 import { render } from "preact";
-import { HUGGIES_MOUNT_ID } from "../../../ts/shared/mount_ids";
-import { HUGGIES_CONTRACT_PAGE_RHEA_STORE } from "../../../ts/contract/rhea/contract_page_rhea_store";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_CONTRACT_PAGE_RHEA_STORE } from "../../../ts/contract/rhea/contract_page_rhea_store";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { compact_usd_fun } from "../../../ts/shared/compact_usd";
 // ========================================
@@ -25,7 +25,7 @@ import { compact_usd_fun } from "../../../ts/shared/compact_usd";
 // --- WHY --- these ids are a constant and not a fetched value: they
 // are the two contracts the page is ABOUT, not something the api
 // reports. the api reports the pools, not the contracts behind them.
-const HUGGIES_RHEA_CONTRACTS: ReadonlyArray<{
+const SHIT_1170_RHEA_CONTRACTS: ReadonlyArray<{
   id: string;
   label: string;
   title: string;
@@ -47,9 +47,9 @@ const HUGGIES_RHEA_CONTRACTS: ReadonlyArray<{
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER_FUN() {
-  const page_data = use_page_store_fun(HUGGIES_CONTRACT_PAGE_RHEA_STORE);
-  const loading = HUGGIES_CONTRACT_PAGE_RHEA_STORE.is_loading();
+function SHIT_1170_COMPONENT_CONTRACT_RHEA_HEADER_FUN() {
+  const page_data = use_page_store_fun(SHIT_1170_CONTRACT_PAGE_RHEA_STORE);
+  const loading = SHIT_1170_CONTRACT_PAGE_RHEA_STORE.is_loading();
 
   // the numbers the header shows. they are the size of the DEX, not of
   // the list on screen: the tvl and the volume are over every pool the
@@ -65,7 +65,7 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER_FUN() {
         <h1>Rhea</h1>
       </header>
       <section class="contracts">
-        {HUGGIES_RHEA_CONTRACTS.map((contract) => (
+        {SHIT_1170_RHEA_CONTRACTS.map((contract) => (
           <article key={contract.id}>
             <span class="contract-label">{contract.label}</span>
             <strong class="contract-title">{contract.title}</strong>
@@ -99,11 +99,12 @@ function HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER;
+const SELF_MOUNT_ID =
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_CONTRACT_RHEA_HEADER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null) {
-    render(<HUGGIES_COMPONENT_CONTRACT_RHEA_HEADER_FUN />, el);
+    render(<SHIT_1170_COMPONENT_CONTRACT_RHEA_HEADER_FUN />, el);
   }
 }
 // ========================================

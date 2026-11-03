@@ -25,12 +25,12 @@
 // put the favourites on top AND this module lifted them again — and the
 // overlap showed a favourite twice once a later page of the list carried
 // the same token.
-import type { HUGGIES_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
+import type { SHIT_1170_DISCOVER_TOKEN_ROW } from "./app_page_discover_token_row";
 import {
-  HUGGIES_DEFAULT_TOKEN_SORT,
-  type HUGGIES_TOKEN_SORT,
+  SHIT_1170_DEFAULT_TOKEN_SORT,
+  type SHIT_1170_TOKEN_SORT,
 } from "./app_page_discover_token_sort_options";
-import { HUGGIES_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
+import { SHIT_1170_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
 // ========================================
 // --- MARKED -----------------------------
 // the marked tokens and their weight, built ONCE when the module loads.
@@ -38,8 +38,8 @@ import { HUGGIES_MARKED_TOKENS } from "./app_page_discover_marked_tokens";
 // --- WHY --- the marked list is a constant, so this map is a constant
 // too. it is not rebuilt on every render: the order of the marked block
 // must not drift between renders or between pages.
-const HUGGIES_MARKED_WEIGHT: Map<string, number> = new Map(
-  HUGGIES_MARKED_TOKENS.map((entry) => [entry.id, entry.weight]),
+const SHIT_1170_MARKED_WEIGHT: Map<string, number> = new Map(
+  SHIT_1170_MARKED_TOKENS.map((entry) => [entry.id, entry.weight]),
 );
 // ========================================
 // ========================================
@@ -62,22 +62,24 @@ const HUGGIES_MARKED_WEIGHT: Map<string, number> = new Map(
 // can arrive twice. showing it twice is a duplicate row, and lifting
 // both copies to the top is a double pin.
 export function order_discover_tokens_fun(
-  tokens: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>,
-  sort: HUGGIES_TOKEN_SORT = HUGGIES_DEFAULT_TOKEN_SORT,
-): HUGGIES_DISCOVER_TOKEN_ROW[] {
+  tokens: ReadonlyArray<SHIT_1170_DISCOVER_TOKEN_ROW>,
+  sort: SHIT_1170_TOKEN_SORT = SHIT_1170_DEFAULT_TOKEN_SORT,
+): SHIT_1170_DISCOVER_TOKEN_ROW[] {
   const seen = new Set<string>();
-  const unique: HUGGIES_DISCOVER_TOKEN_ROW[] = [];
+  const unique: SHIT_1170_DISCOVER_TOKEN_ROW[] = [];
   for (const token of tokens) {
     if (seen.has(token.id)) continue;
     seen.add(token.id);
     unique.push(token);
   }
   if (sort !== "default") return unique;
-  const pinned = unique.filter((token) => HUGGIES_MARKED_WEIGHT.has(token.id));
-  const rest = unique.filter((token) => !HUGGIES_MARKED_WEIGHT.has(token.id));
+  const pinned = unique.filter((token) =>
+    SHIT_1170_MARKED_WEIGHT.has(token.id),
+  );
+  const rest = unique.filter((token) => !SHIT_1170_MARKED_WEIGHT.has(token.id));
   pinned.sort((a, b) => {
-    const a_weight = HUGGIES_MARKED_WEIGHT.get(a.id) ?? 0;
-    const b_weight = HUGGIES_MARKED_WEIGHT.get(b.id) ?? 0;
+    const a_weight = SHIT_1170_MARKED_WEIGHT.get(a.id) ?? 0;
+    const b_weight = SHIT_1170_MARKED_WEIGHT.get(b.id) ?? 0;
     // the lowest weight leads the block.
     if (a_weight !== b_weight) return a_weight - b_weight;
     // --- WHY --- two marked tokens with the same weight are ordered by

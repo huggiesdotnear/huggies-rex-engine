@@ -3,17 +3,17 @@
 // mean something once divided by 10**decimals. every place that shows an
 // amount goes through here, so a balance is never rendered as "1500000"
 // next to a ticker called USDC.
-import type { HUGGIES_TOKEN_INFO } from "./token_info";
+import type { SHIT_1170_TOKEN_INFO } from "./token_info";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // decimals for ordinary values (>= 0.01). large amounts read better with
 // fewer, so they get their own smaller cap.
-const HUGGIES_MAX_DISPLAY_DECIMALS = 2;
+const SHIT_1170_MAX_DISPLAY_DECIMALS = 2;
 // a value below this rounds away to zero at two decimals, so it is shown
 // as "0.00" rather than as a long tail of zeros. 0.01 is the smallest
 // amount that still reads as a real number.
-const HUGGIES_DUST_FLOOR = 0.01;
+const SHIT_1170_DUST_FLOOR = 0.01;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -45,8 +45,8 @@ function group_digits_fun(value: string): string {
 function format_amount_fun(value: number): string {
   if (!Number.isFinite(value)) return "0";
   const abs = Math.abs(value);
-  if (abs < HUGGIES_DUST_FLOOR) return "0.00";
-  const fixed = value.toFixed(HUGGIES_MAX_DISPLAY_DECIMALS);
+  if (abs < SHIT_1170_DUST_FLOOR) return "0.00";
+  const fixed = value.toFixed(SHIT_1170_MAX_DISPLAY_DECIMALS);
   const trimmed = fixed.includes(".")
     ? fixed.replace(/0+$/, "").replace(/\.$/, "")
     : fixed;
@@ -62,7 +62,7 @@ function format_amount_fun(value: number): string {
 // convert a raw balance to its human-readable string for display.
 function format_balance_fun(
   raw: string,
-  info: Pick<HUGGIES_TOKEN_INFO, "decimals">,
+  info: Pick<SHIT_1170_TOKEN_INFO, "decimals">,
 ): string {
   return format_amount_fun(raw_to_human_fun(raw, info.decimals));
 }
@@ -86,13 +86,13 @@ function format_usd_fun(value: number): string {
 // the usd worth of a raw balance: human amount × price.
 function balance_usd_fun(
   raw: string,
-  info: Pick<HUGGIES_TOKEN_INFO, "decimals" | "price_usd">,
+  info: Pick<SHIT_1170_TOKEN_INFO, "decimals" | "price_usd">,
 ): number {
   return raw_to_human_fun(raw, info.decimals) * info.price_usd;
 }
 // ========================================
 // the whole display surface in one object.
-export const HUGGIES_AMOUNT_FORMAT = {
+export const SHIT_1170_AMOUNT_FORMAT = {
   balance: format_balance_fun,
   usd: format_usd_fun,
   balance_usd: balance_usd_fun,

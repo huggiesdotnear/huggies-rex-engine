@@ -41,7 +41,7 @@ use sqlx::{Connection, Executor, SqliteConnection};
 // --- WHY --- `created_at` and `updated_at` are millisecond timestamps as
 // integers, not strings: they sort and compare as numbers, and sqlite
 // has no date type.
-const HUGGIES_DB_SCHEMA: &str = r#"
+const SHIT_1170_DB_SCHEMA: &str = r#"
   CREATE TABLE IF NOT EXISTS sessions (
     account_id         TEXT    NOT NULL PRIMARY KEY,
     session_key        TEXT    NOT NULL,
@@ -64,7 +64,7 @@ const HUGGIES_DB_SCHEMA: &str = r#"
 // the first query against it.
 pub async fn db_schema_create_fun(connection: &mut SqliteConnection) -> Result<(), sqlx::Error> {
     let mut transaction = connection.begin().await?;
-    transaction.execute(HUGGIES_DB_SCHEMA).await?;
+    transaction.execute(SHIT_1170_DB_SCHEMA).await?;
     transaction.commit().await?;
     Ok(())
 }

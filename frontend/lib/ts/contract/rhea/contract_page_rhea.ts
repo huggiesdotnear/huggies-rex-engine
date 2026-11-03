@@ -51,15 +51,15 @@ import type {
   RHEA_POOL_SEARCH_ITEM,
   RHEA_POOL_SEARCH_TYPE,
 } from "@sleet-js/middleman-rhea-api";
-import { HUGGIES_POOL_TOKENS } from "../../shared/pool_tokens";
+import { SHIT_1170_POOL_TOKENS } from "../../shared/pool_tokens";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
 // how many pools one page holds. the list scrolls, so this is how many
 // rows are on screen at once.
-const HUGGIES_RHEA_POOL_PAGE_SIZE = 50;
+const SHIT_1170_RHEA_POOL_PAGE_SIZE = 50;
 // the pool families the reader can pick between.
-const HUGGIES_RHEA_POOL_TYPES: ReadonlyArray<RHEA_POOL_SEARCH_TYPE> = [
+const SHIT_1170_RHEA_POOL_TYPES: ReadonlyArray<RHEA_POOL_SEARCH_TYPE> = [
   "all",
   "classic",
   "dcl",
@@ -68,7 +68,7 @@ const HUGGIES_RHEA_POOL_TYPES: ReadonlyArray<RHEA_POOL_SEARCH_TYPE> = [
 // ========================================
 // --- TYPES ------------------------------
 // one pool as the page shows it.
-export interface HUGGIES_RHEA_POOL {
+export interface SHIT_1170_RHEA_POOL {
   // the pool's own id. it is a string: a classic pool is numbered and a
   // dcl pool is named after its two tokens and its fee.
   id: string;
@@ -106,8 +106,8 @@ export interface HUGGIES_RHEA_POOL {
 }
 // ========================================
 // everything the rhea page has loaded.
-export interface HUGGIES_RHEA_PAGE_DATA {
-  pools: ReadonlyArray<HUGGIES_RHEA_POOL>;
+export interface SHIT_1170_RHEA_PAGE_DATA {
+  pools: ReadonlyArray<SHIT_1170_RHEA_POOL>;
   // how many pools the api matched for the CURRENT view — the family and
   // the search together. this is the count the list pages on.
   total: number;
@@ -134,7 +134,7 @@ function to_finite_number_fun(value: unknown): number {
 }
 // ========================================
 // map one api pool row into the display record.
-function map_pool_fun(pool: RHEA_POOL_SEARCH_ITEM): HUGGIES_RHEA_POOL {
+function map_pool_fun(pool: RHEA_POOL_SEARCH_ITEM): SHIT_1170_RHEA_POOL {
   return {
     id: String(pool.id),
     kind: pool.pool_kind,
@@ -250,14 +250,14 @@ async function load_pools_fun(
   type: RHEA_POOL_SEARCH_TYPE,
   offset: number,
   search: string,
-): Promise<HUGGIES_RHEA_PAGE_DATA> {
+): Promise<SHIT_1170_RHEA_PAGE_DATA> {
   const needle = search.trim();
   const [rows_result, totals, family] = await Promise.all([
     api_rhea_pool_search({
       type,
       sort,
       order_by: desc ? "desc" : "asc",
-      limit: HUGGIES_RHEA_POOL_PAGE_SIZE,
+      limit: SHIT_1170_RHEA_POOL_PAGE_SIZE,
       offset,
       ...(needle.length > 0 ? { token_list: needle } : {}),
     }),
@@ -282,7 +282,7 @@ async function load_pools_fun(
   // SAME api for their icons, and the app's durable token cache holds them
   // for both.
   const token_ids = pools.flatMap((pool) => pool.token_ids);
-  const tokens = await HUGGIES_POOL_TOKENS.fetch(token_ids);
+  const tokens = await SHIT_1170_POOL_TOKENS.fetch(token_ids);
   for (const pool of pools) {
     pool.icons = pool.token_ids.map((id) => tokens.get(id)?.icon ?? null);
   }
@@ -300,9 +300,9 @@ async function load_pools_fun(
 // ========================================
 // ========================================
 // --- PUBLIC ---------------------------
-export const HUGGIES_CONTRACT_PAGE_RHEA = {
+export const SHIT_1170_CONTRACT_PAGE_RHEA = {
   load: load_pools_fun,
-  pool_types: HUGGIES_RHEA_POOL_TYPES,
+  pool_types: SHIT_1170_RHEA_POOL_TYPES,
 };
 // ========================================
 // copyright 2026 by sleet.near

@@ -20,44 +20,44 @@
 // the page's views is showing, and the components read it on their first
 // render. reading it here means the first render already has the right
 // view.
-import { HUGGIES_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
-import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "./app_page_account_store";
-import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
-import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "./app_page_account_tx_details_store";
-import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
-import { HUGGIES_TRANSFER_TOKENS_STORE } from "../shared/transfer_tokens_store";
-import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
+import { SHIT_1170_APP_PAGE_ACCOUNT_ID } from "./app_page_account_id";
+import { SHIT_1170_APP_PAGE_ACCOUNT_STORE } from "./app_page_account_store";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "./app_page_account_tx_details_store";
+import { SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
+import { SHIT_1170_TRANSFER_TOKENS_STORE } from "../shared/transfer_tokens_store";
+import { shit_1170_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
 // --- START -----------------------------
 // the loading bar's patch goes in before the page's first request.
-huggies_loading_bar_start_fun();
+shit_1170_loading_bar_start_fun();
 // the tab comes from the url (`?tab=`), and it says which of the page's
 // views is showing.
-HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.init();
+SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.init();
 // the browser's back and forward buttons move between tabs, so the page
 // follows them.
-HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE.watch();
+SHIT_1170_APP_PAGE_ACCOUNT_TAB_STATE.watch();
 // begin the page's load for the account the url names, and watch the
 // id so a later change reloads the page by itself.
-HUGGIES_APP_PAGE_ACCOUNT_ID.init();
-HUGGIES_APP_PAGE_ACCOUNT_STORE.watch();
+SHIT_1170_APP_PAGE_ACCOUNT_ID.init();
+SHIT_1170_APP_PAGE_ACCOUNT_STORE.watch();
 // the transactions are fetched when the reader is on the transactions
 // tab, and the store watches the tab and the account id, so it fetches
 // by itself when either changes.
-HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.watch();
+SHIT_1170_APP_PAGE_ACCOUNT_TX_STORE.watch();
 // the newest transactions get their full detail, for the cards above
 // the table. it is fetched when the reader is on the transactions tab,
 // the same as the history.
-HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE.watch();
+SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STORE.watch();
 // the cards' transfers need the symbol, the icon and the decimals of
 // every token they moved. the tokens come from the token indexer — a
 // different api from the one the transactions came from — so the
 // watch follows the cards' transactions and asks for their tokens.
-HUGGIES_TRANSFER_TOKENS_STORE.watch_many(
-  HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE,
+SHIT_1170_TRANSFER_TOKENS_STORE.watch_many(
+  SHIT_1170_APP_PAGE_ACCOUNT_TX_DETAIL_STORE,
 );
-void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
+void SHIT_1170_APP_PAGE_ACCOUNT_STORE.load();
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

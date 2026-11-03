@@ -23,7 +23,7 @@ import { useEffect as use_effect, useState as use_state } from "preact/hooks";
 // how close to the bottom of the list the reader has to scroll before
 // the next page is asked for. a little early, so the next page is
 // usually there by the time they reach the end.
-const HUGGIES_SCROLL_LOAD_THRESHOLD_PX = 600;
+const SHIT_1170_SCROLL_LOAD_THRESHOLD_PX = 600;
 // ========================================
 // --- HOOK ------------------------------
 // @param scroll_ref the scroll box the reader scrolls.
@@ -68,7 +68,7 @@ export function use_scroll_load_fun(
     const maybe_load_more_fun = (): void => {
       const distance =
         element.scrollHeight - element.scrollTop - element.clientHeight;
-      if (distance > HUGGIES_SCROLL_LOAD_THRESHOLD_PX) return;
+      if (distance > SHIT_1170_SCROLL_LOAD_THRESHOLD_PX) return;
       load_more();
     };
 

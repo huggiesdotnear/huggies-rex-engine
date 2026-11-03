@@ -13,12 +13,12 @@
 // --- WHY --- the Pumpopoly token has 24 decimals, so one unit is
 // 1e24. dividing by 1e18 showed a balance a million times too big.
 // ========================================
-const HUGGIES_PUMPOPOLY_UNIT = 1_000_000_000_000_000_000_000_000n;
-const HUGGIES_PUMPOPOLY_DECIMALS = 24;
+const SHIT_1170_PUMPOPOLY_UNIT = 1_000_000_000_000_000_000_000_000n;
+const SHIT_1170_PUMPOPOLY_DECIMALS = 24;
 // ========================================
 // ========================================
 // --- SHAPES -----------------------------
-export interface HUGGIES_PUMPOPOLY_PLAYER {
+export interface SHIT_1170_PUMPOPOLY_PLAYER {
   land_count: number;
   location: number;
   balance: string;
@@ -40,22 +40,22 @@ export interface HUGGIES_PUMPOPOLY_PLAYER {
 // --- WHY --- `media` is nullable: the contract makes it optional, and a token
 // with no media has to render as a tile without a picture, not as a broken
 // image.
-export interface HUGGIES_PUMPOPOLY_NFT {
+export interface SHIT_1170_PUMPOPOLY_NFT {
   token_id: string;
   title: string;
   description: string;
   media: string | null;
 }
-export interface HUGGIES_PUMPOPOLY_NFT_DATA {
+export interface SHIT_1170_PUMPOPOLY_NFT_DATA {
   count: number;
-  nfts: HUGGIES_PUMPOPOLY_NFT[];
+  nfts: SHIT_1170_PUMPOPOLY_NFT[];
 }
 // ========================================
-export interface HUGGIES_PUMPOPOLY_DATA {
-  player: HUGGIES_PUMPOPOLY_PLAYER | null;
-  nft: HUGGIES_PUMPOPOLY_NFT_DATA;
+export interface SHIT_1170_PUMPOPOLY_DATA {
+  player: SHIT_1170_PUMPOPOLY_PLAYER | null;
+  nft: SHIT_1170_PUMPOPOLY_NFT_DATA;
   credit_score: number;
-  errors: HUGGIES_PUMPOPOLY_ERRORS;
+  errors: SHIT_1170_PUMPOPOLY_ERRORS;
 }
 // ========================================
 // the errors, one per source.
@@ -66,7 +66,7 @@ export interface HUGGIES_PUMPOPOLY_DATA {
 // could not be told apart that way — the reader would see zeros and not
 // know whether the player has no land or the contract could not be
 // reached.
-export interface HUGGIES_PUMPOPOLY_ERRORS {
+export interface SHIT_1170_PUMPOPOLY_ERRORS {
   // the world contract call failed.
   player: string | null;
   // the nft contract call failed.
@@ -93,10 +93,10 @@ function format_pumpopoly_balance_fun(raw: string): string {
     const amount = BigInt(raw);
     const negative = amount < 0n;
     const magnitude = negative ? -amount : amount;
-    const whole = magnitude / HUGGIES_PUMPOPOLY_UNIT;
-    const fraction = (magnitude % HUGGIES_PUMPOPOLY_UNIT)
+    const whole = magnitude / SHIT_1170_PUMPOPOLY_UNIT;
+    const fraction = (magnitude % SHIT_1170_PUMPOPOLY_UNIT)
       .toString()
-      .padStart(HUGGIES_PUMPOPOLY_DECIMALS, "0")
+      .padStart(SHIT_1170_PUMPOPOLY_DECIMALS, "0")
       .replace(/0+$/, "");
     const sign = negative ? "-" : "";
     return fraction.length === 0
@@ -110,9 +110,9 @@ function format_pumpopoly_balance_fun(raw: string): string {
 // parse a Pumpopoly player view defensively.
 export function parse_pumpopoly_player_fun(
   value: unknown,
-): HUGGIES_PUMPOPOLY_PLAYER | null {
+): SHIT_1170_PUMPOPOLY_PLAYER | null {
   if (typeof value !== "object" || value === null) return null;
-  const player = value as Partial<HUGGIES_PUMPOPOLY_PLAYER>;
+  const player = value as Partial<SHIT_1170_PUMPOPOLY_PLAYER>;
   if (typeof player.account_id !== "string") return null;
   const balance = typeof player.balance === "string" ? player.balance : "0";
   return {
@@ -137,9 +137,9 @@ export function parse_pumpopoly_player_fun(
 // kept, because the id alone is still worth showing.
 export function parse_pumpopoly_nfts_fun(
   value: unknown,
-): HUGGIES_PUMPOPOLY_NFT[] {
+): SHIT_1170_PUMPOPOLY_NFT[] {
   if (!Array.isArray(value)) return [];
-  const nfts: HUGGIES_PUMPOPOLY_NFT[] = [];
+  const nfts: SHIT_1170_PUMPOPOLY_NFT[] = [];
   for (const raw of value) {
     if (typeof raw !== "object" || raw === null) continue;
     const token = raw as {

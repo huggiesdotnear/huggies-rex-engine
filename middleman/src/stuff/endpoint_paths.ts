@@ -3,11 +3,11 @@
 // ========================================
 
 export const ENDPOINT_PATHS = {
-  // --- /api/huggies/* — our own routes ---
-  api_huggies_ping: "/api/huggies/ping",
-  api_huggies_sessions: "/api/huggies/sessions",
-  api_huggies_session_me: "/api/huggies/session/me",
-  api_huggies_session_rotate: "/api/huggies/session/rotate",
+  // --- /api/shit-1170/* — our own routes ---
+  api_shit_1170_ping: "/api/shit-1170/ping",
+  api_shit_1170_sessions: "/api/shit-1170/sessions",
+  api_shit_1170_session_me: "/api/shit-1170/session/me",
+  api_shit_1170_session_rotate: "/api/shit-1170/session/rotate",
 
   // --- /api/trezu/* — our proxy for the trezu api ---
   api_trezu_treasuries: "/api/trezu/user/treasuries",

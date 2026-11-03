@@ -4,7 +4,7 @@
 // anyone, so this is page state, not identity. components read it
 // through here instead of each parsing the url itself.
 // ========================================
-import { HUGGIES_URL_ID } from "../shared/url_id";
+import { SHIT_1170_URL_ID } from "../shared/url_id";
 // ========================================
 // ========================================
 // --- STATE ------------------------------
@@ -50,7 +50,7 @@ function init_fun(): void {
     return;
   }
   if (account_id !== null) return;
-  account_id = HUGGIES_URL_ID.read();
+  account_id = SHIT_1170_URL_ID.read();
   notify_fun();
 }
 // ========================================
@@ -62,7 +62,7 @@ function get_account_id_fun(): string | null {
 // ========================================
 // ========================================
 // public surface, in one place so components have a single import.
-export const HUGGIES_APP_PAGE_ACCOUNT_ID = {
+export const SHIT_1170_APP_PAGE_ACCOUNT_ID = {
   init: init_fun,
   subscribe: subscribe_fun,
   get_account_id: get_account_id_fun,

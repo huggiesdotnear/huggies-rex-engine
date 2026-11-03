@@ -16,48 +16,48 @@
 // AROUND that list: it holds the search text, the sort and the direction,
 // and it drives the page's store.
 //
-// mounts into <div id="HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER">.
+// mounts into <div id="SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER">.
 import { render } from "preact";
 import {
   useEffect as use_effect,
   useMemo as use_memo,
   useState as use_state,
 } from "preact/hooks";
-import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
+import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { order_discover_tokens_fun } from "../../ts/discover/app_page_discover_token_sort_apply";
 import {
-  HUGGIES_DEFAULT_TOKEN_SORT,
-  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-  type HUGGIES_TOKEN_SORT,
-  type HUGGIES_TOKEN_SORT_DIRECTION,
+  SHIT_1170_DEFAULT_TOKEN_SORT,
+  SHIT_1170_DEFAULT_TOKEN_SORT_DIRECTION,
+  type SHIT_1170_TOKEN_SORT,
+  type SHIT_1170_TOKEN_SORT_DIRECTION,
 } from "../../ts/discover/app_page_discover_token_sort_options";
-import { HUGGIES_APP_PAGE_DISCOVER_STORE } from "../../ts/discover/app_page_discover_store";
+import { SHIT_1170_APP_PAGE_DISCOVER_STORE } from "../../ts/discover/app_page_discover_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { marked_token_ids_fun } from "../../ts/discover/app_page_discover_marked_tokens";
-import { huggies_token_list_fun } from "../shared/token_list";
+import { shit_1170_token_list_fun } from "../shared/token_list";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
-  const [sort, set_sort] = use_state<HUGGIES_TOKEN_SORT>(
-    HUGGIES_DEFAULT_TOKEN_SORT,
+function SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
+  const [sort, set_sort] = use_state<SHIT_1170_TOKEN_SORT>(
+    SHIT_1170_DEFAULT_TOKEN_SORT,
   );
-  const [direction, set_direction] = use_state<HUGGIES_TOKEN_SORT_DIRECTION>(
-    HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  const [direction, set_direction] = use_state<SHIT_1170_TOKEN_SORT_DIRECTION>(
+    SHIT_1170_DEFAULT_TOKEN_SORT_DIRECTION,
   );
 
-  const page_data = use_page_store_fun(HUGGIES_APP_PAGE_DISCOVER_STORE);
+  const page_data = use_page_store_fun(SHIT_1170_APP_PAGE_DISCOVER_STORE);
 
   // --- WHY --- the page's start script loads the list with the default
   // sort. this effect is for the reader's OWN choices: when they pick a
   // different sort, the list is loaded again with it. the store ignores a
   // load for a sort that is already loaded, so they do not fight.
   use_effect(() => {
-    void HUGGIES_APP_PAGE_DISCOVER_STORE.load(sort, direction === "desc");
+    void SHIT_1170_APP_PAGE_DISCOVER_STORE.load(sort, direction === "desc");
   }, [sort, direction]);
 
-  const loading = HUGGIES_APP_PAGE_DISCOVER_STORE.is_loading();
-  const searching_now = HUGGIES_APP_PAGE_DISCOVER_STORE.is_searching();
+  const loading = SHIT_1170_APP_PAGE_DISCOVER_STORE.is_loading();
+  const searching_now = SHIT_1170_APP_PAGE_DISCOVER_STORE.is_searching();
 
   // --- WHY --- THE ROWS ON SCREEN COME FROM THE STORE, NOT FROM THE
   // SEARCH BOX: the store holds the list rows and the search results
@@ -81,17 +81,17 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
 
   return (
     <>
-      {huggies_token_list_fun({
+      {shit_1170_token_list_fun({
         tokens: tokens.map((token) => ({
           ...token,
           icon: icons[token.id] ?? token.icon,
         })),
         marked_ids: marked_ids,
         on_search: (query) => {
-          void HUGGIES_APP_PAGE_DISCOVER_STORE.search(query);
+          void SHIT_1170_APP_PAGE_DISCOVER_STORE.search(query);
         },
         on_clear: () => {
-          void HUGGIES_APP_PAGE_DISCOVER_STORE.clear_search();
+          void SHIT_1170_APP_PAGE_DISCOVER_STORE.clear_search();
         },
         loading: loading,
         searching: searching_now,
@@ -101,7 +101,7 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
         on_direction: (next) => set_direction(next),
         has_more: page_data?.token_list.has_more ?? false,
         on_load_more: () => {
-          void HUGGIES_APP_PAGE_DISCOVER_STORE.load_more(
+          void SHIT_1170_APP_PAGE_DISCOVER_STORE.load_more(
             sort,
             direction === "desc",
           );
@@ -115,11 +115,11 @@ function HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN() {
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
 const SELF_MOUNT_ID =
-  HUGGIES_MOUNT_ID.HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER;
+  SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
   if (el !== null)
-    render(<HUGGIES_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN />, el);
+    render(<SHIT_1170_COMPONENT_APP_PAGE_DISCOVER_TOKEN_DISCOVER_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

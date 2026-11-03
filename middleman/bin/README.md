@@ -1,4 +1,4 @@
-# @huggies/huggies-rex-engine-middleman/bin
+# @huggies/shit_1170-middleman/bin
 
 cli bins for our own backend, called through this package's `src/`.
 every bin imports the middleman wrapper (never `fetch`), so the framed
@@ -8,7 +8,7 @@ the frontend sees.
 the bins are grouped by the api they talk to, mirroring the
 middleman:
 
-- [`bin/huggies/`](./huggies/README.md) — our own backend, through
+- [`bin/shit-1170/`](./shit-1170/README.md) — our own backend, through
   `src/`.
 - `bin/fun/` — bin primitives shared by the bins above.
 

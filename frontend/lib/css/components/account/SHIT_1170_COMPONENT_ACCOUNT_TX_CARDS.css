@@ -1,0 +1,131 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS
+   the account's newest transactions as cards: the signer, the receiver,
+   what it did and what it moved.
+
+   the cards sit above the table on the transactions tab. the table
+   below shows the whole history and is cheap; the cards carry the
+   detail that the table's rows cannot carry. */
+/*==================================*/
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-cards {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-cards h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-cards-note {
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  margin: 8px 0 0 0;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-cards-note.is-error {
+  opacity: 1;
+  color: #ffe8e6;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-hash {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: monospace;
+  font-size: 11px;
+  /*color: var(--color-middle);*/
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-hash:hover {
+  color: var(--color-fontend);
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-status {
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-status.is-success {
+  color: #9df7c0;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-status.is-failed {
+  color: #ffe8e6;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-status.is-pending {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #ffe0a3;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-label {
+  flex: 0 0 68px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-actions,
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-transfers {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-action,
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-transfer {
+  font-family: monospace;
+  font-size: 11px;
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  overflow-wrap: anywhere;
+}
+/* the chip that shows a transfer holds the token's icon, its amount and
+   the standard — and they have to sit APART.
+   --- WHY --- the chip was a block, so its children laid out inline
+   with no gap between them: the amount ran straight into the usd value
+   and straight into the standard, and the whole row read as one
+   string. it is a flex row with a gap, so each part has its space. */
+#SHIT_1170_COMPONENT_ACCOUNT_TX_CARDS .tx-card-transfer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/*==================================*/

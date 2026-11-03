@@ -1,19 +1,19 @@
 // ====================================
-use huggies_rex_engine::backend::logic::{
+use shit_1170::backend::logic::{
     db::{db_open_fun::db_open_fun, vault_db_path_fun::vault_db_path_fun},
     server::{
-        huggies_banner_fun::huggies_banner_fun, huggies_host_fun::huggies_host_fun,
-        huggies_port_fun::huggies_port_fun,
+        shit_1170_banner_fun::shit_1170_banner_fun, shit_1170_host_fun::shit_1170_host_fun,
+        shit_1170_port_fun::shit_1170_port_fun,
     },
 };
-use huggies_rex_engine::backend::routes::app_router_fun::app_router_fun;
+use shit_1170::backend::routes::app_router_fun::app_router_fun;
 // ====================================
 #[tokio::main]
 async fn main() {
     let _ = dotenvy::dotenv();
 
-    let host = huggies_host_fun();
-    let port = huggies_port_fun();
+    let host = shit_1170_host_fun();
+    let port = shit_1170_port_fun();
     let addr = format!("{host}:{port}");
 
     // the db is opened BEFORE the listener binds, so a broken db stops
@@ -38,7 +38,7 @@ async fn main() {
         }
     };
 
-    huggies_banner_fun(&host, port);
+    shit_1170_banner_fun(&host, port);
 
     if let Err(e) = axum::serve(listener, app_router_fun(pool)).await {
         eprintln!("server error: {e}");

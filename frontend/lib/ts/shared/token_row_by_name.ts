@@ -8,15 +8,15 @@
 // ========================================
 // --- SHAPE ------------------------------
 // one token row keyed by column name.
-export type HUGGIES_TOKEN_ROW_BY_NAME = Record<string, unknown>;
+export type SHIT_1170_TOKEN_ROW_BY_NAME = Record<string, unknown>;
 // ========================================
 // --- MAP -------------------------------
 // zip a row with its column names into a name-keyed record.
 export function token_row_by_name_fun(
   columns: ReadonlyArray<string>,
   row: ReadonlyArray<unknown>,
-): HUGGIES_TOKEN_ROW_BY_NAME {
-  const out: HUGGIES_TOKEN_ROW_BY_NAME = {};
+): SHIT_1170_TOKEN_ROW_BY_NAME {
+  const out: SHIT_1170_TOKEN_ROW_BY_NAME = {};
   for (let index = 0; index < columns.length; index += 1) {
     out[columns[index]] = row[index];
   }

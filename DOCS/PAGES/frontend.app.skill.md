@@ -7,14 +7,14 @@ for them.
 ```html
 <body>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_LOADING_BAR"></div>
+  <div id="SHIT_1170_COMPONENT_LOADING_BAR"></div>
   <!--==========================================-->
   <!--==========================================-->
   <!--==========================================-->
   <!--==========================================-->
   <main>
     <h1>SKILL</h1>
-    <div id="HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION"></div>
+    <div id="SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION"></div>
     <!--==========================================-->
     <p>
       MORE IS COMING TO THIS PAGE: THE SKILLS THEMSELVES, AND THE ENDPOINTS THAT
@@ -23,9 +23,9 @@ for them.
     <!--==========================================-->
   </main>
   <!--==========================================-->
-  <nav id="HUGGIES_COMPONENT_NAV"></nav>
+  <nav id="SHIT_1170_COMPONENT_NAV"></nav>
   <!--==========================================-->
-  <div id="HUGGIES_COMPONENT_AUTH_BUTTON"></div>
+  <div id="SHIT_1170_COMPONENT_AUTH_BUTTON"></div>
   <!--==========================================-->
   <!--<footer>COPYRIGHT 2026</footer>-->
   <!--==========================================-->
