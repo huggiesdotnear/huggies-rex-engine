@@ -424,13 +424,9 @@ function remove_account_fun(target_account_id: string): void {
     HUGGIES_AUTH_SESSIONS.save_active(account_id);
     if (account_id !== null) sync_url_account_fun(account_id);
   }
-  // --- WHY --- the backend session key is forgotten when the LAST
-  // account goes: the key belongs to the user, and with no account left
-  // there is nobody to verify it for. the key is re-fetched if the
-  // reader signs in again.
-  if (HUGGIES_AUTH_SESSIONS.list_account_ids().length === 0) {
-    HUGGIES_SESSION.reset();
-  }
+  // --- WHY --- the account's backend session key is forgotten with it:
+  // the key belongs to the account, and the account is gone.
+  HUGGIES_SESSION.reset_account(target_account_id);
   notify_fun();
 }
 // ========================================

@@ -1,10 +1,9 @@
 # HUGGIES SESSIONS
 
-`POST /api/huggies/sessions` - turn signed messages into a session key.
+`POST /api/huggies/sessions` - turn signed messages into session keys.
 
 the browser sends every account it holds a signed message for. the
-backend verifies each signature and hands back the ONE session key the
-user has.
+backend verifies each signature and hands back **ONE KEY PER ACCOUNT**.
 
 ## THE REQUEST
 
@@ -30,34 +29,47 @@ messages the wallet made when the reader signed in.
 
 ## THE ANSWER
 
-`200` with the session key:
+`200` with one entry per account:
 
 ```json
 {
-  "sessionKey": "0c97945f73913108222fe70ef6c41bd0f88edb2d5592c8868fd728a989b7e165",
-  "userId": "alice.near",
-  "accounts": ["alice.near", "bob.near"],
-  "created": true
+  "keys": [
+    {
+      "accountId": "alice.near",
+      "sessionKey": "ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2",
+      "created": true
+    },
+    {
+      "accountId": "bob.near",
+      "sessionKey": "e752d71b129754be1072a1c413d894c82974788c2eae8232f140cf1c6cf45dac",
+      "created": true
+    }
+  ]
 }
 ```
 
-`created` is true when this call made the session and false when the
-session already existed and the same key was handed back.
+`created` is true when the call made the key and false when the key
+already existed and the same one was handed back.
 
 on failure it answers json in the shape
 `{ "error": { "code", "message" } }`:
 
-- `400` - `no_accounts` when the body carried no accounts, or
-  `signature_invalid` when one account's signature did not verify
+- `400` - `no_accounts` when the body carried no accounts,
+  `signature_invalid` when one account's signature did not verify, or
+  `duplicate_account` when the same account was sent twice
 - `500` - `db_unavailable` when the db could not be reached, or
   `session_key_unreadable` / `session_key_unencryptable` when the key
   could not be read back or written
 
-## ONE KEY PER USER
+## ONE KEY PER ACCOUNT
 
-a user has exactly one session key, on every device. signing in on a
-second device hands back the SAME key, so the first device keeps
-working.
+an account has exactly one key, on every device. signing in on a second
+device hands back the SAME key, so the first device keeps working.
+
+there is no linking between accounts and no account list: an account
+belongs to itself. the account id is the row's primary key, so there is
+no question of which person an account belongs to, nothing to merge and
+nothing to keep in agreement.
 
 the key is stored ENCRYPTED in the db, and its sha-256 is stored next to
 it so a request can be looked up without decrypting every row. the plain
@@ -70,10 +82,10 @@ recipient that were signed. the check is near-kit-rs's
 `nep413::verify_signature` — the same project the browser signs with,
 so the two agree byte for byte.
 
-> --- WHY --- all the accounts are verified BEFORE a key is made. a body
+> --- WHY --- all the accounts are verified BEFORE any key is made. a body
 > with one good signature and one forged one is a body that must be
-> refused as a whole. handing out a key for the good half would make
-> the forged half pointless to forge.
+> refused as a whole. handing out a key for the good half would make the
+> forged half pointless to forge.
 
 > --- WHY --- the nonce's AGE is not checked. the browser's session was
 > signed when the reader signed in, which may have been days ago, and it

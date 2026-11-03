@@ -1,9 +1,9 @@
 // ========================================
 // API_HUGGIES_SESSIONS_POST
-// POST /api/huggies/sessions — turn signed messages into a session key.
+// POST /api/huggies/sessions — turn signed messages into session keys.
 //
 // the browser sends every account it holds a signature for; the backend
-// verifies each one and answers with the ONE key the user has.
+// verifies each one and answers with ONE KEY PER ACCOUNT.
 //
 // same-origin call, so the browser needs no cors. a non-2xx or a body
 // that is not the expected json object throws a readable Error.
@@ -43,13 +43,24 @@ export async function api_huggies_sessions_post(
     typeof json !== "object" ||
     json === null ||
     Array.isArray(json) ||
-    typeof json.sessionKey !== "string" ||
-    typeof json.userId !== "string" ||
-    !Array.isArray(json.accounts)
+    !Array.isArray(json.keys)
   ) {
     throw new Error(
-      "api_huggies_sessions_post failed: invalid_response: expected a json object with sessionKey, userId and accounts",
+      "api_huggies_sessions_post failed: invalid_response: expected a json object with a keys array",
     );
+  }
+
+  // every entry has to carry an account id and a key — the caller walks
+  // the list and pairs each key with its account.
+  for (const entry of json.keys) {
+    if (
+      typeof entry?.accountId !== "string" ||
+      typeof entry?.sessionKey !== "string"
+    ) {
+      throw new Error(
+        "api_huggies_sessions_post failed: invalid_response: every key entry needs an accountId and a sessionKey",
+      );
+    }
   }
 
   return json;

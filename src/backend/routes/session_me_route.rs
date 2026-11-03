@@ -71,9 +71,9 @@ pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap
         Some(session) => (
             StatusCode::OK,
             Json(serde_json::json!({
-              "userId": session.user_id,
-              "accounts": session.accounts,
+              "accountId": session.account_id,
               "createdAt": session.created_at,
+              "updatedAt": session.updated_at,
             })),
         )
             .into_response(),

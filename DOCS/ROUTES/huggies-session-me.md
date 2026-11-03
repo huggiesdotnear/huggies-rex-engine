@@ -1,15 +1,16 @@
 # HUGGIES SESSION ME
 
-`GET /api/huggies/session/me` - who does this session key belong to.
+`GET /api/huggies/session/me` - which account does this session key
+belong to.
 
 the first route that REQUIRES the session key. the key travels in the
-`x-session-token` header, and the answer is the user the key belongs
+`x-session-token` header, and the answer is the account the key belongs
 to.
 
 ## THE HEADER
 
 ```
-x-session-token: 0c97945f73913108222fe70ef6c41bd0f88edb2d5592c8868fd728a989b7e165
+x-session-token: ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2
 ```
 
 the key is in a HEADER and not in a query parameter: a url ends up in
@@ -22,11 +23,13 @@ bearer token belongs in a header.
 
 ```json
 {
-  "userId": "alice.near",
-  "accounts": ["alice.near", "bob.near"],
-  "createdAt": 1793683430726
+  "accountId": "alice.near",
+  "createdAt": 1793686862973,
+  "updatedAt": 1793686868927
 }
 ```
+
+one account, because one key belongs to one account.
 
 on failure it answers json in the shape
 `{ "error": { "code", "message" } }`:

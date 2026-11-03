@@ -1,23 +1,35 @@
 /*==================================*/
 /* HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION
-   the session management card: the accounts the browser is signed in
-   with, and the one session key the backend issued for them.
+   the session management card: one card per signed-in account, each with
+   its own session key.
 
-   two blocks side by side: the accounts on one side, the key on the
-   other. the key is long — 64 hex characters — so it gets its own
-   column and wraps instead of pushing the layout wide.
+   the accounts are stacked, not side by side: each one carries a
+   64-character key, and a row of them side by side would squeeze the
+   key into a narrow column.
 
    the key is shown in a <code>, so it reads as a value and not as a
-   sentence. the copy button sits under it, full width, like every other
-   button in the app. */
+   sentence. the buttons sit under it, two across, so the card's width
+   is the app's 500px column and not the width of two long button
+   labels. */
 /*==================================*/
-#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION > section > div {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION > section {
+  display: flex;
+  flex-direction: column;
   gap: 0.6rem;
 }
 /*----------------------*/
-#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION > section > div > div {
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION h2 {
+  margin: 0;
+}
+/*----------------------*/
+/* the accounts, one under the other. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-account {
   min-width: 0;
   box-sizing: border-box;
   padding: 0.8rem 0.9rem;
@@ -32,6 +44,7 @@
   padding-bottom: 4px;
   font-size: 13px;
   letter-spacing: 0.08em;
+  word-break: break-all;
 }
 /*----------------------*/
 #HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION p {
@@ -40,17 +53,6 @@
   font-size: 13px;
   line-height: 1.55;
   opacity: 0.9;
-}
-/*----------------------*/
-/* the signed in accounts. a list of long account ids, so each one
-   breaks rather than widening the column. */
-#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION ul {
-  margin: 0;
-  padding-left: 1.1rem;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-  word-break: break-all;
 }
 /*----------------------*/
 /* the session key. it wraps inside the code element so a 64-character
@@ -67,12 +69,32 @@
   text-align: left;
 }
 /*----------------------*/
-/* the copy button. it lives inside the card's column, so it drops the
-   base button's page width and takes the column's instead. */
-#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION button {
+/* the two buttons under a key. they share the row so the card's width
+   is the app's column and not the width of two long labels. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-buttons {
+  display: flex;
+  gap: 6px;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-buttons > button {
+  flex: 1 1 0;
+  min-width: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 8px 6px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+/*----------------------*/
+/* the copy all button. it sits under the accounts, on its own row. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-copy-all {
   width: 100%;
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   padding: 8px 12px;
   font-size: 13px;
   letter-spacing: 1px;
@@ -80,5 +102,17 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+}
+/*----------------------*/
+/* the note under the buttons and the error under the card. */
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-note {
+  margin: 0.4rem 0 0;
+  text-align: left;
+}
+/*----------------------*/
+#HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-error {
+  margin: 0.4rem 0 0;
+  color: #ffd7d2;
+  text-align: left;
 }
 /*==================================*/

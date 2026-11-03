@@ -12,7 +12,7 @@
 // is recorded in `_sqlx_migrations`. sqlx does that bookkeeping itself, so
 // a restart does not re-run a migration and a fresh db gets every one.
 //
-// --- WHY --- the migrations are ADDITIVE ONLY: a new migration appends,
+// --- WHY --- the migrations are APPEND-ONLY: a new migration appends,
 // and an existing one is never edited. editing one that already ran on a
 // live db leaves that db on the old schema and the code on the new one.
 //
@@ -20,61 +20,88 @@
 // migration DOES, not when it was written. a numbered name (`0001_init`)
 // forces every future author to remember the number; a named one reads
 // as what it is.
+//
+// --- WHY --- a migration can be marked DESTRUCTIVE: one that drops a
+// table throws the data away, and the data is not always throwaway. a
+// destructive migration refuses to run unless the operator has said it
+// is allowed, so a mistyped DROP cannot quietly empty a live db. see
+// the flag below.
+// ========================================
 use sqlx::{Connection, Executor, SqliteConnection};
 // ========================================
+// --- CONFIG -----------------------------
+// the env var that allows a destructive migration to run.
+//
+// --- WHY --- it is an env var and not a code constant: the decision to
+// throw data away belongs to whoever is deploying, not to the build. the
+// code says "this migration is destructive"; the operator says "run it".
+const HUGGIES_ALLOW_DESTRUCTIVE_ENV: &str = "HUGGIES_ALLOW_DESTRUCTIVE";
+// ========================================
+// --- MIGRATION -------------------------
+// one migration: its name, its sql, and whether it destroys data.
+struct HUGGIES_MIGRATION {
+    name: &'static str,
+    sql: &'static str,
+    // true when the sql drops a table or deletes rows. a destructive
+    // migration needs the operator's go-ahead.
+    destructive: bool,
+}
+// ========================================
 // --- MIGRATIONS ------------------------
-// each entry is (name, sql). the sql runs inside a transaction.
-const HUGGIES_MIGRATIONS: &[(&str, &str)] = &[(
-    "sessions_table",
-    // the one table for now: the sessions.
-    //
-    // --- WHY --- `user_id` is the PRIMARY KEY, not a row id. a user has
-    // exactly ONE session key, ever: signing in from another device finds
-    // the row by user_id and returns the SAME key. so the key's identity IS
-    // the user.
-    //
-    // --- WHY --- `session_key` holds the key ENCRYPTED and
-    // `session_key_hash` holds its sha-256: the user has exactly one key
-    // and a second device has to get the SAME key back, so the db has to
-    // be able to produce the key again — a hash can verify a key but it
-    // cannot return one. the hash is there so a request is looked up
-    // without decrypting every row.
-    //
-    // --- WHY --- `session_key_hash` has a UNIQUE index of its own: it is
-    // what a request is looked up by, so two users must never share one,
-    // and the index makes that a database guarantee rather than a hope.
-    //
-    // --- WHY --- the accounts are a json array and not a second table: one
-    // user can hold several signed-in accounts (the wallet exposes all of
-    // them), and they are read and written together as one value. a
-    // second table would need its own join for a list nobody queries
-    // separately.
-    //
-    // --- WHY --- `created_at` and `updated_at` are millisecond timestamps
-    // as integers, not strings: they sort and compare as numbers, and
-    // sqlite has no date type.
-    r#"
+// the list, in the order they run.
+const HUGGIES_MIGRATIONS: &[HUGGIES_MIGRATION] = &[
+    HUGGIES_MIGRATION {
+        name: "sessions_table",
+        sql: r#"
   CREATE TABLE IF NOT EXISTS sessions (
-    user_id            TEXT    NOT NULL PRIMARY KEY,
+    account_id         TEXT    NOT NULL PRIMARY KEY,
     session_key        TEXT    NOT NULL,
     session_key_hash   TEXT    NOT NULL,
-    accounts           TEXT    NOT NULL DEFAULT '[]',
     created_at         INTEGER NOT NULL,
     updated_at         INTEGER NOT NULL
   );
   CREATE UNIQUE INDEX IF NOT EXISTS sessions_session_key_hash_idx
     ON sessions (session_key_hash);
   "#,
-)];
+        destructive: false,
+    },
+    HUGGIES_MIGRATION {
+        // --- WHY --- this one is DESTRUCTIVE: the sessions table was
+        // keyed by a "user" that held a json array of accounts, and one
+        // key served all of them. the new table is keyed by the account
+        // id, with one key per account. the old rows cannot be carried
+        // over: their key was SHARED between accounts, so splitting it
+        // would either give several accounts the same key — which is
+        // what we just moved away from — or mint new keys and lock the
+        // reader out of the old one.
+        //
+        // the old table is dropped and the new one created empty. the
+        // accounts sign in again and get their own keys.
+        name: "sessions_by_account_id",
+        sql: r#"
+  DROP TABLE IF EXISTS sessions;
+  CREATE TABLE sessions (
+    account_id         TEXT    NOT NULL PRIMARY KEY,
+    session_key        TEXT    NOT NULL,
+    session_key_hash   TEXT    NOT NULL,
+    created_at         INTEGER NOT NULL,
+    updated_at         INTEGER NOT NULL
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS sessions_session_key_hash_idx
+    ON sessions (session_key_hash);
+  "#,
+        destructive: true,
+    },
+];
 // ========================================
 // --- MIGRATE ----------------------------
 // bring the db up to the latest schema.
 //
-// --- WHY --- each migration gets its OWN connection and its OWN
-// transaction, and the migration's bookkeeping row is written in the
-// same transaction as the migration itself. so a migration either lands
-// completely or not at all, and a db that was killed mid-migration comes
-// back with that migration still pending rather than half applied.
+// --- WHY --- each migration gets its OWN transaction, and the
+// migration's bookkeeping row is written in the same transaction as the
+// migration itself. so a migration either lands completely or not at
+// all, and a db that was killed mid-migration comes back with that
+// migration still pending rather than half applied.
 pub async fn migrate_fun(connection: &mut SqliteConnection) -> Result<(), sqlx::Error> {
     // the bookkeeping table sqlx uses to remember which migrations ran.
     // it is created here rather than as a migration of its own, because
@@ -92,22 +119,31 @@ pub async fn migrate_fun(connection: &mut SqliteConnection) -> Result<(), sqlx::
         )
         .await?;
 
-    for (name, sql) in HUGGIES_MIGRATIONS {
-        if migration_already_ran_fun(connection, name).await? {
+    for migration in HUGGIES_MIGRATIONS {
+        if migration_already_ran_fun(connection, migration.name).await? {
             continue;
         }
-        // the whole migration in one transaction: the schema change and the
-        // record that it happened.
+        // --- WHY --- the destructive check is HERE and not when the
+        // migration is defined: the check is about what this run would
+        // do, and a migration that already ran is not going to run again.
+        if migration.destructive && !destructive_allowed_fun() {
+            return Err(sqlx::Error::Protocol(format!(
+                "the migration '{}' is destructive and {HUGGIES_ALLOW_DESTRUCTIVE_ENV} is not set",
+                migration.name
+            )));
+        }
+        // the whole migration in one transaction: the schema change and
+        // the record that it happened.
         let mut transaction = connection.begin().await?;
-        transaction.execute(*sql).await?;
+        transaction.execute(migration.sql).await?;
         sqlx::query(
             "INSERT INTO _sqlx_migrations
         (version, description, installed_on, success, checksum, execution_time)
        VALUES (?1, ?2, datetime('now'), 1, ?3, 0)",
         )
-        .bind(name)
-        .bind(name)
-        .bind(checksum_for_fun(sql.as_bytes()))
+        .bind(migration.name)
+        .bind(migration.name)
+        .bind(checksum_for_fun(migration.sql.as_bytes()))
         .execute(&mut *transaction)
         .await?;
         transaction.commit().await?;
@@ -139,6 +175,18 @@ async fn migration_already_ran_fun(
             .fetch_optional(connection)
             .await?;
     Ok(row.map(|(count,)| count > 0).unwrap_or(false))
+}
+
+// is the operator allowed to run a destructive migration?
+//
+// --- WHY --- the value has to be exactly "1" and not just "present": a
+// variable that is set to "0" or "false" reads as "not allowed", and a
+// stray `HUGGIES_ALLOW_DESTRUCTIVE=` in an env file should not wipe a
+// db.
+fn destructive_allowed_fun() -> bool {
+    std::env::var(HUGGIES_ALLOW_DESTRUCTIVE_ENV)
+        .map(|value| value.trim() == "1")
+        .unwrap_or(false)
 }
 
 // a checksum of the migration's sql, so a db whose migration file was

@@ -51,12 +51,13 @@ const accounts = Array.isArray(parsed) ? parsed : parsed.accounts;
 
 const sessions = await api_huggies_sessions_post(base_url, { accounts });
 
-console.log(
-  "SESSIONS",
-  sessions.created ? "created" : "existing",
-  `user: ${sessions.userId}`,
-  `accounts: ${sessions.accounts.length}`,
-  `key: ${sessions.sessionKey.slice(0, 8)}…`,
-);
+console.log(`SESSIONS: ${sessions.keys.length} account(s)`);
+for (const entry of sessions.keys) {
+  console.log(
+    `  ${entry.accountId}  ${
+      entry.created ? "created" : "existing"
+    }  key: ${entry.sessionKey.slice(0, 8)}…`,
+  );
+}
 // ========================================
 // copyright 2026 by sleet.near

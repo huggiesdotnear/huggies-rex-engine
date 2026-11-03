@@ -31,6 +31,7 @@ pub mod backend {
         pub mod app_router_fun;
         pub mod ping_route;
         pub mod session_me_route;
+        pub mod session_rotate_route;
         pub mod sessions_route;
         pub mod trezu_treasuries_route;
     }

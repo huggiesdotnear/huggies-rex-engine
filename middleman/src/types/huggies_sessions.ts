@@ -1,10 +1,11 @@
 // ========================================
 // HUGGIES_SESSIONS
-// the shapes of our own sessions route, POST /api/huggies/sessions.
+// the shapes of our own sessions routes, under /api/huggies/sessions
+// and /api/huggies/session/*.
 //
-// the route turns signed messages into a session key: the browser sends
+// the routes turn signed messages into session keys: the browser sends
 // every account it holds a signature for, and the backend answers with
-// the ONE key the user has.
+// ONE KEY PER ACCOUNT.
 //
 // --- WHY --- the fields are camelCase: they mirror the browser's own
 // session object (`accountId`, `publicKey`), so the same names run all
@@ -32,19 +33,31 @@ export interface HUGGIES_SESSIONS_REQUEST {
   accounts: HUGGIES_SIGNED_ACCOUNT[];
 }
 
-// the answer: the one session key, and the accounts it belongs to.
-export interface HUGGIES_SESSIONS_RESPONSE {
+// one account's session key.
+export interface HUGGIES_SESSION_KEY {
+  // the account the key belongs to.
+  accountId: string;
   // the session key. it is sent once, when it is made, and the browser
   // keeps it. a later sign-in from another device gets the SAME key
-  // back — a user has exactly one key, whatever device they use.
+  // back — an account has exactly one key, whatever device it signs in
+  // from.
   sessionKey: string;
-  // the user the session belongs to.
-  userId: string;
-  // every account the user holds signed in.
-  accounts: string[];
-  // true when this call created the session, false when it already
-  // existed and the same key was handed back.
+  // true when this call made the key, false when it already existed
+  // and the same key was handed back.
   created: boolean;
+}
+
+// the answer to the sessions route: one entry per account.
+export interface HUGGIES_SESSIONS_RESPONSE {
+  keys: HUGGIES_SESSION_KEY[];
+}
+
+// the answer to the session/me route: the one account the key belongs
+// to.
+export interface HUGGIES_SESSION_ME {
+  accountId: string;
+  createdAt: number;
+  updatedAt: number;
 }
 // ========================================
 // copyright 2026 by sleet.near

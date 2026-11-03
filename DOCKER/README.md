@@ -35,6 +35,11 @@ chmod 600 .env
 app refuses to start without it, and **changing it makes every existing
 session key unreadable** — the db holds the keys encrypted with it.
 
+`HUGGIES_ALLOW_DESTRUCTIVE=1` lets a destructive migration run — one
+that drops a table or deletes rows. it is off by default so a mistyped
+DROP cannot quietly empty the db. set it for the deploy that needs it
+and take it out again after.
+
 then:
 
 ```sh

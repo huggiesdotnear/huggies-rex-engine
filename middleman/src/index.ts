@@ -16,6 +16,7 @@
 
 export * from "./fun/api_huggies_ping_get";
 export * from "./fun/api_huggies_session_me_get";
+export * from "./fun/api_huggies_session_rotate_post";
 export * from "./fun/api_huggies_sessions_post";
 export * from "./fun/api_trezu_treasuries_get";
 
@@ -34,6 +35,8 @@ export type { REQUEST_OPTIONS } from "./stuff/request_options";
 export type { HUGGIES_ERROR_RESPONSE } from "./types/common";
 export type { HUGGIES_PING } from "./types/huggies_ping";
 export type {
+  HUGGIES_SESSION_KEY,
+  HUGGIES_SESSION_ME,
   HUGGIES_SESSIONS_REQUEST,
   HUGGIES_SESSIONS_RESPONSE,
   HUGGIES_SIGNED_ACCOUNT,

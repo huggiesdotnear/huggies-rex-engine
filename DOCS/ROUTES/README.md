@@ -11,6 +11,8 @@ listed there, and a route that needs its own detail gets a file here.
   into the user's one session key
 - [`huggies-session-me.md`](./huggies-session-me.md) — who does this
   session key belong to
+- [`huggies-session-rotate.md`](./huggies-session-rotate.md) — give an
+  account a new session key
 
 =====================
 <br/>

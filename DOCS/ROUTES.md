@@ -35,6 +35,11 @@ user info and session managmnets
 
   see [`ROUTES/huggies-session-me.md`](./ROUTES/huggies-session-me.md)
 
+- `/api/huggies/session/rotate` - give an account a NEW session key.
+  `POST`. the old key stops working at once.
+
+  see [`ROUTES/huggies-session-rotate.md`](./ROUTES/huggies-session-rotate.md)
+
 ### `/api/trezu/` - trezu specifics
 
 - `/api/trezu/user/treasuries` - the treasuries (sputnik daos) an account

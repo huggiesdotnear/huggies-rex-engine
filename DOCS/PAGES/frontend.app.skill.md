@@ -38,14 +38,21 @@ for them.
 
 ## THE SESSION CARD
 
-the card shows two things side by side:
+the card shows ONE CARD PER SIGNED-IN ACCOUNT. every account has its
+own session key, because a key has to be narrowable to one wallet.
 
-- the accounts the browser holds a signed message for
-- the session key — ONE per user, the same on every device
+each card carries:
 
-the key is shown in full and not masked: the reader is the user, and
-they need to copy it. there is a COPY button, because a 64-character hex
-key cannot be picked out of a line of text by hand.
+- the account id, with the active one marked by a filled dot
+- the account's session key, in full — the reader is the user, and they
+  need to copy it
+- a COPY KEY button — a 64-character hex key cannot be picked out of a
+  line of text by hand
+- a ROTATE button — a key that has been seen by somebody else should be
+  replaceable
+
+a COPY ALL KEYS button sits under the cards, so a reader with several
+accounts does one copy-paste and not ten.
 
 ## THE COMING SOON NOTE
 

@@ -21,6 +21,7 @@ use tower_http::{cors::CorsLayer, services::ServeDir};
 
 use super::ping_route::ping_route;
 use super::session_me_route::session_me_route;
+use super::session_rotate_route::session_rotate_route;
 use super::sessions_route::sessions_route;
 use super::trezu_treasuries_route::trezu_treasuries_route;
 // ====================================
@@ -90,6 +91,7 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         .route("/api/huggies/ping", get(ping_route))
         .route("/api/huggies/sessions", post(sessions_route))
         .route("/api/huggies/session/me", get(session_me_route))
+        .route("/api/huggies/session/rotate", post(session_rotate_route))
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
     // static ServeDir is the FALLBACK at `/`, so any unmatched GET

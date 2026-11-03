@@ -1,6 +1,6 @@
 // ========================================
-// the skill page's SESSION store: the accounts the browser holds and the
-// one session key they belong to.
+// the skill page's SESSION store: the accounts the browser holds and
+// the key each one has.
 //
 // the store has the same shape as every page's store: plain module
 // state, a subscribe/unsubscribe pair, a notify that a throwing
@@ -11,29 +11,34 @@
 // out, or removes an account — and the card has to follow. the auth
 // module announces every one of those changes.
 //
-// --- WHY --- the card's data comes from TWO places and they are kept
-// apart: the ACCOUNTS are the browser's own (read from the session
-// map), and the SESSION KEY is the backend's (fetched with the signed
-// messages). the backend never learns which accounts the browser holds
-// until the card asks it to verify them.
-// ========================================
+// --- WHY --- the ACCOUNTS come from the browser and the KEYS come from
+// the backend: the browser knows which accounts it holds a signed
+// message for, and the backend knows the key each account has.
 import { HUGGIES_AUTH } from "../shared/auth_status";
 import { HUGGIES_AUTH_SESSIONS } from "../shared/auth_sessions";
 import { HUGGIES_SESSION } from "../shared/session";
-import { app_page_skill_session_me_load_fun } from "./app_page_skill_session_me";
+import { app_page_skill_session_rotate_fun } from "./app_page_skill_session_rotate";
 // ========================================
 // --- TYPES ------------------------------
+// one account's row in the card.
+export interface HUGGIES_APP_PAGE_SKILL_ACCOUNT {
+  // the account id.
+  account_id: string;
+  // the account's session key, or null when the backend has not issued
+  // one yet.
+  session_key: string | null;
+  // true for the account the app is currently acting as.
+  is_active: boolean;
+}
+
 // what the card shows.
 export interface HUGGIES_APP_PAGE_SKILL_SESSION_DATA {
-  // the accounts the browser holds a signature for.
-  accounts: string[];
-  // the one session key the user has, or null when the backend has not
-  // issued one yet.
-  session_key: string | null;
-  // the user the key belongs to.
-  user_id: string | null;
-  // true while the key is being fetched.
+  // one row per signed-in account.
+  accounts: HUGGIES_APP_PAGE_SKILL_ACCOUNT[];
+  // true while the keys are being fetched.
   loading: boolean;
+  // true while a rotation is running.
+  rotating: boolean;
   // the message from the last failure, or null.
   error: string | null;
 }
@@ -68,28 +73,31 @@ function subscribe_fun(listener: () => void): () => void {
 }
 // ========================================
 // --- LOAD ------------------------------
-// fill the data: the accounts from the browser, the key from the
+// fill the data: the accounts from the browser, the keys from the
 // backend.
 async function load_fun(): Promise<void> {
-  const accounts = HUGGIES_AUTH_SESSIONS.list_account_ids();
-  const previous = data;
+  const account_ids = HUGGIES_AUTH_SESSIONS.list_account_ids();
+  const active_id = HUGGIES_AUTH.get_account_id();
   data = {
-    accounts,
-    session_key: HUGGIES_SESSION.get_session_key(),
-    user_id: HUGGIES_SESSION.get_user_id(),
-    loading: true,
+    accounts: account_ids.map((account_id) => ({
+      account_id,
+      session_key: HUGGIES_SESSION.get_session_key(account_id),
+      is_active: account_id === active_id,
+    })),
+    loading: account_ids.length > 0,
+    rotating: false,
     error: null,
   };
   notify_fun();
 
-  // the key is fetched only when there are accounts to fetch it with.
-  // without an account there is nothing to verify, so there is no key.
-  if (accounts.length === 0) {
+  // the keys are fetched only when there are accounts to fetch them
+  // with. without an account there is nothing to verify, so there is
+  // no key.
+  if (account_ids.length === 0) {
     data = {
-      accounts,
-      session_key: null,
-      user_id: null,
+      accounts: [],
       loading: false,
+      rotating: false,
       error: null,
     };
     notify_fun();
@@ -97,39 +105,65 @@ async function load_fun(): Promise<void> {
   }
 
   try {
-    const session_key = await HUGGIES_SESSION.get_or_fetch_session_key();
-    // --- WHY --- the backend is asked WHO WE ARE once the key is here:
-    // it is the check that the key actually works. the key came from
-    // the sessions route, and this route is a different one that looks
-    // the key up by its hash — so a green answer here means the key
-    // survives the round trip through the db.
-    let user_id = HUGGIES_SESSION.get_user_id();
-    let error =
-      session_key === null
-        ? "the backend could not issue a session key for these accounts"
-        : null;
-    if (session_key !== null) {
-      try {
-        const me = await app_page_skill_session_me_load_fun();
-        user_id = me.user_id;
-      } catch (err) {
-        console.warn("[skill] the session key was refused by the backend", err);
-        error = err instanceof Error ? err.message : String(err);
-      }
-    }
+    await HUGGIES_SESSION.load();
     data = {
-      accounts: HUGGIES_AUTH_SESSIONS.list_account_ids(),
-      session_key,
-      user_id,
+      accounts: account_ids.map((account_id) => ({
+        account_id,
+        session_key: HUGGIES_SESSION.get_session_key(account_id),
+        is_active: account_id === active_id,
+      })),
       loading: false,
-      error,
+      rotating: false,
+      error: null,
     };
   } catch (err) {
     data = {
-      accounts: HUGGIES_AUTH_SESSIONS.list_account_ids(),
-      session_key: previous?.session_key ?? null,
-      user_id: HUGGIES_SESSION.get_user_id(),
+      accounts: account_ids.map((account_id) => ({
+        account_id,
+        session_key: HUGGIES_SESSION.get_session_key(account_id),
+        is_active: account_id === active_id,
+      })),
       loading: false,
+      rotating: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+  notify_fun();
+}
+// ========================================
+// --- ROTATE ----------------------------
+// give one account a NEW key.
+//
+// --- WHY --- the account's signed message is sent with the request, and
+// not the old key: the old key is what a thief would have, and a
+// rotation that only needed the old key could be done by the thief. the
+// signed message proves the owner still holds the account's NEAR key.
+//
+// --- WHY --- no wallet popup: the browser already holds the signed
+// message in its local storage from the sign-in, and the signature covers
+// the message + nonce + recipient.
+async function rotate_fun(account_id: string): Promise<void> {
+  if (data === null) return;
+  data = { ...data, rotating: true, error: null };
+  notify_fun();
+  try {
+    const result = await app_page_skill_session_rotate_fun(account_id);
+    // the new key replaces the old one in memory.
+    HUGGIES_SESSION.set_session_key(account_id, result.session_key);
+    data = {
+      ...data,
+      accounts: data.accounts.map((account) =>
+        account.account_id === account_id
+          ? { ...account, session_key: result.session_key }
+          : account,
+      ),
+      rotating: false,
+      error: null,
+    };
+  } catch (err) {
+    data = {
+      ...data,
+      rotating: false,
       error: err instanceof Error ? err.message : String(err),
     };
   }
@@ -158,6 +192,7 @@ function get_fun(): HUGGIES_APP_PAGE_SKILL_SESSION_DATA | null {
 // --- PUBLIC ---------------------------
 export const HUGGIES_APP_PAGE_SKILL_SESSION_STORE = {
   load: load_fun,
+  rotate: rotate_fun,
   subscribe: subscribe_fun,
   get: get_fun,
   watch: watch_fun,

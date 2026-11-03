@@ -1,25 +1,20 @@
 // ========================================
-// the backend session: the ONE key the signed-in user has.
+// the backend session: the keys of the signed-in accounts.
 //
 // the browser holds the signed messages in localStorage. this module
-// sends them to our backend, which verifies them and answers with the
-// user's one session key. the key is then kept here, in memory, and
-// every request that needs it picks it up from here.
+// sends them to our backend, which verifies them and answers with ONE
+// KEY PER ACCOUNT. the keys are then kept here, in memory, and every
+// request that needs one picks it up from here.
 //
-// --- WHY --- the key is kept in MEMORY and not in localStorage: the key
-// is a bearer token — whoever holds it IS the user. putting it in
+// --- WHY --- the keys are kept in MEMORY and not in localStorage: a key
+// is a bearer token — whoever holds it IS that account. putting it in
 // localStorage would put it where a script on the page can read it, and
 // where it would survive forever after the tab is closed.
 //
-// --- WHY --- the key is ONE per user and not one per account: the user
-// is the person, and the person has one key. the backend hands back the
-// same key for the same user on every device, so a second device does
-// not invalidate the first.
-//
-// --- WHY --- the session is fetched ONCE and reused: every page that
-// needs a session key asks this module, and the module answers from
-// memory when it already has the key. the browser's signed messages
-// only go to the backend when there is no key yet.
+// --- WHY --- ONE KEY PER ACCOUNT: an account has exactly one key, and
+// the key can be narrowed to that one wallet. the same account on
+// another device gets the SAME key back, so a second device does not
+// invalidate the first.
 //
 // --- WHY --- NOTHING SECRET IS SENT: the browser sends the SIGNED
 // message — the account id, the PUBLIC key, the signature, and the
@@ -31,16 +26,21 @@ import type { HUGGIES_SIGNED_ACCOUNT } from "@huggies/huggies-rex-engine-middlem
 import { HUGGIES_AUTH_SESSIONS } from "./auth_sessions";
 import { HUGGIES_BASE_URL } from "./base_url";
 // ========================================
+// --- TYPES ------------------------------
+// one account's key.
+export interface HUGGIES_SESSION_KEY_ENTRY {
+  account_id: string;
+  session_key: string;
+}
+// ========================================
 // --- STATE ------------------------------
-// the user's session key, or null when there is none yet.
-let session_key: string | null = null;
-// the user the key belongs to.
-let user_id: string | null = null;
-// true while a request for the key is in flight, so two callers do not
+// the keys, by account id.
+const session_keys: Map<string, string> = new Map();
+// true while a request for the keys is in flight, so two callers do not
 // make two requests.
 let loading = false;
-// the key we are waiting for, so a caller can wait on it.
-let pending: Promise<string | null> | null = null;
+// the keys we are waiting for, so a caller can wait on them.
+let pending: Promise<HUGGIES_SESSION_KEY_ENTRY[]> | null = null;
 // ========================================
 // --- HELPERS ----------------------------
 // every signed account the browser holds, in the shape the backend
@@ -67,13 +67,18 @@ function collect_signed_accounts_fun(): HUGGIES_SIGNED_ACCOUNT[] {
 }
 // ========================================
 // --- LOAD ------------------------------
-// get the session key, fetching it if the browser does not have it yet.
-async function load_fun(): Promise<string | null> {
-  if (session_key !== null) return session_key;
+// get the keys, fetching them if the browser does not have them yet.
+//
+// --- WHY --- the keys are fetched ONCE and reused: every page that needs
+// a key asks this module, and the module answers from memory when it
+// already has the keys. the browser's signed messages only go to the
+// backend when a key is missing.
+async function load_fun(): Promise<HUGGIES_SESSION_KEY_ENTRY[]> {
+  if (session_keys.size > 0) return entries_fun();
   if (loading && pending !== null) return pending;
 
   const accounts = collect_signed_accounts_fun();
-  if (accounts.length === 0) return null;
+  if (accounts.length === 0) return [];
 
   loading = true;
   pending = (async () => {
@@ -81,16 +86,17 @@ async function load_fun(): Promise<string | null> {
       const result = await api_huggies_sessions_post(HUGGIES_BASE_URL, {
         accounts,
       });
-      session_key = result.sessionKey;
-      user_id = result.userId;
-      return session_key;
+      for (const entry of result.keys) {
+        session_keys.set(entry.accountId, entry.sessionKey);
+      }
+      return entries_fun();
     } catch (err) {
       // --- WHY --- a failure is logged and not thrown: a page that
-      // needs a session key must still render when the backend is down
-      // or the signatures are stale. the caller gets null and shows what
-      // it can.
-      console.warn("[session] the session key could not be fetched", err);
-      return null;
+      // needs a key must still render when the backend is down or the
+      // signatures are stale. the caller gets nothing and shows what it
+      // can.
+      console.warn("[session] the session keys could not be fetched", err);
+      return [];
     } finally {
       loading = false;
       pending = null;
@@ -100,46 +106,70 @@ async function load_fun(): Promise<string | null> {
 }
 // ========================================
 // --- READ ------------------------------
-// the session key, or null. it does NOT fetch: a component that only
-// displays the key reads this, and the page's load fetches it.
-function get_session_key_fun(): string | null {
-  return session_key;
+// the keys we have, as a list.
+function entries_fun(): HUGGIES_SESSION_KEY_ENTRY[] {
+  return [...session_keys.entries()].map(([account_id, session_key]) => ({
+    account_id,
+    session_key,
+  }));
 }
 
-// the user the key belongs to, or null.
-function get_user_id_fun(): string | null {
-  return user_id;
+// one account's key, or null.
+function get_session_key_fun(account_id: string): string | null {
+  return session_keys.get(account_id) ?? null;
+}
+
+// every account we hold a key for.
+function list_session_keys_fun(): HUGGIES_SESSION_KEY_ENTRY[] {
+  return entries_fun();
 }
 
 // the session key, fetching it if it is not there yet.
 //
-// --- WHY --- this is the function a request that NEEDS the key calls:
-// it returns the key whether it was already known or had to be fetched,
-// so a caller never has to know which it is.
-async function get_or_fetch_session_key_fun(): Promise<string | null> {
-  return load_fun();
+// --- WHY --- this is the function a request that NEEDS a key calls: it
+// returns the key whether it was already known or had to be fetched, so
+// a caller never has to know which it is.
+async function get_or_fetch_session_key_fun(
+  account_id: string,
+): Promise<string | null> {
+  const existing = session_keys.get(account_id);
+  if (existing !== undefined) return existing;
+  await load_fun();
+  return session_keys.get(account_id) ?? null;
+}
+// ========================================
+// --- SET -------------------------------
+// remember a key we were given, e.g. after a rotation.
+function set_session_key_fun(account_id: string, session_key: string): void {
+  session_keys.set(account_id, session_key);
 }
 // ========================================
 // --- RESET -----------------------------
-// forget the session key.
+// forget the keys.
 //
-// --- WHY --- this is called when the user signs out or removes the
-// active account: the key belongs to the USER, and when the user is
-// gone the key must not still be in memory.
+// --- WHY --- this is called when the user signs out or removes an
+// account: a key belongs to an account, and when the account is gone the
+// key must not still be in memory.
 function reset_fun(): void {
-  session_key = null;
-  user_id = null;
+  session_keys.clear();
   loading = false;
   pending = null;
+}
+
+// forget ONE account's key.
+function reset_account_fun(account_id: string): void {
+  session_keys.delete(account_id);
 }
 // ========================================
 // --- PUBLIC ---------------------------
 export const HUGGIES_SESSION = {
   load: load_fun,
   get_session_key: get_session_key_fun,
-  get_user_id: get_user_id_fun,
+  list_session_keys: list_session_keys_fun,
   get_or_fetch_session_key: get_or_fetch_session_key_fun,
+  set_session_key: set_session_key_fun,
   reset: reset_fun,
+  reset_account: reset_account_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

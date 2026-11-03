@@ -16,18 +16,34 @@ NEVER wipe or delete this db.
 
 the db holds ONE table for now: `sessions`.
 
-- `user_id` - the NEAR account id of the user. it is the PRIMARY KEY,
-  because a user has exactly one session, ever.
+- `account_id` - the NEAR account id. it is the PRIMARY KEY, because an
+  account has exactly one session key, ever.
 - `session_key` - the session key, ENCRYPTED. the plain key is never in
   the db.
 - `session_key_hash` - the sha-256 of the key. a request is looked up
   by this, so no row has to be decrypted to find the match.
-- `accounts` - the accounts the user holds signed in, as a json array.
 - `created_at` / `updated_at` - millisecond timestamps.
 
 the schema is written by the migrations in
 `src/backend/logic/db_migrations.rs`. each migration runs once, inside a
 transaction, and the db remembers which ones ran.
+
+## DESTRUCTIVE MIGRATIONS
+
+a migration that DROPS a table or deletes rows is marked destructive in
+the code, and it refuses to run unless `HUGGIES_ALLOW_DESTRUCTIVE=1` is
+set. the app then refuses to start and says why:
+
+```
+failed to open the db at ...: the migration 'sessions_by_account_id' is
+destructive and HUGGIES_ALLOW_DESTRUCTIVE is not set
+```
+
+so a mistyped DROP cannot quietly empty a live db. the flag is a
+decision by whoever deploys, not a constant in the build.
+
+> the flag must be set for ONE deploy, and then removed. it is a
+> go-ahead for the migrations that need it, not a permanent setting.
 
 ## THE SESSION SECRET
 

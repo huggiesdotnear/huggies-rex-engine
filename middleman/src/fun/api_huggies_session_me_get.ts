@@ -1,10 +1,11 @@
 // ========================================
 // API_HUGGIES_SESSION_ME_GET
-// GET /api/huggies/session/me — who does this session key belong to.
+// GET /api/huggies/session/me — which account does this session key
+// belong to.
 //
 // the first route that REQUIRES the session key. the key travels in the
-// `x-session-token` header, and the backend answers with the user the
-// key belongs to.
+// `x-session-token` header, and the answer is the account the key
+// belongs to.
 //
 // the caller passes the key through `options.session_token`. a caller
 // that has no key gets a 401, and the error is thrown like any other.
@@ -17,12 +18,7 @@
 
 import { api_call } from "../stuff/api_call";
 import type { REQUEST_OPTIONS } from "../stuff/request_options";
-
-export interface HUGGIES_SESSION_ME {
-  userId: string;
-  accounts: string[];
-  createdAt: number;
-}
+import type { HUGGIES_SESSION_ME } from "../types/huggies_sessions";
 
 export async function api_huggies_session_me_get(
   base_url: string,
@@ -41,11 +37,10 @@ export async function api_huggies_session_me_get(
     typeof json !== "object" ||
     json === null ||
     Array.isArray(json) ||
-    typeof json.userId !== "string" ||
-    !Array.isArray(json.accounts)
+    typeof json.accountId !== "string"
   ) {
     throw new Error(
-      "api_huggies_session_me_get failed: invalid_response: expected a json object with userId and accounts",
+      "api_huggies_session_me_get failed: invalid_response: expected a json object with an accountId",
     );
   }
 
