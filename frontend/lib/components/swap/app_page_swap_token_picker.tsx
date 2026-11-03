@@ -29,10 +29,6 @@ import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { HUGGIES_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { huggies_token_list_fun } from "../shared/token_list";
-import {
-  HUGGIES_DEFAULT_TOKEN_SORT,
-  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-} from "../../ts/discover/app_page_discover_token_sort_options";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -103,10 +99,14 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
           },
           loading: picker.loading,
           searching: picker.loading,
-          sort: HUGGIES_DEFAULT_TOKEN_SORT,
-          direction: HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
-          on_sort: () => {},
-          on_direction: () => {},
+          sort: picker.sort,
+          direction: picker.direction,
+          on_sort: (next) => {
+            void HUGGIES_SWAP_TOKEN_PICKER.set_sort(next);
+          },
+          on_direction: (next) => {
+            void HUGGIES_SWAP_TOKEN_PICKER.set_direction(next);
+          },
           has_more: false,
           on_load_more: () => {},
           on_pick: (token_id) => {
@@ -115,7 +115,6 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
           empty_text: "NO TOKENS FOUND",
           searching_text: "SEARCHING...",
           loading_text: "LOADING TOKENS...",
-          hide_sort: true,
         })}
       </div>
     </div>

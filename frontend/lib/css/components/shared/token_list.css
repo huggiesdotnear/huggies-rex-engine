@@ -7,6 +7,12 @@
    only — the list has no mount id of its own, so the pages that use it
    scope it however they need to. */
 
+/* the sort row is the shared sort keys control, so its rules ride
+   along with the list. without this import the sort buttons fall back
+   to the global button rule, which sizes every button to the full page
+   column — and the sort row becomes one button per row. */
+@import url(./sort_keys_control.css);
+
 /* the search box sits on its own row above the sort buttons: the page
    column is 500px wide and the sort row already needs most of it. */
 .token-list .controls {

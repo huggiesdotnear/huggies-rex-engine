@@ -20,6 +20,12 @@ import { HUGGIES_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
 import { HUGGIES_NEAR_ID, HUGGIES_NEAR_SYMBOL } from "../shared/token_near";
+import {
+  HUGGIES_DEFAULT_TOKEN_SORT,
+  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+  type HUGGIES_TOKEN_SORT,
+  type HUGGIES_TOKEN_SORT_DIRECTION,
+} from "../discover/app_page_discover_token_sort_options";
 import type { HUGGIES_DISCOVER_TOKEN_ROW } from "../discover/app_page_discover_token_row";
 // ========================================
 // ========================================
@@ -36,6 +42,10 @@ export interface HUGGIES_SWAP_PICKER_STATE {
   tokens: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>;
   // true while the rows are being fetched.
   loading: boolean;
+  // the sort the rows on screen are in.
+  sort: HUGGIES_TOKEN_SORT;
+  // the direction the rows on screen are in.
+  direction: HUGGIES_TOKEN_SORT_DIRECTION;
 }
 // ========================================
 // ========================================
@@ -56,6 +66,8 @@ let state: HUGGIES_SWAP_PICKER_STATE = {
   label: "TOKEN",
   tokens: [],
   loading: false,
+  sort: HUGGIES_DEFAULT_TOKEN_SORT,
+  direction: HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
 };
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
@@ -126,13 +138,18 @@ function near_row_fun(): HUGGIES_DISCOVER_TOKEN_ROW {
 // ========================================
 // --- FETCH -----------------------------
 // the tokens the picker shows before the reader searches: the most
-// liquid ones, by volume.
+// liquid ones, in the chosen sort.
+//
+// --- WHY --- THE SORT IS ASKED FOR FROM THE API: the api sorts and
+// pages on its own, so asking it for a sort is one request that comes
+// back ordered. sorting a downloaded list in javascript would mean
+// downloading the whole index to sort a slice of it.
 async function load_default_tokens_fun(): Promise<void> {
   set_state_fun({ ...state, loading: true });
   try {
     const page = await HUGGIES_DISCOVER_TOKEN_LIST.fetch(
-      "volume_usd_24h",
-      true,
+      state.sort,
+      state.direction === "desc",
       0,
       HUGGIES_PICKER_LIST_LIMIT,
     );
@@ -222,6 +239,39 @@ function clear_search_fun(): void {
   void load_default_tokens_fun();
 }
 // ========================================
+// the reader picked another sort key.
+//
+// --- WHY --- THE LIST IS LOADED AGAIN: the api sorts the rows it
+// serves, so a different sort is a different request and a different
+// set of rows. sorting the rows on screen in javascript would mean
+// downloading the whole index to sort a slice of it.
+//
+// --- WHY --- THE SEARCH IS DROPPED: the search results are a handful
+// of arbitrary tokens and are not the top of any sort, so the sort row
+// and the search results are two different things and only one of them
+// can be on screen. the search is the reader's own question about a
+// token they already half-know the name of, so it wins — and the sort
+// they just picked applies to the list they get back when they clear
+// the box.
+async function set_sort_fun(sort: HUGGIES_TOKEN_SORT): Promise<void> {
+  if (state.sort === sort) return;
+  set_state_fun({ ...state, sort });
+  await load_default_tokens_fun();
+}
+// ========================================
+// the reader flipped the direction.
+//
+// --- WHY --- IT IS ITS OWN ACTION AND NOT A PART OF THE SORT: the
+// direction is half of the view, and flipping it is a different
+// request from picking a different key.
+async function set_direction_fun(
+  direction: HUGGIES_TOKEN_SORT_DIRECTION,
+): Promise<void> {
+  if (state.direction === direction) return;
+  set_state_fun({ ...state, direction });
+  await load_default_tokens_fun();
+}
+// ========================================
 // ========================================
 // --- READ ------------------------------
 function get_fun(): HUGGIES_SWAP_PICKER_STATE {
@@ -236,6 +286,8 @@ export const HUGGIES_SWAP_TOKEN_PICKER = {
   pick: pick_fun,
   search: search_fun,
   clear_search: clear_search_fun,
+  set_sort: set_sort_fun,
+  set_direction: set_direction_fun,
   subscribe: subscribe_fun,
   get: get_fun,
 };

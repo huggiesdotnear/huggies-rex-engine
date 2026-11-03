@@ -91,4 +91,18 @@
 #HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .loading {
   color: var(--color-backend);
 }
+/* the sort row: the shared control is dark and the popup is light, so
+   the bar and the buttons are set here. the ACTIVE button keeps the
+   shared control's own colours, so the chosen sort still reads as the
+   chosen one. */
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .sort .sort-control {
+  border-color: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.06);
+}
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .sort .sort-button {
+  color: var(--color-backend);
+}
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .sort .sort-button:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
 /*==================================*/

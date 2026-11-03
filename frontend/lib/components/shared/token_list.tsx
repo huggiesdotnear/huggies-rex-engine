@@ -99,9 +99,6 @@ export interface HUGGIES_TOKEN_LIST_PROPS {
   loading_text?: string;
   // the text under the list when there is another page.
   more_text?: string;
-  // hide the sort row. the picker sorts by volume only, so it shows
-  // no sort row.
-  hide_sort?: boolean;
 }
 // ========================================
 // ========================================
@@ -245,17 +242,15 @@ export function huggies_token_list_fun(
             }}
           />
         </div>
-        {!props.hide_sort && (
-          <div class="sort">
-            {huggies_sort_keys_control_fun({
-              options: HUGGIES_TOKEN_SORTS,
-              sort: props.sort,
-              direction: props.direction,
-              on_sort: (next) => props.on_sort(next),
-              on_direction: (next) => props.on_direction(next),
-            })}
-          </div>
-        )}
+        <div class="sort">
+          {huggies_sort_keys_control_fun({
+            options: HUGGIES_TOKEN_SORTS,
+            sort: props.sort,
+            direction: props.direction,
+            on_sort: (next) => props.on_sort(next),
+            on_direction: (next) => props.on_direction(next),
+          })}
+        </div>
       </div>
       {errors.map((message) => (
         <p class="error">{message}</p>
