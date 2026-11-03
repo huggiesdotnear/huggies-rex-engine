@@ -5,20 +5,31 @@
 // because a reader asks the same question of both — what did this
 // transaction move.
 //
+// each row carries the token's ICON and SYMBOL next to the amount, so
+// "1.5 USDC" reads as an amount of USDC and not as a bare integer in
+// the token's smallest unit. the raw integer is in the title, for a
+// reader who wants the exact number the chain recorded.
+//
 // it reads the loaded transaction from the page's store. it fetches
-// nothing.
+// nothing — the tokens come from the shared transfer tokens store.
 import { render } from "preact";
 import { format_near_with_unit } from "@sleet-js/fastnear-explorer-api-client";
 import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { HUGGIES_APP_PAGE_TX_STORE } from "../../ts/tx/app_page_tx_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
+import { HUGGIES_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
+import { transfer_token_of_fun } from "../../ts/shared/transfer_tokens";
+import {
+  huggies_transfer_amount_fun,
+  huggies_transfer_icon_fun,
+} from "../shared/transfer_amount";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // the account link for an account id.
 //
-// --- WHY --- the depth is asked for here and not baked in: the page
+// --- WHY the depth is asked for here and not baked in: the page
 // can sit at any depth under /app/, and a link built for the wrong
 // depth lands on a page that does not exist.
 function account_href_fun(account_id: string): string {
@@ -47,6 +58,7 @@ function endpoint_fun(account_id: string | null): preact.JSX.Element {
 // --- COMPONENT --------------------------
 export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
   const state = use_page_store_fun(HUGGIES_APP_PAGE_TX_STORE);
+  const token_state = use_page_store_fun(HUGGIES_TRANSFER_TOKENS_STORE);
   const data = state.data;
   // no transaction yet — there is nothing to show.
   if (data === null) return null;
@@ -55,61 +67,91 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
   const nft_transfers = parsed.nft_transfers;
   // a transaction that moved nothing has no transfers section.
   if (transfers.length === 0 && nft_transfers.length === 0) return null;
+  const tokens = token_state.tokens;
 
   return (
     <section class="tx-transfers">
       <h2>TRANSFERS ({transfers.length + nft_transfers.length})</h2>
       <div class="tx-transfers-list">
-        {transfers.map((transfer, index) => (
-          <div class="tx-transfer" key={`ft-${index}`}>
-            <div class="tx-transfer-line">
-              {endpoint_fun(transfer.from)}
-              <span class="tx-transfer-arrow">&rarr;</span>
-              {endpoint_fun(transfer.to)}
-            </div>
-            <div class="tx-transfer-amount">
-              {/* --- WHY --- a NEAR amount is formatted and a TOKEN
-                  amount is not: the token's amount is in the token's
-                  own smallest unit, and this page does not know the
-                  token's decimals — so it would be a lie to divide it
-                  by something. the raw amount is shown with the
-                  token's standard beside it, so the reader knows what
-                  they are looking at. */}
-              {transfer.token_type === "near" ? (
-                format_near_with_unit(transfer.amount)
-              ) : (
-                <>
-                  <span class="tx-transfer-raw">{transfer.amount}</span>
-                  <span class="tx-transfer-type">
-                    {transfer.token_type.toUpperCase()}
+        {transfers.map((transfer, index) => {
+          const token = transfer_token_of_fun(
+            transfer.token_type,
+            transfer.contract_id,
+            transfer.token_id,
+            tokens,
+          );
+          return (
+            <div class="tx-transfer" key={`ft-${index}`}>
+              <div class="tx-transfer-line">
+                {endpoint_fun(transfer.from)}
+                <span class="tx-transfer-arrow">&rarr;</span>
+                {endpoint_fun(transfer.to)}
+              </div>
+              <div class="tx-transfer-amount">
+                {huggies_transfer_icon_fun(token)}
+                {/* --- WHY --- a NEAR amount is formatted by the client
+                    and a TOKEN amount by the shared token amount: the
+                    native token has no registry entry, so its decimals
+                    are the protocol's own 24, and the client already
+                    knows them. */}
+                {transfer.token_type === "near" ? (
+                  <span class="tx-token-amount">
+                    <span class="tx-token-value">
+                      {format_near_with_unit(transfer.amount)}
+                    </span>
                   </span>
-                </>
+                ) : (
+                  huggies_transfer_amount_fun({
+                    amount: transfer.amount,
+                    token,
+                    contract_id: transfer.contract_id,
+                  })
+                )}
+                {/* --- WHY --- THE STANDARD IS STILL SHOWN: the symbol
+                    says WHICH token, and the standard says WHAT KIND
+                    of token it is. a nep245 row carries a token id as
+                    well, and that id is only meaningful next to the
+                    standard. */}
+                <span class="tx-transfer-type">
+                  {transfer.token_type.toUpperCase()}
+                </span>
+                {transfer.token_id !== undefined && (
+                  <code class="tx-transfer-token-id">{transfer.token_id}</code>
+                )}
+              </div>
+              {transfer.memo !== undefined && transfer.memo.length > 0 && (
+                <div class="tx-transfer-memo">{transfer.memo}</div>
               )}
-              {transfer.contract_id !== undefined && (
+            </div>
+          );
+        })}
+        {nft_transfers.map((transfer, index) => {
+          // --- WHY --- an nft's collection is a contract in the token
+          // registry like any other, so its icon is the collection's
+          // icon — the one a reader recognises the nft by.
+          const token = tokens.get(transfer.contract_id) ?? null;
+          return (
+            <div class="tx-transfer" key={`nft-${index}`}>
+              <div class="tx-transfer-line">
+                {endpoint_fun(transfer.from)}
+                <span class="tx-transfer-arrow">&rarr;</span>
+                {endpoint_fun(transfer.to)}
+              </div>
+              <div class="tx-transfer-amount">
+                {huggies_transfer_icon_fun(token)}
+                <code class="tx-transfer-token-id">{transfer.token_id}</code>
+                {token !== null && (
+                  <span class="tx-token-symbol">{token.symbol}</span>
+                )}
+                <span class="tx-transfer-type">NFT</span>
                 <code class="tx-transfer-contract">{transfer.contract_id}</code>
+              </div>
+              {transfer.memo !== undefined && transfer.memo.length > 0 && (
+                <div class="tx-transfer-memo">{transfer.memo}</div>
               )}
             </div>
-            {transfer.memo !== undefined && transfer.memo.length > 0 && (
-              <div class="tx-transfer-memo">{transfer.memo}</div>
-            )}
-          </div>
-        ))}
-        {nft_transfers.map((transfer, index) => (
-          <div class="tx-transfer" key={`nft-${index}`}>
-            <div class="tx-transfer-line">
-              {endpoint_fun(transfer.from)}
-              <span class="tx-transfer-arrow">&rarr;</span>
-              {endpoint_fun(transfer.to)}
-            </div>
-            <div class="tx-transfer-amount">
-              <code>{transfer.token_id}</code>
-              <code class="tx-transfer-contract">{transfer.contract_id}</code>
-            </div>
-            {transfer.memo !== undefined && transfer.memo.length > 0 && (
-              <div class="tx-transfer-memo">{transfer.memo}</div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

@@ -1,0 +1,70 @@
+/*==================================*/
+/* transfer_amount
+   the shared piece of a token amount: the icon, the amount, the symbol
+   and the usd worth.
+
+   the transaction page's transfers and the account page's transaction
+   cards both render through this, so the two cannot drift. */
+/*==================================*/
+.tx-token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+  align-self: center;
+}
+/* a token with no icon still holds its place, so the amounts line up
+   down the page. */
+.tx-token-icon.is-empty {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+/* the amount, the symbol and the usd worth sit on one line. */
+.tx-token-amount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+/* the amount itself. the title holds the raw integer, so a reader who
+   wants the exact number the chain recorded can hover for it. */
+.tx-token-value {
+  white-space: nowrap;
+}
+/* the raw integer, shown when the token is unknown and there are no
+   decimals to divide by. */
+.tx-token-raw {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  font-family: monospace;
+}
+/* the symbol is the token's ticker. */
+.tx-token-symbol {
+  font-weight: bold;
+  white-space: nowrap;
+}
+/* the usd worth. dimmed, because it is the reader's number and not
+   the chain's. */
+.tx-token-usd {
+  opacity: 0.7;
+  white-space: nowrap;
+  font-size: 11px;
+}
+/* the standard of a transfer, shown beside the symbol. */
+.tx-token-standard {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+/* the contract a raw amount came from. */
+.tx-token-contract {
+  font-size: 10px;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/

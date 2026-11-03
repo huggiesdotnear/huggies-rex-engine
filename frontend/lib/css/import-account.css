@@ -1,5 +1,6 @@
 /*==================================*/
 /* the account page's css: the components it mounts. */
+@import url(./components/shared/transfer_amount.css);
 @import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_ID_H1.css);
 @import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_TABS.css);
 @import url(./components/account/HUGGIES_COMPONENT_ACCOUNT_DIRECT_BALANCE_TABLE.css);

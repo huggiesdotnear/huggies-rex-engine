@@ -18,6 +18,7 @@ import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
 import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "./app_page_account_tx_details";
 import type { HUGGIES_CACHED_ACCOUNT_TX_ROW } from "./app_page_account_transactions_cache";
+import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -208,6 +209,18 @@ function get_state_fun(): HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE {
 }
 // ========================================
 // ========================================
+// --- GET PARSED LIST -------------------
+// the parsed transactions on screen.
+//
+// --- WHY THIS EXISTS: the shared transfer tokens store follows this
+// store and needs to know which transactions are on screen so it can
+// ask for their tokens. the cards show five transactions at once, and
+// each one names its own tokens.
+function get_parsed_list_fun(): ReadonlyArray<PARSE_RESULT> {
+  return state.details.map((detail) => detail.parsed);
+}
+// ========================================
+// ========================================
 // --- WATCH -----------------------------
 // the store follows the page's account id and the page's tab.
 //
@@ -233,6 +246,7 @@ export const HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE = {
   subscribe: subscribe_fun,
   load: load_fun,
   watch: watch_fun,
+  get_parsed_list: get_parsed_list_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

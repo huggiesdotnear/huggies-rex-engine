@@ -26,6 +26,13 @@ import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "../../ts/account/app_p
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../ts/shared/app_depth";
 import { tx_detail_href_fun } from "../../ts/shared/tx_link";
+import { transfer_token_of_fun } from "../../ts/shared/transfer_tokens";
+import type { HUGGIES_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
+import { HUGGIES_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
+import {
+  huggies_transfer_amount_fun,
+  huggies_transfer_icon_fun,
+} from "../shared/transfer_amount";
 import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL } from "../../ts/account/app_page_account_tx_details";
 // ========================================
 // ========================================
@@ -58,8 +65,14 @@ function action_label_fun(type: string, method_name?: string): string {
 // --- CARD -----------------------------
 // one transaction: what it was, who did it, what it did and what it
 // moved.
+//
+// --- WHY THE TOKENS ARE A PARAMETER AND NOT READ FROM THE STORE: the
+// cards are five transactions, and each one names its own tokens. the
+// tokens are gathered for the whole set and handed in, so the card
+// renders without reaching for anything.
 function detail_card_fun(
   detail: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL,
+  tokens: Map<string, HUGGIES_TRANSFER_TOKEN>,
 ): preact.JSX.Element {
   const parsed = detail.parsed;
   const depth = current_app_depth_fun();
@@ -126,14 +139,32 @@ function detail_card_fun(
         <div class="tx-card-row">
           <span class="tx-card-label">MOVED</span>
           <span class="tx-card-transfers">
-            {transfers.slice(0, 2).map((transfer) => (
-              <span class="tx-card-transfer">
-                {transfer.token_type === "near"
-                  ? format_near_with_unit(transfer.amount)
-                  : transfer.amount}{" "}
-                {transfer.token_type.toUpperCase()}
-              </span>
-            ))}
+            {transfers.slice(0, 2).map((transfer) => {
+              const token = transfer_token_of_fun(
+                transfer.token_type,
+                transfer.contract_id,
+                transfer.token_id,
+                tokens,
+              );
+              return (
+                <span class="tx-card-transfer">
+                  {huggies_transfer_icon_fun(token)}
+                  {transfer.token_type === "near" ? (
+                    <span class="tx-token-value">
+                      {format_near_with_unit(transfer.amount)}
+                    </span>
+                  ) : (
+                    huggies_transfer_amount_fun({
+                      amount: transfer.amount,
+                      token,
+                    })
+                  )}
+                  <span class="tx-token-standard">
+                    {transfer.token_type.toUpperCase()}
+                  </span>
+                </span>
+              );
+            })}
             {nft_transfers.length > 0 && (
               <span class="tx-card-transfer">{nft_transfers.length} NFT</span>
             )}
@@ -148,6 +179,7 @@ function detail_card_fun(
 // --- COMPONENT --------------------------
 export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
   const state = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE);
+  const token_state = use_page_store_fun(HUGGIES_TRANSFER_TOKENS_STORE);
   // nothing loaded yet — the section says so and shows nothing else.
   if (state.details.length === 0) {
     if (state.loading) {
@@ -173,7 +205,9 @@ export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
       <h2>LATEST TRANSACTIONS</h2>
       <div class="tx-cards-list">
         {state.details.map((detail) => (
-          <div key={detail.hash}>{detail_card_fun(detail)}</div>
+          <div key={detail.hash}>
+            {detail_card_fun(detail, token_state.tokens)}
+          </div>
         ))}
       </div>
     </section>

@@ -25,6 +25,7 @@ import { HUGGIES_APP_PAGE_ACCOUNT_STORE } from "./app_page_account_store";
 import { HUGGIES_APP_PAGE_ACCOUNT_TAB_STATE } from "./app_page_account_tab_state";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE } from "./app_page_account_tx_details_store";
 import { HUGGIES_APP_PAGE_ACCOUNT_TX_STORE } from "./app_page_account_tx_store";
+import { HUGGIES_TRANSFER_TOKENS_STORE } from "../shared/transfer_tokens_store";
 import { huggies_loading_bar_start_fun } from "../shared/loading_bar_start";
 // ========================================
 // ========================================
@@ -49,6 +50,13 @@ HUGGIES_APP_PAGE_ACCOUNT_TX_STORE.watch();
 // the table. it is fetched when the reader is on the transactions tab,
 // the same as the history.
 HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE.watch();
+// the cards' transfers need the symbol, the icon and the decimals of
+// every token they moved. the tokens come from the token indexer — a
+// different api from the one the transactions came from — so the
+// watch follows the cards' transactions and asks for their tokens.
+HUGGIES_TRANSFER_TOKENS_STORE.watch_many(
+  HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE,
+);
 void HUGGIES_APP_PAGE_ACCOUNT_STORE.load();
 // ========================================
 // copyright 2026 by sleet.near

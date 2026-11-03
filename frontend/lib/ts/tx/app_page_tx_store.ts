@@ -13,6 +13,7 @@
 import { HUGGIES_APP_PAGE_TX } from "./app_page_tx";
 import { HUGGIES_URL_TX } from "./app_page_tx_url";
 import type { HUGGIES_APP_PAGE_TX_DATA } from "./app_page_tx";
+import type { PARSE_RESULT } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -124,11 +125,24 @@ function get_state_fun(): HUGGIES_APP_PAGE_TX_STATE {
 }
 // ========================================
 // ========================================
+// --- GET PARSED ------------------------
+// the parsed transaction on screen, or null while there is none.
+//
+// --- WHY THIS EXISTS: the shared transfer tokens store follows this
+// store and needs to know WHEN a transaction is there and WHICH one it
+// is. it reads that through this one line, so it never reaches into
+// the state shape.
+function get_parsed_fun(): PARSE_RESULT | null {
+  return state.data?.parsed ?? null;
+}
+// ========================================
+// ========================================
 // --- PUBLIC ---------------------------
 export const HUGGIES_APP_PAGE_TX_STORE = {
   get: get_state_fun,
   subscribe: subscribe_fun,
   load: load_fun,
+  get_parsed: get_parsed_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near
