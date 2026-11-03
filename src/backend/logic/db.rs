@@ -7,6 +7,10 @@
 // sqlx's own busy timeout. more than one connection lets a read run while
 // a write is in flight, which is the whole point of having a pool.
 //
+// --- WHY --- the schema is created at startup: a fresh db has no tables,
+// and the first query against a missing table would fail. the statement
+// does nothing on a db that already has them.
+//
 // --- WHY --- the pool is built ONCE, at startup, and handed to the routes
 // as state. opening a pool per request would open a file handle per
 // request and would make every route responsible for closing it.
@@ -70,7 +74,7 @@ pub async fn db_open_fun(path: &Path) -> Result<SqlitePool, sqlx::Error> {
         .connect_with(options)
         .await?;
 
-    crate::backend::logic::db_migrations::migrate_pool_fun(&pool).await?;
+    crate::backend::logic::db_schema::db_schema_create_pool_fun(&pool).await?;
 
     Ok(pool)
 }

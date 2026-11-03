@@ -204,9 +204,6 @@ ENV RUST_LOG=huggies_rex_engine=info
 # `${HOME}/.huggies-rex-engine/huggies-rex-engine.db`, so it needs no
 # env at all — this just says where that is.
 ENV HUGGIES_VAULT_DB_LOCATION=/home/huggies/.huggies-rex-engine/huggies-rex-engine.db
-# --- WHY --- the session secret is NOT baked in: it encrypts the
-# session keys in the db, so it must come from the environment and not
-# from the image. a secret in an image is a secret in every image layer.
 EXPOSE 54733
 
 USER huggies

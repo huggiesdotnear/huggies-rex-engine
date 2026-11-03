@@ -27,13 +27,8 @@ first time only, put your tunnel token in a `.env` at the repo root
 ```sh
 cp .env.example .env
 # then edit .env and set TUNNEL_TOKEN to the token from the cloudflare dashboard
-# and HUGGIES_SESSION_SECRET to a long random string of your own
 chmod 600 .env
 ```
-
-`HUGGIES_SESSION_SECRET` encrypts the session keys in the sqlite db. the
-app refuses to start without it, and **changing it makes every existing
-session key unreadable** — the db holds the keys encrypted with it.
 
 then:
 

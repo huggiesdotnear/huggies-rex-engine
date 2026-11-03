@@ -40,10 +40,8 @@ on failure it answers json in the shape
 
 ## HOW THE KEY IS FOUND
 
-the key is hashed with sha-256 and the hash is what is looked up. the
-db holds the hash and the encrypted key — never the plain key — so the
-request's key is never compared against anything in the db and no row
-has to be decrypted to find the match.
+the key is hashed with sha-256 and the hash is what is looked up, so
+the request's key is never compared against anything in the db.
 
 ## CLIENT
 

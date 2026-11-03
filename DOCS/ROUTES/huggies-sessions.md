@@ -57,9 +57,7 @@ on failure it answers json in the shape
 - `400` - `no_accounts` when the body carried no accounts,
   `signature_invalid` when one account's signature did not verify, or
   `duplicate_account` when the same account was sent twice
-- `500` - `db_unavailable` when the db could not be reached, or
-  `session_key_unreadable` / `session_key_unencryptable` when the key
-  could not be read back or written
+- `500` - `db_unavailable` when the db could not be reached
 
 ## ONE KEY PER ACCOUNT
 
@@ -71,9 +69,8 @@ belongs to itself. the account id is the row's primary key, so there is
 no question of which person an account belongs to, nothing to merge and
 nothing to keep in agreement.
 
-the key is stored ENCRYPTED in the db, and its sha-256 is stored next to
-it so a request can be looked up without decrypting every row. the plain
-key is never in the db.
+the key's sha-256 is stored next to it, so a request is looked up by the
+hash and the read path never compares against every row's key.
 
 ## THE VERIFICATION
 

@@ -18,44 +18,27 @@ the db holds ONE table for now: `sessions`.
 
 - `account_id` - the NEAR account id. it is the PRIMARY KEY, because an
   account has exactly one session key, ever.
-- `session_key` - the session key, ENCRYPTED. the plain key is never in
-  the db.
+- `session_key` - the session key. it is stored as it is: the key is
+  ours and the db is ours, and the key guards nothing that acts as the
+  user yet.
 - `session_key_hash` - the sha-256 of the key. a request is looked up
-  by this, so no row has to be decrypted to find the match.
+  by this, so the read path never has to compare against every row's
+  key.
 - `created_at` / `updated_at` - millisecond timestamps.
 
-the schema is written by the migrations in
-`src/backend/logic/db_migrations.rs`. each migration runs once, inside a
-transaction, and the db remembers which ones ran.
+## THE SCHEMA
 
-## CHANGING THE SCHEMA
+the schema lives in `src/backend/logic/db_schema.rs`, as one statement
+that creates the tables if they are not there yet.
 
-the schema is written by the migrations in
-`src/backend/logic/db_migrations.rs`. each migration runs once, inside a
-transaction, and the db remembers which ones ran.
+**there is no migration system.** a migration system exists so a db's
+schema can be CHANGED over time: each change is a numbered step, the db
+records which steps it has run, and a fresh db runs them all in order.
+this db has one table and one shape for it, so there is nothing to step
+through and nothing to remember.
 
-**a migration that is no longer needed is DELETED, not kept.** the db
-records the migrations it has run, so a deleted migration simply never
-runs again, and the code carries only the schema that exists today. a
-migration kept "just in case" is code for a schema nobody has any more.
-
-the db may hold a record of a migration the code no longer has — that is
-harmless. the record says "this ran"; it does not say "this must run
-again".
-
-## THE SESSION SECRET
-
-the session keys are encrypted with a secret that comes from the
-environment: `HUGGIES_SESSION_SECRET`.
-
-it is NOT in the db and NOT in the image — it lives in the repo-root
-`.env` (see `.env.example`) and goes into the container as an env var.
-
-> changing it makes every existing session key unreadable. the db holds
-> the keys encrypted with it, so a new secret locks every signed-in
-> user out until they sign in again.
-
-make one with `openssl rand -hex 32`.
+a changed shape means changing `db_schema.rs` and starting the db over.
+the db is ours and it holds nothing that cannot be made again.
 
 ## IN DOCKER
 

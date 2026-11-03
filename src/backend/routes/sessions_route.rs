@@ -7,8 +7,7 @@
 // that was signed, and then hands back ONE KEY PER ACCOUNT.
 //
 // 400 = the body was empty, or an account's signature did not verify.
-// 500 = the db could not be reached, or the session key could not be
-// encrypted.
+// 500 = the db could not be reached.
 //
 // --- WHY --- ONE KEY PER ACCOUNT and not one per person: an account has
 // exactly one key, and the account id is the row's identity. a key that
@@ -34,11 +33,7 @@ use sqlx::SqlitePool;
 
 use crate::backend::logic::{
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
-    session_key_fun::{
-        session_key_decrypt_fun, session_key_encrypt_fun, session_key_generate_fun,
-        session_key_hash_fun,
-    },
-    session_secret_fun::session_secret_fun,
+    session_key_fun::{session_key_generate_fun, session_key_hash_fun},
     sessions_store::{session_get_fun, session_upsert_fun},
 };
 use crate::backend::types::sessions_request::{
@@ -57,20 +52,6 @@ pub async fn sessions_route(
         )
         .into_response();
     }
-
-    // the secret the keys are encrypted with.
-    let secret = match session_secret_fun() {
-        Ok(secret) => secret,
-        Err(err) => {
-            eprintln!("[sessions] the session secret is not available: {err}");
-            return huggies_error_fun(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "no_session_secret",
-                "the session key cannot be encrypted",
-            )
-            .into_response();
-        }
-    };
 
     // --- VERIFY ----------------------------
     // every account's signature has to verify before a key is made.
@@ -114,7 +95,7 @@ pub async fn sessions_route(
     // reader holding some keys and not others.
     let mut keys: Vec<SESSION_KEY_ENTRY> = Vec::with_capacity(account_ids.len());
     for account_id in &account_ids {
-        let entry = match account_key_fun(&pool, secret, account_id).await {
+        let entry = match account_key_fun(&pool, account_id).await {
             Ok(entry) => entry,
             Err(err) => {
                 eprintln!("[sessions] could not make the key for {account_id}: {err}");
@@ -139,36 +120,22 @@ pub async fn sessions_route(
 // row, and that read can fail.
 async fn account_key_fun(
     pool: &SqlitePool,
-    secret: &str,
     account_id: &str,
 ) -> Result<SESSION_KEY_ENTRY, sqlx::Error> {
     let existing = session_get_fun(pool, account_id).await?;
 
-    // --- WHY --- an existing account's key is DECRYPTED and handed back
-    // unchanged: the account has exactly one key, and a second device
-    // signing in must get that same key, not a new one. a new key would
-    // invalidate the first device.
+    // --- WHY --- an existing account's key is handed back unchanged: the
+    // account has exactly one key, and a second device signing in must
+    // get that same key, not a new one. a new key would invalidate the
+    // first device.
     let (session_key, created) = match &existing {
-        Some(session) => {
-            let session_key = session_key_decrypt_fun(secret, &session.session_key_encrypted)
-                .map_err(|err| {
-                    eprintln!("[sessions] the stored session key could not be decrypted: {err}");
-                    sqlx::Error::Protocol(
-                        "the stored session key could not be decrypted".to_string(),
-                    )
-                })?;
-            (session_key, false)
-        }
+        Some(session) => (session.session_key.clone(), false),
         None => (session_key_generate_fun(), true),
     };
 
     let session_key_hash = session_key_hash_fun(&session_key);
-    let session_key_encrypted = session_key_encrypt_fun(secret, &session_key).map_err(|err| {
-        eprintln!("[sessions] the session key could not be encrypted: {err}");
-        sqlx::Error::Protocol("the session key could not be encrypted".to_string())
-    })?;
 
-    session_upsert_fun(pool, account_id, &session_key_encrypted, &session_key_hash).await?;
+    session_upsert_fun(pool, account_id, &session_key, &session_key_hash).await?;
 
     Ok(SESSION_KEY_ENTRY {
         account_id: account_id.to_string(),

@@ -6,7 +6,7 @@
 pub mod backend {
     pub mod logic {
         pub mod db;
-        pub mod db_migrations;
+        pub mod db_schema;
         pub mod huggies_banner_fun;
         pub mod huggies_host_fun;
         pub mod huggies_local_ips_fun;
@@ -15,7 +15,6 @@ pub mod backend {
         #[cfg(test)]
         pub mod nep413_verify_fun_test;
         pub mod session_key_fun;
-        pub mod session_secret_fun;
         pub mod sessions_store;
         #[cfg(test)]
         pub mod sessions_store_test;

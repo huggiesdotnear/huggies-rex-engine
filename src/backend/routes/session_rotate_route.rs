@@ -7,7 +7,7 @@
 //
 // 400 = the body was empty, or the account's signature did not verify.
 // 404 = the account has no session to rotate.
-// 500 = the db could not be reached, or the key could not be encrypted.
+// 500 = the db could not be reached.
 //
 // --- WHY --- the request carries a SIGNED MESSAGE and not the old key:
 // the old key is what a thief has. if a rotation only needed the old
@@ -34,8 +34,7 @@ use sqlx::SqlitePool;
 
 use crate::backend::logic::{
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
-    session_key_fun::{session_key_encrypt_fun, session_key_generate_fun, session_key_hash_fun},
-    session_secret_fun::session_secret_fun,
+    session_key_fun::{session_key_generate_fun, session_key_hash_fun},
     sessions_store::{session_get_fun, session_rotate_fun},
 };
 use crate::backend::types::sessions_request::{SESSION_KEY_ENTRY, SESSIONS_REQUEST};
@@ -84,19 +83,6 @@ pub async fn session_rotate_route(
         .into_response();
     }
 
-    let secret = match session_secret_fun() {
-        Ok(secret) => secret,
-        Err(err) => {
-            eprintln!("[session] the session secret is not available: {err}");
-            return huggies_error_fun(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "no_session_secret",
-                "the session key cannot be encrypted",
-            )
-            .into_response();
-        }
-    };
-
     // the account has to HAVE a session — a rotation replaces a key, it
     // does not make one.
     match session_get_fun(&pool, &account.account_id).await {
@@ -123,26 +109,9 @@ pub async fn session_rotate_route(
     // the new key.
     let session_key = session_key_generate_fun();
     let session_key_hash = session_key_hash_fun(&session_key);
-    let session_key_encrypted = match session_key_encrypt_fun(secret, &session_key) {
-        Ok(encrypted) => encrypted,
-        Err(err) => {
-            eprintln!("[session] the session key could not be encrypted: {err}");
-            return huggies_error_fun(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "session_key_unencryptable",
-                "the session key could not be encrypted",
-            )
-            .into_response();
-        }
-    };
 
-    let rotated = session_rotate_fun(
-        &pool,
-        &account.account_id,
-        &session_key_encrypted,
-        &session_key_hash,
-    )
-    .await;
+    let rotated =
+        session_rotate_fun(&pool, &account.account_id, &session_key, &session_key_hash).await;
     if let Err(err) = rotated {
         eprintln!("[session] could not rotate the session: {err}");
         return huggies_error_fun(

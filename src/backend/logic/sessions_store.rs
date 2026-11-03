@@ -13,9 +13,9 @@
 // belongs to, so there is nothing to merge and nothing to keep in
 // agreement.
 //
-// --- WHY --- the session key is stored ENCRYPTED: the key can be
-// handed back out on a later sign-in, so the db has to be able to
-// produce it again. see session_key_fun for the encryption.
+// --- WHY --- the session key is stored AS IT IS: the key can be handed
+// back out on a later sign-in, so the db has to be able to produce it
+// again, and the key is ours and the db is ours.
 use sqlx::{Row, SqlitePool};
 // ========================================
 // --- TYPES ------------------------------
@@ -24,8 +24,8 @@ use sqlx::{Row, SqlitePool};
 pub struct SESSION_ROW {
     // the account the session belongs to. it is the row's primary key.
     pub account_id: String,
-    // the session key, encrypted. decrypt it to get the real key.
-    pub session_key_encrypted: String,
+    // the session key.
+    pub session_key: String,
     // the hash of the session key. a request is looked up by this.
     pub session_key_hash: String,
     // when the session was created, in ms since the epoch.
@@ -100,7 +100,7 @@ pub async fn session_list_account_ids_fun(pool: &SqlitePool) -> Result<Vec<Strin
 pub async fn session_upsert_fun(
     pool: &SqlitePool,
     account_id: &str,
-    session_key_encrypted: &str,
+    session_key: &str,
     session_key_hash: &str,
 ) -> Result<SESSION_ROW, sqlx::Error> {
     let now = now_ms_fun();
@@ -113,7 +113,7 @@ pub async fn session_upsert_fun(
        updated_at = excluded.updated_at",
     )
     .bind(account_id)
-    .bind(session_key_encrypted)
+    .bind(session_key)
     .bind(session_key_hash)
     .bind(now)
     .execute(pool)
@@ -139,7 +139,7 @@ pub async fn session_upsert_fun(
 pub async fn session_rotate_fun(
     pool: &SqlitePool,
     account_id: &str,
-    session_key_encrypted: &str,
+    session_key: &str,
     session_key_hash: &str,
 ) -> Result<SESSION_ROW, sqlx::Error> {
     let now = now_ms_fun();
@@ -150,7 +150,7 @@ pub async fn session_rotate_fun(
       WHERE account_id = ?1",
     )
     .bind(account_id)
-    .bind(session_key_encrypted)
+    .bind(session_key)
     .bind(session_key_hash)
     .bind(now)
     .execute(pool)
@@ -170,7 +170,7 @@ pub async fn session_rotate_fun(
 fn row_to_session_fun(row: &sqlx::sqlite::SqliteRow) -> SESSION_ROW {
     SESSION_ROW {
         account_id: row.get("account_id"),
-        session_key_encrypted: row.get("session_key"),
+        session_key: row.get("session_key"),
         session_key_hash: row.get("session_key_hash"),
         created_at: row.get("created_at"),
         updated_at: row.get("updated_at"),

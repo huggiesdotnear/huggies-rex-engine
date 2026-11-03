@@ -4,22 +4,12 @@
 // the db is a temp file, not an in-memory one, because the production db
 // is a file and the two can differ: WAL, the journal mode, and the way
 // sqlite writes pages are all file behaviours.
-//
-// the session key's secret is passed in, because the store cannot
-// encrypt anything without it.
-use crate::backend::logic::session_key_fun::{
-    session_key_decrypt_fun, session_key_encrypt_fun, session_key_generate_fun,
-    session_key_hash_fun,
-};
+use crate::backend::logic::session_key_fun::{session_key_generate_fun, session_key_hash_fun};
 use crate::backend::logic::sessions_store::{
     session_get_by_key_hash_fun, session_get_fun, session_list_account_ids_fun, session_rotate_fun,
     session_upsert_fun,
 };
-// ========================================
-// --- CONFIG -----------------------------
-// the secret the test encrypts with. it is passed in and never read from
-// the environment, so the test does not depend on the process state.
-const TEST_SECRET: &str = "test-secret-for-the-store";
+use sqlx::Row;
 // ========================================
 // --- HELPERS ----------------------------
 // a temp db file, removed when the guard is dropped.
@@ -56,8 +46,7 @@ impl Drop for TEMP_DB {
 async fn put_fun(pool: &sqlx::SqlitePool, account_id: &str) -> (String, String) {
     let key = session_key_generate_fun();
     let key_hash = session_key_hash_fun(&key);
-    let key_encrypted = session_key_encrypt_fun(TEST_SECRET, &key).expect("the key should encrypt");
-    session_upsert_fun(pool, account_id, &key_encrypted, &key_hash)
+    session_upsert_fun(pool, account_id, &key, &key_hash)
         .await
         .expect("the session should save");
     (key, key_hash)
@@ -76,12 +65,8 @@ async fn a_session_is_stored_and_read_back() {
         .expect("the session should read")
         .expect("the session should exist");
     assert_eq!(stored.account_id, "alice.near");
+    assert_eq!(stored.session_key, key);
     assert_eq!(stored.session_key_hash, key_hash);
-
-    // the key comes back out of the db and is the SAME key.
-    let decrypted = session_key_decrypt_fun(TEST_SECRET, &stored.session_key_encrypted)
-        .expect("the key should decrypt");
-    assert_eq!(decrypted, key);
 }
 
 #[tokio::test]
@@ -94,8 +79,7 @@ async fn a_second_device_gets_the_same_key() {
     // the second device signs in with the SAME account. the upsert must
     // not replace the key — the account has one key, and the first
     // device has to keep working.
-    let key_encrypted = session_key_encrypt_fun(TEST_SECRET, &key).expect("the key should encrypt");
-    session_upsert_fun(&pool, "alice.near", &key_encrypted, &key_hash)
+    session_upsert_fun(&pool, "alice.near", &key, &key_hash)
         .await
         .expect("the session should save again");
 
@@ -103,9 +87,7 @@ async fn a_second_device_gets_the_same_key() {
         .await
         .expect("the session should read")
         .expect("the session should exist");
-    let decrypted = session_key_decrypt_fun(TEST_SECRET, &stored.session_key_encrypted)
-        .expect("the key should decrypt");
-    assert_eq!(decrypted, key);
+    assert_eq!(stored.session_key, key);
 
     // and there is exactly ONE row for the account.
     let count: (i64,) = sqlx::query_as("SELECT COUNT(1) FROM sessions WHERE account_id = ?1")
@@ -137,13 +119,8 @@ async fn each_account_gets_its_own_key() {
         .await
         .expect("the session should read")
         .expect("the session should exist");
-
-    let alice_plain = session_key_decrypt_fun(TEST_SECRET, &alice.session_key_encrypted)
-        .expect("the key should decrypt");
-    let bob_plain = session_key_decrypt_fun(TEST_SECRET, &bob.session_key_encrypted)
-        .expect("the key should decrypt");
-    assert_eq!(alice_plain, alice_key);
-    assert_eq!(bob_plain, bob_key);
+    assert_eq!(alice.session_key, alice_key);
+    assert_eq!(bob.session_key, bob_key);
 }
 
 #[tokio::test]
@@ -190,9 +167,7 @@ async fn a_rotation_replaces_the_key_and_the_old_one_stops_working() {
     // the new key.
     let new_key = session_key_generate_fun();
     let new_hash = session_key_hash_fun(&new_key);
-    let new_encrypted =
-        session_key_encrypt_fun(TEST_SECRET, &new_key).expect("the key should encrypt");
-    session_rotate_fun(&pool, "alice.near", &new_encrypted, &new_hash)
+    session_rotate_fun(&pool, "alice.near", &new_key, &new_hash)
         .await
         .expect("the session should rotate");
 
@@ -201,9 +176,7 @@ async fn a_rotation_replaces_the_key_and_the_old_one_stops_working() {
         .await
         .expect("the session should read")
         .expect("the session should exist");
-    let decrypted = session_key_decrypt_fun(TEST_SECRET, &stored.session_key_encrypted)
-        .expect("the key should decrypt");
-    assert_eq!(decrypted, new_key);
+    assert_eq!(stored.session_key, new_key);
 
     // the OLD key no longer finds the session — that is the point of a
     // rotation.
@@ -228,54 +201,70 @@ async fn a_rotation_of_an_account_with_no_session_fails() {
 
     let key = session_key_generate_fun();
     let key_hash = session_key_hash_fun(&key);
-    let key_encrypted = session_key_encrypt_fun(TEST_SECRET, &key).expect("the key should encrypt");
 
-    let result = session_rotate_fun(&pool, "nobody.near", &key_encrypted, &key_hash).await;
+    let result = session_rotate_fun(&pool, "nobody.near", &key, &key_hash).await;
     assert!(result.is_err(), "rotating a missing session should fail");
 }
 
 #[tokio::test]
-async fn the_migrations_are_not_run_twice() {
-    let db = TEMP_DB::new_fun("migrate");
-    // the db is opened twice, so the migrations run twice. the second run
-    // must find them already applied and do nothing.
+async fn the_schema_is_created_and_the_db_opens_again() {
+    let db = TEMP_DB::new_fun("schema");
+    // the db is opened twice: the second open finds the tables already
+    // there and does nothing.
     let _pool = db.pool_fun().await;
     let pool = db.pool_fun().await;
 
-    let count: (i64,) = sqlx::query_as("SELECT COUNT(1) FROM _sqlx_migrations WHERE success = 1")
-        .fetch_one(&pool)
+    // the table is there, with the columns the code reads.
+    let columns: Vec<String> = sqlx::query("SELECT name FROM pragma_table_info('sessions')")
+        .fetch_all(&pool)
         .await
-        .expect("the count should read");
-    assert_eq!(count.0, 1);
+        .expect("the columns should read")
+        .iter()
+        .map(|row| row.get::<String, _>("name"))
+        .collect();
+    assert_eq!(
+        columns,
+        vec![
+            "account_id",
+            "session_key",
+            "session_key_hash",
+            "created_at",
+            "updated_at"
+        ]
+    );
+
+    // and there is no bookkeeping table — there is no migration system.
+    let tables: Vec<String> = sqlx::query("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .fetch_all(&pool)
+        .await
+        .expect("the tables should read")
+        .iter()
+        .map(|row| row.get::<String, _>("name"))
+        .collect();
+    assert!(
+        !tables.contains(&"_sqlx_migrations".to_string()),
+        "there is no migration system, so there is no bookkeeping table"
+    );
 }
 
 #[test]
-fn a_key_encrypts_and_decrypts_back_to_itself() {
-    let key = session_key_generate_fun();
-    let encrypted = session_key_encrypt_fun(TEST_SECRET, &key).expect("the key should encrypt");
-    // the encrypted form must not contain the plain key.
-    assert!(!encrypted.contains(&key));
-    let decrypted =
-        session_key_decrypt_fun(TEST_SECRET, &encrypted).expect("the key should decrypt");
-    assert_eq!(decrypted, key);
-}
-
-#[test]
-fn two_encryptions_of_one_key_differ() {
-    let key = session_key_generate_fun();
-    let first = session_key_encrypt_fun(TEST_SECRET, &key).expect("the key should encrypt");
-    let second = session_key_encrypt_fun(TEST_SECRET, &key).expect("the key should encrypt");
-    // the nonce is random per call, so the ciphertext is never the same
-    // twice.
+fn a_key_is_random_and_long() {
+    let first = session_key_generate_fun();
+    let second = session_key_generate_fun();
+    // 32 bytes, hex encoded.
+    assert_eq!(first.len(), 64);
     assert_ne!(first, second);
-    assert_eq!(
-        session_key_decrypt_fun(TEST_SECRET, &first).expect("the key should decrypt"),
-        key
-    );
-    assert_eq!(
-        session_key_decrypt_fun(TEST_SECRET, &second).expect("the key should decrypt"),
-        key
-    );
+}
+
+#[test]
+fn a_key_hashes_to_a_fixed_length_hash() {
+    let key = session_key_generate_fun();
+    let hash = session_key_hash_fun(&key);
+    // sha-256, hex encoded.
+    assert_eq!(hash.len(), 64);
+    // the same key always hashes the same, and the hash is not the key.
+    assert_eq!(hash, session_key_hash_fun(&key));
+    assert_ne!(hash, key);
 }
 // ========================================
 // copyright 2026 by sleet.near

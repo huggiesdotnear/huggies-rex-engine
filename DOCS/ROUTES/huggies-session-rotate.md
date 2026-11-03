@@ -42,7 +42,7 @@ on failure it answers json in the shape
 - `400` - `no_accounts`, `too_many_accounts` when more than one account
   was sent, or `signature_invalid` when the signature did not verify
 - `404` - `no_session` when the account has no session to rotate
-- `500` - `db_unavailable`, or `session_key_unencryptable`
+- `500` - `db_unavailable`
 
 ## WHY THE SIGNED MESSAGE AND NOT THE OLD KEY
 

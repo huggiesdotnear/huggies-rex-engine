@@ -1,8 +1,7 @@
 // ====================================
 use huggies_rex_engine::backend::logic::{
     db::db_open_fun, huggies_banner_fun::huggies_banner_fun, huggies_host_fun::huggies_host_fun,
-    huggies_port_fun::huggies_port_fun, session_secret_fun::session_secret_fun,
-    vault_db_path_fun::vault_db_path_fun,
+    huggies_port_fun::huggies_port_fun, vault_db_path_fun::vault_db_path_fun,
 };
 use huggies_rex_engine::backend::routes::app_router_fun::app_router_fun;
 // ====================================
@@ -27,17 +26,6 @@ async fn main() {
         }
     };
     println!("db ready at {}", db_path.display());
-
-    // the session secret is read at startup, so a missing one stops the
-    // app before the first sign-in instead of failing the request.
-    match session_secret_fun() {
-        Ok(_) => {}
-        Err(err) => {
-            eprintln!("{err}");
-            eprintln!("set HUGGIES_SESSION_SECRET in the environment (or the .env file).");
-            std::process::exit(1);
-        }
-    }
 
     let listener = match tokio::net::TcpListener::bind(&addr).await {
         Ok(l) => l,

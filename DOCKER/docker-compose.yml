@@ -47,16 +47,12 @@ services:
       HUGGIES_PORT: "54733"
       RUST_LOG: "huggies_rex_engine=info"
 
-    # --- WHY --- the session secret comes from the repo-root .env
-    # through env_file, and NOT through `${HUGGIES_SESSION_SECRET}`
-    # interpolation: compose only auto-loads a .env sitting NEXT TO
-    # this compose file (in DOCKER/), and it interpolates BEFORE the
-    # service's env_file is read. so the interpolated form was empty.
-    # env_file hands the repo-root .env to the container verbatim, the
-    # same way cloudflared gets its tunnel token.
-    #
-    # the app refuses to start without this secret — it encrypts the
-    # session keys in the db.
+    # --- WHY --- the tunnel token comes from the repo-root .env
+    # through env_file, and NOT through `${TUNNEL_TOKEN}` interpolation:
+    # compose only auto-loads a .env sitting NEXT TO this compose file
+    # (in DOCKER/), and it interpolates BEFORE the service's env_file is
+    # read. so the interpolated form was empty. env_file hands the
+    # repo-root .env to the container verbatim.
     env_file:
       - ../.env
 
