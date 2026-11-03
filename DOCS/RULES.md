@@ -33,6 +33,18 @@ layout changes, GOLD.md changes, not this file.
 
 - a class is used ONLY where an element selector cannot say it: when the same element type appears twice with different rules (a card's label span and its value span), when it carries a state (`.is-active`, `.is-revealed`), or when it is a variant (`.is-dev`, `.is-dex`). everything else is a bare element selector — `p`, `a`, `code`, `strong`, `td`, `h2`.
 
+## no legacy code
+
+- only code for what is CURRENTLY implemented. when a thing is replaced,
+  the code for it is DELETED — not kept "just in case", not left behind
+  to fix up what was there before.
+- the same goes for a db migration: a migration that is no longer needed
+  is deleted. the db records the migrations it has run, so a deleted
+  migration never runs again, and the code carries only the schema that
+  exists today.
+- a leftover record in a db's bookkeeping table is fine. the record says
+  "this ran", not "this must run again".
+
 ## the layers + workflow
 
 - i am sure i mentioned this somewhere but we have clean clear separation of logic, the middleman should never import from the frontend logic or have any frontend specific logic. when i am working on the frontend and i ask to add features we may need to add backend or middleman logic. if i ask to remove something from a page only stuff in the frontend should be touched, remove the css and logic for that feature. do not touch the middleman or backend logic for that unless i say or ask first.
