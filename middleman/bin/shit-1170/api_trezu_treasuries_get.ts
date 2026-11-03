@@ -9,7 +9,7 @@
 //       [--include-hidden] [--base-url <url>]
 // ========================================
 
-import { api_trezu_treasuries_get } from "@huggies/shit_1170-middleman";
+import { api_trezu_treasuries_get } from "@huggies/shit-1170-middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 import { split_argv } from "../fun/split_argv";
 

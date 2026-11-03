@@ -1,4 +1,4 @@
-# SHIT_1170 SESSION ROTATE
+# SHIT-1170 SESSION ROTATE
 
 `POST /api/shit-1170/session/rotate` - give an account a NEW session key.
 
@@ -71,7 +71,7 @@ old key, which is exactly what a rotation must stop.
 ## CLIENT
 
 the typed client lives in `middleman/src/`, published as
-`@huggies/shit_1170-middleman`:
+`@huggies/shit-1170-middleman`:
 `api_shit_1170_session_rotate_post(base_url, { accounts }, options)`.
 
 =====================

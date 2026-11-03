@@ -4,7 +4,7 @@
 import {
   api_trezu_treasuries_get,
   type TREZU_TREASURY,
-} from "@huggies/shit_1170-middleman";
+} from "@huggies/shit-1170-middleman";
 import { SHIT_1170_BASE_URL } from "../../shared/base_url";
 export type { TREZU_TREASURY };
 // ========================================

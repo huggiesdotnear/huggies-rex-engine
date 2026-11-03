@@ -1,5 +1,5 @@
 {
-  "name": "@huggies/shit_1170-middleman",
+  "name": "@huggies/shit-1170-middleman",
   "version": "0.0.1",
   "description": "Clean TypeScript middleman for the shit-1170 backend routes (/api/shit-1170/*, /api/trezu/*).",
   "license": "MIT",

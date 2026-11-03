@@ -16,7 +16,7 @@
 //
 // --- WHY --- the session token rides along: the backend uses it to be
 // sure the rotation is for the account whose key it holds.
-import { api_shit_1170_session_rotate_post } from "@huggies/shit_1170-middleman";
+import { api_shit_1170_session_rotate_post } from "@huggies/shit-1170-middleman";
 import { SHIT_1170_AUTH_SESSIONS } from "../shared/auth_sessions";
 import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { session_options_fun } from "../shared/session_token";

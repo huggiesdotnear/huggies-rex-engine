@@ -25,7 +25,7 @@
 // does not say otherwise.
 import { SHIT_1170_AUTH } from "./auth_status";
 import { SHIT_1170_SESSION } from "./session";
-import type { REQUEST_OPTIONS } from "@huggies/shit_1170-middleman";
+import type { REQUEST_OPTIONS } from "@huggies/shit-1170-middleman";
 // ========================================
 // --- TOKEN -----------------------------
 // the session key for an account, fetched if it is not known yet.

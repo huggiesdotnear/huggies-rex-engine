@@ -1,4 +1,4 @@
-# SHIT_1170 SESSION ME
+# SHIT-1170 SESSION ME
 
 `GET /api/shit-1170/session/me` - which account does this session key
 belong to.
@@ -46,7 +46,7 @@ the request's key is never compared against anything in the db.
 ## CLIENT
 
 the typed client lives in `middleman/src/`, published as
-`@huggies/shit_1170-middleman`:
+`@huggies/shit-1170-middleman`:
 `api_shit_1170_session_me_get(base_url, options)` — where `options` is
 `{ session_token }`.
 

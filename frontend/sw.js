@@ -1,5 +1,5 @@
 // ========================================
-// SHIT_1170 SERVICE WORKER
+// SHIT-1170 SERVICE WORKER
 //
 // the app is NOT offline-capable and does NOT want to be. every request
 // goes to the network, always. this worker exists for exactly two

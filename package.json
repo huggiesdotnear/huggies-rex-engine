@@ -1,5 +1,5 @@
 {
-  "name": "@huggies/shit_1170-frontend",
+  "name": "@huggies/shit-1170-frontend",
   "version": "0.0.1-pre",
   "private": true,
   "type": "module",
@@ -8,13 +8,13 @@
   ],
   "scripts": {
     "build": "bun run build.ts",
-    "build:middleman": "bun run --filter @huggies/shit_1170-middleman build",
+    "build:middleman": "bun run --filter @huggies/shit-1170-middleman build",
     "typecheck": "bun run --filter '*' typecheck && tsc --noEmit",
-    "clean": "bun run --filter @huggies/shit_1170-middleman clean"
+    "clean": "bun run --filter @huggies/shit-1170-middleman clean"
   },
   "dependencies": {
     "@hot-labs/near-connect": "^0.12.0",
-    "@huggies/shit_1170-middleman": "workspace:*",
+    "@huggies/shit-1170-middleman": "workspace:*",
     "@huggies/shit-bin": "0.0.5",
     "@near-kit-tool-box/fun": "0.3.0",
     "@near-kit-tool-box/web": "0.3.0",

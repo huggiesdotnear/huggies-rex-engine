@@ -17,7 +17,7 @@ import { SHIT_1170_AUTH } from "../../shared/auth_status";
 import { SHIT_1170_URL_ID } from "../../shared/url_id";
 import type { SHIT_1170_DAO_INFO } from "./contract_page_sputnik_dao";
 import type { SHIT_1170_DAO_BALANCE } from "./contract_page_sputnik_dao_balances";
-import type { TREZU_TREASURY } from "@huggies/shit_1170-middleman";
+import type { TREZU_TREASURY } from "@huggies/shit-1170-middleman";
 // ========================================
 // --- TYPES ------------------------------
 export interface SHIT_1170_DAO_PAGE_STATE {

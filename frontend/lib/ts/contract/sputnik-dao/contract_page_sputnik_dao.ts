@@ -43,7 +43,7 @@ import type {
 } from "@near-kit-tool-box/fun";
 import { list_trezu_treasuries_fun } from "./contract_page_sputnik_dao_trezu_treasuries";
 import { SHIT_1170_TOKEN_INFO } from "../../shared/token_info";
-import type { TREZU_TREASURY } from "@huggies/shit_1170-middleman";
+import type { TREZU_TREASURY } from "@huggies/shit-1170-middleman";
 // ========================================
 // --- TYPES ------------------------------
 // how a role is open. `Group` names the accounts in it; `Everyone`

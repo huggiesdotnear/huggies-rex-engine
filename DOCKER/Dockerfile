@@ -40,7 +40,7 @@ COPY build.ts ./build.ts
 #
 # --- WHY: the workspace install links the local package ---
 # the root package.json declares `workspaces: ["middleman"]`, so
-# `bun install` links `@huggies/shit_1170-middleman` from
+# `bun install` links `@huggies/shit-1170-middleman` from
 # node_modules/ to middleman/ — no registry round trip.
 RUN bun install
 
@@ -48,7 +48,7 @@ RUN bun install
 #
 # --- WHY: the frontend imports the package by name ---
 # the frontend does `import { api_trezu_treasuries_get } from
-# "@huggies/shit_1170-middleman"`, and that package's
+# "@huggies/shit-1170-middleman"`, and that package's
 # `exports` field points at `./dist/index.js`. the workspace link
 # alone is not enough: without dist/ the import does not resolve and
 # the frontend build fails with "Could not resolve".

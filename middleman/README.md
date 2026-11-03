@@ -1,4 +1,4 @@
-# @huggies/shit_1170-middleman
+# @huggies/shit-1170-middleman
 
 clean ts library for interacting with the shit-1170 backend routes.
 
