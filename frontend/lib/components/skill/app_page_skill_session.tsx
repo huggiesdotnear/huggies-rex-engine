@@ -83,9 +83,7 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
           <div class="skill-session-accounts">
             {page_data.accounts.map((account) => (
               <div key={account.account_id} class="skill-session-account">
-                <h3 class={account.is_active ? "is-active" : ""}>
-                  {account.account_id}
-                </h3>
+                <h3>{account.account_id}</h3>
                 {account.session_key === null ? (
                   <p>
                     {page_data.loading

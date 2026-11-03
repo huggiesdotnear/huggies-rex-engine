@@ -13,9 +13,8 @@
    labels.
 
    the card is a white sheet on the dark page, and its text is the
-   app's #474747 grey. the ACTIVE account is marked by a small dot
-   drawn by css beside the id, so the id reads as a clean id and not
-   as a bullet point. */
+   app's #474747 grey. the account id is a plain id: no dot and no
+   bullet in front of it. */
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION > section {
   display: flex;
@@ -49,9 +48,8 @@
   text-align: left;
 }
 /*----------------------*/
-/* the account's id. the ACTIVE account is marked by a small dot on
-   the left of the name, drawn by css and not written into the text,
-   so the id itself stays a clean id and reads no bullet. */
+/* the account's id. it is a plain id: no dot, no bullet, nothing in
+   front of it. */
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h3 {
   margin: 0 0 0.4rem;
   padding-bottom: 4px;
@@ -59,21 +57,6 @@
   letter-spacing: 0.08em;
   word-break: break-all;
   color: #474747;
-}
-/*----------------------*/
-#SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h3.is-active {
-  padding-left: 14px;
-  position: relative;
-}
-#SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION h3.is-active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.45em;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #474747;
 }
 /*----------------------*/
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION p {
