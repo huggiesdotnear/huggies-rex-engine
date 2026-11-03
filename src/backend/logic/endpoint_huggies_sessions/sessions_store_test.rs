@@ -4,8 +4,10 @@
 // the db is a temp file, not an in-memory one, because the production db
 // is a file and the two can differ: WAL, the journal mode, and the way
 // sqlite writes pages are all file behaviours.
-use crate::backend::logic::session_key_fun::{session_key_generate_fun, session_key_hash_fun};
-use crate::backend::logic::sessions_store::{
+use crate::backend::logic::endpoint_huggies_sessions::session_key_fun::{
+    session_key_generate_fun, session_key_hash_fun,
+};
+use crate::backend::logic::endpoint_huggies_sessions::sessions_store::{
     session_get_by_key_hash_fun, session_get_fun, session_list_account_ids_fun, session_rotate_fun,
     session_upsert_fun,
 };
@@ -27,7 +29,7 @@ impl TEMP_DB {
     }
 
     async fn pool_fun(&self) -> sqlx::SqlitePool {
-        crate::backend::logic::db::db_open_fun(&self.path)
+        crate::backend::logic::db::db_open_fun::db_open_fun(&self.path)
             .await
             .expect("the db should open")
     }

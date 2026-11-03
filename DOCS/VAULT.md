@@ -28,7 +28,7 @@ the db holds ONE table for now: `sessions`.
 
 ## THE SCHEMA
 
-the schema lives in `src/backend/logic/db_schema.rs`, as one statement
+the schema lives in `src/backend/logic/db/db_schema.rs`, as one statement
 that creates the tables if they are not there yet.
 
 **there is no migration system.** a migration system exists so a db's

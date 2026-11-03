@@ -26,8 +26,8 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::session_key_fun::session_key_hash_fun;
-use crate::backend::logic::sessions_store::session_get_by_key_hash_fun;
+use crate::backend::logic::endpoint_huggies_sessions::session_key_fun::session_key_hash_fun;
+use crate::backend::logic::endpoint_huggies_sessions::sessions_store::session_get_by_key_hash_fun;
 // ========================================
 // the header the session key travels in.
 const HUGGIES_SESSION_TOKEN_HEADER: &str = "x-session-token";

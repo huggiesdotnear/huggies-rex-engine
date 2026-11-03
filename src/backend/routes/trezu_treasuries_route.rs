@@ -21,7 +21,7 @@ use axum::{
 };
 use serde_json::Value;
 
-use crate::backend::logic::{
+use crate::backend::logic::endpoint_trezu::{
     trezu_account_id_fun::trezu_account_id_fun, trezu_base_url_fun::trezu_base_url_fun,
     trezu_client_fun::trezu_client_fun, trezu_error_fun::trezu_error_fun,
     trezu_include_hidden_fun::trezu_include_hidden_fun,

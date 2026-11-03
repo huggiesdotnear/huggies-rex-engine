@@ -31,7 +31,7 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::{
+use crate::backend::logic::endpoint_huggies_sessions::{
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
     session_key_fun::{session_key_generate_fun, session_key_hash_fun},
     sessions_store::{session_get_fun, session_upsert_fun},

@@ -1,7 +1,10 @@
 // ====================================
 use huggies_rex_engine::backend::logic::{
-    db::db_open_fun, huggies_banner_fun::huggies_banner_fun, huggies_host_fun::huggies_host_fun,
-    huggies_port_fun::huggies_port_fun, vault_db_path_fun::vault_db_path_fun,
+    db::{db_open_fun::db_open_fun, vault_db_path_fun::vault_db_path_fun},
+    server::{
+        huggies_banner_fun::huggies_banner_fun, huggies_host_fun::huggies_host_fun,
+        huggies_port_fun::huggies_port_fun,
+    },
 };
 use huggies_rex_engine::backend::routes::app_router_fun::app_router_fun;
 // ====================================

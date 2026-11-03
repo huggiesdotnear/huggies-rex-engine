@@ -1,5 +1,5 @@
 // ========================================
-// DB
+// DB_OPEN_FUN
 // the sqlite pool: the one place the backend touches the database.
 //
 // --- WHY --- a pool and not one connection: sqlite allows exactly one
@@ -74,7 +74,7 @@ pub async fn db_open_fun(path: &Path) -> Result<SqlitePool, sqlx::Error> {
         .connect_with(options)
         .await?;
 
-    crate::backend::logic::db_schema::db_schema_create_pool_fun(&pool).await?;
+    crate::backend::logic::db::db_schema::db_schema_create_pool_fun(&pool).await?;
 
     Ok(pool)
 }
