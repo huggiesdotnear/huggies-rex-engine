@@ -5,12 +5,10 @@
 some files/folders
 
 - frontend/ - frontend
-- middleman/ - shit-1170-rex-engine-middleman api client
+- middleman/ - api client
 - src/ - our backend
 - DOCS/
 - DOCKER/
-- bin/
-- SKILL/
 
 =========================
 <br/>
