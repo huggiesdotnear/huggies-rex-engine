@@ -71,7 +71,7 @@ old key, which is exactly what a rotation must stop.
 ## CLIENT
 
 the typed client lives in `middleman/src/`, published as
-`@huggies/shit-1170-middleman`:
+`@huggies/shit-1170-rex-engine-middleman`:
 `api_shit_1170_session_rotate_post(base_url, { accounts }, options)`.
 
 =====================

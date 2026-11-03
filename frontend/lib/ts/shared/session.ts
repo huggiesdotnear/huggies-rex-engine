@@ -21,8 +21,8 @@
 // message + nonce + recipient that were signed. the user's NEAR
 // private key stays in the wallet and never reaches us or the backend.
 // ========================================
-import { api_shit_1170_sessions_post } from "@huggies/shit-1170-middleman";
-import type { SHIT_1170_SIGNED_ACCOUNT } from "@huggies/shit-1170-middleman";
+import { api_shit_1170_sessions_post } from "@huggies/shit-1170-rex-engine-middleman";
+import type { SHIT_1170_SIGNED_ACCOUNT } from "@huggies/shit-1170-rex-engine-middleman";
 import { SHIT_1170_AUTH_SESSIONS } from "./auth_sessions";
 import { SHIT_1170_BASE_URL } from "./base_url";
 // ========================================

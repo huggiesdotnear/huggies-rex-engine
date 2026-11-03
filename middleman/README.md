@@ -1,6 +1,6 @@
-# @huggies/shit-1170-middleman
+# @huggies/shit-1170-rex-engine-middleman
 
-clean ts library for interacting with the shit-1170 backend routes.
+clean ts library for interacting with the shit-1170-rex-engine backend routes.
 
 ```sh
 bun i
@@ -16,7 +16,7 @@ bunx prettier . --write
 
 ---
 
-shit-1170
+shit-1170-rex-engine
 <br/>
 https://shit-1170.com
 

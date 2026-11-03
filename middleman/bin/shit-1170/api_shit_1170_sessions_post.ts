@@ -16,11 +16,11 @@
 // ========================================
 
 import { readFileSync } from "node:fs";
-import { api_shit_1170_sessions_post } from "@huggies/shit-1170-middleman";
+import { api_shit_1170_sessions_post } from "@huggies/shit-1170-rex-engine-middleman";
 import type {
   SHIT_1170_SIGNED_ACCOUNT,
   SHIT_1170_SESSIONS_REQUEST,
-} from "@huggies/shit-1170-middleman";
+} from "@huggies/shit-1170-rex-engine-middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 
 // --- CONFIG --------------------------------------------------------

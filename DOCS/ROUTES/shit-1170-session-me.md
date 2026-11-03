@@ -46,7 +46,7 @@ the request's key is never compared against anything in the db.
 ## CLIENT
 
 the typed client lives in `middleman/src/`, published as
-`@huggies/shit-1170-middleman`:
+`@huggies/shit-1170-rex-engine-middleman`:
 `api_shit_1170_session_me_get(base_url, options)` — where `options` is
 `{ session_token }`.
 

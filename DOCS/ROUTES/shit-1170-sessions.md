@@ -115,7 +115,7 @@ the only secret the app holds is the session key, which is ours.
 ## CLIENT
 
 the typed client lives in `middleman/src/`, published as
-`@huggies/shit-1170-middleman`:
+`@huggies/shit-1170-rex-engine-middleman`:
 `api_shit_1170_sessions_post(base_url, { accounts })`.
 
 the base url is the first argument, not a constant: the frontend passes

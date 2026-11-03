@@ -5,7 +5,7 @@
 some files/folders
 
 - frontend/ - frontend
-- middleman/ - shit-1170-middleman api client
+- middleman/ - shit-1170-rex-engine-middleman api client
 - src/ - our backend
 - DOCS/
 - DOCKER/

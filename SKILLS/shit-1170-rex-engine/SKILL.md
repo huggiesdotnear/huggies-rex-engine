@@ -1,6 +1,6 @@
-# shit-1170
+# shit-1170-rex-engine
 
-see [SKILL.md](./SKILL.md)
+skill coming soon.
 
 =====================
 <br/>

@@ -20,7 +20,7 @@ cargo check
 cargo run
 # cargo build
 cargo build --release
-./target/release/shit-1170
+./target/release/shit-1170-rex-engine
 ```
 
 =====================

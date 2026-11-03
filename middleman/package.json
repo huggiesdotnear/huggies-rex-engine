@@ -1,7 +1,7 @@
 {
-  "name": "@huggies/shit-1170-middleman",
+  "name": "@huggies/shit-1170-rex-engine-middleman",
   "version": "0.0.1",
-  "description": "Clean TypeScript middleman for the shit-1170 backend routes (/api/shit-1170/*, /api/trezu/*).",
+  "description": "Clean TypeScript middleman for the shit-1170-rex-engine backend routes (/api/shit-1170/*, /api/trezu/*).",
   "license": "MIT",
   "homepage": "https://sleet-js.near.page",
   "repository": {

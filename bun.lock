@@ -6,7 +6,7 @@
       "name": "@huggies/huggies-rex-engine-frontend",
       "dependencies": {
         "@hot-labs/near-connect": "^0.12.0",
-        "@huggies/shit-1170-middleman": "workspace:*",
+        "@huggies/shit-1170-rex-engine-middleman": "workspace:*",
         "@huggies/shit-bin": "0.0.5",
         "@near-kit-tool-box/fun": "0.3.0",
         "@near-kit-tool-box/web": "0.3.0",
@@ -31,7 +31,7 @@
       },
     },
     "middleman": {
-      "name": "@huggies/shit-1170-middleman",
+      "name": "@huggies/shit-1170-rex-engine-middleman",
       "version": "0.0.1",
       "devDependencies": {
         "@types/bun": "latest",
@@ -46,7 +46,7 @@
   "packages": {
     "@hot-labs/near-connect": ["@hot-labs/near-connect@0.12.0", "", {}, "sha512-aBb1UPGr43tHPsj/uk3fEwCn83Y7+cO6Ct8B6G/dm9EkTwXh9/xntXyWhQ6fA1eSt2WtYqSczOCENXlrBAXZqg=="],
 
-    "@huggies/shit-1170-middleman": ["@huggies/shit-1170-middleman@workspace:middleman"],
+    "@huggies/shit-1170-rex-engine-middleman": ["@huggies/shit-1170-rex-engine-middleman@workspace:middleman"],
 
     "@huggies/shit-bin": ["@huggies/shit-bin@0.0.5", "", { "dependencies": { "@near-kit-tool-box/env": "^0.3.0", "@near-kit-tool-box/fun": "^0.3.0", "@near-kit-tool-box/web": "^0.3.0", "near-kit": "^0.20.2", "prettier": "^3.8.3" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-Yiu2+B1eB4GdKMr1zb98P1oNhpzr3Ax6GMV0r5jVbhXr1rYXTBhhJ3Iw2i0Y7UM7/oteiKK3B75CtrYkebvjwA=="],
 

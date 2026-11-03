@@ -2647,7 +2647,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "shit-1170"
+name = "shit-1170-rex-engine"
 version = "0.1.0"
 dependencies = [
  "axum",

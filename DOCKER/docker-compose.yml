@@ -6,7 +6,8 @@
 #   docker compose -f DOCKER/docker-compose.yml down
 #
 # there IS persistent state: the sqlite db. it lives in the named volume
-# `shit-1170-vault`, mounted at the app's default vault path. the# `static/` frontend bundle is baked into the image, and the frontend
+# `shit-1170-rex-engine-vault`, mounted at the app's default vault path. the
+# `static/` frontend bundle is baked into the image, and the frontend
 # talks to the intear api directly from the browser (the backend is
 # never rate limited by it).
 #
@@ -14,9 +15,9 @@
 # reachable only through the cloudflare tunnel over https, which is
 # what makes wallet sign-in work (see the secure-context note at the
 # bottom). to reach it another way while debugging, uncomment the
-# `ports:` block on shit-1170-backend below.
+# `ports:` block on shit-1170-rex-engine-backend below.
 
-name: shit-1170-fullstack-backend
+name: shit-1170-rex-engine-fullstack-backend
 volumes:
   # the sqlite db. named, so `docker compose down` keeps it and a
   # rebuild never touches it.
@@ -33,15 +34,15 @@ volumes:
   # is the volume the live deployment already has: it holds every
   # session key. NEVER delete it and never point this at a different
   # name without migrating the data first.
-  shit-1170-vault:
+  shit-1170-rex-engine-vault:
     name: huggies-rex-engine-fullstack-backend_huggies-vault
 services:
-  shit-1170-backend:
+  shit-1170-rex-engine-backend:
     build:
       context: ..
       dockerfile: DOCKER/Dockerfile
-    image: shit-1170/shit-1170:0.1.0
-    container_name: shit-1170-fullstack-backend
+    image: shit-1170-rex-engine/shit-1170-rex-engine:0.1.0
+    container_name: shit-1170-rex-engine-fullstack-backend
     restart: unless-stopped
 
     # NO `ports:` here on purpose — the app is not published to the
@@ -72,7 +73,7 @@ services:
     # --- WHY --- the vault is a named volume and not a bind mount: the
     # db must survive `docker compose down`, and it must never be
     # touched by a rebuild. the path inside the container matches the
-    # app's default (`${HOME}/.shit-1170/`), so no env is
+    # app's default (`${HOME}/.shit-1170-rex-engine/`), so no env is
     # needed for it.
     #
     # --- WHY --- the volume is mounted at the FOLDER and not at the
@@ -80,7 +81,7 @@ services:
     # create the WAL and SHM files beside it. mounting the file would
     # give it a directory where it expects a file.
     volumes:
-      - shit-1170-vault:/home/shit-1170/.shit-1170
+      - shit-1170-rex-engine-vault:/home/shit-1170/.shit-1170-rex-engine
 
   # ----------------------------------------
   # cloudflare tunnel — the only way in.
@@ -91,7 +92,7 @@ services:
   # dashboard, not here. for that dashboard route's "Service URL",
   # use the container name and port:
   #
-  #     http://shit-1170-fullstack-backend:54733
+  #     http://shit-1170-rex-engine-fullstack-backend:54733
   #
   # (NOT localhost — cloudflared is a separate container and has its
   # own loopback that nothing else is listening on. the container
@@ -99,7 +100,7 @@ services:
   # ----------------------------------------
   cloudflared:
     image: cloudflare/cloudflared:latest
-    container_name: shit-1170-cloudflared
+    container_name: shit-1170-rex-engine-cloudflared
     restart: unless-stopped
     # --- WHY the token comes from the environment, not `--token` ---
     # `command: ... --token ${CLOUDFLARE_TUNNEL_TOKEN}` looks natural
@@ -119,7 +120,7 @@ services:
       # TUNNEL_TOKEN, which is the name cloudflared looks for.
       - ../.env
     depends_on:
-      - shit-1170-backend
+      - shit-1170-rex-engine-backend
 
 # ========================================
 # NOTE: wallet sign-in needs a SECURE CONTEXT.

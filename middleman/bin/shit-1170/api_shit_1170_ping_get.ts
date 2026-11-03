@@ -8,7 +8,7 @@
 //   bun middleman/bin/shit-1170/api_shit_1170_ping_get.ts [--base-url <url>]
 // ========================================
 
-import { api_shit_1170_ping_get } from "@huggies/shit-1170-middleman";
+import { api_shit_1170_ping_get } from "@huggies/shit-1170-rex-engine-middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 
 // --- CONFIG --------------------------------------------------------

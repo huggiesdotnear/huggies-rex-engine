@@ -1,10 +1,10 @@
 # SKILLS
 
-to do cretae shit-1170 specci skills here
+to do cretae shit-1170-rex-engine specci skills here
 <br/>
 follow https://github.com/sleetplayground/near-kit-tool-box-skills as a guide for creetaing skills here for inetarcting with differnt cornatcts with our api.
 <br/>
-thnik of SKILLS/shit-1170 as a baseilc skill for using the app
+thnik of SKILLS/shit-1170-rex-engine as a baseilc skill for using the app
 <br/>
 can add other skills for specific smart conatcts.
 <br/>
@@ -14,7 +14,7 @@ the skill should refference the live site at "https://shit-1170.com/"
 
 skills
 
-- [SKILLS/shit-1170](./shit-1170/SKILL.md)
+- [SKILLS/shit-1170-rex-engine](./shit-1170-rex-engine/SKILL.md)
 - shit-1170-rex-hello-sleet-near
 - shit-1170-rex-ft
 - ...

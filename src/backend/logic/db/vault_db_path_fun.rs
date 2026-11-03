@@ -1,7 +1,7 @@
 // VAULT_DB_PATH_FUN
 // where the sqlite db file lives.
 //
-// the default is `${HOME}/.shit-1170/shit-1170.db`, and
+// the default is `${HOME}/.shit-1170-rex-engine/shit-1170-rex-engine.db`, and
 // `SHIT_1170_VAULT_DB_LOCATION` overrides it. the folder is created if it
 // is not there yet, so a fresh install does not need a manual mkdir.
 //
@@ -15,12 +15,12 @@ use std::path::PathBuf;
 // the env var that overrides the db location.
 const SHIT_1170_VAULT_DB_LOCATION_ENV: &str = "SHIT_1170_VAULT_DB_LOCATION";
 // the folder under the home dir that holds the db.
-const SHIT_1170_VAULT_DIR_NAME: &str = ".shit-1170";
+const SHIT_1170_VAULT_DIR_NAME: &str = ".shit-1170-rex-engine";
 // the db file's name inside that folder.
-const SHIT_1170_VAULT_DB_FILE_NAME: &str = "shit-1170.db";
+const SHIT_1170_VAULT_DB_FILE_NAME: &str = "shit-1170-rex-engine.db";
 // ========================================
 // --- HELPERS ----------------------------
-// the default location: `${HOME}/.shit-1170/shit-1170.db`.
+// the default location: `${HOME}/.shit-1170-rex-engine/shit-1170-rex-engine.db`.
 fn default_db_path_fun() -> PathBuf {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
     PathBuf::from(home)

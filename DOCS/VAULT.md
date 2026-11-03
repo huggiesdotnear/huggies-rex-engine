@@ -2,7 +2,7 @@
 
 the backend db storage location will be hardcoded to this location for simplicity.
 
-LOCATION: `${HOME}/.shit-1170/shit-1170.db`
+LOCATION: `${HOME}/.shit-1170-rex-engine/shit-1170-rex-engine.db`
 
 that will be the default location that we use to store the sqlite db file.
 
@@ -46,7 +46,7 @@ the db is ours and it holds nothing that cannot be made again.
 ## IN DOCKER
 
 the db lives in the named volume `shit-1170-vault`, mounted at
-`/home/shit-1170/.shit-1170` — the app's default path inside the
+`/home/shit-1170/.shit-1170-rex-engine` — the app's default path inside the
 image, since `HOME` is `/home/shit-1170` there.
 
 the volume is declared in `docker-compose.yml` with an explicit `name:`,
