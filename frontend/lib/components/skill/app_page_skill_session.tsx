@@ -12,7 +12,7 @@
 // user, and they need to copy the key. hiding it would make the card
 // useless.
 //
-// --- WHY --- there is a COPY button: a 64-character hex key cannot be
+// --- WHY --- there is a COPY button: a 74-character key cannot be
 // picked out of a line of text by hand, and typing it is how it gets
 // wrong.
 //

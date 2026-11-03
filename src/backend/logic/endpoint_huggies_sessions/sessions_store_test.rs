@@ -253,9 +253,49 @@ async fn the_schema_is_created_and_the_db_opens_again() {
 fn a_key_is_random_and_long() {
     let first = session_key_generate_fun();
     let second = session_key_generate_fun();
-    // 32 bytes, hex encoded.
-    assert_eq!(first.len(), 64);
+    // the prefix (10 chars), then 32 bytes hex encoded.
+    assert_eq!(first.len(), 74);
     assert_ne!(first, second);
+}
+
+#[test]
+fn a_new_key_carries_the_prefix() {
+    let key = session_key_generate_fun();
+    assert!(
+        key.starts_with("shit_1170_"),
+        "a new key must start with the prefix"
+    );
+    // the part after the prefix is the 64 hex characters of the random
+    // bytes, and nothing else.
+    let random_part = &key["shit_1170_".len()..];
+    assert_eq!(random_part.len(), 64);
+    assert!(
+        random_part.chars().all(|c| c.is_ascii_hexdigit()),
+        "the random part must be hex"
+    );
+}
+
+#[tokio::test]
+async fn a_key_without_the_prefix_still_hashes_and_is_found() {
+    // an OLD key — one made before the prefix existed — has to keep
+    // working. the read path hashes the whole key, so its hash is found
+    // by the very same lookup.
+    let old_style_key = "ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2";
+    let old_style_hash = session_key_hash_fun(old_style_key);
+
+    let db = TEMP_DB::new_fun("old-key");
+    let pool = db.pool_fun().await;
+
+    session_upsert_fun(&pool, "alice.near", old_style_key, &old_style_hash)
+        .await
+        .expect("the session should save");
+
+    let found = session_get_by_key_hash_fun(&pool, &old_style_hash)
+        .await
+        .expect("the session should read")
+        .expect("the session should exist");
+    assert_eq!(found.account_id, "alice.near");
+    assert_eq!(found.session_key, old_style_key);
 }
 
 #[test]

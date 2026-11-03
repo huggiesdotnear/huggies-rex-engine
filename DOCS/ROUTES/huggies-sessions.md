@@ -36,12 +36,12 @@ messages the wallet made when the reader signed in.
   "keys": [
     {
       "accountId": "alice.near",
-      "sessionKey": "ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2",
+      "sessionKey": "shit_1170_ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2",
       "created": true
     },
     {
       "accountId": "bob.near",
-      "sessionKey": "e752d71b129754be1072a1c413d894c82974788c2eae8232f140cf1c6cf45dac",
+      "sessionKey": "shit_1170_e752d71b129754be1072a1c413d894c82974788c2eae8232f140cf1c6cf45dac",
       "created": true
     }
   ]
@@ -50,6 +50,20 @@ messages the wallet made when the reader signed in.
 
 `created` is true when the call made the key and false when the key
 already existed and the same one was handed back.
+
+## THE KEY'S SHAPE
+
+a key is the `shit_1170_` prefix followed by 32 random bytes hex
+encoded — 10 characters of prefix and 64 of hex.
+
+the prefix is BRANDING, not security: it is a known string, it adds no
+entropy, and it protects nothing. it is there so a key that is ours is
+recognisable at a glance, and so a key pasted into the wrong place is
+noticed.
+
+only NEW keys carry it. a key made before the prefix existed keeps
+working: the read path hashes the WHOLE key, prefix and all, and the db
+is looked up by that hash — so a key of either shape finds its account.
 
 on failure it answers json in the shape
 `{ "error": { "code", "message" } }`:

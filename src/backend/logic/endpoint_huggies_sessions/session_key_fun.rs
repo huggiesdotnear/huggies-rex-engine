@@ -33,13 +33,35 @@ use sha2::{Digest, Sha256};
 // --- CONFIG -----------------------------
 // how many random bytes a key carries.
 const HUGGIES_SESSION_KEY_BYTES: usize = 32;
+// the prefix every NEW key carries.
+//
+// --- WHY --- a prefix and not nothing: a key that is obviously ours is
+// spotted before it is pasted into the wrong box, and a key that shows
+// up in a log or a screenshot is recognisable as one of ours. it is
+// BRANDING, not security — the string is known to everybody, so it
+// adds no entropy and protects nothing.
+//
+// --- WHY --- underscores and not dashes or dots: the key travels in a
+// header and can end up in a url, and `_` is safe in both, where a `.`
+// would look like a file extension.
+//
+// --- WHY --- only NEW keys get it: the prefix is added where the key
+// is MADE, and a key that already exists is handed back as it is. an
+// existing key keeps working because the READ path hashes the whole
+// key, prefix and all — the db is looked up by that hash, so a key of
+// either shape finds its account.
+const HUGGIES_SESSION_KEY_PREFIX: &str = "shit_1170_";
 // ========================================
 // --- GENERATE ---------------------------
-// a fresh session key, hex encoded.
+// a fresh session key, hex encoded, with the prefix on the front.
+//
+// --- WHY --- the prefix goes on the FRONT: the reader copies the key
+// from the top of the string, and the prefix is the part that says who
+// the key belongs to.
 pub fn session_key_generate_fun() -> String {
     let mut bytes = [0u8; HUGGIES_SESSION_KEY_BYTES];
     rand::rng().fill_bytes(&mut bytes);
-    hex::encode(bytes)
+    format!("{}{}", HUGGIES_SESSION_KEY_PREFIX, hex::encode(bytes))
 }
 // ========================================
 // --- HASH -------------------------------

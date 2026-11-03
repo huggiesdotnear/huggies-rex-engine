@@ -46,7 +46,7 @@ each card carries:
 - the account id, with the active one marked by a filled dot
 - the account's session key, in full — the reader is the user, and they
   need to copy it
-- a COPY KEY button — a 64-character hex key cannot be picked out of a
+- a COPY KEY button — a 74-character key cannot be picked out of a
   line of text by hand
 - a ROTATE button — a key that has been seen by somebody else should be
   replaceable

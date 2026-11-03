@@ -13,6 +13,8 @@ pub mod backend {
     pub mod routes {
         pub mod app_router_fun;
         pub mod ping_route;
+        #[cfg(test)]
+        pub mod session_key_prefix_test;
         pub mod session_me_route;
         pub mod session_rotate_route;
         pub mod sessions_route;

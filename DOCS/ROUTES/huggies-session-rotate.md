@@ -31,7 +31,7 @@ being rotated:
 ```json
 {
   "accountId": "alice.near",
-  "sessionKey": "8c711c7ca8c208017203dcfa9e5f83f7cb9814cb575225afe8bc6fcaf95e21bc",
+  "sessionKey": "shit_1170_8c711c7ca8c208017203dcfa9e5f83f7cb9814cb575225afe8bc6fcaf95e21bc",
   "created": true
 }
 ```

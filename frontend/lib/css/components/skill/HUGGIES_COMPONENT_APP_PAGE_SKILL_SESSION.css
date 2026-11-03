@@ -4,7 +4,7 @@
    its own session key.
 
    the accounts are stacked, not side by side: each one carries a
-   64-character key, and a row of them side by side would squeeze the
+   74-character key, and a row of them side by side would squeeze the
    key into a narrow column.
 
    the key is shown in a <code>, so it reads as a value and not as a
@@ -55,7 +55,7 @@
   opacity: 0.9;
 }
 /*----------------------*/
-/* the session key. it wraps inside the code element so a 64-character
+/* the session key. it wraps inside the code element so a 74-character
    key never widens the card. */
 #HUGGIES_COMPONENT_APP_PAGE_SKILL_SESSION code {
   display: block;

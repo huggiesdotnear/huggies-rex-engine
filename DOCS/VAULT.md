@@ -20,7 +20,10 @@ the db holds ONE table for now: `sessions`.
   account has exactly one session key, ever.
 - `session_key` - the session key. it is stored as it is: the key is
   ours and the db is ours, and the key guards nothing that acts as the
-  user yet.
+  user yet. a key made now is the `shit_1170_` prefix followed by
+  32 random bytes hex encoded; a key made before the prefix existed
+  is still in its old bare form and still works, because the read path
+  hashes the WHOLE key and the db is looked up by that hash.
 - `session_key_hash` - the sha-256 of the key. a request is looked up
   by this, so the read path never has to compare against every row's
   key.
