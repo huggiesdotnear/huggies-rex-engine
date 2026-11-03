@@ -29,6 +29,7 @@ import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { HUGGIES_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { huggies_token_list_fun } from "../shared/token_list";
+import { marked_token_ids_fun } from "../../ts/discover/app_page_discover_marked_tokens";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
@@ -91,6 +92,7 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
         </div>
         {huggies_token_list_fun({
           tokens: tokens,
+          marked_ids: marked_token_ids_fun(),
           on_search: (query) => {
             void HUGGIES_SWAP_TOKEN_PICKER.search(query);
           },

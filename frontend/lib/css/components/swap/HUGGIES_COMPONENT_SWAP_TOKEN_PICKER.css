@@ -91,6 +91,19 @@
 #HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .loading {
   color: var(--color-backend);
 }
+/* the marked tokens — the ones we spotlight — stand out wherever the
+   sort puts them, the same way they do on the discover page. the
+   shared rule uses a border and a background for a dark page, so the
+   popup's own colours are set here. the symbol wears a DARKER cyan
+   than the shared rule, because the popup is light and the shared cyan
+   is too pale to read on it. */
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list-row.is-marked {
+  border-color: #009aab;
+  background: rgba(0, 154, 171, 0.12);
+}
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list-row.is-marked strong {
+  color: #009aab;
+}
 /* the sort row: the shared control is dark and the popup is light, so
    the bar and the buttons are set here. the ACTIVE button keeps the
    shared control's own colours, so the chosen sort still reads as the

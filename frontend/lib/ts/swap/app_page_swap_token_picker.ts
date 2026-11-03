@@ -17,6 +17,8 @@
 // would have to be mapped into it, and the two shapes would drift.
 import { search_tokens_fun } from "../discover/app_page_discover_token_search";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token_list";
+import { HUGGIES_APP_PAGE_DISCOVER } from "../discover/app_page_discover";
+import { order_discover_tokens_fun } from "../discover/app_page_discover_token_sort_apply";
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
 import { HUGGIES_NEAR_ID, HUGGIES_NEAR_SYMBOL } from "../shared/token_near";
@@ -137,23 +139,42 @@ function near_row_fun(): HUGGIES_DISCOVER_TOKEN_ROW {
 // ========================================
 // ========================================
 // --- FETCH -----------------------------
-// the tokens the picker shows before the reader searches: the most
-// liquid ones, in the chosen sort.
+// the tokens the picker shows before the reader searches: the marked
+// tokens, then the most liquid ones, in the chosen sort.
 //
 // --- WHY --- THE SORT IS ASKED FOR FROM THE API: the api sorts and
 // pages on its own, so asking it for a sort is one request that comes
 // back ordered. sorting a downloaded list in javascript would mean
 // downloading the whole index to sort a slice of it.
+//
+// --- WHY --- THE MARKED TOKENS ARE FETCHED TOO: they are the tokens we
+// spotlight, and a reader picking a token wants them at the top of the
+// list — the same place the discover page puts them. they are asked for
+// by id, because the api cannot sort by "our marked tokens".
+//
+// --- WHY --- THE MARKED TOKENS ONLY LEAD THE `default` VIEW: the other
+// sorts are strict — the reader asked for volume or market cap, and
+// the rows arrive in that order. the marked block is a landing view,
+// not a permanent override.
 async function load_default_tokens_fun(): Promise<void> {
   set_state_fun({ ...state, loading: true });
   try {
-    const page = await HUGGIES_DISCOVER_TOKEN_LIST.fetch(
-      state.sort,
-      state.direction === "desc",
-      0,
-      HUGGIES_PICKER_LIST_LIMIT,
-    );
-    const icons = await fetch_token_icons_fun(page.rows.map((row) => row.id));
+    const wants_marked = state.sort === "default";
+    const [page, marked] = await Promise.all([
+      HUGGIES_DISCOVER_TOKEN_LIST.fetch(
+        state.sort,
+        state.direction === "desc",
+        0,
+        HUGGIES_PICKER_LIST_LIMIT,
+      ),
+      wants_marked
+        ? HUGGIES_APP_PAGE_DISCOVER.load_favourites()
+        : Promise.resolve([]),
+    ]);
+    const icons = await fetch_token_icons_fun([
+      ...page.rows.map((row) => row.id),
+      ...marked.map((row) => row.id),
+    ]);
     const tokens = page.rows.map((row) => ({
       ...row,
       icon: icons.get(row.id) ?? row.icon,
@@ -161,12 +182,20 @@ async function load_default_tokens_fun(): Promise<void> {
     // --- WHY --- NEAR IS PUT AT THE TOP AND NOT AT THE END: it is the
     // token every wallet holds, so it is the one a reader is most
     // likely to be reaching for.
+    const with_near = [
+      near_row_fun(),
+      ...tokens.filter((t) => t.id !== HUGGIES_NEAR_ID),
+    ];
+    // --- WHY --- THE MARKED TOKENS GO ON TOP: the order module is the
+    // ONE place that puts them there, and it is the same module the
+    // discover page uses. so the two pages lead with the same tokens.
+    const with_marked = marked.map((row) => ({
+      ...row,
+      icon: icons.get(row.id) ?? row.icon,
+    }));
     set_state_fun({
       ...state,
-      tokens: [
-        near_row_fun(),
-        ...tokens.filter((t) => t.id !== HUGGIES_NEAR_ID),
-      ],
+      tokens: order_discover_tokens_fun([...with_marked, ...with_near]),
       loading: false,
     });
   } catch (err) {
