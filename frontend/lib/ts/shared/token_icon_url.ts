@@ -23,6 +23,8 @@
 // rasterises svg icons, so a token with an svg icon gets a webp here too.
 // the original svg is still available as the `icon` field when a caller
 // genuinely wants the source.
+import { MAINNET_TOKEN_ICON_FALLBACKS } from "@huggies/shit-bin";
+
 const SHIT_1170_INTEAR_BASE_URL = "https://api.intea.rs";
 
 // ========================================
@@ -48,12 +50,8 @@ const SHIT_1170_INTEAR_BASE_URL = "https://api.intea.rs";
 // icon for one of these tokens is itself the broken artifact, so using it
 // would show the reader the same truncated shape.
 //
-// to add a token: put its account id here and the url of an image that
-// shows it.
-const SHIT_1170_ICON_FALLBACKS: Readonly<Record<string, string>> = {
-  "pussy.laboratory.jumpfinance.near": "https://i.imgur.com/zjkBYpA.jpeg",
-  "ftv2.nekotoken.near": "https://i.imgur.com/glVxMOD.png",
-};
+// to add a token: add its account id and image url to
+// `MAINNET_TOKEN_ICON_FALLBACKS` in `@huggies/shit-bin`.
 // ========================================
 // ========================================
 // --- PUBLIC -----------------------------
@@ -70,7 +68,7 @@ export function token_icon_for_fun(
 ): string | null {
   const url = token_icon_url_fun(icon_hash);
   if (url !== null) return url;
-  return SHIT_1170_ICON_FALLBACKS[token_id] ?? null;
+  return MAINNET_TOKEN_ICON_FALLBACKS[token_id] ?? null;
 }
 // ========================================
 // the icon url for an icon hash, or null when there is no hash.
