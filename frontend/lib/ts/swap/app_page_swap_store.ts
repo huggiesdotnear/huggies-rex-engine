@@ -727,77 +727,6 @@ function reset_fun(): void {
 }
 // ========================================
 // ========================================
-// --- FILL FROM POSITION -----------------
-// the reader tapped a position card: sell that position's whole
-// amount for the token the page is buying.
-//
-// --- WHY THE POSITION IS SOLD AND THE PAGE'S TOKEN IS BOUGHT: the
-// reader tapped a card that says what they HOLD, so the token they
-// hold is the one going out. the token on the page's other side is the
-// one they want in return, and it is left alone — the reader picked it
-// on purpose, and a position card is not a reason to change it.
-//
-// --- WHY THE AMOUNT IS THE WHOLE POSITION: the card says what they
-// hold, and tapping it means "sell this". a partial amount would need
-// a second step, and the card carries no way to type one.
-//
-// --- WHY THE IN SIDE IS FILLED AND NOT THE OUT SIDE: the amount is
-// what the reader SELLS, and the input side is the one that is sold.
-// filling the output side would ask the router what this amount
-// BUYS, which is a different question from the one the reader asked.
-//
-// --- WHY A SAME-TOKEN PAIR IS REFUSED AND NOT LEFT ALONE: the page
-// opens on NEAR → SHIT, so tapping the SHIT position would put SHIT on
-// both sides. a swap of a token for itself has no route at all, and
-// the page would sit there saying NO ROUTE FOR THIS PAIR. the reader
-// is trying to SELL that token, so the other side has to be a
-// different one — and the one the page was already offering is the
-// reader's own default. the two sides trade places, the same way they
-// do when the reader picks a token that is already on the other side.
-async function fill_from_position_fun(
-  token_id: string,
-  amount_unit: string,
-): Promise<void> {
-  const trimmed = token_id.trim();
-  if (trimmed.length === 0) return;
-  if (amount_unit === "0") return;
-  // --- WHY --- the token's decimals are needed: the position's amount
-  // is in the token's smallest unit, and the input box shows whole
-  // tokens.
-  const info_map = await HUGGIES_TOKEN_INFO.get([trimmed]);
-  const info = info_map.get(trimmed) ?? null;
-  if (info === null) return;
-  const human = unit_to_human_fun(amount_unit, info.decimals);
-  if (human.length === 0) return;
-  // --- WHY --- THE OTHER SIDE KEEPS ITS TOKEN: the reader chose what
-  // they want to receive. a position card says what they hold, and
-  // filling it in must not silently change what they are buying.
-  //
-  // --- WHY --- UNLESS IT IS THE SAME TOKEN: a swap of a token for
-  // itself has no route, so the two sides trade places and the reader
-  // gets a pair that can actually trade. the old output token — the
-  // one the reader was buying — becomes the one they sell, and the
-  // position's token becomes the one they buy. that is the same
-  // swap, read the other way round, and it is what the reader meant:
-  // "sell this position".
-  const token_out =
-    state.token_out === trimmed ? state.token_in : state.token_out;
-  set_state_fun({
-    ...state,
-    token_in: trimmed,
-    token_out: token_out,
-    amount_in: human,
-    amount_out: "",
-    amount_side: "in",
-  });
-  HUGGIES_APP_PAGE_SWAP_URL.write(trimmed, token_out);
-  HUGGIES_APP_PAGE_SWAP_URL.write_amount("in", human);
-  clear_routes_fun();
-  await load_tokens_and_balances_fun(trimmed, token_out);
-  // the routes are asked for the amount the reader just filled in.
-  await quote_fun();
-}
-// ========================================
 // --- PUBLIC ---------------------------
 export const HUGGIES_APP_PAGE_SWAP_STORE = {
   load: load_fun,
@@ -811,7 +740,6 @@ export const HUGGIES_APP_PAGE_SWAP_STORE = {
   get: get_fun,
   get_selected_route: selected_route_fun,
   get_balance: balance_of_fun,
-  fill_from_position: fill_from_position_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near
