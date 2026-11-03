@@ -29,6 +29,8 @@ import { tx_detail_href_fun } from "../../ts/shared/tx_link";
 import { transfer_token_of_fun } from "../../ts/shared/transfer_tokens";
 import type { HUGGIES_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
 import { HUGGIES_TRANSFER_TOKENS_STORE } from "../../ts/shared/transfer_tokens_store";
+import { huggies_account_tab_view_fun } from "./app_page_account_tab_view";
+import type { HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE } from "../../ts/account/app_page_account_tx_details_store";
 import {
   huggies_transfer_amount_fun,
   huggies_transfer_icon_fun,
@@ -180,6 +182,35 @@ function detail_card_fun(
 export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
   const state = use_page_store_fun(HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STORE);
   const token_state = use_page_store_fun(HUGGIES_TRANSFER_TOKENS_STORE);
+  // --- WHY THE CARDS BELONG TO THE TRANSACTIONS TAB: the account
+  // page's tab decides what the page shows, and the balances and the
+  // transactions are two views of the same account. without this gate
+  // the cards stayed on screen after the reader switched to the
+  // balances tab — they were fetched for the transactions tab, but
+  // nothing said they belonged to it.
+  //
+  // the gate is the SAME one the balance tables use, so both sides of
+  // the page decide the same way.
+  return (
+    <>
+      {huggies_account_tab_view_fun({
+        tab: "transactions",
+        children: huggies_tx_cards_fun(state, token_state.tokens),
+      })}
+    </>
+  );
+}
+
+// the cards themselves, once the tab gate has said the transactions
+// tab is the one on screen.
+//
+// --- WHY THIS IS ITS OWN FUNCTION: the gate takes children, so the
+// cards are built as a value and handed to it. that keeps the gate
+// the single thing that decides what is on screen.
+function huggies_tx_cards_fun(
+  state: HUGGIES_APP_PAGE_ACCOUNT_TX_DETAIL_STATE,
+  tokens: Map<string, HUGGIES_TRANSFER_TOKEN>,
+): preact.JSX.Element | null {
   // nothing loaded yet — the section says so and shows nothing else.
   if (state.details.length === 0) {
     if (state.loading) {
@@ -205,9 +236,7 @@ export function HUGGIES_COMPONENT_ACCOUNT_TX_CARDS_FUN() {
       <h2>LATEST TRANSACTIONS</h2>
       <div class="tx-cards-list">
         {state.details.map((detail) => (
-          <div key={detail.hash}>
-            {detail_card_fun(detail, token_state.tokens)}
-          </div>
+          <div key={detail.hash}>{detail_card_fun(detail, tokens)}</div>
         ))}
       </div>
     </section>

@@ -117,4 +117,15 @@
   background: rgba(0, 0, 0, 0.16);
   overflow-wrap: anywhere;
 }
+/* the chip that shows a transfer holds the token's icon, its amount and
+   the standard — and they have to sit APART.
+   --- WHY --- the chip was a block, so its children laid out inline
+   with no gap between them: the amount ran straight into the usd value
+   and straight into the standard, and the whole row read as one
+   string. it is a flex row with a gap, so each part has its space. */
+#HUGGIES_COMPONENT_ACCOUNT_TX_CARDS .tx-card-transfer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 /*==================================*/
