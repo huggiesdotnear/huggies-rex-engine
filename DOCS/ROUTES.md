@@ -3,7 +3,6 @@
 routes and pages
 
 - `/` - serve the static folder
-- `/skills` - serve the SKILLS folder
 
 every route under `/api/` is prefixed with the api it fronts, so the
 url alone says which backend the route belongs to:
