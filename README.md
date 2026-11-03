@@ -1,6 +1,6 @@
 # shit-1170-rex-engine
 
-💩 shit-1170 agentic and defi engine
+💩 shit-1170 agentic and defi engine for near
 
 bun/frontend
 
