@@ -28,22 +28,20 @@ the schema is written by the migrations in
 `src/backend/logic/db_migrations.rs`. each migration runs once, inside a
 transaction, and the db remembers which ones ran.
 
-## DESTRUCTIVE MIGRATIONS
+## CHANGING THE SCHEMA
 
-a migration that DROPS a table or deletes rows is marked destructive in
-the code, and it refuses to run unless `HUGGIES_ALLOW_DESTRUCTIVE=1` is
-set. the app then refuses to start and says why:
+the schema is written by the migrations in
+`src/backend/logic/db_migrations.rs`. each migration runs once, inside a
+transaction, and the db remembers which ones ran.
 
-```
-failed to open the db at ...: the migration 'sessions_by_account_id' is
-destructive and HUGGIES_ALLOW_DESTRUCTIVE is not set
-```
+**a migration that is no longer needed is DELETED, not kept.** the db
+records the migrations it has run, so a deleted migration simply never
+runs again, and the code carries only the schema that exists today. a
+migration kept "just in case" is code for a schema nobody has any more.
 
-so a mistyped DROP cannot quietly empty a live db. the flag is a
-decision by whoever deploys, not a constant in the build.
-
-> the flag must be set for ONE deploy, and then removed. it is a
-> go-ahead for the migrations that need it, not a permanent setting.
+the db may hold a record of a migration the code no longer has — that is
+harmless. the record says "this ran"; it does not say "this must run
+again".
 
 ## THE SESSION SECRET
 

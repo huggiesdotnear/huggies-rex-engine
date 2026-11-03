@@ -33,16 +33,6 @@ impl TEMP_DB {
         path.push(format!("huggies-test-{name}-{:?}.db", std::process::id()));
         // a leftover from a previous run would make the test read old rows.
         let _ = std::fs::remove_file(&path);
-        // --- WHY --- the flag is set here: the migration that replaced
-        // the sessions table is destructive, and a destructive migration
-        // refuses to run without the operator's go-ahead. the tests are
-        // the operator.
-        // --- WHY --- it is set ONCE and not per test: `set_var` is
-        // unsafe in edition 2024 (the process environment is shared), so
-        // it is set in one place and never raced.
-        unsafe {
-            std::env::set_var("HUGGIES_ALLOW_DESTRUCTIVE", "1");
-        }
         TEMP_DB { path }
     }
 
@@ -256,8 +246,7 @@ async fn the_migrations_are_not_run_twice() {
         .fetch_one(&pool)
         .await
         .expect("the count should read");
-    // two migrations: the first table, and the one that replaced it.
-    assert_eq!(count.0, 2);
+    assert_eq!(count.0, 1);
 }
 
 #[test]

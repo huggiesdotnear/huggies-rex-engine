@@ -21,38 +21,26 @@
 // forces every future author to remember the number; a named one reads
 // as what it is.
 //
-// --- WHY --- a migration can be marked DESTRUCTIVE: one that drops a
-// table throws the data away, and the data is not always throwaway. a
-// destructive migration refuses to run unless the operator has said it
-// is allowed, so a mistyped DROP cannot quietly empty a live db. see
-// the flag below.
+// --- WHY --- THERE IS ONLY ONE MIGRATION HERE. a migration that is no
+// longer needed is DELETED, not kept: the db records the ones it has
+// run, so a deleted migration simply never runs again, and the code
+// carries only the schema that exists today. a migration kept "just in
+// case" is code for a schema nobody has any more.
 // ========================================
 use sqlx::{Connection, Executor, SqliteConnection};
 // ========================================
-// --- CONFIG -----------------------------
-// the env var that allows a destructive migration to run.
-//
-// --- WHY --- it is an env var and not a code constant: the decision to
-// throw data away belongs to whoever is deploying, not to the build. the
-// code says "this migration is destructive"; the operator says "run it".
-const HUGGIES_ALLOW_DESTRUCTIVE_ENV: &str = "HUGGIES_ALLOW_DESTRUCTIVE";
-// ========================================
 // --- MIGRATION -------------------------
-// one migration: its name, its sql, and whether it destroys data.
+// one migration: its name and its sql.
 struct HUGGIES_MIGRATION {
     name: &'static str,
     sql: &'static str,
-    // true when the sql drops a table or deletes rows. a destructive
-    // migration needs the operator's go-ahead.
-    destructive: bool,
 }
 // ========================================
 // --- MIGRATIONS ------------------------
 // the list, in the order they run.
-const HUGGIES_MIGRATIONS: &[HUGGIES_MIGRATION] = &[
-    HUGGIES_MIGRATION {
-        name: "sessions_table",
-        sql: r#"
+const HUGGIES_MIGRATIONS: &[HUGGIES_MIGRATION] = &[HUGGIES_MIGRATION {
+    name: "sessions_table",
+    sql: r#"
   CREATE TABLE IF NOT EXISTS sessions (
     account_id         TEXT    NOT NULL PRIMARY KEY,
     session_key        TEXT    NOT NULL,
@@ -63,36 +51,7 @@ const HUGGIES_MIGRATIONS: &[HUGGIES_MIGRATION] = &[
   CREATE UNIQUE INDEX IF NOT EXISTS sessions_session_key_hash_idx
     ON sessions (session_key_hash);
   "#,
-        destructive: false,
-    },
-    HUGGIES_MIGRATION {
-        // --- WHY --- this one is DESTRUCTIVE: the sessions table was
-        // keyed by a "user" that held a json array of accounts, and one
-        // key served all of them. the new table is keyed by the account
-        // id, with one key per account. the old rows cannot be carried
-        // over: their key was SHARED between accounts, so splitting it
-        // would either give several accounts the same key — which is
-        // what we just moved away from — or mint new keys and lock the
-        // reader out of the old one.
-        //
-        // the old table is dropped and the new one created empty. the
-        // accounts sign in again and get their own keys.
-        name: "sessions_by_account_id",
-        sql: r#"
-  DROP TABLE IF EXISTS sessions;
-  CREATE TABLE sessions (
-    account_id         TEXT    NOT NULL PRIMARY KEY,
-    session_key        TEXT    NOT NULL,
-    session_key_hash   TEXT    NOT NULL,
-    created_at         INTEGER NOT NULL,
-    updated_at         INTEGER NOT NULL
-  );
-  CREATE UNIQUE INDEX IF NOT EXISTS sessions_session_key_hash_idx
-    ON sessions (session_key_hash);
-  "#,
-        destructive: true,
-    },
-];
+}];
 // ========================================
 // --- MIGRATE ----------------------------
 // bring the db up to the latest schema.
@@ -122,15 +81,6 @@ pub async fn migrate_fun(connection: &mut SqliteConnection) -> Result<(), sqlx::
     for migration in HUGGIES_MIGRATIONS {
         if migration_already_ran_fun(connection, migration.name).await? {
             continue;
-        }
-        // --- WHY --- the destructive check is HERE and not when the
-        // migration is defined: the check is about what this run would
-        // do, and a migration that already ran is not going to run again.
-        if migration.destructive && !destructive_allowed_fun() {
-            return Err(sqlx::Error::Protocol(format!(
-                "the migration '{}' is destructive and {HUGGIES_ALLOW_DESTRUCTIVE_ENV} is not set",
-                migration.name
-            )));
         }
         // the whole migration in one transaction: the schema change and
         // the record that it happened.
@@ -175,18 +125,6 @@ async fn migration_already_ran_fun(
             .fetch_optional(connection)
             .await?;
     Ok(row.map(|(count,)| count > 0).unwrap_or(false))
-}
-
-// is the operator allowed to run a destructive migration?
-//
-// --- WHY --- the value has to be exactly "1" and not just "present": a
-// variable that is set to "0" or "false" reads as "not allowed", and a
-// stray `HUGGIES_ALLOW_DESTRUCTIVE=` in an env file should not wipe a
-// db.
-fn destructive_allowed_fun() -> bool {
-    std::env::var(HUGGIES_ALLOW_DESTRUCTIVE_ENV)
-        .map(|value| value.trim() == "1")
-        .unwrap_or(false)
 }
 
 // a checksum of the migration's sql, so a db whose migration file was
