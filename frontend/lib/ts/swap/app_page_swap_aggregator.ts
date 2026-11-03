@@ -12,6 +12,8 @@
 //                 package's KNOWN list still names a few that were
 //                 removed upstream, so we ask for the ACTIVE ones and
 //                 never see a dex that cannot quote.
+//   level         "info" — route quote and live route-update diagnostics
+//                 are printed to the browser console.
 //
 // everything else stays at the package's default: the router base url
 // (https://router.intear.tech) and the per-request wait budget (2s).
@@ -63,7 +65,12 @@ function referral_id_fun(): string {
 // the one client. quoting is read-only, so it holds no signer and no
 // credentials.
 const HUGGIES_SWAP_REFERRER_ID = referral_id_fun();
-const client = new DEX_AGGREGATOR_CLIENT()
+const client = new DEX_AGGREGATOR_CLIENT({
+  // The swap page needs a live view of the routes it receives, including
+  // every socket update. `info` keeps the output useful without dumping
+  // the complete route bodies; `debug` would add those bodies.
+  level: "info",
+})
   .WITH_REFERRER_ID(HUGGIES_SWAP_REFERRER_ID)
   .WITH_DEFAULT_DEXES(HUGGIES_SWAP_DEXES);
 // ========================================

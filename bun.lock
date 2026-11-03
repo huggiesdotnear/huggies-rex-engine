@@ -16,7 +16,7 @@
         "@shikijs/themes": "4.5.0",
         "@sleet-js/fastnear-explorer-api-client": "^0.1.5",
         "@sleet-js/intear-api-tool-box": "^0.1.1",
-        "@sleet-js/intear-dex-aggregator-tool-box": "0.1.2",
+        "@sleet-js/intear-dex-aggregator-tool-box": "0.1.3",
         "@sleet-js/middleman-intear-api": "0.1.0",
         "@sleet-js/middleman-intear-dex-api": "0.1.0",
         "@sleet-js/middleman-rhea-api": "0.1.1",
@@ -116,7 +116,7 @@
 
     "@sleet-js/intear-api-tool-box": ["@sleet-js/intear-api-tool-box@0.1.1", "", { "peerDependencies": { "typescript": "^7" } }, "sha512-VjOhxQNc5s9W/Wa4HdfuTJ1KW93krt+rN8VIYI/TqHgprZZgvM8rU0LloJnHjU4EAD2pQwdIq25zkcgiWbk6Bg=="],
 
-    "@sleet-js/intear-dex-aggregator-tool-box": ["@sleet-js/intear-dex-aggregator-tool-box@0.1.2", "", { "dependencies": { "@near-kit-tool-box/env": "^0.3.0", "near-kit": "^0.20.2" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-QNA67NfezNtMmp5VkaCVffqitPUd6K9YGc1jktw3NiiDw1R6Is7AY50p3y+Utw75NDLADNXsB+dnZ5FfQJev3Q=="],
+    "@sleet-js/intear-dex-aggregator-tool-box": ["@sleet-js/intear-dex-aggregator-tool-box@0.1.3", "", { "dependencies": { "@near-kit-tool-box/env": "^0.3.0", "near-kit": "^0.20.2" }, "peerDependencies": { "typescript": "^7.0.2" } }, "sha512-+MQ6Dil6Ve3HTKrs0uvWjtNPxj5zj8XYF3M3PXkvfRjmBUoBOwTDMRP8OC4A0dBt9wRw1zlCOqKFTnK6Zkht2g=="],
 
     "@sleet-js/middleman-intear-api": ["@sleet-js/middleman-intear-api@0.1.0", "", { "dependencies": { "@sleet-js/intear-api-tool-box": "^0.1.1" }, "peerDependencies": { "typescript": "^7" } }, "sha512-SOsqSjjOgPCGiFy7encRtl5nKFh8EQwvqJkf+GbJjcv5ChzG7b0lbN901aRxqBACdP9fkk2mI+EMPDPCrwp8yA=="],
 
