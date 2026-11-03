@@ -1,5 +1,6 @@
 /*==================================*/
 /* the swap page's css: the components it mounts. */
+@import url(./components/swap/HUGGIES_COMPONENT_SWAP_POSITIONS.css);
 @import url(./components/swap/HUGGIES_COMPONENT_SWAP_FORM.css);
 @import url(./components/swap/HUGGIES_COMPONENT_SWAP_ROUTES.css);
 @import url(./components/swap/HUGGIES_COMPONENT_SWAP_TOKEN_PICKER.css);

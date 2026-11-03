@@ -15,6 +15,7 @@
 // report, so the layer is the swap page's own.
 import "./import-app-wide";
 import "./swap/app_page_swap_start";
+import "../components/swap/app_page_swap_positions";
 import "../components/swap/app_page_swap_form";
 import "../components/swap/app_page_swap_routes";
 import "../components/swap/app_page_swap_token_picker";

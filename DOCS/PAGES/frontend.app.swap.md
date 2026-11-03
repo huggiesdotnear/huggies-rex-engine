@@ -18,6 +18,8 @@ the swap page trades one token for another over the intear dex-aggregator. it is
     <!--==========================================-->
     <div id="HUGGIES_COMPONENT_SWAP_ROUTES"></div>
     <!--==========================================-->
+    <div id="HUGGIES_COMPONENT_SWAP_POSITIONS"></div>
+    <!--==========================================-->
   </main>
   <!--==========================================-->
   <nav id="HUGGIES_COMPONENT_NAV"></nav>
