@@ -1,4 +1,4 @@
-# frontend/app/swap.html
+# frontend/app/swap.html ?in={token} ?out={token} ?amount_in={amount} ?amount_out={amount}
 
 the swap page trades one token for another over the intear dex-aggregator. it is the app's first transaction page: the reader signs a swap here, and the page tells them what came of it.
 

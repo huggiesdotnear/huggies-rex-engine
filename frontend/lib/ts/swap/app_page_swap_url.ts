@@ -1,5 +1,6 @@
 // ========================================
-// the swap page's url parameters: `?in=` and `?out=`.
+// the swap page's url parameters: `?in=`, `?out=`, `?amount_in=` and
+// `?amount_out=`.
 //
 // the swap page holds TWO tokens, so it needs TWO url parameters. they
 // are named `in` and `out` rather than a single `?id=`, because a link
@@ -10,9 +11,24 @@
 // swap page holds two, and two named parameters are clearer in a link
 // than one parameter that changes meaning depending on the page.
 //
+// --- WHY THE AMOUNTS HAVE THEIR OWN PARAMETERS AND NOT ONE `?amount=`:
+// the page has TWO amount boxes and the reader types into EITHER of
+// them. the box they typed into is the side they are fixing, and the
+// router is asked about that side. so the url says which box the number
+// belongs to by the name of the parameter that holds it: `?amount_in=`
+// is the input box and `?amount_out=` is the output box.
+//
+// --- WHY THE TWO AMOUNT PARAMETERS ARE NEVER BOTH SET: the two boxes
+// are two views of ONE quote. the reader fixes one side and the router
+// answers the other, so only the side they fixed has a number to keep.
+// a link carrying both would be a link saying two different questions
+// at once, and the page would have to pick one to answer.
+//
 // --- WHY IT IMPORTS NOTHING: the rule is the whole of it.
 const URL_IN_PARAM = "in";
 const URL_OUT_PARAM = "out";
+const URL_AMOUNT_IN_PARAM = "amount_in";
+const URL_AMOUNT_OUT_PARAM = "amount_out";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -47,6 +63,53 @@ function read_url_out_fun(): string | null {
   return normalize_token_id_fun(params.get(URL_OUT_PARAM));
 }
 // ========================================
+// the `?amount_in=` off the current url, or null when there is none.
+//
+// --- WHY --- blank is treated as absent, the same as the tokens: a
+// trailing `?amount_in=` link points at nothing, and an empty amount is
+// not an amount.
+function read_url_amount_in_fun(): string | null {
+  if (typeof window === "undefined" || typeof window.location === "undefined") {
+    return null;
+  }
+  const params = new URLSearchParams(window.location.search);
+  return normalize_token_id_fun(params.get(URL_AMOUNT_IN_PARAM));
+}
+// ========================================
+// the `?amount_out=` off the current url, or null when there is none.
+function read_url_amount_out_fun(): string | null {
+  if (typeof window === "undefined" || typeof window.location === "undefined") {
+    return null;
+  }
+  const params = new URLSearchParams(window.location.search);
+  return normalize_token_id_fun(params.get(URL_AMOUNT_OUT_PARAM));
+}
+// ========================================
+// the amount the url carries and the side it belongs to.
+//
+// --- WHY --- THE SIDE IS READ FROM THE PARAMETER NAME AND NOT FROM A
+// FLAG: the name IS the side. `?amount_in=` is the input box and
+// `?amount_out=` is the output box, so a link that says "1.5 of NEAR in"
+// needs no second parameter saying "in".
+//
+// --- WHY --- THE IN SIDE WINS WHEN BOTH ARE SET: a link that carries
+// both is a link asking two questions at once, and the page answers
+// one. the input side is the side the reader types into first, so it
+// is the one that is answered.
+export interface HUGGIES_SWAP_URL_AMOUNT {
+  // the human amount, or null when the url carries none.
+  amount: string | null;
+  // the side the amount belongs to.
+  side: "in" | "out";
+}
+function read_url_amount_fun(): HUGGIES_SWAP_URL_AMOUNT {
+  const amount_in = read_url_amount_in_fun();
+  if (amount_in !== null) return { amount: amount_in, side: "in" };
+  const amount_out = read_url_amount_out_fun();
+  if (amount_out !== null) return { amount: amount_out, side: "out" };
+  return { amount: null, side: "in" };
+}
+// ========================================
 // ========================================
 // --- WRITE -----------------------------
 // put both tokens on the url, without a reload.
@@ -63,19 +126,59 @@ function write_url_tokens_fun(
   token_in: string | null,
   token_out: string | null,
 ): void {
+  write_url_fun({
+    [URL_IN_PARAM]: token_in,
+    [URL_OUT_PARAM]: token_out,
+  });
+}
+// ========================================
+// put the reader's amount on the url, and take the OTHER side's amount
+// off it.
+//
+// --- WHY --- THE OTHER SIDE'S AMOUNT GOES: the two boxes are two views of
+// ONE quote. when the reader types into the input box, the output box
+// shows the router's answer, and that answer is not the reader's number.
+// keeping the old `?amount_out=` on the url would leave a link saying
+// "I want this much OUT" on a page where the reader fixed the input.
+//
+// --- WHY --- `replaceState` and not `pushState`: the amount changes on
+// every keystroke, and a history entry per keystroke would fill the
+// back button with every prefix of the number the reader typed.
+function write_url_amount_fun(side: "in" | "out", amount: string | null): void {
+  const trimmed = amount === null ? null : amount.trim();
+  const empty = trimmed === null || trimmed.length === 0;
+  if (side === "in") {
+    write_url_fun({
+      [URL_AMOUNT_IN_PARAM]: empty ? null : trimmed,
+      [URL_AMOUNT_OUT_PARAM]: null,
+    });
+    return;
+  }
+  write_url_fun({
+    [URL_AMOUNT_IN_PARAM]: null,
+    [URL_AMOUNT_OUT_PARAM]: empty ? null : trimmed,
+  });
+}
+// ========================================
+// ========================================
+// --- HELPERS ----------------------------
+// put a set of parameters on the url, without a reload. a null value
+// takes the parameter off the url.
+//
+// --- WHY --- ONE HELPER FOR BOTH WRITES: the two writers must not drift
+// on how they touch `window.history`, and a reader looking for the url
+// rules should find them in one place.
+function write_url_fun(values: Record<string, string | null>): void {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return;
   }
   const url = new URL(window.location.href);
-  if (token_in === null) {
-    url.searchParams.delete(URL_IN_PARAM);
-  } else {
-    url.searchParams.set(URL_IN_PARAM, token_in);
-  }
-  if (token_out === null) {
-    url.searchParams.delete(URL_OUT_PARAM);
-  } else {
-    url.searchParams.set(URL_OUT_PARAM, token_out);
+  for (const [key, value] of Object.entries(values)) {
+    if (value === null) {
+      url.searchParams.delete(key);
+    } else {
+      url.searchParams.set(key, value);
+    }
   }
   window.history.replaceState(null, "", url.toString());
 }
@@ -85,7 +188,9 @@ function write_url_tokens_fun(
 export const HUGGIES_APP_PAGE_SWAP_URL = {
   read_in: read_url_in_fun,
   read_out: read_url_out_fun,
+  read_amount: read_url_amount_fun,
   write: write_url_tokens_fun,
+  write_amount: write_url_amount_fun,
   normalize: normalize_token_id_fun,
 };
 // ========================================

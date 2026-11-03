@@ -148,6 +148,39 @@ function read_tokens_fun(): { token_in: string; token_out: string } {
   };
 }
 // ========================================
+// the amount the page holds, read from the url on the first load.
+//
+// --- WHY --- THE SIDE COMES FROM THE URL TOO: the parameter the amount
+// sits in IS the side the reader is fixing. `?amount_out=100` says
+// "I want 100 out", and the router is asked about the output side. so
+// the page opens on the same question the link asks.
+//
+// --- WHY --- THE OTHER SIDE'S AMOUNT IS EMPTY: only the side the reader
+// fixed carries a number, so the other side starts blank and the
+// router fills it.
+function read_amount_fun(): {
+  amount_in: string;
+  amount_out: string;
+  amount_side: HUGGIES_SWAP_AMOUNT_SIDE;
+} {
+  const from_url = HUGGIES_APP_PAGE_SWAP_URL.read_amount();
+  if (from_url.amount === null) {
+    return { amount_in: "", amount_out: "", amount_side: "in" };
+  }
+  if (from_url.side === "in") {
+    return {
+      amount_in: from_url.amount,
+      amount_out: "",
+      amount_side: "in",
+    };
+  }
+  return {
+    amount_in: "",
+    amount_out: from_url.amount,
+    amount_side: "out",
+  };
+}
+// ========================================
 // the token infos for the two tokens, and the balances of them.
 //
 // --- WHY --- the balances come FIRST: they decide whether the swap
@@ -328,15 +361,31 @@ function open_subscription_fun(
 // --- LOAD -------------------------------
 // load the page: the pair from the url, their info, their balances and
 // the first quote.
+//
+// --- WHY --- THE AMOUNT IS READ FROM THE URL HERE AND NOT BY THE
+// COMPONENTS: the amount and the side it belongs to are ONE question,
+// and the components read the store. if each component read the url
+// itself they could disagree about which side the amount is on.
+//
+// --- WHY --- THE QUOTE IS ASKED AT THE END: the quote needs the token's
+// decimals, and the decimals come with the token info. so the quote
+// waits until the info has landed.
 async function load_fun(): Promise<void> {
   const tokens = read_tokens_fun();
+  const amounts = read_amount_fun();
   HUGGIES_APP_PAGE_SWAP_URL.write(tokens.token_in, tokens.token_out);
   set_state_fun({
     ...state,
     token_in: tokens.token_in,
     token_out: tokens.token_out,
+    amount_in: amounts.amount_in,
+    amount_out: amounts.amount_out,
+    amount_side: amounts.amount_side,
   });
   await load_tokens_and_balances_fun(tokens.token_in, tokens.token_out);
+  // the amount the link carried is quoted, so the page opens with the
+  // routes already on screen.
+  await quote_fun();
 }
 // ========================================
 // quote the swap: the routes for the current pair and amount, and the
@@ -388,6 +437,11 @@ async function quote_fun(): Promise<void> {
 // token, and carrying it over would ask the router to trade a number
 // that means something else entirely.
 //
+// --- WHY --- THE AMOUNT GOES OFF THE URL TOO: the url says what the
+// page is showing, and the page is showing no amount. a link with a
+// stale amount on it would open the new pair with the old pair's
+// number in the box.
+//
 // --- WHY --- PICKING THE TOKEN ON THE OTHER SIDE SWAPS THE PAIR: the
 // reader who picks the token that is already on the other side is
 // saying "I want to trade the other way round". refusing the pick
@@ -433,8 +487,18 @@ async function set_token_fun(
     });
     HUGGIES_APP_PAGE_SWAP_URL.write(state.token_in, trimmed);
   }
+  clear_amount_from_url_fun();
   clear_routes_fun();
   await load_tokens_and_balances_fun(state.token_in, state.token_out);
+}
+// ========================================
+// take the reader's amount off the url.
+//
+// --- WHY --- IT IS ITS OWN HELPER: the amount has to come off the url
+// in three places — a token picked, the pair swapped and the page
+// reset — and each of them would otherwise write it out again.
+function clear_amount_from_url_fun(): void {
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount(state.amount_side, null);
 }
 // ========================================
 // the two sides trade places: the token on one side becomes the token
@@ -456,6 +520,10 @@ async function swap_pair_fun(): Promise<void> {
     amount_out: "",
   });
   HUGGIES_APP_PAGE_SWAP_URL.write(old_token_out, old_token_in);
+  // --- WHY --- THE AMOUNT GOES OFF THE URL: the amount was typed for
+  // the old pair, and the two sides have traded places, so the number
+  // in the url would name a token that is no longer on that side.
+  clear_amount_from_url_fun();
   clear_routes_fun();
   await load_tokens_and_balances_fun(old_token_out, old_token_in);
 }
@@ -470,6 +538,12 @@ async function swap_pair_fun(): Promise<void> {
 // --- WHY THE OTHER SIDE'S AMOUNT IS CLEARED: the two boxes are two
 // views of ONE quote. the reader typed the new amount, so the old
 // answer on the other side is stale and must go.
+//
+// --- WHY THE URL IS WRITTEN HERE: the url says what the page is
+// showing, and the reader's number is part of that. a link the reader
+// copies while the amount is on screen then says the same thing the
+// screen does. the url is written AFTER the state, so the state and
+// the url never disagree about which side is fixed.
 function set_amount_fun(side: HUGGIES_SWAP_AMOUNT_SIDE, amount: string): void {
   if (side === "in") {
     set_state_fun({
@@ -486,6 +560,7 @@ function set_amount_fun(side: HUGGIES_SWAP_AMOUNT_SIDE, amount: string): void {
       amount_side: "out",
     });
   }
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount(side, amount);
 }
 // ========================================
 // the reader picked a route.
@@ -592,6 +667,15 @@ async function switch_direction_fun(): Promise<void> {
     amount_side: new_side,
   });
   HUGGIES_APP_PAGE_SWAP_URL.write(new_token_in, new_token_out);
+  // --- WHY --- THE URL FOLLOWS THE AMOUNTS: the two amounts traded
+  // places with the two tokens, and the side they are fixing flipped
+  // with them. so the url carries the amount the reader FIXED on the
+  // side they are NOW fixing, and it is the same trade read the other
+  // way round.
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount(
+    new_side,
+    new_side === "in" ? new_amount_in : new_amount_out,
+  );
   clear_routes_fun();
   await load_tokens_and_balances_fun(new_token_in, new_token_out);
   // the amount the reader fixed is now the amount they SELL, and it has
@@ -620,6 +704,10 @@ async function switch_direction_fun(): Promise<void> {
 function reset_fun(): void {
   clear_routes_fun();
   quoted_amount_side = "in";
+  // the amount goes off the url with the rest of the page, so a reload
+  // after a reset opens the page the way it opens.
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount("in", null);
+  HUGGIES_APP_PAGE_SWAP_URL.write_amount("out", null);
   set_state_fun({
     token_in: HUGGIES_SWAP_DEFAULT_TOKEN_IN,
     token_out: HUGGIES_SWAP_DEFAULT_TOKEN_OUT,

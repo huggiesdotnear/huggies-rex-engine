@@ -10,22 +10,20 @@
 // --- WHY IT REUSES THE DISCOVER SEARCH AND NOT A COPY: the search
 // helper is exactly what the picker needs, and a second copy of the
 // api call is a second place for the field list to drift.
+//
+// --- WHY THE ROWS ARE THE DISCOVER ROW SHAPE: the picker draws the
+// discover page's token list (components/shared/token_list.tsx), and
+// that list takes the discover row. a picker row of its own shape
+// would have to be mapped into it, and the two shapes would drift.
 import { search_tokens_fun } from "../discover/app_page_discover_token_search";
 import { HUGGIES_DISCOVER_TOKEN_LIST } from "../discover/app_page_discover_token_list";
 import { fetch_token_icons_fun } from "../shared/token_icon_fetch";
 import { HUGGIES_APP_PAGE_SWAP_STORE } from "./app_page_swap_store";
 import { HUGGIES_NEAR_ID, HUGGIES_NEAR_SYMBOL } from "../shared/token_near";
+import type { HUGGIES_DISCOVER_TOKEN_ROW } from "../discover/app_page_discover_token_row";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// one row in the picker's list.
-export interface HUGGIES_SWAP_PICKER_TOKEN {
-  id: string;
-  name: string;
-  symbol: string;
-  icon: string | null;
-}
-// ========================================
 // the picker's whole state.
 export interface HUGGIES_SWAP_PICKER_STATE {
   // is the popup open?
@@ -35,7 +33,7 @@ export interface HUGGIES_SWAP_PICKER_STATE {
   // the heading on the popup.
   label: string;
   // the rows on screen.
-  tokens: ReadonlyArray<HUGGIES_SWAP_PICKER_TOKEN>;
+  tokens: ReadonlyArray<HUGGIES_DISCOVER_TOKEN_ROW>;
   // true while the rows are being fetched.
   loading: boolean;
 }
@@ -51,6 +49,7 @@ const HUGGIES_PICKER_LIST_LIMIT = 50;
 // ========================================
 // ========================================
 // --- STATE ------------------------------
+// the state the picker holds.
 let state: HUGGIES_SWAP_PICKER_STATE = {
   open: false,
   side: "in",
@@ -91,21 +90,6 @@ function set_state_fun(next: HUGGIES_SWAP_PICKER_STATE): void {
   notify_fun();
 }
 // ========================================
-// map the discover row shape into the picker's row shape.
-function map_row_fun(row: {
-  id: string;
-  name: string;
-  symbol: string;
-  icon: string | null;
-}): HUGGIES_SWAP_PICKER_TOKEN {
-  return {
-    id: row.id,
-    name: row.name,
-    symbol: row.symbol,
-    icon: row.icon,
-  };
-}
-// ========================================
 // ========================================
 // --- NEAR ------------------------------
 // native NEAR as a picker row.
@@ -124,12 +108,18 @@ function map_row_fun(row: {
 // is a fixed value — the icon it points at is content addressed, so it
 // never changes under a different hash.
 const HUGGIES_NEAR_ICON_URL = "https://api.intea.rs/icon/tKxD06CdiM_S80-L.webp";
-function near_row_fun(): HUGGIES_SWAP_PICKER_TOKEN {
+function near_row_fun(): HUGGIES_DISCOVER_TOKEN_ROW {
   return {
     id: HUGGIES_NEAR_ID,
     name: "Near Protocol",
     symbol: HUGGIES_NEAR_SYMBOL,
+    decimals: 24,
     icon: HUGGIES_NEAR_ICON_URL,
+    price_usd: 0,
+    reputation: "Reputable",
+    holders: 0,
+    volume_usd_24h: 0,
+    market_cap_usd: 0,
   };
 }
 // ========================================
@@ -147,9 +137,10 @@ async function load_default_tokens_fun(): Promise<void> {
       HUGGIES_PICKER_LIST_LIMIT,
     );
     const icons = await fetch_token_icons_fun(page.rows.map((row) => row.id));
-    const tokens = page.rows.map((row) =>
-      map_row_fun({ ...row, icon: icons.get(row.id) ?? row.icon }),
-    );
+    const tokens = page.rows.map((row) => ({
+      ...row,
+      icon: icons.get(row.id) ?? row.icon,
+    }));
     // --- WHY --- NEAR IS PUT AT THE TOP AND NOT AT THE END: it is the
     // token every wallet holds, so it is the one a reader is most
     // likely to be reaching for.
@@ -173,9 +164,10 @@ async function search_fun(query: string): Promise<void> {
   try {
     const rows = await search_tokens_fun(query);
     const icons = await fetch_token_icons_fun(rows.map((row) => row.id));
-    const tokens = rows.map((row) =>
-      map_row_fun({ ...row, icon: icons.get(row.id) ?? row.icon }),
-    );
+    const tokens = rows.map((row) => ({
+      ...row,
+      icon: icons.get(row.id) ?? row.icon,
+    }));
     // --- WHY --- NEAR IS ADDED WHEN THE SEARCH FINDS IT: the api
     // cannot find it, so a reader who typed "near" would get nothing.
     // the query is matched against the symbol and the name, so it only

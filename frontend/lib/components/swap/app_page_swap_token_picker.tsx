@@ -2,18 +2,25 @@
 // the token picker: the popup that opens when the reader taps a token
 // card, and hands the chosen token back.
 //
-// it is the discover page's token list, in a popup: the same search
-// box, the same rows, the same icons. the search hits the api's
-// /tokens/search, so a token outside the loaded page is still findable.
+// it is the discover page's token list, in a popup: the SAME shared list
+// (components/shared/token_list.tsx), the same rows, the same icons. the
+// search hits the api's /tokens/search, so a token outside the loaded
+// page is still findable.
 //
 // --- WHY IT IS A SEPARATE COMPONENT: the swap form has two token
 // cards and both of them open the same picker. one component serves
 // both, and it says which side it is picking for.
 //
+// --- WHY IT IS THE SHARED LIST AND NOT A COPY OF IT: the picker used
+// to have its own rows, its own css class names and its own idea of
+// what a token row carries. so a token looked one way on the discover
+// page and another way in the picker, and a change to the list had to
+// be made twice. the shared list draws the rows, and the picker only
+// owns the popup around it.
+//
 // mounts into <div id="HUGGIES_COMPONENT_SWAP_TOKEN_PICKER">.
 import { render } from "preact";
 import {
-  useState as use_state,
   useEffect as use_effect,
   useMemo as use_memo,
   useRef as use_ref,
@@ -21,42 +28,15 @@ import {
 import { HUGGIES_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { HUGGIES_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import type { HUGGIES_SWAP_PICKER_TOKEN } from "../../ts/swap/app_page_swap_token_picker";
-// ========================================
-// ========================================
-// --- CONFIG -----------------------------
-// how long to wait after a keystroke before asking the api, so typing a
-// word is one request and not one per letter.
-const HUGGIES_PICKER_SEARCH_DEBOUNCE_MS = 250;
-// ========================================
-// ========================================
-// --- ROW -------------------------------
-function picker_row_fun(token: HUGGIES_SWAP_PICKER_TOKEN): preact.JSX.Element {
-  return (
-    <button
-      type="button"
-      class="picker-row"
-      onClick={() => {
-        HUGGIES_SWAP_TOKEN_PICKER.pick(token.id);
-      }}
-    >
-      {token.icon !== null ? (
-        <img class="picker-icon" src={token.icon} alt="" />
-      ) : (
-        <span class="picker-icon is-empty" />
-      )}
-      <span class="picker-copy">
-        <strong>{token.symbol}</strong>
-        <span>{token.name}</span>
-      </span>
-    </button>
-  );
-}
+import { huggies_token_list_fun } from "../shared/token_list";
+import {
+  HUGGIES_DEFAULT_TOKEN_SORT,
+  HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+} from "../../ts/discover/app_page_discover_token_sort_options";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
 function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
-  const [query, set_query] = use_state("");
   // the picker's own root, so a click outside it can close it.
   const root_ref = use_ref<HTMLDivElement | null>(null);
 
@@ -69,21 +49,6 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
   // a subscription the picker would never learn that it was opened.
   const picker = use_page_store_fun(HUGGIES_SWAP_TOKEN_PICKER);
   const tokens = use_memo(() => picker.tokens, [picker.tokens]);
-
-  // the search asks the api, debounced.
-  use_effect(() => {
-    const needle = query.trim();
-    if (needle.length === 0) {
-      HUGGIES_SWAP_TOKEN_PICKER.clear_search();
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      HUGGIES_SWAP_TOKEN_PICKER.search(needle);
-    }, HUGGIES_PICKER_SEARCH_DEBOUNCE_MS);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [query]);
 
   // close the picker when the reader clicks anywhere else.
   use_effect(() => {
@@ -128,30 +93,34 @@ function HUGGIES_COMPONENT_SWAP_TOKEN_PICKER_FUN() {
             ✕
           </button>
         </div>
-        <div class="picker-search">
-          <input
-            type="search"
-            value={query}
-            placeholder="name or symbol"
-            autoFocus
-            onInput={(event) => {
-              set_query((event.currentTarget as HTMLInputElement).value);
-            }}
-          />
-        </div>
-        <div class="picker-list">
-          {tokens.length === 0 && !picker.loading ? (
-            <p class="picker-empty">NO TOKENS FOUND</p>
-          ) : (
-            tokens.map((token) => picker_row_fun(token))
-          )}
-          {picker.loading && <p class="picker-loading">SEARCHING...</p>}
-        </div>
+        {huggies_token_list_fun({
+          tokens: tokens,
+          on_search: (query) => {
+            void HUGGIES_SWAP_TOKEN_PICKER.search(query);
+          },
+          on_clear: () => {
+            HUGGIES_SWAP_TOKEN_PICKER.clear_search();
+          },
+          loading: picker.loading,
+          searching: picker.loading,
+          sort: HUGGIES_DEFAULT_TOKEN_SORT,
+          direction: HUGGIES_DEFAULT_TOKEN_SORT_DIRECTION,
+          on_sort: () => {},
+          on_direction: () => {},
+          has_more: false,
+          on_load_more: () => {},
+          on_pick: (token_id) => {
+            HUGGIES_SWAP_TOKEN_PICKER.pick(token_id);
+          },
+          empty_text: "NO TOKENS FOUND",
+          searching_text: "SEARCHING...",
+          loading_text: "LOADING TOKENS...",
+          hide_sort: true,
+        })}
       </div>
     </div>
   );
 }
-// ========================================
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.

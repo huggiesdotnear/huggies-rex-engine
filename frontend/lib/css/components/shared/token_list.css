@@ -1,0 +1,156 @@
+/*==================================*/
+/* the shared token list: the search box, the sort row, the rows and the
+   notes.
+
+   it is used by the discover page's token list and the swap page's
+   token picker, so a token looks the same in both. the css is by class
+   only — the list has no mount id of its own, so the pages that use it
+   scope it however they need to. */
+
+/* the search box sits on its own row above the sort buttons: the page
+   column is 500px wide and the sort row already needs most of it. */
+.token-list .controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  margin-bottom: 12px;
+  width: 100%;
+  min-width: 0;
+}
+.token-list .search {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+/* the sort control's own row, the full width of the column, so the
+   buttons spread across it rather than bunched at the left edge. */
+.token-list .sort {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+.token-list .sort .sort-control {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+.token-list .sort .sort-button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+.token-list .sort .sort-direction {
+  flex: 0 0 auto;
+}
+.token-list .search input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  padding: 10px 12px;
+  font: inherit;
+}
+.token-list .search input:focus {
+  outline: 2px solid var(--color-middle);
+  outline-offset: 1px;
+}
+/* the scroll box is a WRAPPER around the results, not the results
+   themselves. the wrapper is what the page listens to for the scroll
+   event that asks for the next page. */
+.token-list .results-scroll {
+  max-height: 460px;
+  overflow-y: auto;
+  width: 100%;
+  min-width: 0;
+}
+.token-list .results {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  gap: 6px;
+}
+.token-list .loading {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  text-align: center;
+  margin: 8px 0 0;
+}
+.token-list .error {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #ff8a80;
+  margin: 0 0 8px;
+}
+/*==================================*/
+.token-list-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.token-list-row:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.24);
+}
+/* marked tokens stand out wherever the chosen sort puts them, but they
+   never override the order. */
+.token-list-row.is-marked {
+  border-color: var(--color-middle);
+  background: rgba(0, 0, 0, 0.2);
+}
+.token-list-row.is-marked strong {
+  color: var(--color-middle);
+}
+.token-list-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.token-list-icon.is-empty {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+}
+.token-list-copy,
+.token-list-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.token-list-copy span,
+.token-list-copy code,
+.token-list-values span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.token-list-copy code {
+  font-size: 10px;
+}
+.token-list-values {
+  align-items: flex-end;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+/*==================================*/

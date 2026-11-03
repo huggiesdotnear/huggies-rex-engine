@@ -3,8 +3,10 @@
    the popup that opens when the reader taps a token card.
 
    it is a modal: a dimmed backdrop over the page, and the popup in
-   the middle of it. the rows are the discover page's rows, so a token
-   looks the same wherever it is shown. */
+   the middle of it. the rows are the SHARED token list, so a token
+   looks the same on the discover page and in here. */
+@import url(../shared/token_list.css);
+
 #HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-backdrop {
   position: fixed;
   inset: 0;
@@ -16,7 +18,7 @@
   padding: 16px;
 }
 /*==================================*/
-/* the popup itself: the head, the search box and the list. */
+/* the popup itself: the head and the list. */
 #HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker {
   display: flex;
   flex-direction: column;
@@ -63,95 +65,30 @@
   color: var(--color-fontend);
 }
 /*==================================*/
-/* the search box. */
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-search input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 9px 12px;
-  font: inherit;
-  font-size: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
+/* the shared token list, inside the popup. the popup is light and the
+   shared list is dark, so the list's own colours are set here. */
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .search input {
+  border-color: rgba(0, 0, 0, 0.25);
   background: #ffffff;
   color: var(--color-backend);
 }
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-search input:focus {
-  outline: 2px solid var(--color-middle);
-  outline-offset: 1px;
-}
-/*==================================*/
-/* the list of tokens. it scrolls, so a long list does not push the
-   popup off the screen. */
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-  min-height: 0;
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .results-scroll {
   max-height: 56vh;
 }
-/*==================================*/
-/* one token row: the icon, the symbol and the name. */
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-row {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 8px 10px;
-  text-align: left;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list-row {
+  border-color: rgba(0, 0, 0, 0.12);
   background: #ffffff;
   color: var(--color-backend);
 }
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-row:hover {
-  background: var(--color-middle);
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list-row:hover {
   border-color: #009aab;
+  background: var(--color-middle);
   color: var(--color-fontend);
 }
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-icon.is-empty {
-  display: inline-block;
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list-icon.is-empty {
   background: rgba(0, 0, 0, 0.2);
 }
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-copy strong {
-  font-size: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-copy span {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  opacity: 0.75;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/*==================================*/
-/* the notes under the list. */
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-empty,
-#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .picker-loading {
-  margin: 8px 0 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  opacity: 0.7;
-  text-align: center;
+#HUGGIES_COMPONENT_SWAP_TOKEN_PICKER .token-list .loading {
+  color: var(--color-backend);
 }
 /*==================================*/
