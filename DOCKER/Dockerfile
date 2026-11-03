@@ -171,6 +171,19 @@ RUN apt-get update \
     && useradd --system --uid 1000 --home /home/huggies \
         --shell /usr/sbin/nologin huggies
 
+# --- WHY: the vault folder is created in the image, owned by the app
+# user ---
+# a named volume mounted over a folder INHERITS that folder's
+# ownership the first time it is created — but only if the folder
+# exists in the image. a volume mounted over a folder that does NOT
+# exist is created empty and owned by root, and then the app (running
+# as uid 1000) cannot write the db into it.
+#
+# so the folder is created here, owned by the huggies user, and the
+# volume takes that ownership when it is first mounted.
+RUN mkdir -p /home/huggies/.huggies-rex-engine \
+    && chown -R huggies:huggies /home/huggies
+
 COPY --from=rust-builder /build/target/release/huggies-rex-engine /usr/local/bin/huggies-backend
 COPY --from=frontend /src/static /app/static
 

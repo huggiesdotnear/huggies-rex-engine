@@ -46,17 +46,30 @@ services:
       HUGGIES_HOST: "0.0.0.0"
       HUGGIES_PORT: "54733"
       RUST_LOG: "huggies_rex_engine=info"
-      # --- WHY --- the session secret comes from the repo-root .env
-      # and not from here: it encrypts the session keys in the db, so it
-      # must be a secret and not a value in this file. the app refuses
-      # to start without it.
-      HUGGIES_SESSION_SECRET: "${HUGGIES_SESSION_SECRET}"
+
+    # --- WHY --- the session secret comes from the repo-root .env
+    # through env_file, and NOT through `${HUGGIES_SESSION_SECRET}`
+    # interpolation: compose only auto-loads a .env sitting NEXT TO
+    # this compose file (in DOCKER/), and it interpolates BEFORE the
+    # service's env_file is read. so the interpolated form was empty.
+    # env_file hands the repo-root .env to the container verbatim, the
+    # same way cloudflared gets its tunnel token.
+    #
+    # the app refuses to start without this secret — it encrypts the
+    # session keys in the db.
+    env_file:
+      - ../.env
 
     # --- WHY --- the vault is a named volume and not a bind mount: the
     # db must survive `docker compose down`, and it must never be
     # touched by a rebuild. the path inside the container matches the
     # app's default (`${HOME}/.huggies-rex-engine/`), so no env is
     # needed for it.
+    #
+    # --- WHY --- the volume is mounted at the FOLDER and not at the
+    # db file: sqlite creates the db file itself, and it needs to
+    # create the WAL and SHM files beside it. mounting the file would
+    # give it a directory where it expects a file.
     volumes:
       - huggies-vault:/home/huggies/.huggies-rex-engine
 
