@@ -27,7 +27,10 @@ BUT do not rebuild/restart the container for a MINIMAL backend code change that 
 
 ### USING
 
-coming soon!
+- see live site at 🌐 https://shit-1170.com/
+- see skills at 🐱 https://github.com/huggiesdotnear/shit-1170-rex-engine-skills
+
+
 
 ========================================
 <br/>
