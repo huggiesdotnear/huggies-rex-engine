@@ -24,6 +24,7 @@ import {
   huggies_transfer_amount_fun,
   huggies_transfer_icon_fun,
 } from "../shared/transfer_amount";
+import { huggies_transfer_memo_fun } from "./app_page_tx_transfer_memo";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -119,9 +120,9 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
                   <code class="tx-transfer-token-id">{transfer.token_id}</code>
                 )}
               </div>
-              {transfer.memo !== undefined && transfer.memo.length > 0 && (
-                <div class="tx-transfer-memo">{transfer.memo}</div>
-              )}
+              {transfer.memo !== undefined &&
+                transfer.memo.length > 0 &&
+                huggies_transfer_memo_fun({ memo: transfer.memo })}
             </div>
           );
         })}
@@ -146,9 +147,9 @@ export function HUGGIES_COMPONENT_TX_TRANSFERS_FUN() {
                 <span class="tx-transfer-type">NFT</span>
                 <code class="tx-transfer-contract">{transfer.contract_id}</code>
               </div>
-              {transfer.memo !== undefined && transfer.memo.length > 0 && (
-                <div class="tx-transfer-memo">{transfer.memo}</div>
-              )}
+              {transfer.memo !== undefined &&
+                transfer.memo.length > 0 &&
+                huggies_transfer_memo_fun({ memo: transfer.memo })}
             </div>
           );
         })}
