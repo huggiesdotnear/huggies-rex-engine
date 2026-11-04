@@ -89,47 +89,64 @@
   font-weight: 700;
 }
 /*==================================*/
-/* the actions row. the DETAIL link is pushed to the right. */
+/* the actions row: SEND, the ADD / REMOVE and the DETAIL link.
+
+   --- WHY --- ALL THREE ARE ON ONE LINE: they are the three things a
+   reader can do with a post, and they belong side by side. a SEND on
+   its own row with the other two under it made the post twice as tall
+   as it needed to be and hid the DETAIL link under the buttons.
+
+   --- WHY --- THEY SHARE THE ROW EVENLY: `flex: 1` on each makes the
+   three the same width whatever their labels are, so the row reads as
+   three buttons and not as two buttons and a link.
+
+   --- WHY --- the row does NOT WRAP: the three are short labels and the
+   card is 500px wide, so they fit. a wrap would break the even widths
+   the row is built on. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-actions {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 2px;
+  align-items: stretch;
+  gap: 6px;
+  flex-wrap: nowrap;
+  margin-top: 4px;
 }
 /*==================================*/
-/* the buttons are the base app buttons and they keep the base's full
-   width.
+/* the buttons are the base app buttons, narrowed to a third of the card.
 
-   --- WHY --- and not the narrower ones: the base button is 500px —
-   the width of the page column — and the queue page's buttons are
-   that wide. the post's buttons were narrowed to sit side by side, and
-   they came out looking like a row of little pills under a wide card.
-
-   --- WHY --- the row WRAPS and the buttons are NOT squeezed: the SEND
-   and the ADD / REMOVE each take a whole row, so they are the same
-   width and they line up with the card's edges. two buttons that each
-   take half a row would be narrower than the card and the DETAIL link
-   would have nowhere to go. */
+   --- WHY --- and not the base's full width: the base button is as wide
+   as the page column, which is right for a button that stands alone and
+   wrong for three that share it. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-send,
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-queue {
-  flex: 1 1 100%;
-  width: 100%;
-  max-width: 100%;
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-queue,
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 8px 6px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 /*==================================*/
 /* the DETAIL link is a plain link, so it carries the page's link rules
    and only overrides the size. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail {
-  margin-left: auto;
-  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  border: 1px solid currentColor;
-  border-radius: 8px;
-  padding: 6px 10px;
+  border: 2px solid var(--color-middle);
+  border-radius: 12px;
   text-decoration: none;
-  white-space: nowrap;
+  color: var(--color-backend);
+  background-color: #ffe8e6;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail:hover {
@@ -137,6 +154,7 @@
   border-color: #009aab;
   color: var(--color-fontend);
 }
+/*==================================*/
 /*==================================*/
 /* the reader's status on the post. the dot is the state and the word
    says it too — the dot is for the reader who scans the feed, and the
