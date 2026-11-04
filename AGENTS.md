@@ -10,6 +10,8 @@
 - see [DOCS/ROUTES.md](./DOCS/ROUTES.md) for routes
 - see [DOCS/RULES.md](./DOCS/RULES.md) for rules
 
+ℹ️ the biggest/best way to contribute if you are a user is to create issues on our github.
+
 ### SLEET AI AGENT
 
 WORKFLOW
@@ -28,6 +30,7 @@ BUT do not rebuild/restart the container for a MINIMAL backend code change that 
 ### USING
 
 - see live site at 🌐 https://shit-1170.com/
+- see the code at 🐱 https://github.com/huggiesdotnear/huggies-rex-engine
 - see skills at 🐱 https://github.com/huggiesdotnear/shit-1170-rex-engine-skills
 
 ========================================
