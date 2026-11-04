@@ -14,7 +14,7 @@ use axum::{
     http::{HeaderValue, Method, StatusCode},
     middleware::{self, Next},
     response::{IntoResponse, Response},
-    routing::{get, post},
+    routing::{delete, get, post},
 };
 use sqlx::SqlitePool;
 use tower_http::{cors::CorsLayer, services::ServeDir};
@@ -24,6 +24,13 @@ use super::api_key_rotate_route::api_key_rotate_route;
 use super::api_keys_route::api_keys_route;
 use super::ping_route::ping_route;
 use super::trezu_treasuries_route::trezu_treasuries_route;
+use super::tx_queue_accounts_delete_route::tx_queue_accounts_delete_route;
+use super::tx_queue_accounts_route::tx_queue_accounts_route;
+use super::tx_queue_one_route::tx_queue_one_route;
+use super::tx_queue_route::{tx_queue_get_route, tx_queue_post_route};
+use super::tx_queue_sent_route::tx_queue_sent_route;
+use super::tx_queue_stats_contracts_route::tx_queue_stats_contracts_route;
+use super::tx_queue_stats_methods_route::tx_queue_stats_methods_route;
 // ====================================
 // CORS preflight middleware — intercepts every OPTIONS request before
 // any handler runs and answers 204 with CORS headers.
@@ -92,6 +99,34 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         .route("/api/shit-1170/api-keys", post(api_keys_route))
         .route("/api/shit-1170/api-key/me", get(api_key_me_route))
         .route("/api/shit-1170/api-key/rotate", post(api_key_rotate_route))
+        // the tx queue. the stats routes come BEFORE the `{queue_id}`
+        // route, because axum matches the more specific path first and
+        // `stats` would otherwise be read as a queue id.
+        .route(
+            "/api/shit-1170/tx-queue/stats/contracts",
+            get(tx_queue_stats_contracts_route),
+        )
+        .route(
+            "/api/shit-1170/tx-queue/stats/methods",
+            get(tx_queue_stats_methods_route),
+        )
+        .route(
+            "/api/shit-1170/tx-queue",
+            post(tx_queue_post_route).get(tx_queue_get_route),
+        )
+        .route("/api/shit-1170/tx-queue/{queue_id}", get(tx_queue_one_route))
+        .route(
+            "/api/shit-1170/tx-queue/{queue_id}/accounts",
+            post(tx_queue_accounts_route),
+        )
+        .route(
+            "/api/shit-1170/tx-queue/{queue_id}/accounts/{account_id}",
+            delete(tx_queue_accounts_delete_route),
+        )
+        .route(
+            "/api/shit-1170/tx-queue/{queue_id}/sent",
+            post(tx_queue_sent_route),
+        )
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
     // static ServeDir is the FALLBACK at `/`, so any unmatched GET
