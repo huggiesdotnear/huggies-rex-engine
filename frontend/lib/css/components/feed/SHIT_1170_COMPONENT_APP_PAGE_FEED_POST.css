@@ -250,16 +250,48 @@
   gap: 6px;
 }
 /*==================================*/
+/* the arrow is its own element: it is a direction, not a token, and it
+   is what tells the reader at a glance that this card holds two sides
+   rather than one call.
+
+   --- WHY --- IT IS A FLEX BOX AND NOT A PLAIN SPAN: the arrow is an
+   svg now, and an svg is an inline element with its own baseline. the
+   box centres it against the token amounts beside it, so the arrow
+   sits on the line of the amounts and not on the line of the text. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-swap-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-middle);
-  font-size: 16px;
-  font-weight: 700;
 }
 /*==================================*/
-/* the SWAP IT link is the card's main action, so it carries the same
+/* the SWAP NOW link is the card's main action, so it carries the same
    rules the DETAIL link carries — a swap cannot be signed from the
    feed, so the link IS the action. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail.is-swap {
   border-color: var(--color-middle);
+}
+/*==================================*/
+/* the DETAILS link is the QUIET one beside it.
+
+   --- WHY --- IT IS QUIET AND NOT A SECOND LOUD BUTTON: the two links
+   go to the same page, so they are the same weight of thing. a card
+   with two loud buttons and a third quiet one reads as three different
+   actions, and two of them go to the same place. so the SWAP NOW is
+   the loud one — it carries the trade — and the DETAILS is the outline
+   beside it. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail.is-swap.is-quiet {
+  border-width: 1px;
+  background-color: transparent;
+  color: inherit;
+  opacity: 0.8;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST
+  .feed-post-detail.is-swap.is-quiet:hover {
+  background: var(--color-middle);
+  border-color: #009aab;
+  color: var(--color-fontend);
+  opacity: 1;
 }
 /*==================================*/

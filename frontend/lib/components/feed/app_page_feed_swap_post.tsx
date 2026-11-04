@@ -21,8 +21,20 @@
 //
 // --- WHY THERE IS NO SEND BUTTON: a queued swap cannot be signed from
 // the feed. signing it means working out the route, and the route is
-// the swap page's job. so the card's action is a LINK to the swap page,
-// and the swap page does the signing.
+// the swap page's job. so the card's actions are LINKS to the swap
+// page, and the swap page does the signing.
+//
+// --- WHY THERE ARE TWO LINKS AND NOT ONE: SWAP NOW is the trade, and
+// DETAILS is the record. a queued swap has no detail page of its own —
+// the swap page IS its home — so both links go there, and the two
+// names say what the reader means by going. SWAP NOW is the loud one
+// because it carries the trade, and DETAILS is the quiet outline
+// beside it.
+//
+// --- WHY THE ARROW IS AN ICON AND NOT A CHARACTER: the app's icons
+// come from lucide, and an arrow drawn as a character sits on the
+// text's baseline while the token amounts beside it sit on their own.
+// the icon is in a flex box, so it centres on the amounts.
 //
 // --- WHY THE WHO ARE CHIPS AND NOT A COUNT: the same reason the queued
 // batch's card uses them. a count says "2 accounts" and tells the
@@ -37,6 +49,7 @@
 // on every card, so the component takes the swap as a prop and the
 // feed's own css file carries the rules.
 import { useState as use_state } from "preact/hooks";
+import { ArrowRight } from "lucide-preact";
 import { SHIT_1170_APP_PAGE_FEED_STORE } from "../../ts/feed/app_page_feed_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
@@ -182,7 +195,7 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
           })}
         </div>
         <span class="feed-swap-arrow" aria-hidden="true">
-          &rarr;
+          <ArrowRight size={18} />
         </span>
         <div class="feed-swap-side">
           {shit_1170_transfer_icon_fun(token_out)}
@@ -234,9 +247,23 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
         )}
       </div>
       <div class="feed-post-actions">
-        {/* --- WHY --- THE LINK IS THE MAIN ACTION: a queued swap cannot
-            be signed from the feed. the swap page works out the route
-            and signs it. */}
+        {/* --- WHY --- THERE ARE TWO BUTTONS AND NOT ONE: they are two
+            different things. SWAP NOW is the trade - it opens the swap
+            page on this exact queued swap, with the route worked out and
+            ready to sign. DETAILS is the record - the same page, but as
+            a link the reader can open, bookmark or send somebody
+            without meaning to trade anything.
+
+            --- WHY --- BOTH GO TO THE SWAP PAGE: a queued swap has no
+            detail page of its own. the swap page IS its home - it shows
+            the trade, it works out the route, and it signs it. so the
+            two buttons are the same place with two different intents,
+            and the reader picks the one that says what they mean.
+
+            --- WHY --- SWAP NOW IS THE PROMISED ONE: the button that
+            carries the trade is the one the reader presses when they
+            mean it, and the DETAILS button is the quiet one beside
+            it. */}
         <a
           class="feed-post-detail is-swap"
           href={swap_quote_href_fun(
@@ -247,7 +274,19 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
             depth,
           )}
         >
-          SWAP IT
+          SWAP NOW
+        </a>
+        <a
+          class="feed-post-detail is-swap is-quiet"
+          href={swap_quote_href_fun(
+            swap.swapId,
+            swap.tokenIn,
+            swap.tokenOut,
+            swap.amountIn,
+            depth,
+          )}
+        >
+          DETAILS
         </a>
         {account_id !== null && !sent && (
           <button
