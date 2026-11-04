@@ -51,9 +51,19 @@ pub async fn tx_queue_stats_methods_route(
     Query(query): Query<TX_QUEUE_STATS_QUERY>,
 ) -> Response {
     // the key is the gate, even for a read that says nothing private.
-    if let Err(failure) = tx_queue_caller_fun(&pool, &headers).await {
-        return shit_1170_error_fun(failure.status, &failure.code, &failure.message).into_response();
-    }
+    // --- WHY --- THE KEY IS NOT ASKED FOR: the stats are READ-ONLY and
+    // they are about the queue as a whole — how many batches name this
+    // contract, how many call this method. there is no account in the
+    // answer and nothing the reader can act on, so there is nothing to
+    // gate.
+    let _caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
+        Ok(account_id) => Some(account_id),
+        Err(failure) if failure.status == StatusCode::UNAUTHORIZED => None,
+        Err(failure) => {
+            return shit_1170_error_fun(failure.status, &failure.code, &failure.message)
+                .into_response();
+        }
+    };
 
     let limit = match query.limit {
         None => SHIT_1170_TX_QUEUE_STATS_LIMIT,

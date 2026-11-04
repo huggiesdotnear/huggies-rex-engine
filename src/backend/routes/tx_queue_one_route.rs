@@ -35,12 +35,22 @@ pub async fn tx_queue_one_route(
     headers: HeaderMap,
     Path(queue_id): Path<String>,
 ) -> Response {
-    // --- WHY --- the key is checked FIRST: a caller who cannot prove who
-    // they are gets nothing, not even the 404 that says whether the queue
-    // exists.
-    if let Err(failure) = tx_queue_caller_fun(&pool, &headers).await {
-        return shit_1170_error_fun(failure.status, &failure.code, &failure.message).into_response();
-    }
+    // --- WHY --- THE KEY IS NOT ASKED FOR: the queue is an OPEN offer.
+    // the list is open, so opening one of them must be open too — a
+    // reader who is not signed in can still read a batch they were sent
+    // a link to. what they cannot do is ACT on it, and the acting is what
+    // the other routes ask the key for.
+    //
+    // the key is read here only so the route knows whether the reader
+    // has one, and the read never fails the request.
+    let _caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
+        Ok(account_id) => Some(account_id),
+        Err(failure) if failure.status == StatusCode::UNAUTHORIZED => None,
+        Err(failure) => {
+            return shit_1170_error_fun(failure.status, &failure.code, &failure.message)
+                .into_response();
+        }
+    };
 
     // --- THE QUEUE ------------------------
     let queue = match tx_queue_get_fun(&pool, &queue_id).await {

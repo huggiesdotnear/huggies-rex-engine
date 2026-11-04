@@ -282,11 +282,26 @@ pub async fn tx_queue_get_route(
     headers: HeaderMap,
     Query(query): Query<TX_QUEUE_QUERY>,
 ) -> Response {
-    // the key is required even though the list is open: the list is open
-    // to people who have one, not to everybody.
-    if let Err(failure) = tx_queue_caller_fun(&pool, &headers).await {
-        return shit_1170_error_fun(failure.status, &failure.code, &failure.message).into_response();
-    }
+    // --- WHY --- THE LIST DOES NOT ASK FOR A KEY: the queue is an OPEN
+    // offer. a reader who is not signed in can still read the feed — they
+    // see every batch, and they can open one. what they cannot do is act
+    // on it, and the acting is what the other routes ask the key for.
+    //
+    // so the key is read here ONLY when the reader asked for their OWN
+    // queues — the `account_id` filter and the `hide_sent` filter are
+    // questions about one account, and that account has to be the
+    // caller's own.
+    let caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
+        Ok(account_id) => Some(account_id),
+        // --- WHY --- a missing or unknown key is NOT an error here: the
+        // list is open. the key is only needed for the account filters,
+        // and those are checked below.
+        Err(failure) if failure.status == StatusCode::UNAUTHORIZED => None,
+        Err(failure) => {
+            return shit_1170_error_fun(failure.status, &failure.code, &failure.message)
+                .into_response();
+        }
+    };
 
     // --- WHY --- `hide_sent` needs an account: "has this account sent it"
     // is a question about ONE account. a queue can be sent by alice and
@@ -303,8 +318,35 @@ pub async fn tx_queue_get_route(
         .into_response();
     }
 
+    // --- WHY --- THE ACCOUNT FILTER IS THE CALLER'S OWN ACCOUNT: the
+    // filter says "the queues THIS account is on", and a reader who is
+    // not signed in has no account. asking for somebody else's queues by
+    // name is not a thing a stranger can do.
+    //
+    // --- WHY --- THE ACCOUNT IN THE QUERY IS IGNORED AND NOT REFUSED: the
+    // reader who is signed in gets their OWN queues whatever the query
+    // says. a link with another account's id in it shows the reader
+    // their own feed, not somebody else's.
+    let account_id = match (&caller_account_id, query.account_id.as_deref()) {
+        // the reader is signed in: their own account, whatever the query
+        // named.
+        (Some(caller), _) => Some(caller.clone()),
+        // the reader is signed out and named an account: there is nobody
+        // to be "mine", so the filter cannot be answered.
+        (None, Some(_)) => {
+            return shit_1170_error_fun(
+                StatusCode::UNAUTHORIZED,
+                "no_api_key",
+                "filtering by an account needs an api key",
+            )
+            .into_response();
+        }
+        // the reader is signed out and named nobody: the whole feed.
+        (None, None) => None,
+    };
+
     let list_query = TX_QUEUE_LIST_QUERY {
-        account_id: query.account_id.clone(),
+        account_id,
         hide_sent,
         contract_id: query.contract_id.clone(),
         method: query.method.clone(),

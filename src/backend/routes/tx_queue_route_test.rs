@@ -864,13 +864,62 @@ async fn the_list_filters_by_account_and_by_contract() {
 }
 
 #[tokio::test]
-async fn the_list_needs_an_api_key() {
-    let db = TEMP_DB::new_fun("list-no-key");
+async fn the_list_is_open_and_needs_no_api_key() {
+    let db = TEMP_DB::new_fun("list-open");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // a batch is queued, so the list has something in it.
+    post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
+
+    // --- WHY --- NO HEADER AT ALL: the queue is an OPEN offer. a reader
+    // who is not signed in can still read the feed.
+    let request = reqwest::Client::new()
+        .get(format!("{base_url}/api/shit-1170/tx-queue"))
+        .send()
+        .await
+        .expect("the route should answer");
+    let status = request.status().as_u16();
+    let text = request.text().await.unwrap_or_default();
+    assert_eq!(status, 200, "body was: {text}");
+    let body: serde_json::Value = serde_json::from_str(&text).expect("json");
+    assert_eq!(body["total"], 1, "the open list must show the batch");
+}
+
+#[tokio::test]
+async fn the_list_of_one_queue_is_open_and_needs_no_api_key() {
+    let db = TEMP_DB::new_fun("one-open");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
+    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+
+    let request = reqwest::Client::new()
+        .get(format!("{base_url}/api/shit-1170/tx-queue/{queue_id}"))
+        .send()
+        .await
+        .expect("the route should answer");
+    let status = request.status().as_u16();
+    let text = request.text().await.unwrap_or_default();
+    assert_eq!(status, 200, "body was: {text}");
+    let body: serde_json::Value = serde_json::from_str(&text).expect("json");
+    assert_eq!(body["queueId"], queue_id);
+}
+
+#[tokio::test]
+async fn the_list_filtered_by_an_account_needs_an_api_key() {
+    let db = TEMP_DB::new_fun("list-account-no-key");
     let pool = db.pool_fun().await;
     let base_url = serve_fun(pool).await;
 
+    // --- WHY --- THE ACCOUNT FILTER IS NOT OPEN: "the queues THIS
+    // account is on" is a question about one account, and a stranger
+    // with no key has no account to answer it about.
     let request = reqwest::Client::new()
-        .get(format!("{base_url}/api/shit-1170/tx-queue"))
+        .get(format!("{base_url}/api/shit-1170/tx-queue?account_id=alice.near"))
         .send()
         .await
         .expect("the route should answer");
@@ -880,6 +929,27 @@ async fn the_list_needs_an_api_key() {
     assert!(
         text.contains("no_api_key"),
         "the answer must name the reason, body was: {text}"
+    );
+}
+
+#[tokio::test]
+async fn the_list_filtered_by_an_account_ignores_the_account_that_was_named() {
+    let db = TEMP_DB::new_fun("list-account-ignored");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let bob_key = put_api_key_fun(&pool, "bob.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // bob queues a batch for himself.
+    post_queue_fun(&base_url, Some(&bob_key), &one_tx_body_fun()).await;
+
+    // alice asks for bob's queues by name. she gets her OWN queues — and
+    // she has none.
+    let answer = get_list_fun(&base_url, &alice_key, "account_id=bob.near").await;
+    assert_eq!(answer.status, 200, "body was: {}", answer.body);
+    assert_eq!(
+        answer.body["total"], 0,
+        "a reader must not see another account's queues"
     );
 }
 
