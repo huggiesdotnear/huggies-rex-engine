@@ -16,7 +16,7 @@
 // request and would make every route responsible for closing it.
 //
 // --- WHY --- WAL mode: the app's reads (the skill page's card) and its
-// writes (a sign-in creating a session) overlap. WAL lets the reader
+// writes (a sign-in creating an api key) overlap. WAL lets the reader
 // keep reading while the writer writes, instead of the reader blocking
 // behind the write.
 //
@@ -74,7 +74,7 @@ pub async fn db_open_fun(path: &Path) -> Result<SqlitePool, sqlx::Error> {
         .connect_with(options)
         .await?;
 
-    crate::backend::logic::db::db_schema::db_schema_create_pool_fun(&pool).await?;
+    crate::backend::logic::db::db_schema_run_fun::db_schema_run_pool_fun(&pool).await?;
 
     Ok(pool)
 }

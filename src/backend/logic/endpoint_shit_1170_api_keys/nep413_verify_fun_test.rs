@@ -10,7 +10,7 @@
 //
 // the fixture is a fixed signature so the test never depends on the
 // machine's randomness.
-use crate::backend::logic::endpoint_shit_1170_sessions::nep413_verify_fun::{
+use crate::backend::logic::endpoint_shit_1170_api_keys::nep413_verify_fun::{
     NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun,
 };
 // ========================================

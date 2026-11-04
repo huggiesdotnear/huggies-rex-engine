@@ -1,10 +1,10 @@
 // ========================================
-// SESSION_ME_ROUTE
-// GET /api/shit-1170/session/me — who does this session key belong to.
+// API_KEY_ME_ROUTE
+// GET /api/shit-1170/api-key/me — who does this api key belong to.
 //
-// the first route that REQUIRES the session key. the reader sends the
-// key in the `x-session-token` header, the backend looks it up by its
-// hash, and the answer is the user the key belongs to.
+// the first route that REQUIRES the api key. the reader sends the key in
+// the `x-api-key` header, the backend looks it up by its hash, and the
+// answer is the user the key belongs to.
 //
 // it exists so the automatic key handling is real and not hypothetical:
 // a page that calls this route gets the key attached for it, and a
@@ -17,7 +17,12 @@
 // --- WHY --- the key is looked up by its HASH and never compared: the
 // db holds the hash, so the request's key is hashed and the hash is
 // what is matched. the plain key is not in the db at all.
-// ========================================
+//
+// --- WHY --- the OLD `x-session-token` header still works: an agent
+// built against the old name is out in the world already, and it would
+// break the moment the backend stopped reading that header. during the
+// beta the backend reads BOTH headers — `x-api-key` first, and the old
+// one as the fallback.
 use axum::{
     Json,
     extract::State,
@@ -26,61 +31,53 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::session_key_hash_fun;
-use crate::backend::logic::endpoint_shit_1170_sessions::sessions_store::session_get_by_key_hash_fun;
+use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_fun::api_key_hash_fun;
+use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_of_header_fun::api_key_of_header_fun;
+use crate::backend::logic::endpoint_shit_1170_api_keys::api_keys_store::api_key_get_by_hash_fun;
 // ========================================
-// the header the session key travels in.
-const SHIT_1170_SESSION_TOKEN_HEADER: &str = "x-session-token";
-// ========================================
-pub async fn session_me_route(State(pool): State<SqlitePool>, headers: HeaderMap) -> Response {
+pub async fn api_key_me_route(State(pool): State<SqlitePool>, headers: HeaderMap) -> Response {
     // the key comes from the header, not from a query parameter: a url
     // ends up in logs and in the referer of the next page.
-    let session_key = headers
-        .get(SHIT_1170_SESSION_TOKEN_HEADER)
-        .and_then(|value| value.to_str().ok())
-        .map(|value| value.trim())
-        .filter(|value| !value.is_empty());
-
-    let session_key = match session_key {
-        Some(session_key) => session_key,
+    let api_key = match api_key_of_header_fun(&headers) {
+        Some(api_key) => api_key.to_string(),
         None => {
             return shit_1170_error_fun(
                 StatusCode::UNAUTHORIZED,
-                "no_session_key",
-                "the x-session-token header is missing",
+                "no_api_key",
+                "the x-api-key header is missing",
             )
             .into_response();
         }
     };
 
-    let session_key_hash = session_key_hash_fun(session_key);
-    let found = match session_get_by_key_hash_fun(&pool, &session_key_hash).await {
+    let api_key_hash = api_key_hash_fun(&api_key);
+    let found = match api_key_get_by_hash_fun(&pool, &api_key_hash).await {
         Ok(found) => found,
         Err(err) => {
-            eprintln!("[session] could not read the session: {err}");
+            eprintln!("[api-key] could not read the api key: {err}");
             return shit_1170_error_fun(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "db_unavailable",
-                "the session could not be read",
+                "the api key could not be read",
             )
             .into_response();
         }
     };
 
     match found {
-        Some(session) => (
+        Some(row) => (
             StatusCode::OK,
             Json(serde_json::json!({
-              "accountId": session.account_id,
-              "createdAt": session.created_at,
-              "updatedAt": session.updated_at,
+              "accountId": row.account_id,
+              "createdAt": row.created_at,
+              "updatedAt": row.updated_at,
             })),
         )
             .into_response(),
         None => shit_1170_error_fun(
             StatusCode::UNAUTHORIZED,
-            "unknown_session_key",
-            "the session key is not one of ours",
+            "unknown_api_key",
+            "the api key is not one of ours",
         )
         .into_response(),
     }

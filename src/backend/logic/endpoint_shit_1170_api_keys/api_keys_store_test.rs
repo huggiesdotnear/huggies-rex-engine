@@ -1,15 +1,15 @@
 // ========================================
-// the session store, tested against a real sqlite file.
+// the api key store, tested against a real sqlite file.
 //
 // the db is a temp file, not an in-memory one, because the production db
 // is a file and the two can differ: WAL, the journal mode, and the way
 // sqlite writes pages are all file behaviours.
-use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::{
-    session_key_generate_fun, session_key_hash_fun,
+use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_fun::{
+    api_key_generate_fun, api_key_hash_fun,
 };
-use crate::backend::logic::endpoint_shit_1170_sessions::sessions_store::{
-    session_get_by_key_hash_fun, session_get_fun, session_list_account_ids_fun, session_rotate_fun,
-    session_upsert_fun,
+use crate::backend::logic::endpoint_shit_1170_api_keys::api_keys_store::{
+    api_key_get_by_hash_fun, api_key_get_fun, api_key_list_account_ids_fun, api_key_rotate_fun,
+    api_key_upsert_fun,
 };
 use sqlx::Row;
 // ========================================
@@ -44,31 +44,31 @@ impl Drop for TEMP_DB {
     }
 }
 
-// a stored session for one account, with a fresh key.
+// a stored api key for one account, with a fresh key.
 async fn put_fun(pool: &sqlx::SqlitePool, account_id: &str) -> (String, String) {
-    let key = session_key_generate_fun();
-    let key_hash = session_key_hash_fun(&key);
-    session_upsert_fun(pool, account_id, &key, &key_hash)
+    let key = api_key_generate_fun();
+    let key_hash = api_key_hash_fun(&key);
+    api_key_upsert_fun(pool, account_id, &key, &key_hash)
         .await
-        .expect("the session should save");
+        .expect("the api key should save");
     (key, key_hash)
 }
 // ========================================
 // --- TESTS -----------------------------
 #[tokio::test]
-async fn a_session_is_stored_and_read_back() {
+async fn an_api_key_is_stored_and_read_back() {
     let db = TEMP_DB::new_fun("store");
     let pool = db.pool_fun().await;
 
     let (key, key_hash) = put_fun(&pool, "alice.near").await;
 
-    let stored = session_get_fun(&pool, "alice.near")
+    let stored = api_key_get_fun(&pool, "alice.near")
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
+        .expect("the api key should read")
+        .expect("the api key should exist");
     assert_eq!(stored.account_id, "alice.near");
-    assert_eq!(stored.session_key, key);
-    assert_eq!(stored.session_key_hash, key_hash);
+    assert_eq!(stored.api_key, key);
+    assert_eq!(stored.api_key_hash, key_hash);
 }
 
 #[tokio::test]
@@ -81,18 +81,18 @@ async fn a_second_device_gets_the_same_key() {
     // the second device signs in with the SAME account. the upsert must
     // not replace the key — the account has one key, and the first
     // device has to keep working.
-    session_upsert_fun(&pool, "alice.near", &key, &key_hash)
+    api_key_upsert_fun(&pool, "alice.near", &key, &key_hash)
         .await
-        .expect("the session should save again");
+        .expect("the api key should save again");
 
-    let stored = session_get_fun(&pool, "alice.near")
+    let stored = api_key_get_fun(&pool, "alice.near")
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
-    assert_eq!(stored.session_key, key);
+        .expect("the api key should read")
+        .expect("the api key should exist");
+    assert_eq!(stored.api_key, key);
 
     // and there is exactly ONE row for the account.
-    let count: (i64,) = sqlx::query_as("SELECT COUNT(1) FROM sessions WHERE account_id = ?1")
+    let count: (i64,) = sqlx::query_as("SELECT COUNT(1) FROM api_keys WHERE account_id = ?1")
         .bind("alice.near")
         .fetch_one(&pool)
         .await
@@ -113,35 +113,35 @@ async fn each_account_gets_its_own_key() {
     // both could not be narrowed to one wallet.
     assert_ne!(alice_key, bob_key);
 
-    let alice = session_get_fun(&pool, "alice.near")
+    let alice = api_key_get_fun(&pool, "alice.near")
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
-    let bob = session_get_fun(&pool, "bob.near")
+        .expect("the api key should read")
+        .expect("the api key should exist");
+    let bob = api_key_get_fun(&pool, "bob.near")
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
-    assert_eq!(alice.session_key, alice_key);
-    assert_eq!(bob.session_key, bob_key);
+        .expect("the api key should read")
+        .expect("the api key should exist");
+    assert_eq!(alice.api_key, alice_key);
+    assert_eq!(bob.api_key, bob_key);
 }
 
 #[tokio::test]
-async fn a_session_is_found_by_its_key_hash() {
+async fn an_api_key_is_found_by_its_hash() {
     let db = TEMP_DB::new_fun("by-hash");
     let pool = db.pool_fun().await;
 
     let (_key, key_hash) = put_fun(&pool, "alice.near").await;
 
-    let found = session_get_by_key_hash_fun(&pool, &key_hash)
+    let found = api_key_get_by_hash_fun(&pool, &key_hash)
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
+        .expect("the api key should read")
+        .expect("the api key should exist");
     assert_eq!(found.account_id, "alice.near");
 
     // a key nobody has finds nothing.
-    let missing = session_get_by_key_hash_fun(&pool, &session_key_hash_fun("nope"))
+    let missing = api_key_get_by_hash_fun(&pool, &api_key_hash_fun("nope"))
         .await
-        .expect("the session should read");
+        .expect("the api key should read");
     assert!(missing.is_none());
 }
 
@@ -153,7 +153,7 @@ async fn the_accounts_are_listed() {
     put_fun(&pool, "alice.near").await;
     put_fun(&pool, "bob.near").await;
 
-    let ids = session_list_account_ids_fun(&pool)
+    let ids = api_key_list_account_ids_fun(&pool)
         .await
         .expect("the list should read");
     assert_eq!(ids, vec!["alice.near".to_string(), "bob.near".to_string()]);
@@ -167,45 +167,45 @@ async fn a_rotation_replaces_the_key_and_the_old_one_stops_working() {
     let (old_key, old_hash) = put_fun(&pool, "alice.near").await;
 
     // the new key.
-    let new_key = session_key_generate_fun();
-    let new_hash = session_key_hash_fun(&new_key);
-    session_rotate_fun(&pool, "alice.near", &new_key, &new_hash)
+    let new_key = api_key_generate_fun();
+    let new_hash = api_key_hash_fun(&new_key);
+    api_key_rotate_fun(&pool, "alice.near", &new_key, &new_hash)
         .await
-        .expect("the session should rotate");
+        .expect("the api key should rotate");
 
     // the new key is the one that is stored.
-    let stored = session_get_fun(&pool, "alice.near")
+    let stored = api_key_get_fun(&pool, "alice.near")
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
-    assert_eq!(stored.session_key, new_key);
+        .expect("the api key should read")
+        .expect("the api key should exist");
+    assert_eq!(stored.api_key, new_key);
 
-    // the OLD key no longer finds the session — that is the point of a
+    // the OLD key no longer finds the api key — that is the point of a
     // rotation.
-    let by_old = session_get_by_key_hash_fun(&pool, &old_hash)
+    let by_old = api_key_get_by_hash_fun(&pool, &old_hash)
         .await
-        .expect("the session should read");
-    assert!(by_old.is_none(), "the old key must not find the session");
+        .expect("the api key should read");
+    assert!(by_old.is_none(), "the old key must not find the api key");
 
     // and the new one does.
-    let by_new = session_get_by_key_hash_fun(&pool, &new_hash)
+    let by_new = api_key_get_by_hash_fun(&pool, &new_hash)
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
+        .expect("the api key should read")
+        .expect("the api key should exist");
     assert_eq!(by_new.account_id, "alice.near");
     assert_ne!(old_key, new_key);
 }
 
 #[tokio::test]
-async fn a_rotation_of_an_account_with_no_session_fails() {
+async fn a_rotation_of_an_account_with_no_api_key_fails() {
     let db = TEMP_DB::new_fun("rotate-none");
     let pool = db.pool_fun().await;
 
-    let key = session_key_generate_fun();
-    let key_hash = session_key_hash_fun(&key);
+    let key = api_key_generate_fun();
+    let key_hash = api_key_hash_fun(&key);
 
-    let result = session_rotate_fun(&pool, "nobody.near", &key, &key_hash).await;
-    assert!(result.is_err(), "rotating a missing session should fail");
+    let result = api_key_rotate_fun(&pool, "nobody.near", &key, &key_hash).await;
+    assert!(result.is_err(), "rotating a missing api key should fail");
 }
 
 #[tokio::test]
@@ -217,7 +217,7 @@ async fn the_schema_is_created_and_the_db_opens_again() {
     let pool = db.pool_fun().await;
 
     // the table is there, with the columns the code reads.
-    let columns: Vec<String> = sqlx::query("SELECT name FROM pragma_table_info('sessions')")
+    let columns: Vec<String> = sqlx::query("SELECT name FROM pragma_table_info('api_keys')")
         .fetch_all(&pool)
         .await
         .expect("the columns should read")
@@ -228,8 +228,8 @@ async fn the_schema_is_created_and_the_db_opens_again() {
         columns,
         vec![
             "account_id",
-            "session_key",
-            "session_key_hash",
+            "api_key",
+            "api_key_hash",
             "created_at",
             "updated_at"
         ]
@@ -251,8 +251,8 @@ async fn the_schema_is_created_and_the_db_opens_again() {
 
 #[test]
 fn a_key_is_random_and_long() {
-    let first = session_key_generate_fun();
-    let second = session_key_generate_fun();
+    let first = api_key_generate_fun();
+    let second = api_key_generate_fun();
     // the prefix (10 chars), then 32 bytes hex encoded.
     assert_eq!(first.len(), 74);
     assert_ne!(first, second);
@@ -260,7 +260,7 @@ fn a_key_is_random_and_long() {
 
 #[test]
 fn a_new_key_carries_the_prefix() {
-    let key = session_key_generate_fun();
+    let key = api_key_generate_fun();
     assert!(
         key.starts_with("shit_1170_"),
         "a new key must start with the prefix"
@@ -281,31 +281,31 @@ async fn a_key_without_the_prefix_still_hashes_and_is_found() {
     // working. the read path hashes the whole key, so its hash is found
     // by the very same lookup.
     let old_style_key = "ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2";
-    let old_style_hash = session_key_hash_fun(old_style_key);
+    let old_style_hash = api_key_hash_fun(old_style_key);
 
     let db = TEMP_DB::new_fun("old-key");
     let pool = db.pool_fun().await;
 
-    session_upsert_fun(&pool, "alice.near", old_style_key, &old_style_hash)
+    api_key_upsert_fun(&pool, "alice.near", old_style_key, &old_style_hash)
         .await
-        .expect("the session should save");
+        .expect("the api key should save");
 
-    let found = session_get_by_key_hash_fun(&pool, &old_style_hash)
+    let found = api_key_get_by_hash_fun(&pool, &old_style_hash)
         .await
-        .expect("the session should read")
-        .expect("the session should exist");
+        .expect("the api key should read")
+        .expect("the api key should exist");
     assert_eq!(found.account_id, "alice.near");
-    assert_eq!(found.session_key, old_style_key);
+    assert_eq!(found.api_key, old_style_key);
 }
 
 #[test]
 fn a_key_hashes_to_a_fixed_length_hash() {
-    let key = session_key_generate_fun();
-    let hash = session_key_hash_fun(&key);
+    let key = api_key_generate_fun();
+    let hash = api_key_hash_fun(&key);
     // sha-256, hex encoded.
     assert_eq!(hash.len(), 64);
     // the same key always hashes the same, and the hash is not the key.
-    assert_eq!(hash, session_key_hash_fun(&key));
+    assert_eq!(hash, api_key_hash_fun(&key));
     assert_ne!(hash, key);
 }
 // ========================================

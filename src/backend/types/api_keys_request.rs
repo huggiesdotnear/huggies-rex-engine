@@ -1,6 +1,6 @@
 // ========================================
-// SESSIONS_REQUEST
-// the body our /api/shit-1170/sessions route accepts: the signed
+// API_KEYS_REQUEST
+// the body our /api/shit-1170/api-keys route accepts: the signed
 // messages of every account the browser holds.
 //
 // the browser sends ALL of its accounts at once, because the wallet
@@ -16,13 +16,18 @@
 // --- WHY --- the response is a LIST and not one key: an account has its
 // own key, so a browser holding three accounts holds three keys. the
 // list says which key belongs to which account.
+//
+// --- WHY --- the wire field is `apiKey` and not `sessionKey`: the key
+// is not a browser session. it is the credential the user hands to an
+// agent, and the agent holds it as a bearer token for as long as it
+// lives.
 use serde::{Deserialize, Serialize};
 // ========================================
 // --- TYPES ------------------------------
 // one account's signed message.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SESSION_SIGNED_MESSAGE {
+pub struct API_KEY_SIGNED_MESSAGE {
     pub account_id: String,
     pub public_key: String,
     pub signature: String,
@@ -34,22 +39,22 @@ pub struct SESSION_SIGNED_MESSAGE {
 // the request body.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SESSIONS_REQUEST {
+pub struct API_KEYS_REQUEST {
     // every account the browser holds a signature for.
-    pub accounts: Vec<SESSION_SIGNED_MESSAGE>,
+    pub accounts: Vec<API_KEY_SIGNED_MESSAGE>,
 }
 // ========================================
 // --- RESPONSE --------------------------
-// one account's session key.
+// one account's api key.
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SESSION_KEY_ENTRY {
+pub struct API_KEY_ENTRY {
     // the account the key belongs to.
     pub account_id: String,
-    // the session key. it is sent once, at the moment it is made, and
-    // the browser keeps it. a later sign-in from another device gets the
+    // the api key. it is sent once, at the moment it is made, and the
+    // browser keeps it. a later sign-in from another device gets the
     // SAME key back.
-    pub session_key: String,
+    pub api_key: String,
     // true when this call made the key, false when it already existed
     // and the same key was handed back.
     pub created: bool,
@@ -58,9 +63,9 @@ pub struct SESSION_KEY_ENTRY {
 // the answer: one key per account.
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SESSIONS_RESPONSE {
+pub struct API_KEYS_RESPONSE {
     // one entry per account the browser sent.
-    pub keys: Vec<SESSION_KEY_ENTRY>,
+    pub keys: Vec<API_KEY_ENTRY>,
 }
 // ========================================
 // copyright 2026 by sleet.near

@@ -1,10 +1,16 @@
 // ========================================
-// SESSION_KEY_FUN
-// make a session key, and hash it for the lookup.
+// API_KEY_FUN
+// make an api key, and hash it for the lookup.
 //
 // the key is what a request carries to prove which account it is for. it
 // is a bearer token: whoever holds it IS that account, so it has to be
 // unguessable.
+//
+// --- WHY --- it is called an API KEY and not a session key: the user
+// signs in once and hands the key to an agent, and the agent holds it as
+// a bearer token for as long as it lives. a "session" describes the
+// browser's short use of it; an "api key" describes what it actually is —
+// a long-lived credential for calling this backend, held by a third party.
 //
 // --- WHY --- 32 random bytes from the OS, hex encoded: 32 bytes is
 // 256 bits of entropy, which is far past anything guessable, and the OS
@@ -32,7 +38,7 @@ use sha2::{Digest, Sha256};
 // ========================================
 // --- CONFIG -----------------------------
 // how many random bytes a key carries.
-const SHIT_1170_SESSION_KEY_BYTES: usize = 32;
+const SHIT_1170_API_KEY_BYTES: usize = 32;
 // the prefix every NEW key carries.
 //
 // --- WHY --- a prefix and not nothing: a key that is obviously ours is
@@ -50,18 +56,18 @@ const SHIT_1170_SESSION_KEY_BYTES: usize = 32;
 // existing key keeps working because the READ path hashes the whole
 // key, prefix and all — the db is looked up by that hash, so a key of
 // either shape finds its account.
-const SHIT_1170_SESSION_KEY_PREFIX: &str = "shit_1170_";
+const SHIT_1170_API_KEY_PREFIX: &str = "shit_1170_";
 // ========================================
 // --- GENERATE ---------------------------
-// a fresh session key, hex encoded, with the prefix on the front.
+// a fresh api key, hex encoded, with the prefix on the front.
 //
 // --- WHY --- the prefix goes on the FRONT: the reader copies the key
 // from the top of the string, and the prefix is the part that says who
 // the key belongs to.
-pub fn session_key_generate_fun() -> String {
-    let mut bytes = [0u8; SHIT_1170_SESSION_KEY_BYTES];
+pub fn api_key_generate_fun() -> String {
+    let mut bytes = [0u8; SHIT_1170_API_KEY_BYTES];
     rand::rng().fill_bytes(&mut bytes);
-    format!("{}{}", SHIT_1170_SESSION_KEY_PREFIX, hex::encode(bytes))
+    format!("{}{}", SHIT_1170_API_KEY_PREFIX, hex::encode(bytes))
 }
 // ========================================
 // --- HASH -------------------------------
@@ -70,8 +76,8 @@ pub fn session_key_generate_fun() -> String {
 // --- WHY --- the hash is stored as well as the key: a request arrives
 // carrying the key, and the lookup is by hash, so the lookup does not
 // have to compare against every row's key.
-pub fn session_key_hash_fun(session_key: &str) -> String {
-    let digest = Sha256::digest(session_key.as_bytes());
+pub fn api_key_hash_fun(api_key: &str) -> String {
+    let digest = Sha256::digest(api_key.as_bytes());
     hex::encode(digest)
 }
 // ========================================

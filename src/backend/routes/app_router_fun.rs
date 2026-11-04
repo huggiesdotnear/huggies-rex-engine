@@ -19,10 +19,10 @@ use axum::{
 use sqlx::SqlitePool;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
+use super::api_key_me_route::api_key_me_route;
+use super::api_key_rotate_route::api_key_rotate_route;
+use super::api_keys_route::api_keys_route;
 use super::ping_route::ping_route;
-use super::session_me_route::session_me_route;
-use super::session_rotate_route::session_rotate_route;
-use super::sessions_route::sessions_route;
 use super::trezu_treasuries_route::trezu_treasuries_route;
 // ====================================
 // CORS preflight middleware — intercepts every OPTIONS request before
@@ -89,9 +89,9 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
     // --------------------------------------------------------
     let api_router = Router::new()
         .route("/api/shit-1170/ping", get(ping_route))
-        .route("/api/shit-1170/sessions", post(sessions_route))
-        .route("/api/shit-1170/session/me", get(session_me_route))
-        .route("/api/shit-1170/session/rotate", post(session_rotate_route))
+        .route("/api/shit-1170/api-keys", post(api_keys_route))
+        .route("/api/shit-1170/api-key/me", get(api_key_me_route))
+        .route("/api/shit-1170/api-key/rotate", post(api_key_rotate_route))
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------
     // static ServeDir is the FALLBACK at `/`, so any unmatched GET

@@ -1,5 +1,5 @@
 // ========================================
-// the session key prefix, tested through the REAL routes.
+// the api key prefix, tested through the REAL routes.
 //
 // the store test proves the key is made with the prefix. this proves
 // the thing that matters: a key made with the prefix WORKS, and a key
@@ -50,16 +50,16 @@ impl Drop for TEMP_DB {
     }
 }
 
-// put a session into the db with the given key, the way the sessions
+// put an api key into the db with the given key, the way the api keys
 // route would have.
-async fn put_session_fun(pool: &SqlitePool, account_id: &str, session_key: &str) {
-    use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::session_key_hash_fun;
-    use crate::backend::logic::endpoint_shit_1170_sessions::sessions_store::session_upsert_fun;
+async fn put_api_key_fun(pool: &SqlitePool, account_id: &str, api_key: &str) {
+    use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_fun::api_key_hash_fun;
+    use crate::backend::logic::endpoint_shit_1170_api_keys::api_keys_store::api_key_upsert_fun;
 
-    let session_key_hash = session_key_hash_fun(session_key);
-    session_upsert_fun(pool, account_id, session_key, &session_key_hash)
+    let api_key_hash = api_key_hash_fun(api_key);
+    api_key_upsert_fun(pool, account_id, api_key, &api_key_hash)
         .await
-        .expect("the session should save");
+        .expect("the api key should save");
 }
 
 // a running server on a free port, and the url it answers on.
@@ -84,10 +84,14 @@ async fn serve_fun(pool: SqlitePool) -> String {
 
 // ask the me-route who a key belongs to, and give back the status and
 // the body.
-async fn who_am_i_fun(base_url: &str, session_key: &str) -> (u16, String) {
+//
+// --- WHY --- the header is named in the caller: the same route has to
+// answer for the new `x-api-key` header AND for the legacy
+// `x-session-token` one, so the test says which one it means.
+async fn who_am_i_fun(base_url: &str, header_name: &str, api_key: &str) -> (u16, String) {
     let response = reqwest::Client::new()
-        .get(format!("{base_url}/api/shit-1170/session/me"))
-        .header("x-session-token", session_key)
+        .get(format!("{base_url}/api/shit-1170/api-key/me"))
+        .header(header_name, api_key)
         .send()
         .await
         .expect("the route should answer");
@@ -102,18 +106,18 @@ async fn a_new_key_carries_the_prefix_and_works() {
     let db = TEMP_DB::new_fun("new");
     let pool = db.pool_fun().await;
 
-    use crate::backend::logic::endpoint_shit_1170_sessions::session_key_fun::session_key_generate_fun;
-    let key = session_key_generate_fun();
+    use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_fun::api_key_generate_fun;
+    let key = api_key_generate_fun();
 
     assert!(
         key.starts_with("shit_1170_"),
         "a new key must start with the prefix, got {key}"
     );
 
-    put_session_fun(&pool, "alice.near", &key).await;
+    put_api_key_fun(&pool, "alice.near", &key).await;
     let base_url = serve_fun(pool).await;
 
-    let (status, body) = who_am_i_fun(&base_url, &key).await;
+    let (status, body) = who_am_i_fun(&base_url, "x-api-key", &key).await;
     assert_eq!(status, 200, "body was: {body}");
     assert!(
         body.contains("alice.near"),
@@ -129,14 +133,34 @@ async fn an_old_key_without_the_prefix_still_works() {
     // a key made before the prefix existed.
     let old_key = "ab7fca21168a6961f47677dee81dc178cd0aa9b7146c38fa9c87c3bd1e0f8fc2";
 
-    put_session_fun(&pool, "alice.near", old_key).await;
+    put_api_key_fun(&pool, "alice.near", old_key).await;
     let base_url = serve_fun(pool).await;
 
-    let (status, body) = who_am_i_fun(&base_url, old_key).await;
+    let (status, body) = who_am_i_fun(&base_url, "x-api-key", old_key).await;
     assert_eq!(status, 200, "body was: {body}");
     assert!(
         body.contains("alice.near"),
         "an old key must still find its account, body was: {body}"
+    );
+}
+
+#[tokio::test]
+async fn the_legacy_session_token_header_still_works() {
+    let db = TEMP_DB::new_fun("legacy-header");
+    let pool = db.pool_fun().await;
+
+    use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_fun::api_key_generate_fun;
+    let key = api_key_generate_fun();
+
+    put_api_key_fun(&pool, "alice.near", &key).await;
+    let base_url = serve_fun(pool).await;
+
+    // an agent built against the old header name must keep working.
+    let (status, body) = who_am_i_fun(&base_url, "x-session-token", &key).await;
+    assert_eq!(status, 200, "body was: {body}");
+    assert!(
+        body.contains("alice.near"),
+        "the legacy header must still find the account, body was: {body}"
     );
 }
 
@@ -148,12 +172,33 @@ async fn a_key_that_is_not_ours_is_refused() {
 
     let (status, body) = who_am_i_fun(
         &base_url,
+        "x-api-key",
         "shit_1170_00000000000000000000000000000000000000000000000000000000000000",
     )
     .await;
     assert_eq!(status, 401, "body was: {body}");
     assert!(
-        body.contains("unknown_session_key"),
+        body.contains("unknown_api_key"),
+        "the answer must name the reason, body was: {body}"
+    );
+}
+
+#[tokio::test]
+async fn a_request_with_no_key_at_all_is_refused() {
+    let db = TEMP_DB::new_fun("no-key");
+    let pool = db.pool_fun().await;
+    let base_url = serve_fun(pool).await;
+
+    let response = reqwest::Client::new()
+        .get(format!("{base_url}/api/shit-1170/api-key/me"))
+        .send()
+        .await
+        .expect("the route should answer");
+    let status = response.status().as_u16();
+    let body = response.text().await.unwrap_or_default();
+    assert_eq!(status, 401, "body was: {body}");
+    assert!(
+        body.contains("no_api_key"),
         "the answer must name the reason, body was: {body}"
     );
 }

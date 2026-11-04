@@ -1,6 +1,6 @@
 // ========================================
-// SESSIONS_ROUTE
-// POST /api/shit-1170/sessions — turn signed messages into session keys.
+// API_KEYS_ROUTE
+// POST /api/shit-1170/api-keys — turn signed messages into api keys.
 //
 // the browser sends every account it holds a signature for. the backend
 // verifies each signature against the exact message + nonce + recipient
@@ -19,7 +19,7 @@
 // refused as a whole. handing out a key for the good half would make the
 // forged half pointless to forge.
 //
-// --- WHY --- an account that already has a session gets the SAME key
+// --- WHY --- an account that already has an api key gets the SAME key
 // back: signing in on another device must not invalidate the first
 // device. so the key lives in the db, keyed by the account, and a later
 // sign-in reads it back out.
@@ -31,18 +31,16 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::endpoint_shit_1170_sessions::{
+use crate::backend::logic::endpoint_shit_1170_api_keys::{
+    api_key_fun::{api_key_generate_fun, api_key_hash_fun},
+    api_keys_store::{api_key_get_fun, api_key_upsert_fun},
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
-    session_key_fun::{session_key_generate_fun, session_key_hash_fun},
-    sessions_store::{session_get_fun, session_upsert_fun},
 };
-use crate::backend::types::sessions_request::{
-    SESSION_KEY_ENTRY, SESSIONS_REQUEST, SESSIONS_RESPONSE,
-};
+use crate::backend::types::api_keys_request::{API_KEY_ENTRY, API_KEYS_REQUEST, API_KEYS_RESPONSE};
 // ========================================
-pub async fn sessions_route(
+pub async fn api_keys_route(
     State(pool): State<SqlitePool>,
-    Json(body): Json<SESSIONS_REQUEST>,
+    Json(body): Json<API_KEYS_REQUEST>,
 ) -> Response {
     if body.accounts.is_empty() {
         return shit_1170_error_fun(
@@ -93,16 +91,16 @@ pub async fn sessions_route(
     // one key per account, and every key is made before any of them is
     // handed back — so a failure halfway through does not leave the
     // reader holding some keys and not others.
-    let mut keys: Vec<SESSION_KEY_ENTRY> = Vec::with_capacity(account_ids.len());
+    let mut keys: Vec<API_KEY_ENTRY> = Vec::with_capacity(account_ids.len());
     for account_id in &account_ids {
         let entry = match account_key_fun(&pool, account_id).await {
             Ok(entry) => entry,
             Err(err) => {
-                eprintln!("[sessions] could not make the key for {account_id}: {err}");
+                eprintln!("[api-keys] could not make the key for {account_id}: {err}");
                 return shit_1170_error_fun(
                     StatusCode::INTERNAL_SERVER_ERROR,
                     "db_unavailable",
-                    "the session key could not be made",
+                    "the api key could not be made",
                 )
                 .into_response();
             }
@@ -110,7 +108,7 @@ pub async fn sessions_route(
         keys.push(entry);
     }
 
-    (StatusCode::OK, Json(SESSIONS_RESPONSE { keys })).into_response()
+    (StatusCode::OK, Json(API_KEYS_RESPONSE { keys })).into_response()
 }
 // ========================================
 // --- HELPERS ----------------------------
@@ -121,25 +119,25 @@ pub async fn sessions_route(
 async fn account_key_fun(
     pool: &SqlitePool,
     account_id: &str,
-) -> Result<SESSION_KEY_ENTRY, sqlx::Error> {
-    let existing = session_get_fun(pool, account_id).await?;
+) -> Result<API_KEY_ENTRY, sqlx::Error> {
+    let existing = api_key_get_fun(pool, account_id).await?;
 
     // --- WHY --- an existing account's key is handed back unchanged: the
     // account has exactly one key, and a second device signing in must
     // get that same key, not a new one. a new key would invalidate the
     // first device.
-    let (session_key, created) = match &existing {
-        Some(session) => (session.session_key.clone(), false),
-        None => (session_key_generate_fun(), true),
+    let (api_key, created) = match &existing {
+        Some(row) => (row.api_key.clone(), false),
+        None => (api_key_generate_fun(), true),
     };
 
-    let session_key_hash = session_key_hash_fun(&session_key);
+    let api_key_hash = api_key_hash_fun(&api_key);
 
-    session_upsert_fun(pool, account_id, &session_key, &session_key_hash).await?;
+    api_key_upsert_fun(pool, account_id, &api_key, &api_key_hash).await?;
 
-    Ok(SESSION_KEY_ENTRY {
+    Ok(API_KEY_ENTRY {
         account_id: account_id.to_string(),
-        session_key,
+        api_key,
         created,
     })
 }

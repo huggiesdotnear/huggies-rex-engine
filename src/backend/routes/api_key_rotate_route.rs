@@ -1,12 +1,12 @@
 // ========================================
-// SESSION_ROTATE_ROUTE
-// POST /api/shit-1170/session/rotate — give an account a NEW session key.
+// API_KEY_ROTATE_ROUTE
+// POST /api/shit-1170/api-key/rotate — give an account a NEW api key.
 //
 // the reader asks for a new key for an account. the old key stops
 // working at once, and the new one takes its place.
 //
 // 400 = the body was empty, or the account's signature did not verify.
-// 404 = the account has no session to rotate.
+// 404 = the account has no api key to rotate.
 // 500 = the db could not be reached.
 //
 // --- WHY --- the request carries a SIGNED MESSAGE and not the old key:
@@ -32,16 +32,16 @@ use axum::{
 };
 use sqlx::SqlitePool;
 
-use crate::backend::logic::endpoint_shit_1170_sessions::{
+use crate::backend::logic::endpoint_shit_1170_api_keys::{
+    api_key_fun::{api_key_generate_fun, api_key_hash_fun},
+    api_keys_store::{api_key_get_fun, api_key_rotate_fun},
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
-    session_key_fun::{session_key_generate_fun, session_key_hash_fun},
-    sessions_store::{session_get_fun, session_rotate_fun},
 };
-use crate::backend::types::sessions_request::{SESSION_KEY_ENTRY, SESSIONS_REQUEST};
+use crate::backend::types::api_keys_request::{API_KEY_ENTRY, API_KEYS_REQUEST};
 // ========================================
-pub async fn session_rotate_route(
+pub async fn api_key_rotate_route(
     State(pool): State<SqlitePool>,
-    Json(body): Json<SESSIONS_REQUEST>,
+    Json(body): Json<API_KEYS_REQUEST>,
 ) -> Response {
     if body.accounts.is_empty() {
         return shit_1170_error_fun(
@@ -83,50 +83,49 @@ pub async fn session_rotate_route(
         .into_response();
     }
 
-    // the account has to HAVE a session — a rotation replaces a key, it
+    // the account has to HAVE an api key — a rotation replaces a key, it
     // does not make one.
-    match session_get_fun(&pool, &account.account_id).await {
+    match api_key_get_fun(&pool, &account.account_id).await {
         Ok(Some(_)) => {}
         Ok(None) => {
             return shit_1170_error_fun(
                 StatusCode::NOT_FOUND,
-                "no_session",
-                &format!("{} has no session to rotate", account.account_id),
+                "no_api_key",
+                &format!("{} has no api key to rotate", account.account_id),
             )
             .into_response();
         }
         Err(err) => {
-            eprintln!("[session] could not read the session: {err}");
+            eprintln!("[api-key] could not read the api key: {err}");
             return shit_1170_error_fun(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "db_unavailable",
-                "the session could not be read",
+                "the api key could not be read",
             )
             .into_response();
         }
     }
 
     // the new key.
-    let session_key = session_key_generate_fun();
-    let session_key_hash = session_key_hash_fun(&session_key);
+    let api_key = api_key_generate_fun();
+    let api_key_hash = api_key_hash_fun(&api_key);
 
-    let rotated =
-        session_rotate_fun(&pool, &account.account_id, &session_key, &session_key_hash).await;
+    let rotated = api_key_rotate_fun(&pool, &account.account_id, &api_key, &api_key_hash).await;
     if let Err(err) = rotated {
-        eprintln!("[session] could not rotate the session: {err}");
+        eprintln!("[api-key] could not rotate the api key: {err}");
         return shit_1170_error_fun(
             StatusCode::INTERNAL_SERVER_ERROR,
             "db_unavailable",
-            "the session could not be rotated",
+            "the api key could not be rotated",
         )
         .into_response();
     }
 
     (
         StatusCode::OK,
-        Json(SESSION_KEY_ENTRY {
+        Json(API_KEY_ENTRY {
             account_id: account.account_id.clone(),
-            session_key,
+            api_key,
             created: true,
         }),
     )

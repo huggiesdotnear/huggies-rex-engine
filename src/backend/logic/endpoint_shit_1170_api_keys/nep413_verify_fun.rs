@@ -4,7 +4,7 @@
 //
 // this is the backend's check that a claimed account id really belongs
 // to whoever sent the signature. without it, anybody could post a
-// signature made by another account and be handed a session key for it.
+// signature made by another account and be handed an api key for it.
 //
 // --- WHY --- near-kit-rs does the work and not this file: the browser
 // signs with near-kit's JAVASCRIPT package, and the two have to agree
