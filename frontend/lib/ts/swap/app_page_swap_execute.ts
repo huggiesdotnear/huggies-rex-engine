@@ -27,6 +27,7 @@ import {
 import { near_connect_client } from "@near-kit-tool-box/web";
 import { SHIT_1170_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
 import { router_token_id_fun } from "./app_page_swap_router_token";
+import { shit_1170_outcome_hash_fun } from "../shared/outcome_hash";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -48,23 +49,14 @@ export interface SHIT_1170_SWAP_EXECUTION {
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the transaction hash of one outcome, or null.
-//
-// --- WHY --- the outcomes are near-kit's FinalExecutionOutcome, whose
-// hash lives under `transaction.hash`.
-function outcome_hash_fun(outcome: unknown): string | null {
-  if (typeof outcome !== "object" || outcome === null) return null;
-  const transaction = (outcome as { transaction?: { hash?: unknown } })
-    .transaction;
-  if (typeof transaction !== "object" || transaction === null) return null;
-  const hash = transaction.hash;
-  return typeof hash === "string" && hash.length > 0 ? hash : null;
-}
-// ========================================
 // the hash of the first transaction that was actually sent.
+//
+// --- WHY --- the hash of an outcome is read by the SHARED helper: a
+// near-kit outcome carries its hash under `transaction.hash`, and the
+// feed's send reads the same thing. one helper, one knowledge.
 function first_hash_fun(outcomes: ReadonlyArray<unknown>): string | null {
   for (const outcome of outcomes) {
-    const hash = outcome_hash_fun(outcome);
+    const hash = shit_1170_outcome_hash_fun(outcome);
     if (hash !== null) return hash;
   }
   return null;

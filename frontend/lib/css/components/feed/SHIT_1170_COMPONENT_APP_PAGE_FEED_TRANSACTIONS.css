@@ -1,0 +1,37 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS
+   the post's ONE call line: the first transaction of the batch, with its
+   token amount when it has one.
+
+   --- WHY THE RULES ARE SCOPED UNDER THE POST: the call line is drawn
+   INSIDE the post, so it lives under the post's mount element. one
+   call line per post means one element per post, and an id per post
+   would be the same id many times over. so the call line is styled
+   where it is drawn. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-contract {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-method {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.8;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-arrow {
+  opacity: 0.6;
+}
+/*==================================*/

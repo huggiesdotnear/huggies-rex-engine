@@ -1,7 +1,7 @@
 # frontend/app/skill.html
 
 the skill page. it shows the session management card: the accounts the
-browser is signed in with, and the one session key the backend issued
+browser is signed in with, and the one api key the backend issued
 for them.
 
 ```html
@@ -18,7 +18,7 @@ for them.
     <!--==========================================-->
     <p>
       MORE IS COMING TO THIS PAGE: THE SKILLS THEMSELVES, AND THE ENDPOINTS THAT
-      TAKE THE SESSION KEY.
+      TAKE THE API KEY.
     </p>
     <!--==========================================-->
   </main>
@@ -39,12 +39,12 @@ for them.
 ## THE SESSION CARD
 
 the card shows ONE CARD PER SIGNED-IN ACCOUNT. every account has its
-own session key, because a key has to be narrowable to one wallet.
+own api key, because a key has to be narrowable to one wallet.
 
 each card carries:
 
 - the account id, with the active one marked by a filled dot
-- the account's session key, in full — the reader is the user, and they
+- the account's api key, in full — the reader is the user, and they
   need to copy it
 - a COPY KEY button — a 74-character key cannot be picked out of a
   line of text by hand

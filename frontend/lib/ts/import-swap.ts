@@ -10,15 +10,15 @@
 // 3. the components mount last and read what the load brought back.
 //
 // --- WHY --- the app-wide ones (the nav, the auth button, the loading
-// bar) come with import-app-wide. the toast layer does NOT: the swap
-// is the app's first transaction and the only page with something to
-// report, so the layer is the swap page's own.
+// bar) come with import-app-wide. the toast layer does NOT: the layer
+// is mounted by the pages that have something to report, and the swap
+// page is one of them.
 import "./import-app-wide";
 import "./swap/app_page_swap_start";
 import "../components/swap/app_page_swap_form";
 import "../components/swap/app_page_swap_routes";
 import "../components/shared/token_picker";
-import "../components/swap/app_page_swap_toasts";
+import "../components/shared/toast_layer";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

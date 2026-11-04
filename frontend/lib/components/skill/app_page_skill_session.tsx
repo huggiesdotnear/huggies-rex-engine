@@ -39,9 +39,9 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
 
   if (page_data === null) return null;
 
-  const copy_fun = async (account_id: string, session_key: string) => {
+  const copy_fun = async (account_id: string, api_key: string) => {
     try {
-      await navigator.clipboard.writeText(session_key);
+      await navigator.clipboard.writeText(api_key);
       set_copied(account_id);
       // the tick goes away on its own, so the card does not need a
       // timer to clean it up.
@@ -54,9 +54,9 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
   const copy_all_fun = async () => {
     const keys = page_data.accounts
       .map((account) =>
-        account.session_key === null
+        account.api_key === null
           ? null
-          : `${account.account_id} ${account.session_key}`,
+          : `${account.account_id} ${account.api_key}`,
       )
       .filter((line): line is string => line !== null);
     if (keys.length === 0) return;
@@ -84,7 +84,7 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
             {page_data.accounts.map((account) => (
               <div key={account.account_id} class="skill-session-account">
                 <h3>{account.account_id}</h3>
-                {account.session_key === null ? (
+                {account.api_key === null ? (
                   <p>
                     {page_data.loading
                       ? "ASKING THE BACKEND…"
@@ -92,17 +92,17 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
                   </p>
                 ) : (
                   <>
-                    <code>{account.session_key}</code>
+                    <code>{account.api_key}</code>
                     <div class="skill-session-buttons">
                       <button
                         type="button"
                         onClick={() => {
                           void copy_fun(
                             account.account_id,
-                            account.session_key ?? "",
+                            account.api_key ?? "",
                           );
                         }}
-                        title="copy the session key"
+                        title="copy the api key"
                         disabled={page_data.rotating}
                       >
                         {copied === account.account_id ? (

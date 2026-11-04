@@ -1,10 +1,10 @@
 // ========================================
-// the backend session: the keys of the signed-in accounts.
+// the backend api keys: the key of every signed-in account.
 //
 // the browser holds the signed messages in localStorage. this module
 // sends them to our backend, which verifies them and answers with ONE
-// KEY PER ACCOUNT. the keys are then kept here, in memory, and every
-// request that needs one picks it up from here.
+// API KEY PER ACCOUNT. the keys are then kept here, in memory, and
+// every request that needs one picks it up from here.
 //
 // --- WHY --- the keys are kept in MEMORY and not in localStorage: a key
 // is a bearer token — whoever holds it IS that account. putting it in
@@ -20,27 +20,35 @@
 // message — the account id, the PUBLIC key, the signature, and the
 // message + nonce + recipient that were signed. the user's NEAR
 // private key stays in the wallet and never reaches us or the backend.
-// ========================================
-import { api_shit_1170_sessions_post } from "@huggies/shit-1170-rex-engine-middleman";
+//
+// --- WHY --- IT IS CALLED AN API KEY AND NOT A SESSION KEY: the
+// credential in it is not a browser session. the user signs in once and
+// hands the key to an agent, and the agent holds it as a bearer token
+// for as long as it lives. a "session" describes the browser's short
+// use of it; an "api key" describes what it actually is.
+import { api_shit_1170_api_keys_post } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_SIGNED_ACCOUNT } from "@huggies/shit-1170-rex-engine-middleman";
 import { SHIT_1170_AUTH_SESSIONS } from "./auth_sessions";
 import { SHIT_1170_BASE_URL } from "./base_url";
 // ========================================
+// ========================================
 // --- TYPES ------------------------------
-// one account's key.
-export interface SHIT_1170_SESSION_KEY_ENTRY {
+// one account's api key.
+export interface SHIT_1170_API_KEY_ENTRY {
   account_id: string;
-  session_key: string;
+  api_key: string;
 }
+// ========================================
 // ========================================
 // --- STATE ------------------------------
 // the keys, by account id.
-const session_keys: Map<string, string> = new Map();
+const api_keys: Map<string, string> = new Map();
 // true while a request for the keys is in flight, so two callers do not
 // make two requests.
 let loading = false;
 // the keys we are waiting for, so a caller can wait on them.
-let pending: Promise<SHIT_1170_SESSION_KEY_ENTRY[]> | null = null;
+let pending: Promise<SHIT_1170_API_KEY_ENTRY[]> | null = null;
+// ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // every signed account the browser holds, in the shape the backend
@@ -66,6 +74,7 @@ function collect_signed_accounts_fun(): SHIT_1170_SIGNED_ACCOUNT[] {
   return out;
 }
 // ========================================
+// ========================================
 // --- LOAD ------------------------------
 // get the keys, fetching them if the browser does not have them yet.
 //
@@ -73,8 +82,8 @@ function collect_signed_accounts_fun(): SHIT_1170_SIGNED_ACCOUNT[] {
 // a key asks this module, and the module answers from memory when it
 // already has the keys. the browser's signed messages only go to the
 // backend when a key is missing.
-async function load_fun(): Promise<SHIT_1170_SESSION_KEY_ENTRY[]> {
-  if (session_keys.size > 0) return entries_fun();
+async function load_fun(): Promise<SHIT_1170_API_KEY_ENTRY[]> {
+  if (api_keys.size > 0) return entries_fun();
   if (loading && pending !== null) return pending;
 
   const accounts = collect_signed_accounts_fun();
@@ -83,11 +92,11 @@ async function load_fun(): Promise<SHIT_1170_SESSION_KEY_ENTRY[]> {
   loading = true;
   pending = (async () => {
     try {
-      const result = await api_shit_1170_sessions_post(SHIT_1170_BASE_URL, {
+      const result = await api_shit_1170_api_keys_post(SHIT_1170_BASE_URL, {
         accounts,
       });
       for (const entry of result.keys) {
-        session_keys.set(entry.accountId, entry.sessionKey);
+        api_keys.set(entry.accountId, entry.apiKey);
       }
       return entries_fun();
     } catch (err) {
@@ -95,7 +104,7 @@ async function load_fun(): Promise<SHIT_1170_SESSION_KEY_ENTRY[]> {
       // needs a key must still render when the backend is down or the
       // signatures are stale. the caller gets nothing and shows what it
       // can.
-      console.warn("[session] the session keys could not be fetched", err);
+      console.warn("[api_key] the api keys could not be fetched", err);
       return [];
     } finally {
       loading = false;
@@ -105,44 +114,47 @@ async function load_fun(): Promise<SHIT_1170_SESSION_KEY_ENTRY[]> {
   return pending;
 }
 // ========================================
+// ========================================
 // --- READ ------------------------------
 // the keys we have, as a list.
-function entries_fun(): SHIT_1170_SESSION_KEY_ENTRY[] {
-  return [...session_keys.entries()].map(([account_id, session_key]) => ({
+function entries_fun(): SHIT_1170_API_KEY_ENTRY[] {
+  return [...api_keys.entries()].map(([account_id, api_key]) => ({
     account_id,
-    session_key,
+    api_key,
   }));
 }
 
 // one account's key, or null.
-function get_session_key_fun(account_id: string): string | null {
-  return session_keys.get(account_id) ?? null;
+function get_api_key_fun(account_id: string): string | null {
+  return api_keys.get(account_id) ?? null;
 }
 
 // every account we hold a key for.
-function list_session_keys_fun(): SHIT_1170_SESSION_KEY_ENTRY[] {
+function list_api_keys_fun(): SHIT_1170_API_KEY_ENTRY[] {
   return entries_fun();
 }
 
-// the session key, fetching it if it is not there yet.
+// the api key, fetching it if it is not there yet.
 //
 // --- WHY --- this is the function a request that NEEDS a key calls: it
 // returns the key whether it was already known or had to be fetched, so
 // a caller never has to know which it is.
-async function get_or_fetch_session_key_fun(
+async function get_or_fetch_api_key_fun(
   account_id: string,
 ): Promise<string | null> {
-  const existing = session_keys.get(account_id);
+  const existing = api_keys.get(account_id);
   if (existing !== undefined) return existing;
   await load_fun();
-  return session_keys.get(account_id) ?? null;
+  return api_keys.get(account_id) ?? null;
 }
+// ========================================
 // ========================================
 // --- SET -------------------------------
 // remember a key we were given, e.g. after a rotation.
-function set_session_key_fun(account_id: string, session_key: string): void {
-  session_keys.set(account_id, session_key);
+function set_api_key_fun(account_id: string, api_key: string): void {
+  api_keys.set(account_id, api_key);
 }
+// ========================================
 // ========================================
 // --- RESET -----------------------------
 // forget the keys.
@@ -151,23 +163,24 @@ function set_session_key_fun(account_id: string, session_key: string): void {
 // account: a key belongs to an account, and when the account is gone the
 // key must not still be in memory.
 function reset_fun(): void {
-  session_keys.clear();
+  api_keys.clear();
   loading = false;
   pending = null;
 }
 
 // forget ONE account's key.
 function reset_account_fun(account_id: string): void {
-  session_keys.delete(account_id);
+  api_keys.delete(account_id);
 }
 // ========================================
+// ========================================
 // --- PUBLIC ---------------------------
-export const SHIT_1170_SESSION = {
+export const SHIT_1170_API_KEY = {
   load: load_fun,
-  get_session_key: get_session_key_fun,
-  list_session_keys: list_session_keys_fun,
-  get_or_fetch_session_key: get_or_fetch_session_key_fun,
-  set_session_key: set_session_key_fun,
+  get_api_key: get_api_key_fun,
+  list_api_keys: list_api_keys_fun,
+  get_or_fetch_api_key: get_or_fetch_api_key_fun,
+  set_api_key: set_api_key_fun,
   reset: reset_fun,
   reset_account: reset_account_fun,
 };

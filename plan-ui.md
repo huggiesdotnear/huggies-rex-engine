@@ -17,10 +17,10 @@ and a **queue page** that says everything about one queued batch.
 
 ## 0. THE TWO PAGES
 
-| page | file | url | what it is |
-|---|---|---|---|
-| the **FEED** | `frontend/app/index.html` | `/app/index.html` | the social feed of queued txs |
-| the **QUEUE** | `frontend/app/queue.html` | `/app/queue.html?queue=<queue_id>` | everything about one batch |
+| page          | file                      | url                                | what it is                    |
+| ------------- | ------------------------- | ---------------------------------- | ----------------------------- |
+| the **FEED**  | `frontend/app/index.html` | `/app/index.html`                  | the social feed of queued txs |
+| the **QUEUE** | `frontend/app/queue.html` | `/app/queue.html?queue=<queue_id>` | everything about one batch    |
 
 **the feed page is already there** — `frontend/app/index.html` is the
 app's front door and it currently says "COMING SOON!". it becomes the
@@ -69,11 +69,11 @@ a bar across the top of the feed, above the posts:
 [ ALL ] [ MINE ]   [ HIDE SENT ]   [ NEWEST ▾ ]
 ```
 
-| control | what it does | where it lives |
-|---|---|---|
-| **ALL / MINE** | all the queues, or only the ones the reader is on | the url's `account` |
-| **HIDE SENT** | hide the queues the reader has already sent. it only applies to MINE | the url's `hide_sent` |
-| **NEWEST / MOST ACCOUNTS** | the sort | the url's `sort` |
+| control                    | what it does                                                         | where it lives        |
+| -------------------------- | -------------------------------------------------------------------- | --------------------- |
+| **ALL / MINE**             | all the queues, or only the ones the reader is on                    | the url's `account`   |
+| **HIDE SENT**              | hide the queues the reader has already sent. it only applies to MINE | the url's `hide_sent` |
+| **NEWEST / MOST ACCOUNTS** | the sort                                                             | the url's `sort`      |
 
 **HIDE SENT is disabled in the ALL view.** there is no account to be
 "sent by" in that view, so the control is greyed out and the url's
@@ -105,7 +105,7 @@ signs in wants their own queue. a reader who is signed out gets all of
 it.
 
 **why the account filter is not a search box.** the reader filters by
-*themselves*. the "which account" question is answered by the sign-in,
+_themselves_. the "which account" question is answered by the sign-in,
 not typed. that is the whole point of the account filter — it is not a
 search box, it is "mine or everyone's".
 
@@ -121,11 +121,11 @@ is a plain dropdown.
 /app/index.html?account=alice.near&hide_sent=1&sort=newest
 ```
 
-| parameter | values | default |
-|---|---|---|
-| `account` | an account id, or absent for all | the signed-in account |
-| `hide_sent` | `1` | absent |
-| `sort` | `newest`, `most_accounts` | `newest` |
+| parameter   | values                           | default               |
+| ----------- | -------------------------------- | --------------------- |
+| `account`   | an account id, or absent for all | the signed-in account |
+| `hide_sent` | `1`                              | absent                |
+| `sort`      | `newest`, `most_accounts`        | `newest`              |
 
 **why the defaults are not written to the url.** a url that always
 carries its defaults is noisy, and a link to the plain feed should open
@@ -133,11 +133,11 @@ the plain feed. the url only carries what the reader changed.
 
 ### the post's actions
 
-| action | what it does |
-|---|---|
-| **SEND** | send the transactions in the wallet popup |
+| action               | what it does                                  |
+| -------------------- | --------------------------------------------- |
+| **SEND**             | send the transactions in the wallet popup     |
 | **ADD** / **REMOVE** | add YOUR account to the queue, or take it off |
-| **DETAIL** | go to the queue page |
+| **DETAIL**           | go to the queue page                          |
 
 **the ADD / REMOVE button is one button that says the opposite of what
 it will do.** if your account is on the queue and has not sent it, the
@@ -197,15 +197,15 @@ components**, as you asked.
 
 ### the components
 
-| component | what it shows |
-|---|---|
-| `SHIT_1170_COMPONENT_QUEUE_STATUS` | the status line — where this batch stands for the reader |
-| `SHIT_1170_COMPONENT_QUEUE_SUMMARY` | the what / when / why card |
-| `SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS` | the transactions, in order, with their args |
-| `SHIT_1170_COMPONENT_QUEUE_TRANSFERS` | **the ft transfers the transactions make** |
-| `SHIT_1170_COMPONENT_QUEUE_ACCOUNTS` | the WHO — every account, its status and its hash |
-| `SHIT_1170_COMPONENT_QUEUE_ACTIONS` | the buttons — ADD / REMOVE / SEND |
-| `SHIT_1170_COMPONENT_QUEUE_TOASTS` | the toast layer, like the swap page's |
+| component                                | what it shows                                            |
+| ---------------------------------------- | -------------------------------------------------------- |
+| `SHIT_1170_COMPONENT_QUEUE_STATUS`       | the status line — where this batch stands for the reader |
+| `SHIT_1170_COMPONENT_QUEUE_SUMMARY`      | the what / when / why card                               |
+| `SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS` | the transactions, in order, with their args              |
+| `SHIT_1170_COMPONENT_QUEUE_TRANSFERS`    | **the ft transfers the transactions make**               |
+| `SHIT_1170_COMPONENT_QUEUE_ACCOUNTS`     | the WHO — every account, its status and its hash         |
+| `SHIT_1170_COMPONENT_QUEUE_ACTIONS`      | the buttons — ADD / REMOVE / SEND                        |
+| `SHIT_1170_COMPONENT_QUEUE_TOASTS`       | the toast layer, like the swap page's                    |
 
 ### the transfers component — the ft transfer reading
 
@@ -222,12 +222,12 @@ transfer in them — the token id, the amount, the receiver. so the
 transfers component **reads the args** and pulls out the transfer it can
 find:
 
-| the method is | the args carry | the row shows |
-|---|---|---|
-| `ft_transfer` | `receiver_id`, `amount` | the token's icon, `1.5 USDC`, the receiver |
-| `ft_transfer_call` | `receiver_id`, `amount`, `token_id` | the same, plus the token id |
-| `ft_swap` | `token_in`, `token_out`, `amount` | the amount in, and what it is worth |
-| anything else | nothing recognisable | nothing |
+| the method is      | the args carry                      | the row shows                              |
+| ------------------ | ----------------------------------- | ------------------------------------------ |
+| `ft_transfer`      | `receiver_id`, `amount`             | the token's icon, `1.5 USDC`, the receiver |
+| `ft_transfer_call` | `receiver_id`, `amount`, `token_id` | the same, plus the token id                |
+| `ft_swap`          | `token_in`, `token_out`, `amount`   | the amount in, and what it is worth        |
+| anything else      | nothing recognisable                | nothing                                    |
 
 **the amount is read exactly as the tx page reads it.** the same
 `SHIT_1170_TRANSFER_TOKENS_STORE` and the same
@@ -386,12 +386,16 @@ one of them would drift. so it moves to `lib/ts/shared/`.
 one call, the whole batch:
 
 ```ts
-await api_shit_1170_tx_queue_sent_post(base_url, {
-  txHashes: [
-    { txId: "1a2b...", txHash: "9hN3...", status: "succeeded" },
-    { txId: "2b3c...", txHash: "AbCd...", status: "failed" },
-  ],
-}, session_options);
+await api_shit_1170_tx_queue_sent_post(
+  base_url,
+  {
+    txHashes: [
+      { txId: "1a2b...", txHash: "9hN3...", status: "succeeded" },
+      { txId: "2b3c...", txHash: "AbCd...", status: "failed" },
+    ],
+  },
+  session_options,
+);
 ```
 
 **the `status` is optional per entry.** when the outcome could not be
@@ -425,12 +429,12 @@ does the same thing the swap does. so it moves to
 
 **what the toast says.**
 
-| the outcome | the toast |
-|---|---|
-| everything worked | "SENT" and the link to the transaction |
-| some worked | "SENT" and "2 of 3 transactions worked" |
+| the outcome         | the toast                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------- |
+| everything worked   | "SENT" and the link to the transaction                                                      |
+| some worked         | "SENT" and "2 of 3 transactions worked"                                                     |
 | the reader declined | no toast — declining is not a failure, and the swap page does not toast on a decline either |
-| the wallet threw | "error" and the message |
+| the wallet threw    | "error" and the message                                                                     |
 
 **why a decline is not a toast.** the reader said no. a toast that says
 "it failed" for a deliberate no is telling the reader they did something
@@ -649,11 +653,11 @@ filter names the account it is about, and that is the `account_id`.
 
 **so the two views are two different requests:**
 
-| the reader is looking at | the request |
-|---|---|
-| **ALL** | no filters. every queue, sent or not — a sent tx is still worth seeing, and the reader wants to see who did it |
-| **MINE** | `account_id=<theirs>` — the queues they are on |
-| **MINE, hide sent** | `account_id=<theirs>&hide_sent=1` — the queues they are on that they have not sent yet. the actionable ones |
+| the reader is looking at | the request                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **ALL**                  | no filters. every queue, sent or not — a sent tx is still worth seeing, and the reader wants to see who did it |
+| **MINE**                 | `account_id=<theirs>` — the queues they are on                                                                 |
+| **MINE, hide sent**      | `account_id=<theirs>&hide_sent=1` — the queues they are on that they have not sent yet. the actionable ones    |
 
 **why the ALL view does not hide the sent ones.** a sent tx is still
 worth seeing — the reader wants to know who sent it and what it did. and
@@ -831,20 +835,20 @@ nothing is broken along the way.
 
 ## 8. THE DECISIONS THAT WERE MADE
 
-| # | the question | the answer |
-|---|---|---|
-| 1 | does the feed replace "COMING SOON!"? | **yes.** the feed page IS the queue feed |
-| 2 | the sort options | **NEWEST** (default) and **MOST ACCOUNTS**. "most accounts" is the popularity sort a social feed answers that a tx list does not |
-| 3 | the "hide sent" control | **one toggle**, HIDE SENT. off by default. it is **per account** — the api filters on it — and it only applies in the MINE view, because in the ALL view there is no account to be "sent by" |
-| 4 | how are the ft transfers read? | **the standard.** the three ft methods have fixed arg names, and the token is the contract being called. no guessing — see section 6 |
-| 5 | the queue page's url | **`?queue=<queue_id>`**. it says what the page is about and does not collide with the token page's `?id=` |
-| 6 | one popup per account | **yes.** the reader signs the whole batch for their own account. the other accounts on the queue sign separately |
-| 7 | the toast | **the existing system, moved to `shared/`.** one store, one component, each page mounts its own layer element. only one page is ever on screen |
-| 8 | the ADD button when signed out | **hidden.** a button that cannot work is noise |
-| 9 | the transactions list on the feed | **the head, the what, the WHO and the buttons.** the calls live on the queue page — see section 1 |
-| 10 | the outcome reading | **A** — the feed calls `wallet.signAndSendTransactions` itself and reads both the hash and the outcome |
-| 11 | the post's tabs | **no tabs.** the what is the headline, the who is the meta line, the how is the queue page |
-| 12 | the post's size | **headline + one call line + the WHO chips + the buttons.** everything else is the queue page |
+| #   | the question                          | the answer                                                                                                                                                                                   |
+| --- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | does the feed replace "COMING SOON!"? | **yes.** the feed page IS the queue feed                                                                                                                                                     |
+| 2   | the sort options                      | **NEWEST** (default) and **MOST ACCOUNTS**. "most accounts" is the popularity sort a social feed answers that a tx list does not                                                             |
+| 3   | the "hide sent" control               | **one toggle**, HIDE SENT. off by default. it is **per account** — the api filters on it — and it only applies in the MINE view, because in the ALL view there is no account to be "sent by" |
+| 4   | how are the ft transfers read?        | **the standard.** the three ft methods have fixed arg names, and the token is the contract being called. no guessing — see section 6                                                         |
+| 5   | the queue page's url                  | **`?queue=<queue_id>`**. it says what the page is about and does not collide with the token page's `?id=`                                                                                    |
+| 6   | one popup per account                 | **yes.** the reader signs the whole batch for their own account. the other accounts on the queue sign separately                                                                             |
+| 7   | the toast                             | **the existing system, moved to `shared/`.** one store, one component, each page mounts its own layer element. only one page is ever on screen                                               |
+| 8   | the ADD button when signed out        | **hidden.** a button that cannot work is noise                                                                                                                                               |
+| 9   | the transactions list on the feed     | **the head, the what, the WHO and the buttons.** the calls live on the queue page — see section 1                                                                                            |
+| 10  | the outcome reading                   | **A** — the feed calls `wallet.signAndSendTransactions` itself and reads both the hash and the outcome                                                                                       |
+| 11  | the post's tabs                       | **no tabs.** the what is the headline, the who is the meta line, the how is the queue page                                                                                                   |
+| 12  | the post's size                       | **headline + one call line + the WHO chips + the buttons.** everything else is the queue page                                                                                                |
 
 ### the post, decided
 

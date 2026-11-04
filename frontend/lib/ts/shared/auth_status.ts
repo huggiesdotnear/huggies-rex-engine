@@ -25,7 +25,7 @@ import {
   SHIT_1170_AUTH_SESSIONS,
   type SHIT_1170_AUTH_SESSION,
 } from "./auth_sessions";
-import { SHIT_1170_SESSION } from "./session";
+import { SHIT_1170_API_KEY } from "./api_key";
 // ========================================
 // ========================================
 // ========================================
@@ -394,9 +394,9 @@ async function sign_out_fun(): Promise<void> {
     console.info("[auth] disconnect had no wallet to close", err);
   } finally {
     clear_session_fun();
-    // the backend session key belongs to the user, and the user is
+    // the backend api key belongs to the user, and the user is
     // gone — so the key is forgotten here and not left in memory.
-    SHIT_1170_SESSION.reset();
+    SHIT_1170_API_KEY.reset();
     account_id = null;
     set_error_fun(null);
     notify_fun();
@@ -424,9 +424,9 @@ function remove_account_fun(target_account_id: string): void {
     SHIT_1170_AUTH_SESSIONS.save_active(account_id);
     if (account_id !== null) sync_url_account_fun(account_id);
   }
-  // --- WHY --- the account's backend session key is forgotten with it:
+  // --- WHY --- the account's backend api key is forgotten with it:
   // the key belongs to the account, and the account is gone.
-  SHIT_1170_SESSION.reset_account(target_account_id);
+  SHIT_1170_API_KEY.reset_account(target_account_id);
   notify_fun();
 }
 // ========================================
@@ -494,9 +494,9 @@ function init_fun(): void {
     // mirror external sign-out (from the wallet UI itself).
     connector.on("wallet:signOut", () => {
       clear_session_fun();
-      // the user is gone, so the backend session key is forgotten here
+      // the user is gone, so the backend api key is forgotten here
       // too — same as our own sign out.
-      SHIT_1170_SESSION.reset();
+      SHIT_1170_API_KEY.reset();
       account_id = null;
       notify_fun();
     });

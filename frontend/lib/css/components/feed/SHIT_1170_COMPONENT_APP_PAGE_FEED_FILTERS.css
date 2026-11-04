@@ -1,0 +1,81 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS
+   the feed's filter bar: ALL / MINE, HIDE SENT and the sort.
+
+   the bar sits across the top of the feed, above the posts. it is one
+   row, and it wraps on a narrow screen so the sort does not push the
+   toggles off the edge.
+
+   the active button is the filled-in one, and a disabled one is greyed
+   out by the base button rules. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+  text-align: left;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-toggle {
+  display: flex;
+  gap: 6px;
+}
+/*==================================*/
+/* the buttons are the base app buttons, so they carry the base look.
+   they are only narrower here, because a filter row of full-width
+   buttons would take a whole screen each. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-button {
+  width: auto;
+  min-width: 88px;
+  padding: 8px 14px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+/*==================================*/
+/* the active one is filled in, so the reader can see which view is
+   showing without reading the labels. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-button.is-active {
+  background-color: var(--color-middle);
+  color: var(--color-fontend);
+  border-color: #009aab;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-select {
+  width: auto;
+  min-width: 150px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-backend);
+  background-color: #ffe8e6;
+  border: 2px solid var(--color-middle);
+  border-radius: 12px;
+  cursor: pointer;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-select:hover {
+  background-color: var(--color-middle);
+  color: var(--color-fontend);
+  border-color: #009aab;
+}
+/*==================================*/

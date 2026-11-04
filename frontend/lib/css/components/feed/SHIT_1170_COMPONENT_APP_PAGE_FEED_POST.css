@@ -1,0 +1,185 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_FEED_POST
+   one post in the feed: the headline, the one call line, the WHO chips,
+   the reader's status and the actions.
+
+   a post is a card: the headline on top, the call line under it, then
+   the chips and the status on one row, then the buttons.
+
+   the actions row is a flex row so the DETAIL link sits on the right
+   and the buttons on the left, which is where a reader's eye goes
+   first. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto 32px auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+/*==================================*/
+/* the WHAT is the headline. it is the agent's own sentence about the
+   batch, so it gets the largest type on the card. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-what {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the call line's own rules live in the file named after its component:
+   SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS.css. */
+/*==================================*/
+/* the meta row: the chips on the left, the status on the right. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-who {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+/* a chip is a small rounded label with the account id cut to a few
+   characters. a chip with a tick on it is an account that has sent the
+   batch. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.75;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-chip.is-sent {
+  border-color: var(--color-middle);
+  opacity: 1;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-chip-tick {
+  color: var(--color-middle);
+  font-weight: 700;
+}
+/*==================================*/
+/* the actions row. the DETAIL link is pushed to the right. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+/*==================================*/
+/* the buttons are the base app buttons, only narrower here. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-send,
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-queue {
+  width: auto;
+  min-width: 96px;
+  padding: 8px 14px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+/*==================================*/
+/* the DETAIL link is a plain link, so it carries the page's link rules
+   and only overrides the size. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail:hover {
+  background: var(--color-middle);
+  border-color: #009aab;
+  color: var(--color-fontend);
+}
+/*==================================*/
+/* the reader's status on the post. the dot is the state and the word
+   says it too — the dot is for the reader who scans the feed, and the
+   word is for the reader who reads it. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+/*==================================*/
+/* the dot carries the state. the waiting one is quiet, the sent one is
+   the teal accent, and the failed one is the page's red. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-status.is-sent .feed-status-dot,
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST
+  .feed-status.is-succeeded
+  .feed-status-dot {
+  background: var(--color-middle);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST
+  .feed-status.is-failed
+  .feed-status-dot {
+  background: var(--color-backend);
+}
+/*==================================*/
+/* the link to the reader's own transaction. it is a plain link, so it
+   carries the page's link rules and only overrides the size. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-status-link {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 3px 6px;
+  text-decoration: none;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-status-link:hover {
+  background: var(--color-middle);
+  border-color: #009aab;
+  color: var(--color-fontend);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-empty {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+/*==================================*/

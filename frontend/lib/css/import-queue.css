@@ -1,0 +1,10 @@
+/*==================================*/
+/* the queue page's css: the components it mounts. */
+@import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_STATUS.css);
+@import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_SUMMARY.css);
+@import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS.css);
+@import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_TRANSFERS.css);
+@import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_ACCOUNTS.css);
+@import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_ACTIONS.css);
+@import url(./components/shared/SHIT_1170_COMPONENT_TOAST_LAYER.css);
+/*==================================*/

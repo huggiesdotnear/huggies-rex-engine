@@ -1,0 +1,26 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_APP_PAGE_FEED_STATUS
+   the feed's page status: the error line when the load failed.
+
+   on a page that loaded it renders nothing at all — the posts take
+   over. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_STATUS .feed-status {
+  display: block;
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the error line is the page's red, because a failure should read as a
+   failure at a glance. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_STATUS .feed-status.is-error {
+  color: var(--color-backend);
+}
+/*==================================*/

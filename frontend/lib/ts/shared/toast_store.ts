@@ -1,6 +1,6 @@
 // ========================================
-// the toast store: the list of messages that appear over the swap page
-// and then go away.
+// the toast store: the list of messages that appear over a page and then
+// go away.
 //
 // a toast is the app's way of saying "that worked" or "that did not",
 // without taking the reader away from what they were doing. the swap
@@ -16,7 +16,13 @@
 // --- WHY THE READER IS A COMPONENT AND NOT A PIECE OF PAGE MARKUP:
 // a toast floats over the page, so it cannot live inside the page's
 // column — it has to be a fixed layer of its own.
-import { tx_detail_href_fun } from "../shared/tx_link";
+//
+// --- WHY IT IS SHARED AND NOT THE SWAP PAGE'S: the feed and the queue
+// page report sends too, and a second page that wants the same toast
+// copies it. so it lives in shared/ and every page mounts its own
+// layer element over the one store.
+import { tx_detail_href_fun } from "./tx_link";
+import { current_app_depth_fun } from "./app_depth";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -116,11 +122,11 @@ function get_fun(): ReadonlyArray<SHIT_1170_TOAST> {
 // ========================================
 // the link to the transaction page, for a toast that has a hash.
 //
-// --- WHY --- the depth is 0: the toast layer sits on the swap page,
-// which is at the top of app/, so the transaction page is one level up
-// from it and needs no "../" prefix.
+// --- WHY --- the depth is ASKED FOR and not baked in: the toast layer
+// sits on a page that can be at any depth under /app/, and a link built
+// for the wrong depth lands on a page that does not exist.
 function tx_link_fun(tx_hash: string): string {
-  return tx_detail_href_fun(tx_hash, 0);
+  return tx_detail_href_fun(tx_hash, current_app_depth_fun());
 }
 // ========================================
 // ========================================

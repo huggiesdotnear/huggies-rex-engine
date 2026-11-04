@@ -18,22 +18,22 @@ for a user, the user signs them, the queue records what happened.
 you said the "session key" was wrongly named and should be called the
 **api key**. so, everywhere in this plan:
 
-| old name | new name | what it is |
-|---|---|---|
-| session key | **api key** | the bearer token the user hands to an agent |
-| `x-session-token` header | `x-api-key` header | where the api key travels |
-| `sessions` table | `api_keys` table | the table the api keys live in |
-| `sessions_store.rs` | `api_keys_store.rs` | the store for that table |
-| `POST /api/shit-1170/sessions` | `POST /api/shit-1170/api-keys` | minting one |
-| `GET /api/shit-1170/session/me` | `GET /api/shit-1170/api-key/me` | who a key belongs to |
-| `POST /api/shit-1170/session/rotate` | `POST /api/shit-1170/api-key/rotate` | replace one |
+| old name                             | new name                             | what it is                                  |
+| ------------------------------------ | ------------------------------------ | ------------------------------------------- |
+| session key                          | **api key**                          | the bearer token the user hands to an agent |
+| `x-session-token` header             | `x-api-key` header                   | where the api key travels                   |
+| `sessions` table                     | `api_keys` table                     | the table the api keys live in              |
+| `sessions_store.rs`                  | `api_keys_store.rs`                  | the store for that table                    |
+| `POST /api/shit-1170/sessions`       | `POST /api/shit-1170/api-keys`       | minting one                                 |
+| `GET /api/shit-1170/session/me`      | `GET /api/shit-1170/api-key/me`      | who a key belongs to                        |
+| `POST /api/shit-1170/session/rotate` | `POST /api/shit-1170/api-key/rotate` | replace one                                 |
 
 **why this is right, not just a rename.** the current "session key" is
 already exactly the credential you described: the user signs in once with
 NEP-413, the backend hands out one long-lived key, and that key is what
 the user gives to the agent. the agent then holds a bearer token for the
-user's account. calling it a *session* key describes the browser's
-short-lived use of it; calling it an *api* key describes what it
+user's account. calling it a _session_ key describes the browser's
+short-lived use of it; calling it an _api_ key describes what it
 actually is — a long-lived credential for calling this backend, which a
 third party (the agent) holds.
 
@@ -72,16 +72,16 @@ a QUEUE  (queue_id)          what / when / why
 
 ### WHAT, WHEN, WHY — free text, on the QUEUE row
 
-| field | meaning | required |
-|---|---|---|
-| `what` | what the txs do, in words | no |
-| `when` | when they should happen, in words — "when the market opens", "after the price drops below 0.5" | no |
-| `why` | why the user wants them | no |
-| `when_at` | the machine-readable version of `when`, epoch ms | no |
+| field     | meaning                                                                                        | required |
+| --------- | ---------------------------------------------------------------------------------------------- | -------- |
+| `what`    | what the txs do, in words                                                                      | no       |
+| `when`    | when they should happen, in words — "when the market opens", "after the price drops below 0.5" | no       |
+| `why`     | why the user wants them                                                                        | no       |
+| `when_at` | the machine-readable version of `when`, epoch ms                                               | no       |
 
 **why `when` is text AND `when_at` is a timestamp.** you asked for the
 string, like `what` and `why` — and that is right, because most of the
-time "when" is a *condition*, not a moment: "when the price is right",
+time "when" is a _condition_, not a moment: "when the price is right",
 "after this proposal passes". a string can say that and a timestamp
 cannot. but some requests really are "at 10:00 on friday", and that
 needs a number the machine can sort on and the ui can count down to.
@@ -109,11 +109,11 @@ joined back to the transaction. your original spec —
 — maps onto the table exactly. each object in your array is one row, and
 your three fields are three columns:
 
-| your array object | its column |
-|---|---|
-| `accountId` | `account_id` |
-| `status` | `status` |
-| `txHash` | `tx_hash` |
+| your array object | its column   |
+| ----------------- | ------------ |
+| `accountId`       | `account_id` |
+| `status`          | `status`     |
+| `txHash`          | `tx_hash`    |
 
 the array you read on the wire is those rows serialized back to a list.
 nothing is added and nothing is lost.
@@ -154,10 +154,10 @@ joins the WHO list when they do.
 there are **two different rules** here, and they pull in opposite
 directions. keeping them apart is the whole security story of the queue.
 
-| | who it is | the rule |
-|---|---|---|
-| **NAMING** | the **agent** queues a tx and names the accounts it is for | the agent may name **ONLY accounts whose api key it holds** |
-| **SIGNING** | a **user** sees a tx in their feed and signs it | any signed-in user may sign **any** queue they can see |
+|             | who it is                                                  | the rule                                                    |
+| ----------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
+| **NAMING**  | the **agent** queues a tx and names the accounts it is for | the agent may name **ONLY accounts whose api key it holds** |
+| **SIGNING** | a **user** sees a tx in their feed and signs it            | any signed-in user may sign **any** queue they can see      |
 
 **why the naming rule exists.** the WHO list is what puts a tx in
 somebody's feed. if an agent could name any account id it liked, agent A
@@ -186,12 +186,12 @@ becomes a closed club either.
 
 ### the STATUS — four states, on the account row
 
-| status | meaning |
-|---|---|
-| `pending` | on the queue, not signed yet |
-| `sent` | signed and sent — the outcome is not known yet |
-| `succeeded` | it went through |
-| `failed` | it did not work |
+| status      | meaning                                        |
+| ----------- | ---------------------------------------------- |
+| `pending`   | on the queue, not signed yet                   |
+| `sent`      | signed and sent — the outcome is not known yet |
+| `succeeded` | it went through                                |
+| `failed`    | it did not work                                |
 
 **why the status lives ONLY on the account row.** it is the one place
 where the truth is. a transaction is not "sent" or "failed" on its own —
@@ -212,13 +212,13 @@ this matches the near-kit toolbox `generic_contract_call_fun` type
 exactly. only function calls can be queued — no transfers, no key
 management, no account creation. each transaction row carries:
 
-| field | meaning |
-|---|---|
-| `contract_id` | the contract being called |
-| `method` | the method name |
-| `args` | the arguments, as a json object |
-| `gas` | the gas, as a string (the toolbox takes `number \| string`) |
-| `deposit` | the deposit, as a string (the toolbox takes `number \| string \| bigint`) |
+| field         | meaning                                                                   |
+| ------------- | ------------------------------------------------------------------------- |
+| `contract_id` | the contract being called                                                 |
+| `method`      | the method name                                                           |
+| `args`        | the arguments, as a json object                                           |
+| `gas`         | the gas, as a string (the toolbox takes `number \| string`)               |
+| `deposit`     | the deposit, as a string (the toolbox takes `number \| string \| bigint`) |
 
 **why `contract_id`, `method` and `args` have their own columns and not
 one json blob.** you asked for this, and you were right: the plan is to
@@ -316,16 +316,16 @@ the transactions table.
 they are there for the endpoints you asked for, and each one has a
 reason:
 
-| index | serves |
-|---|---|
+| index                                   | serves                                                           |
+| --------------------------------------- | ---------------------------------------------------------------- |
 | `tx_queue_transactions_contract_id_idx` | "how many txs for this contract" and "the most common contracts" |
-| `tx_queue_transactions_method_idx` | "the most common methods" |
-| `tx_queue_transactions_queue_id_idx` | "the transactions of this queue", in order |
-| `tx_queue_transactions_created_at_idx` | the feed list, newest first |
-| `tx_queue_accounts_account_id_idx` | "the txs for THIS account" — the feed filter |
-| `tx_queue_accounts_queue_id_idx` | "the accounts on this queue" |
-| `tx_queue_accounts_status_idx` | "the txs this account has not sent yet" |
-| `api_keys_api_key_hash_idx` | the api key lookup on every authenticated request |
+| `tx_queue_transactions_method_idx`      | "the most common methods"                                        |
+| `tx_queue_transactions_queue_id_idx`    | "the transactions of this queue", in order                       |
+| `tx_queue_transactions_created_at_idx`  | the feed list, newest first                                      |
+| `tx_queue_accounts_account_id_idx`      | "the txs for THIS account" — the feed filter                     |
+| `tx_queue_accounts_queue_id_idx`        | "the accounts on this queue"                                     |
+| `tx_queue_accounts_status_idx`          | "the txs this account has not sent yet"                          |
+| `api_keys_api_key_hash_idx`             | the api key lookup on every authenticated request                |
 
 ### `queue_id` and `tx_id` are uuids
 
@@ -528,35 +528,35 @@ everything under `/api/shit-1170/`. the api key travels in the
 
 ### the queue routes
 
-| method | path | what it does |
-|---|---|---|
-| `POST` | `/api/shit-1170/tx-queue` | queue a batch of transactions |
-| `GET` | `/api/shit-1170/tx-queue` | the queue list, filterable |
-| `GET` | `/api/shit-1170/tx-queue/{queue_id}` | one queued batch, with its transactions and accounts |
-| `POST` | `/api/shit-1170/tx-queue/{queue_id}/accounts` | add YOUR OWN account to a queued batch |
-| `DELETE` | `/api/shit-1170/tx-queue/{queue_id}/accounts/{account_id}` | remove YOUR OWN account from a queued batch |
-| `POST` | `/api/shit-1170/tx-queue/{queue_id}/sent` | record that transactions were sent — the hashes and the outcome |
-| `GET` | `/api/shit-1170/tx-queue/stats/contracts` | how many queued txs per contract |
-| `GET` | `/api/shit-1170/tx-queue/stats/methods` | how many queued txs per method |
+| method   | path                                                       | what it does                                                    |
+| -------- | ---------------------------------------------------------- | --------------------------------------------------------------- |
+| `POST`   | `/api/shit-1170/tx-queue`                                  | queue a batch of transactions                                   |
+| `GET`    | `/api/shit-1170/tx-queue`                                  | the queue list, filterable                                      |
+| `GET`    | `/api/shit-1170/tx-queue/{queue_id}`                       | one queued batch, with its transactions and accounts            |
+| `POST`   | `/api/shit-1170/tx-queue/{queue_id}/accounts`              | add YOUR OWN account to a queued batch                          |
+| `DELETE` | `/api/shit-1170/tx-queue/{queue_id}/accounts/{account_id}` | remove YOUR OWN account from a queued batch                     |
+| `POST`   | `/api/shit-1170/tx-queue/{queue_id}/sent`                  | record that transactions were sent — the hashes and the outcome |
+| `GET`    | `/api/shit-1170/tx-queue/stats/contracts`                  | how many queued txs per contract                                |
+| `GET`    | `/api/shit-1170/tx-queue/stats/methods`                    | how many queued txs per method                                  |
 
 ### the api key routes (the renamed session routes)
 
-| method | path | what it does |
-|---|---|---|
-| `POST` | `/api/shit-1170/api-keys` | sign in → get an api key (was `/sessions`) |
-| `GET` | `/api/shit-1170/api-key/me` | who this api key belongs to (was `/session/me`) |
-| `POST` | `/api/shit-1170/api-key/rotate` | replace an api key (was `/session/rotate`) |
+| method | path                            | what it does                                    |
+| ------ | ------------------------------- | ----------------------------------------------- |
+| `POST` | `/api/shit-1170/api-keys`       | sign in → get an api key (was `/sessions`)      |
+| `GET`  | `/api/shit-1170/api-key/me`     | who this api key belongs to (was `/session/me`) |
+| `POST` | `/api/shit-1170/api-key/rotate` | replace an api key (was `/session/rotate`)      |
 
 ### the filters on the queue list
 
-| query param | what it does |
-|---|---|
-| `account_id` | only the queues this account is on |
-| `hide_sent` | with `account_id`, drop the queues this account has already sent |
-| `contract_id` | only the queues holding a tx for this contract |
-| `method` | only the queues holding a tx for this method |
-| `limit` | how many, default 50 |
-| `offset` | where to start, default 0 |
+| query param   | what it does                                                     |
+| ------------- | ---------------------------------------------------------------- |
+| `account_id`  | only the queues this account is on                               |
+| `hide_sent`   | with `account_id`, drop the queues this account has already sent |
+| `contract_id` | only the queues holding a tx for this contract                   |
+| `method`      | only the queues holding a tx for this method                     |
+| `limit`       | how many, default 50                                             |
+| `offset`      | where to start, default 0                                        |
 
 **there is no `status` filter.** the status is per account and per
 transaction, and a queue has no global status to filter on.
@@ -583,10 +583,10 @@ queue is an open offer, and hiding it would defeat the point.
 
 **the feed's two views, and what each asks for:**
 
-| the reader is looking at | the request |
-|---|---|
-| **ALL** | no filters. every queue, sent or not — a sent tx is still worth seeing, and the reader wants to see who did it |
-| **MINE, hide sent** | `account_id=<theirs>&hide_sent=1` — the queues they are on that they have not sent yet. the actionable ones |
+| the reader is looking at | the request                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **ALL**                  | no filters. every queue, sent or not — a sent tx is still worth seeing, and the reader wants to see who did it |
+| **MINE, hide sent**      | `account_id=<theirs>&hide_sent=1` — the queues they are on that they have not sent yet. the actionable ones    |
 
 ---
 
@@ -610,14 +610,23 @@ cannot queue a batch for an account it does not hold a key for.
     {
       "contractId": "ref.finance.near",
       "method": "ft_swap",
-      "args": { "receiver_id": "alice.near", "amount": "100000000", "token_in": "usdt.tether-token.near", "token_out": "wrap.near" },
+      "args": {
+        "receiver_id": "alice.near",
+        "amount": "100000000",
+        "token_in": "usdt.tether-token.near",
+        "token_out": "wrap.near"
+      },
       "gas": "30000000000000",
       "deposit": "1"
     },
     {
       "contractId": "ref.finance.near",
       "method": "ft_resolve_transfer",
-      "args": { "token_id": "usdt.tether-token.near", "receiver_id": "alice.near", "amount": "100000000" },
+      "args": {
+        "token_id": "usdt.tether-token.near",
+        "receiver_id": "alice.near",
+        "amount": "100000000"
+      },
       "gas": "30000000000000",
       "deposit": "1"
     }
@@ -700,14 +709,14 @@ and hash for each.
 GET /api/shit-1170/tx-queue?account_id=alice.near&hide_sent=1&limit=50&offset=0
 ```
 
-| param | what it does |
-|---|---|
-| `account_id` | only the queues this account is on |
-| `hide_sent` | `1` drops the ones this account has sent. it needs `account_id` |
-| `contract_id` | only the queues holding a tx for this contract |
-| `method` | only the queues holding a tx for this method |
-| `limit` | default 50 |
-| `offset` | default 0 |
+| param         | what it does                                                    |
+| ------------- | --------------------------------------------------------------- |
+| `account_id`  | only the queues this account is on                              |
+| `hide_sent`   | `1` drops the ones this account has sent. it needs `account_id` |
+| `contract_id` | only the queues holding a tx for this contract                  |
+| `method`      | only the queues holding a tx for this method                    |
+| `limit`       | default 50                                                      |
+| `offset`      | default 0                                                       |
 
 **`hide_sent` without `account_id` is a `400`.** the filter is about one
 account, and without an account there is no account to be about. saying
@@ -770,8 +779,16 @@ the body:
 ```json
 {
   "txHashes": [
-    { "txId": "1a2b3c4d-0000-0000-0000-000000000001", "txHash": "9hN3lq...", "status": "succeeded" },
-    { "txId": "1a2b3c4d-0000-0000-0000-000000000002", "txHash": "AbCdEf...", "status": "failed" }
+    {
+      "txId": "1a2b3c4d-0000-0000-0000-000000000001",
+      "txHash": "9hN3lq...",
+      "status": "succeeded"
+    },
+    {
+      "txId": "1a2b3c4d-0000-0000-0000-000000000002",
+      "txHash": "AbCdEf...",
+      "status": "failed"
+    }
   ]
 }
 ```
@@ -799,7 +816,7 @@ the header — the key IS the account — so the body does not repeat it.
 ### `GET /api/shit-1170/tx-queue/stats/contracts` — the popular contracts
 
 ```json
-{ "items": [ { "contractId": "ref.finance.near", "count": 12 } ] }
+{ "items": [{ "contractId": "ref.finance.near", "count": 12 }] }
 ```
 
 ordered by count, biggest first. a `limit` query param, default 20.
@@ -807,7 +824,11 @@ ordered by count, biggest first. a `limit` query param, default 20.
 ### `GET /api/shit-1170/tx-queue/stats/methods` — the popular methods
 
 ```json
-{ "items": [ { "method": "ft_swap", "contractId": "ref.finance.near", "count": 9 } ] }
+{
+  "items": [
+    { "method": "ft_swap", "contractId": "ref.finance.near", "count": 9 }
+  ]
+}
 ```
 
 ordered by count, biggest first. `limit`, default 20.
@@ -1011,7 +1032,7 @@ session object. the db rows are snake_case and stay in the store.
 
 ## 8. THE FRONTEND — NOT IN THIS PLAN
 
-you said: *"for now just make sure backend logic and DB tables are clean."*
+you said: _"for now just make sure backend logic and DB tables are clean."_
 
 so this plan is **backend + middleman only**. the feed page's queue list,
 the signing flow, the filter ui — all of that is a later plan, and it
@@ -1072,8 +1093,8 @@ DOCS/ROUTES/shit-1170-session-rotate.md
 ```
 
 **note on the rule about tables in markdown.** `DOCS/RULES.md` says
-*"never put a table in a markdown file. prefer to create .csv files
-instead."* so the schema and the route lists go in `.csv` files:
+_"never put a table in a markdown file. prefer to create .csv files
+instead."_ so the schema and the route lists go in `.csv` files:
 
 ```
 DOCS/DB/tables.csv     — the three tables, one row per column
@@ -1156,22 +1177,22 @@ sessions_store_test.rs       → api_keys_store_test.rs
 
 ## 12. THE THINGS I AM NOT DOING, AND WHY
 
-| not doing | why |
-|---|---|
-| the feed page ui | you said backend and db first |
-| the signing flow | the queue records the hash — the app that signs it is the ui's job |
-| transfers in the queue | only function calls. a transfer is not a function call and the toolbox type is a function call |
-| one queued tx with two actions | the toolbox type has one action per transaction. two actions are two TRANSACTIONS in one batch, which is the same thing with a different name |
-| a queue expiry / ttl | not asked for. a queued tx waits until it is signed or removed |
-| a soft delete on the queue | a hard delete cascades to the account rows. it is a beta |
-| rate limiting the queue | the api key is the gate. a rate limiter is a later thing |
-| editing a queued transaction | a queued batch is immutable once queued. a change means a new batch |
-| a "is the queue done" status | a queue is never done — anyone can always join and send it. the status is per account and per transaction, and that is all there is |
-| the agent naming accounts it has no key for | the WHO list is the agent's own users. naming somebody else would be the agent putting a tx in somebody's feed without them asking |
-| removing one transaction from a batch | the positions would renumber and the wallet would get a different set. a batch is all or nothing |
-| the agent's own identity | one api key, one agent. which agent queued what is not tracked |
-| deleting a sent row | a row with a hash is history. it shows who did the tx, and it stays |
-| the backend checking the chain | the frontend reads the outcome from fastnear, as the swap page already does, and reports it back. the backend stores what it is told |
+| not doing                                   | why                                                                                                                                           |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| the feed page ui                            | you said backend and db first                                                                                                                 |
+| the signing flow                            | the queue records the hash — the app that signs it is the ui's job                                                                            |
+| transfers in the queue                      | only function calls. a transfer is not a function call and the toolbox type is a function call                                                |
+| one queued tx with two actions              | the toolbox type has one action per transaction. two actions are two TRANSACTIONS in one batch, which is the same thing with a different name |
+| a queue expiry / ttl                        | not asked for. a queued tx waits until it is signed or removed                                                                                |
+| a soft delete on the queue                  | a hard delete cascades to the account rows. it is a beta                                                                                      |
+| rate limiting the queue                     | the api key is the gate. a rate limiter is a later thing                                                                                      |
+| editing a queued transaction                | a queued batch is immutable once queued. a change means a new batch                                                                           |
+| a "is the queue done" status                | a queue is never done — anyone can always join and send it. the status is per account and per transaction, and that is all there is           |
+| the agent naming accounts it has no key for | the WHO list is the agent's own users. naming somebody else would be the agent putting a tx in somebody's feed without them asking            |
+| removing one transaction from a batch       | the positions would renumber and the wallet would get a different set. a batch is all or nothing                                              |
+| the agent's own identity                    | one api key, one agent. which agent queued what is not tracked                                                                                |
+| deleting a sent row                         | a row with a hash is history. it shows who did the tx, and it stays                                                                           |
+| the backend checking the chain              | the frontend reads the outcome from fastnear, as the swap page already does, and reports it back. the backend stores what it is told          |
 
 ---
 
@@ -1181,30 +1202,30 @@ these came out of the question box, and they are baked into the plan
 above. they are listed here so a reader can see what was chosen and
 why, without scrolling back.
 
-| decision | what was chosen |
-|---|---|
-| the session key's name | **api key**. the header is `x-api-key`. the old `x-session-token` still works |
-| the agent's credential | the same key. the user signs in once and hands that key to the agent |
-| the WHO's shape | one row per account, with `account_id`, `status` and `tx_hash` — exactly the three fields you named |
-| the WHO is a table, not json | so "the txs for this account" is an indexed read and the hash is a column |
-| transactions per queue | many. one `queue_id` holds a batch, sent in one wallet popup |
-| every account signs every tx | yes — one popup per account, covering the whole batch |
-| the order of the batch | it matters. the `position` column holds it |
-| the batch size cap | 50 |
-| the status | four states on the account row: `pending`, `sent`, `succeeded`, `failed` |
-| a queue-level status | **none**. a queue is never done — anyone can always join and send it |
-| a transaction-level status | **none**. the truth is the account rows |
-| who is on a queue | the accounts the agent named (status `pending`) AND the accounts that sent it (status `sent`/`succeeded`/`failed`) |
-| **who the agent may NAME** | **only accounts whose api key it holds.** it cannot name a stranger's account, so it cannot put a tx in another agent's user's feed |
-| who may SIGN | any signed-in user, on any queue they can see. the queue is an open offer |
-| signing a queue you were not named on | allowed. the account row is created and it joins the WHO list |
-| adding an account | the route stays, but it only ever adds **your own** account |
-| removing an account | your own account, and only while it has no hash. a sent row is history |
-| reporting a send | one call for the whole batch, with `txId` + `txHash` + optional `status` per entry |
-| recording success/failure | the frontend reads the outcome from the chain and reports it back. the backend stores it |
-| the list | open to anyone with an api key. no `status` filter, only `account_id` |
-| `when` | free text, plus a nullable `when_at` epoch ms for the machine-readable case |
-| the deploy | **not this session**. build and test locally only |
+| decision                              | what was chosen                                                                                                                     |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| the session key's name                | **api key**. the header is `x-api-key`. the old `x-session-token` still works                                                       |
+| the agent's credential                | the same key. the user signs in once and hands that key to the agent                                                                |
+| the WHO's shape                       | one row per account, with `account_id`, `status` and `tx_hash` — exactly the three fields you named                                 |
+| the WHO is a table, not json          | so "the txs for this account" is an indexed read and the hash is a column                                                           |
+| transactions per queue                | many. one `queue_id` holds a batch, sent in one wallet popup                                                                        |
+| every account signs every tx          | yes — one popup per account, covering the whole batch                                                                               |
+| the order of the batch                | it matters. the `position` column holds it                                                                                          |
+| the batch size cap                    | 50                                                                                                                                  |
+| the status                            | four states on the account row: `pending`, `sent`, `succeeded`, `failed`                                                            |
+| a queue-level status                  | **none**. a queue is never done — anyone can always join and send it                                                                |
+| a transaction-level status            | **none**. the truth is the account rows                                                                                             |
+| who is on a queue                     | the accounts the agent named (status `pending`) AND the accounts that sent it (status `sent`/`succeeded`/`failed`)                  |
+| **who the agent may NAME**            | **only accounts whose api key it holds.** it cannot name a stranger's account, so it cannot put a tx in another agent's user's feed |
+| who may SIGN                          | any signed-in user, on any queue they can see. the queue is an open offer                                                           |
+| signing a queue you were not named on | allowed. the account row is created and it joins the WHO list                                                                       |
+| adding an account                     | the route stays, but it only ever adds **your own** account                                                                         |
+| removing an account                   | your own account, and only while it has no hash. a sent row is history                                                              |
+| reporting a send                      | one call for the whole batch, with `txId` + `txHash` + optional `status` per entry                                                  |
+| recording success/failure             | the frontend reads the outcome from the chain and reports it back. the backend stores it                                            |
+| the list                              | open to anyone with an api key. no `status` filter, only `account_id`                                                               |
+| `when`                                | free text, plus a nullable `when_at` epoch ms for the machine-readable case                                                         |
+| the deploy                            | **not this session**. build and test locally only                                                                                   |
 
 ---
 

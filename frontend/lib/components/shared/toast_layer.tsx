@@ -1,29 +1,29 @@
 // ========================================
-// the toast layer: the messages that float over the swap page.
+// the toast layer: the messages that float over a page.
 //
 // a toast says "that worked" or "that did not", and links to the
 // transaction when there is one.
 //
-// --- WHY IT IS ITS OWN COMPONENT AND NOT PART OF THE SWAP FORM: the
-// toast floats OVER the page, so it cannot live inside the page's 500px
-// column — it is a fixed layer of its own, and it reads a store that
-// any part of the page can write to.
+// --- WHY IT IS ITS OWN COMPONENT AND NOT PART OF A PAGE'S MARKUP: the
+// toast floats OVER the page, so it cannot live inside the page's
+// 500px column — it is a fixed layer of its own, and it reads a store
+// that any part of the page can write to.
 //
-// --- WHY IT IS THE SWAP PAGE'S AND NOT THE APP'S: the swap is the
-// app's first transaction, so it is the only page that has something
-// to report. a toast layer on a page that never writes to it is a
-// layer of nothing.
+// --- WHY IT IS SHARED AND NOT THE SWAP PAGE'S: the swap, the feed and
+// the queue page all report a transaction, and all three say the same
+// thing about it. so the layer lives in shared/ and every page that has
+// something to report mounts its own layer element over the one store.
 //
-// mounts into <div id="SHIT_1170_COMPONENT_SWAP_TOASTS">.
+// mounts into <div id="SHIT_1170_COMPONENT_TOAST_LAYER">.
 import { render } from "preact";
 import { useState as use_state, useEffect as use_effect } from "preact/hooks";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { SHIT_1170_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
-import type { SHIT_1170_TOAST } from "../../ts/swap/app_page_swap_toast_store";
+import { SHIT_1170_TOAST_STORE } from "../../ts/shared/toast_store";
+import type { SHIT_1170_TOAST } from "../../ts/shared/toast_store";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-function SHIT_1170_COMPONENT_SWAP_TOASTS_FUN() {
+function SHIT_1170_COMPONENT_TOAST_LAYER_FUN() {
   // --- WHY --- a revision counter forces a re-render on every store
   // notify; preact does not re-render from external state changes
   // alone.
@@ -73,10 +73,10 @@ function SHIT_1170_COMPONENT_SWAP_TOASTS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
-const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_SWAP_TOASTS;
+const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TOAST_LAYER;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<SHIT_1170_COMPONENT_SWAP_TOASTS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_TOAST_LAYER_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

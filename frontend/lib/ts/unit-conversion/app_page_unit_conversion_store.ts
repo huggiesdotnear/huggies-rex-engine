@@ -143,7 +143,10 @@ function derive_fun(
   if (decimals === null || !/^\d+$/.test(fixed_amount.trim())) {
     return { human: "", unit: fixed_amount };
   }
-  return { human: unit_to_human_fun(fixed_amount, decimals), unit: fixed_amount };
+  return {
+    human: unit_to_human_fun(fixed_amount, decimals),
+    unit: fixed_amount,
+  };
 }
 // ========================================
 // write the pair to the url.
@@ -205,12 +208,22 @@ function apply_pending_url_amounts_fun(token_info: TOKEN_INFO | null): void {
   const decimals = token_info?.decimals ?? null;
   if (side === "unit") {
     const derived = derive_fun("unit", unit ?? "", decimals);
-    set_state_fun({ ...state, human: derived.human, unit: derived.unit, fixed_side: "unit" });
+    set_state_fun({
+      ...state,
+      human: derived.human,
+      unit: derived.unit,
+      fixed_side: "unit",
+    });
     write_url_fun(derived.human, derived.unit);
     return;
   }
   const derived = derive_fun("human", human ?? "", decimals);
-  set_state_fun({ ...state, human: derived.human, unit: derived.unit, fixed_side: "human" });
+  set_state_fun({
+    ...state,
+    human: derived.human,
+    unit: derived.unit,
+    fixed_side: "human",
+  });
   write_url_fun(derived.human, derived.unit);
 }
 // ========================================

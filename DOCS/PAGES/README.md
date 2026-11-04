@@ -95,7 +95,8 @@ everything for that page. no component fetches anything.
   and the source each one reads from
 - [`requests.csv`](./requests.csv) - the requests each page makes
 - [`frontend.index.md`](./frontend.index.md) - `frontend/index.html`
-- [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - FEED
+- [`frontend.app.index.md`](./frontend.app.index.md) - `frontend/app/index.html` - ?account= - ?hide_sent= - ?sort= - FEED
+- [`frontend.app.queue.md`](./frontend.app.queue.md) - `frontend/app/queue.html` - ?queue= - QUEUE
 - [`frontend.app.auth.md`](./frontend.app.auth.md) - `frontend/app/auth.html` - AUTH
 - [`frontend.app.discover.md`](./frontend.app.discover.md) - `frontend/app/discover.html`
 - [`frontend.app.burn.md`](./frontend.app.burn.md) - `frontend/app/burn.html` - BURN

@@ -1,0 +1,57 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_QUEUE_STATUS
+   the queue page's status line: where the READER stands on this batch.
+
+   the dot carries the state and the words say it. the waiting one is
+   quiet, the sent one is the teal accent, and the failed one is the
+   page's red. */
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  flex: 0 0 auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status.is-sent .queue-status-dot,
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status.is-succeeded .queue-status-dot {
+  background: var(--color-middle);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status.is-failed .queue-status-dot {
+  background: var(--color-backend);
+}
+/*==================================*/
+/* the link to the transaction. it is a plain link, so it carries the
+   page's link rules and only overrides the size. */
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status-link {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 3px 6px;
+  text-decoration: none;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_STATUS .queue-status-link:hover {
+  background: var(--color-middle);
+  border-color: #009aab;
+  color: var(--color-fontend);
+}
+/*==================================*/

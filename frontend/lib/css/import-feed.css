@@ -1,0 +1,8 @@
+/*==================================*/
+/* the feed page's css: the components it mounts. */
+@import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS.css);
+@import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_POST.css);
+@import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_STATUS.css);
+@import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS.css);
+@import url(./components/shared/SHIT_1170_COMPONENT_TOAST_LAYER.css);
+/*==================================*/

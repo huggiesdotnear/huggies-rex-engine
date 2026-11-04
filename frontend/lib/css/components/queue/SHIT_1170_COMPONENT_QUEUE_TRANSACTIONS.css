@@ -1,0 +1,86 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS
+   the queue page's calls: every transaction, in position order, with its
+   raw arguments.
+
+   the arguments are a json code block, and the block's own look lives in
+   its own file (tx/code_block.css). */
+@import url(../tx/code_block.css);
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transactions {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transactions h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+/*==================================*/
+/* the head row: the position, the contract and the method. */
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+/* the position is the batch's own order, so a swap's legs read in the
+   order they were meant to run. */
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-position {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  flex: 0 0 auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-contract {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-method {
+  font-family: monospace;
+  font-size: 12px;
+  opacity: 0.85;
+}
+/*==================================*/
+/* the gas and the deposit, as the agent wrote them. */
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+/*==================================*/

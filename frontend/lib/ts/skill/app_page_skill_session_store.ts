@@ -16,7 +16,7 @@
 // message for, and the backend knows the key each account has.
 import { SHIT_1170_AUTH } from "../shared/auth_status";
 import { SHIT_1170_AUTH_SESSIONS } from "../shared/auth_sessions";
-import { SHIT_1170_SESSION } from "../shared/session";
+import { SHIT_1170_API_KEY } from "../shared/api_key";
 import { app_page_skill_session_rotate_fun } from "./app_page_skill_session_rotate";
 // ========================================
 // --- TYPES ------------------------------
@@ -24,9 +24,9 @@ import { app_page_skill_session_rotate_fun } from "./app_page_skill_session_rota
 export interface SHIT_1170_APP_PAGE_SKILL_ACCOUNT {
   // the account id.
   account_id: string;
-  // the account's session key, or null when the backend has not issued
+  // the account's api key, or null when the backend has not issued
   // one yet.
-  session_key: string | null;
+  api_key: string | null;
   // true for the account the app is currently acting as.
   is_active: boolean;
 }
@@ -81,7 +81,7 @@ async function load_fun(): Promise<void> {
   data = {
     accounts: account_ids.map((account_id) => ({
       account_id,
-      session_key: SHIT_1170_SESSION.get_session_key(account_id),
+      api_key: SHIT_1170_API_KEY.get_api_key(account_id),
       is_active: account_id === active_id,
     })),
     loading: account_ids.length > 0,
@@ -105,11 +105,11 @@ async function load_fun(): Promise<void> {
   }
 
   try {
-    await SHIT_1170_SESSION.load();
+    await SHIT_1170_API_KEY.load();
     data = {
       accounts: account_ids.map((account_id) => ({
         account_id,
-        session_key: SHIT_1170_SESSION.get_session_key(account_id),
+        api_key: SHIT_1170_API_KEY.get_api_key(account_id),
         is_active: account_id === active_id,
       })),
       loading: false,
@@ -120,7 +120,7 @@ async function load_fun(): Promise<void> {
     data = {
       accounts: account_ids.map((account_id) => ({
         account_id,
-        session_key: SHIT_1170_SESSION.get_session_key(account_id),
+        api_key: SHIT_1170_API_KEY.get_api_key(account_id),
         is_active: account_id === active_id,
       })),
       loading: false,
@@ -149,12 +149,12 @@ async function rotate_fun(account_id: string): Promise<void> {
   try {
     const result = await app_page_skill_session_rotate_fun(account_id);
     // the new key replaces the old one in memory.
-    SHIT_1170_SESSION.set_session_key(account_id, result.session_key);
+    SHIT_1170_API_KEY.set_api_key(account_id, result.api_key);
     data = {
       ...data,
       accounts: data.accounts.map((account) =>
         account.account_id === account_id
-          ? { ...account, session_key: result.session_key }
+          ? { ...account, api_key: result.api_key }
           : account,
       ),
       rotating: false,

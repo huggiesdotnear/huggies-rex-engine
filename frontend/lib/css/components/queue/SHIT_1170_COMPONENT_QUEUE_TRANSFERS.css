@@ -1,0 +1,69 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_QUEUE_TRANSFERS
+   the queue page's transfers: the ft transfers the batch's calls make.
+
+   one row per transfer: the token's icon and the amount on top, and the
+   method and the receiver under it.
+
+   the amount reads through the SHARED transfer amount component, so the
+   icon, the symbol and the usd worth are the app's own. */
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfers {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfers h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfer-amount {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfer-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfer-method {
+  font-family: monospace;
+  opacity: 0.8;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSFERS .queue-transfer-receiver {
+  font-size: 11px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/

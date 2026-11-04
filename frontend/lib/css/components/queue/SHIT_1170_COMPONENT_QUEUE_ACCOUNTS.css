@@ -1,0 +1,83 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_QUEUE_ACCOUNTS
+   the queue page's WHO: every account, its status and its hash.
+
+   one row per account: the id on the left, the status in the middle and
+   the hash on the right. the hash links to the transaction page, and the
+   reader's own row is marked so it can be found at a glance. */
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-accounts {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-accounts h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+}
+/*==================================*/
+/* the reader's own row is marked with the teal border, so the reader can
+   find their own line without reading every id. */
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account.is-reader {
+  border-color: var(--color-middle);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account-id {
+  font-family: monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  flex: 1 1 160px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account-status {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account-status.is-succeeded {
+  color: var(--color-middle);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account-status.is-failed {
+  color: var(--color-backend);
+}
+/*==================================*/
+/* the hash. it is a plain link, so it carries the page's link rules and
+   only overrides the size. */
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account-hash {
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_ACCOUNTS .queue-account-hash.is-empty {
+  opacity: 0.45;
+  text-decoration: none;
+}
+/*==================================*/

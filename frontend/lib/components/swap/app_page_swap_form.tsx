@@ -16,7 +16,7 @@ import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
 import { SHIT_1170_TOKEN_PICKER } from "../../ts/shared/token_picker";
 import { SHIT_1170_APP_PAGE_SWAP_EXECUTE } from "../../ts/swap/app_page_swap_execute";
-import { SHIT_1170_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
+import { SHIT_1170_TOAST_STORE } from "../../ts/shared/toast_store";
 import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
 import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
