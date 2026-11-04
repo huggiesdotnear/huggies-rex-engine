@@ -72,8 +72,12 @@ a bar across the top of the feed, above the posts:
 | control | what it does | where it lives |
 |---|---|---|
 | **ALL / MINE** | all the queues, or only the ones the reader is on | the url's `account` |
-| **HIDE SENT** | hide the queues the reader has already sent | the url's `hide_sent` |
+| **HIDE SENT** | hide the queues the reader has already sent. it only applies to MINE | the url's `hide_sent` |
 | **NEWEST / MOST ACCOUNTS** | the sort | the url's `sort` |
+
+**HIDE SENT is disabled in the ALL view.** there is no account to be
+"sent by" in that view, so the control is greyed out and the url's
+`hide_sent` is ignored. switching to MINE turns it back on.
 
 **the filter lives in the url**, so a filtered feed is a link somebody
 can paste:
@@ -88,9 +92,13 @@ do it. a feed that cannot be linked is a feed that cannot be shared, and
 sharing a feed of txs is the whole point of a social feed.
 
 **why "HIDE SENT" and not a "SENT" filter.** a reader who has already
-sent a tx does not want to see it again — it is done, it is not
-actionable. but they might want to look at what they sent, so hiding is
-a toggle and not a filter that replaces the list.
+sent a tx does not want to see it again in their own view — it is done,
+it is not actionable. but they might want to look at what they sent, so
+hiding is a toggle and not a filter that replaces the list.
+
+**the toggle only applies to the reader's own view.** in the ALL view
+there is no account to be "sent by", so the control is disabled. the
+sent txs stay visible there — they are still worth seeing.
 
 **why "MINE" is the default when the reader is signed in.** a reader who
 signs in wants their own queue. a reader who is signed out gets all of
@@ -595,8 +603,9 @@ the feed, and the bar never talks to the api.
 **"ALL / MINE" is a two-button toggle**, the same shape the token page's
 holder filters use — one button is filled in and the other is not.
 
-**"HIDE SENT" is a checkbox-ish button** that is filled in when it is on.
-it is off by default.
+**"HIDE SENT" is a checkbox-ish button** that is filled in when it is
+on. it is off by default, and it is **disabled in the ALL view** —
+there is no account to be "sent by" there.
 
 **the sort is a plain dropdown**, because it is a named set with no
 direction. the shared `sort_keys_control` is a row of buttons with a
@@ -620,24 +629,37 @@ the request. `account_id` and `contract_id` and `method` go to the api as
 query parameters, so a new filter IS a new request — the same way a new
 sort is a new request on the discover page.
 
-### the "HIDE SENT" filter is done on the client
+### the "HIDE SENT" filter is done by the api
 
-the api has no `hide_sent` parameter — the backend has no global
-status to filter on, because a queue is never done. so the list comes
-back whole and the feed drops the ones the reader has sent.
+the request carries it:
 
-**why the api does not do it.** it cannot. the "has this account sent
-it" question is per account and per transaction, and the api does not
-know which account the reader is unless it is told. doing it on the
-client means one request and a local filter, and the reader's own
-account is already known in the browser.
+```
+GET /api/shit-1170/tx-queue?account_id=alice.near&hide_sent=1
+```
 
-**why the filter is not on the api at all.** it would need the account
-id in the query — which the api already takes for the `account_id`
-filter. so "hide sent" is really "the queues I am on, minus the ones I
-have sent". it could be an api filter, and the reason it is not is that
-the client already has both halves. the api filter is a later thing if
-the list gets long.
+**why the api does it.** the frontend would have to fetch every queue,
+read every account row, and work out which ones the reader has sent —
+and then throw most of them away. the api does it in the query, so the
+reader gets the twenty they asked for and not two hundred they did not.
+
+**the filter is about ONE account.** "has this account sent it" is a
+question about a single account. there is no such question about all the
+accounts — a queue can be sent by alice and not by bob — so the
+filter names the account it is about, and that is the `account_id`.
+
+**so the two views are two different requests:**
+
+| the reader is looking at | the request |
+|---|---|
+| **ALL** | no filters. every queue, sent or not — a sent tx is still worth seeing, and the reader wants to see who did it |
+| **MINE** | `account_id=<theirs>` — the queues they are on |
+| **MINE, hide sent** | `account_id=<theirs>&hide_sent=1` — the queues they are on that they have not sent yet. the actionable ones |
+
+**why the ALL view does not hide the sent ones.** a sent tx is still
+worth seeing — the reader wants to know who sent it and what it did. and
+"hide the ones they sent" is meaningless without an account, because
+the reader has no account of their own in that view. so ALL shows
+everything.
 
 ---
 
@@ -813,7 +835,7 @@ nothing is broken along the way.
 |---|---|---|
 | 1 | does the feed replace "COMING SOON!"? | **yes.** the feed page IS the queue feed |
 | 2 | the sort options | **NEWEST** (default) and **MOST ACCOUNTS**. "most accounts" is the popularity sort a social feed answers that a tx list does not |
-| 3 | the "hide sent" control | **one toggle**, HIDE SENT. off by default, so everything shows until the reader says otherwise |
+| 3 | the "hide sent" control | **one toggle**, HIDE SENT. off by default. it is **per account** — the api filters on it — and it only applies in the MINE view, because in the ALL view there is no account to be "sent by" |
 | 4 | how are the ft transfers read? | **the standard.** the three ft methods have fixed arg names, and the token is the contract being called. no guessing — see section 6 |
 | 5 | the queue page's url | **`?queue=<queue_id>`**. it says what the page is about and does not collide with the token page's `?id=` |
 | 6 | one popup per account | **yes.** the reader signs the whole batch for their own account. the other accounts on the queue sign separately |

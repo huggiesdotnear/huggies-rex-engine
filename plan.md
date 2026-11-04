@@ -424,12 +424,80 @@ account row and nowhere else, so there is no rule to write down and no
 level that can disagree with another. the account row's status IS the
 status.
 
+**the query is in `tx_queue_store.rs`.** it is the list query, and the
+store is where the sql lives. the `hide_sent` shape is written down
+here so it is written down once.
+
 **why `tx_queue_named_accounts_fun.rs` exists.** the NAMING rule — an
 agent may only name accounts whose api key it holds — is a check over
 a list, and it is used by the queue route. the file takes the agent's
 own account and the list of accounts it wants to name, and answers with
 the ones it is allowed to name. the check lives in one place so the rule
 cannot be written two ways.
+
+### the `hide_sent` query
+
+this is the one query in the plan that is not a straight read, so it is
+worth writing out.
+
+**what it has to answer.** "the queues this account is on, minus the
+ones this account has already sent".
+
+**the shape of the answer.** a queue is on the account's list when the
+account has a row under one of its transactions. the account has SENT it
+when one of those rows carries a hash.
+
+```
+a queue is on the list when:
+  EXISTS a row in tx_queue_accounts
+    WHERE tx_queue_accounts.account_id = <the account>
+      AND tx_queue_accounts.queue_id  = tx_queue.queue_id
+
+a queue is HIDDEN when:
+  EXISTS a row in tx_queue_accounts
+    WHERE tx_queue_accounts.account_id = <the account>
+      AND tx_queue_accounts.queue_id  = tx_queue.queue_id
+      AND tx_queue_accounts.tx_hash IS NOT NULL
+```
+
+**so the two are one query with a `NOT EXISTS`.** the account rows
+table carries `queue_id` as a column precisely so this does not have to
+join through the transactions table.
+
+```sql
+SELECT ...
+  FROM tx_queue
+ WHERE ( ?account_id IS NULL
+     OR EXISTS (SELECT 1 FROM tx_queue_accounts a
+                 WHERE a.queue_id = tx_queue.queue_id
+                   AND a.account_id = ?account_id) )
+   AND ( ?hide_sent IS NULL OR ?hide_sent = 0
+     OR NOT EXISTS (SELECT 1 FROM tx_queue_accounts s
+                     WHERE s.queue_id = tx_queue.queue_id
+                       AND s.account_id = ?account_id
+                       AND s.tx_hash IS NOT NULL) )
+ ORDER BY tx_queue.created_at DESC
+ LIMIT ?limit OFFSET ?offset
+```
+
+**why the account's OWN row is what counts.** a queue can be sent by
+alice and not by bob. the filter asks about the account that is being
+filtered, and nobody else's send changes the answer.
+
+**why `tx_hash IS NOT NULL` and not `status <> 'pending'`.** the hash is
+the fact. the status is a label that could be `sent`, `succeeded` or
+`failed` — three values that all mean "it went out". the hash is one
+column that answers the question directly, and it is the column the
+account row is built around.
+
+**why the index carries it.** `tx_queue_accounts_account_id_idx` is on
+`account_id`, and the query filters on it first. the `queue_id` is the
+primary key's second half, so the lookup finds the account's rows and
+walks them.
+
+**why the queue's own `status` column is not in this.** there is none.
+the whole point is that the status lives on the account rows, and this
+query reads them where they are.
 
 ---
 
@@ -464,19 +532,41 @@ everything under `/api/shit-1170/`. the api key travels in the
 | query param | what it does |
 |---|---|
 | `account_id` | only the queues this account is on |
+| `hide_sent` | with `account_id`, drop the queues this account has already sent |
 | `contract_id` | only the queues holding a tx for this contract |
 | `method` | only the queues holding a tx for this method |
 | `limit` | how many, default 50 |
 | `offset` | where to start, default 0 |
 
 **there is no `status` filter.** the status is per account and per
-transaction, and a queue has no global status to filter on. the
-`account_id` filter is the one the feed uses — "the queues I am on" —
-and the ui can show which of those this account has already sent by
-reading the account rows it gets back.
+transaction, and a queue has no global status to filter on.
+
+**`hide_sent` is about the account, never about everybody.** it takes
+`account_id` and it means "the queues this account is on, minus the ones
+this account has already sent". it is a filter on ONE account's view.
+
+**why `hide_sent` needs `account_id`.** "has this account sent it" is
+a question about one account. there is no such question about all the
+accounts, because a queue can be sent by alice and not by bob — so
+there is no single answer to "has this queue been sent". the filter
+therefore names the account it is about, and `account_id` is that
+account.
+
+**why the api does it and not the frontend.** the frontend would have to
+fetch every queue, read every account row, and work out which ones the
+reader has sent — and then throw most of them away. the api can do it
+in the query, so the reader gets the twenty they asked for and not two
+hundred they did not.
 
 **the list is open.** anyone with an api key can list the queues. a
 queue is an open offer, and hiding it would defeat the point.
+
+**the feed's two views, and what each asks for:**
+
+| the reader is looking at | the request |
+|---|---|
+| **ALL** | no filters. every queue, sent or not — a sent tx is still worth seeing, and the reader wants to see who did it |
+| **MINE, hide sent** | `account_id=<theirs>&hide_sent=1` — the queues they are on that they have not sent yet. the actionable ones |
 
 ---
 
@@ -584,8 +674,30 @@ and hash for each.
 
 **auth.** an api key is required. the list is open to anyone with a key.
 
+**the query.**
+
+```
+GET /api/shit-1170/tx-queue?account_id=alice.near&hide_sent=1&limit=50&offset=0
+```
+
+| param | what it does |
+|---|---|
+| `account_id` | only the queues this account is on |
+| `hide_sent` | `1` drops the ones this account has sent. it needs `account_id` |
+| `contract_id` | only the queues holding a tx for this contract |
+| `method` | only the queues holding a tx for this method |
+| `limit` | default 50 |
+| `offset` | default 0 |
+
+**`hide_sent` without `account_id` is a `400`.** the filter is about one
+account, and without an account there is no account to be about. saying
+so is better than quietly ignoring it and returning the whole list.
+
 **the answer.** `{ "items": [ ...one batch each... ], "total": 1 }`,
 where each item is the same shape as the `201` answer above.
+
+**the `total` is the count BEFORE `limit` and `offset`.** it is how many
+queues matched, so a client knows how many pages there are.
 
 ### `GET /api/shit-1170/tx-queue/{queue_id}` — one batch
 
@@ -730,6 +842,7 @@ plus the types:
 middleman/src/types/
   shit_1170_api_keys.ts        — the api key shapes
   shit_1170_tx_queue.ts        — the queue shapes
+  shit_1170_tx_queue_query.ts  — the list filters
 ```
 
 the queue types are the wire shapes:
