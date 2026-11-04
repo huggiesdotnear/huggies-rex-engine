@@ -1,12 +1,12 @@
-# SHIT-1170 SESSION ROTATE
+# SHIT-1170 API KEY ROTATE
 
-`POST /api/shit-1170/session/rotate` - give an account a NEW session key.
+`POST /api/shit-1170/api-key/rotate` - give an account a NEW api key.
 
 the old key stops working at once, and the new one takes its place.
 
 ## THE REQUEST
 
-the same body the sessions route takes, with **one** account — the one
+the same body the api-keys route takes, with **one** account - the one
 being rotated:
 
 ```json
@@ -24,6 +24,9 @@ being rotated:
 }
 ```
 
+this route takes NO api key in the header. the signed message IS the
+proof.
+
 ## THE ANSWER
 
 `200`:
@@ -31,7 +34,7 @@ being rotated:
 ```json
 {
   "accountId": "alice.near",
-  "sessionKey": "shit_1170_8c711c7ca8c208017203dcfa9e5f83f7cb9814cb575225afe8bc6fcaf95e21bc",
+  "apiKey": "shit_1170_8c711c7ca8c208017203dcfa9e5f83f7cb9814cb575225afe8bc6fcaf95e21bc",
   "created": true
 }
 ```
@@ -39,15 +42,16 @@ being rotated:
 on failure it answers json in the shape
 `{ "error": { "code", "message" } }`:
 
-- `400` - `no_accounts`, `too_many_accounts` when more than one account
-  was sent, or `signature_invalid` when the signature did not verify
-- `404` - `no_session` when the account has no session to rotate
+- `400` - `no_accounts` when the body carried no accounts,
+  `too_many_accounts` when more than one account was sent, or
+  `signature_invalid` when the signature did not verify
+- `404` - `no_api_key` when the account has no api key to rotate
 - `500` - `db_unavailable`
 
 ## WHY THE SIGNED MESSAGE AND NOT THE OLD KEY
 
 the old key is what a thief has. if a rotation only needed the old key,
-a thief could rotate it — getting a fresh key and locking the owner out
+a thief could rotate it - getting a fresh key and locking the owner out
 at the same time.
 
 so a rotation carries the account's **signed message**: it proves the
@@ -58,6 +62,10 @@ in its local storage from the sign-in, and the signature covers the
 message + nonce + recipient. the reader asked for the rotation on
 purpose.
 
+> --- WHY --- a rotation is for ONE account at a time. a rotation that
+> silently rotated one of three would be a surprise, so more than one
+> account is refused rather than half-honoured.
+
 ## THE OLD KEY DIES AT ONCE
 
 there is no grace window. the point of a rotation is that the old key
@@ -65,14 +73,14 @@ stops working, and a grace window would mean a stolen key keeps working
 for that window.
 
 the new key's hash is written with it, so the old key no longer finds
-the row — a rotate that kept the old hash would still be found by the
+the row - a rotate that kept the old hash would still be found by the
 old key, which is exactly what a rotation must stop.
 
 ## CLIENT
 
 the typed client lives in `middleman/src/`, published as
 `@huggies/shit-1170-rex-engine-middleman`:
-`api_shit_1170_session_rotate_post(base_url, { accounts }, options)`.
+`api_shit_1170_api_key_rotate_post(base_url, { accounts }, options)`.
 
 =====================
 <br/>

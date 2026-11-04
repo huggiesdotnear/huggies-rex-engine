@@ -414,15 +414,20 @@ string and the wire shape is a json object. the conversion lives in one
 file so the two can never disagree, and so a bad args blob is caught in
 one place.
 
-**why `tx_queue_auth_fun.rs` exists.** three routes need the same
-question answered — "is the caller allowed to touch this queue?" — and
-the answer is: the caller's api key belongs to an account that is ON the
-queue. that check is written once.
+**why `tx_queue_auth_fun.rs` exists.** it answers "which account is
+this api key?" — the caller's account. it is the one lookup every route
+needs before it can do anything.
 
-**there is no `tx_queue_status_fun.rs`.** the status lives on the
-account row and nowhere else, so there is no rule to write down and no
-level that can disagree with another. the account row's status IS the
-status.
+**and `tx_queue_caller_fun.rs` sits on top of it.** seven routes need
+the same "who is calling, and is that ok" answer, and putting it in one
+place means no route can forget the `401`. the per-queue rules (is this
+account on this queue? is this the caller's own account?) stay in the
+routes that enforce them.
+
+**`tx_queue_status_fun.rs` holds the four status constants and NOTHING
+else.** the status lives on the account row and nowhere else, so there is
+no rule to write down and no level that can disagree with another. the
+account row's status IS the status.
 
 **the query is in `tx_queue_store.rs`.** it is the list query, and the
 store is where the sql lives. the `hide_sent` shape is written down
@@ -1257,7 +1262,10 @@ src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_accounts_store.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_args_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_row_to_json_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_auth_fun.rs
+src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_caller_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_named_accounts_fun.rs
+src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_row_to_json_fun.rs
+src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_stats_store.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_uuid_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_store_test.rs
 ```

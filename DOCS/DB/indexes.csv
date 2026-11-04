@@ -1,0 +1,9 @@
+index,table,columns,unique,what it serves
+api_keys_api_key_hash_idx,api_keys,api_key_hash,yes,"the api key lookup on every authenticated request. it is UNIQUE because two rows with the same hash would mean two accounts behind one credential"
+tx_queue_transactions_contract_id_idx,tx_queue_transactions,contract_id,no,"""how many queued txs hit this contract"" and the contract stats route"
+tx_queue_transactions_method_idx,tx_queue_transactions,method,no,"""the most common methods"" and the method stats route"
+tx_queue_transactions_queue_id_idx,tx_queue_transactions,queue_id,no,"the transactions of this queue, in position order"
+tx_queue_transactions_created_at_idx,tx_queue_transactions,created_at,no,"the feed list, newest first"
+tx_queue_accounts_account_id_idx,tx_queue_accounts,account_id,no,"""the txs for THIS account"" — the account_id filter of the queue list"
+tx_queue_accounts_queue_id_idx,tx_queue_accounts,queue_id,no,"the accounts on this queue — the WHO of a batch"
+tx_queue_accounts_status_idx,tx_queue_accounts,status,no,"""the txs this account has not sent yet"""

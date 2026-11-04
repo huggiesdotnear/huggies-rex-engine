@@ -15,29 +15,69 @@ a route with more than one bullet point gets its own file in
 
 ### `/api/shit-1170/` - shit-1170 specifics
 
-user info and session managmnets
+user info, api key managmnets and the tx queue
 
 - `/api/shit-1170/ping` - liveness check, returns `{ "ok": true, "app": "shit-1170" }`
 
   the typed client is `api_shit_1170_ping_get(base_url)`. it is named
   after us because it is OUR route — nothing is proxied through it.
 
-- `/api/shit-1170/sessions` - turn signed messages into a session key.
+- `/api/shit-1170/api-keys` - turn signed messages into api keys.
   `POST`. the browser sends every account it holds a signed message for,
-  the backend verifies each one, and the answer is the ONE session key
-  the user has.
+  the backend verifies each one, and the answer is the ONE api key the
+  user has per account.
 
-  see [`ROUTES/shit-1170-sessions.md`](./ROUTES/shit-1170-sessions.md)
+  see [`ROUTES/shit-1170-api-keys.md`](./ROUTES/shit-1170-api-keys.md)
 
-- `/api/shit-1170/session/me` - who does this session key belong to.
-  `GET`. the key travels in the `x-session-token` header.
+- `/api/shit-1170/api-key/me` - who does this api key belong to.
+  `GET`. the key travels in the `x-api-key` header.
 
-  see [`ROUTES/shit-1170-session-me.md`](./ROUTES/shit-1170-session-me.md)
+  see [`ROUTES/shit-1170-api-key-me.md`](./ROUTES/shit-1170-api-key-me.md)
 
-- `/api/shit-1170/session/rotate` - give an account a NEW session key.
+- `/api/shit-1170/api-key/rotate` - give an account a NEW api key.
   `POST`. the old key stops working at once.
 
-  see [`ROUTES/shit-1170-session-rotate.md`](./ROUTES/shit-1170-session-rotate.md)
+  see [`ROUTES/shit-1170-api-key-rotate.md`](./ROUTES/shit-1170-api-key-rotate.md)
+
+- `/api/shit-1170/tx-queue` - the tx queue. `POST` queues a BATCH of
+  transactions, `GET` is the filterable list of them. a queue is never
+  done — the status lives on the account row.
+
+  see [`ROUTES/shit-1170-tx-queue.md`](./ROUTES/shit-1170-tx-queue.md)
+
+- `/api/shit-1170/tx-queue/{queue_id}` - one queued batch, with its
+  transactions and its accounts. `GET`.
+
+  see [`ROUTES/shit-1170-tx-queue.md`](./ROUTES/shit-1170-tx-queue.md)
+
+- `/api/shit-1170/tx-queue/{queue_id}/accounts` - add YOUR OWN account
+  to a queued batch. `POST`.
+
+  see [`ROUTES/shit-1170-tx-queue-accounts.md`](./ROUTES/shit-1170-tx-queue-accounts.md)
+
+- `/api/shit-1170/tx-queue/{queue_id}/accounts/{account_id}` - remove
+  YOUR OWN account from a queued batch. `DELETE`.
+
+  see [`ROUTES/shit-1170-tx-queue-accounts.md`](./ROUTES/shit-1170-tx-queue-accounts.md)
+
+- `/api/shit-1170/tx-queue/{queue_id}/sent` - record that the
+  transactions were sent — the hashes and the outcome. `POST`.
+
+  see [`ROUTES/shit-1170-tx-queue-sent.md`](./ROUTES/shit-1170-tx-queue-sent.md)
+
+- `/api/shit-1170/tx-queue/stats/contracts` - how many queued txs per
+  contract. `GET`.
+
+  see [`ROUTES/shit-1170-tx-queue-stats.md`](./ROUTES/shit-1170-tx-queue-stats.md)
+
+- `/api/shit-1170/tx-queue/stats/methods` - how many queued txs per
+  method. `GET`.
+
+  see [`ROUTES/shit-1170-tx-queue-stats.md`](./ROUTES/shit-1170-tx-queue-stats.md)
+
+the api key travels in the `x-api-key` header. the old `x-session-token`
+header is still accepted during the beta — `x-api-key` is read FIRST and
+the old name is the fallback.
 
 ### `/api/trezu/` - trezu specifics
 

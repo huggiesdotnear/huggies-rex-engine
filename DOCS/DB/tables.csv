@@ -1,0 +1,30 @@
+table,column,type,nullable,default,what it is
+api_keys,account_id,TEXT,no,,"the NEAR account id. it is the PRIMARY KEY because an account has exactly one api key, ever"
+api_keys,api_key,TEXT,no,,"the api key. stored as it is — the key is ours and the db is ours, and the key has to be producible again on a later sign-in"
+api_keys,api_key_hash,TEXT,no,,"the sha-256 of the key. a request is looked up by this, so the read path never compares against every row's key"
+api_keys,created_at,INTEGER,no,,when the key was created in ms since the epoch
+api_keys,updated_at,INTEGER,no,,when the key was last touched in ms since the epoch
+tx_queue,queue_id,TEXT,no,,the uuid v4 that names the batch. it is the PRIMARY KEY and it is what goes in the url
+tx_queue,what,TEXT,yes,,what the transactions do in words. null says there was no what
+tx_queue,when,TEXT,yes,,"when they should happen in words. the column is quoted because `when` is a reserved word in sqlite"
+tx_queue,why,TEXT,yes,,why the user wants them
+tx_queue,when_at,INTEGER,yes,,the machine-readable version of `when` in epoch ms. null when there is no moment
+tx_queue,created_at,INTEGER,no,,when the batch was queued in ms since the epoch
+tx_queue,updated_at,INTEGER,no,,when the batch was last touched in ms since the epoch
+tx_queue_transactions,tx_id,TEXT,no,,"the uuid v4 that names one transaction inside the batch. it is the PRIMARY KEY. a uuid and not queue_id + position, because the position is renumbered when a call is removed from the middle"
+tx_queue_transactions,queue_id,TEXT,no,,the batch this transaction belongs to. a FOREIGN KEY to tx_queue(queue_id) ON DELETE CASCADE
+tx_queue_transactions,position,INTEGER,no,,the order of this transaction inside the batch from zero. it is what the wallet popup needs
+tx_queue_transactions,contract_id,TEXT,no,,the contract being called. it has its own column so the stats query is a GROUP BY and not a json scan
+tx_queue_transactions,method,TEXT,no,,the method name. it has its own column for the same reason as contract_id
+tx_queue_transactions,args,TEXT,no,,"the arguments as a compact json object held as a string. it stays a json column because it is a bag of arbitrary keys with no shape"
+tx_queue_transactions,gas,TEXT,yes,,the gas as a string. null when the call has no gas of its own
+tx_queue_transactions,deposit,TEXT,yes,,the deposit as a string. null when the call has no deposit of its own
+tx_queue_transactions,created_at,INTEGER,no,,when the transaction was queued in ms since the epoch
+tx_queue_transactions,updated_at,INTEGER,no,,when the transaction was last touched in ms since the epoch
+tx_queue_accounts,queue_id,TEXT,no,,"the batch the transaction belongs to. it is kept as a column even though it is not part of the primary key, so ""every account on this queue"" is one indexed read"
+tx_queue_accounts,tx_id,TEXT,no,,"the transaction the account is on. part of the PRIMARY KEY (tx_id, account_id) and a FOREIGN KEY to tx_queue_transactions(tx_id) ON DELETE CASCADE"
+tx_queue_accounts,account_id,TEXT,no,,"the account. part of the PRIMARY KEY (tx_id, account_id)"
+tx_queue_accounts,status,TEXT,no,"'pending'","where the account is with this transaction: pending / sent / succeeded / failed. the ONLY place a status lives — there is none on tx_queue and none on tx_queue_transactions"
+tx_queue_accounts,tx_hash,TEXT,yes,,"the hash of the transaction the account sent. null until somebody sends. a row with a hash is history and is never deleted"
+tx_queue_accounts,created_at,INTEGER,no,,when the row was created in ms since the epoch
+tx_queue_accounts,updated_at,INTEGER,no,,when the row was last touched in ms since the epoch

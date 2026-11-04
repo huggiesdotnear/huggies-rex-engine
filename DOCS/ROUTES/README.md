@@ -7,12 +7,20 @@ listed there, and a route that needs its own detail gets a file here.
 
 - [`trezu-treasuries.md`](./trezu-treasuries.md) — the treasuries
   (sputnik daos) an account belongs to
-- [`shit-1170-sessions.md`](./shit-1170-sessions.md) — turn signed messages
-  into the user's one session key
-- [`shit-1170-session-me.md`](./shit-1170-session-me.md) — who does this
-  session key belong to
-- [`shit-1170-session-rotate.md`](./shit-1170-session-rotate.md) — give an
-  account a new session key
+- [`shit-1170-api-keys.md`](./shit-1170-api-keys.md) — turn signed
+  messages into the user's one api key per account
+- [`shit-1170-api-key-me.md`](./shit-1170-api-key-me.md) — who does
+  this api key belong to, and the header it travels in
+- [`shit-1170-api-key-rotate.md`](./shit-1170-api-key-rotate.md) — give
+  an account a new api key
+- [`shit-1170-tx-queue.md`](./shit-1170-tx-queue.md) — queue a batch of
+  transactions, and the filterable list of them
+- [`shit-1170-tx-queue-accounts.md`](./shit-1170-tx-queue-accounts.md) —
+  add or remove YOUR OWN account on a queued batch
+- [`shit-1170-tx-queue-sent.md`](./shit-1170-tx-queue-sent.md) — record
+  the hashes of the transactions that went out
+- [`shit-1170-tx-queue-stats.md`](./shit-1170-tx-queue-stats.md) — how
+  many queued txs per contract and per method
 
 =====================
 <br/>
