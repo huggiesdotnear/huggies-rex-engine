@@ -13,13 +13,13 @@ import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
   const [copied, set_copied] = use_state("");
 
-  const install_fun = async (skill_id: string, install_command: string) => {
+  const install_fun = async (skill_id: string, copy_message: string) => {
     try {
-      await navigator.clipboard.writeText(install_command);
+      await navigator.clipboard.writeText(copy_message);
       set_copied(skill_id);
       setTimeout(() => set_copied(""), 2000);
     } catch (err) {
-      console.warn("[skill] the install command could not be copied", err);
+      console.warn("[skill] the skill instructions could not be copied", err);
     }
   };
 
@@ -32,6 +32,15 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
         "bunx skills add sleetplayground/near-kit-tool-box-skills",
       list_command:
         "bunx skills add sleetplayground/near-kit-tool-box-skills --list",
+      copy_message: [
+        "Install the general skills for interacting with NEAR smart contracts:",
+        "",
+        "bunx skills add sleetplayground/near-kit-tool-box-skills",
+        "",
+        "To list the skills:",
+        "",
+        "bunx skills add sleetplayground/near-kit-tool-box-skills --list",
+      ].join("\n"),
     },
     {
       id: "shit-1170-rex-engine-skills",
@@ -42,6 +51,15 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
         "bunx skills add huggiesdotnear/shit-1170-rex-engine-skills",
       list_command:
         "bunx skills add huggiesdotnear/shit-1170-rex-engine-skills --list",
+      copy_message: [
+        "Install the specific skills for interacting with NEAR smart contracts via the shit-1170 rex engine:",
+        "",
+        "bunx skills add huggiesdotnear/shit-1170-rex-engine-skills",
+        "",
+        "To list the skills:",
+        "",
+        "bunx skills add huggiesdotnear/shit-1170-rex-engine-skills --list",
+      ].join("\n"),
     },
   ];
 
@@ -56,36 +74,17 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
           <div key={skill.id} class="skill-install-card">
             <h3>{skill.title}</h3>
             <p>{skill.description}</p>
-            <div class="skill-install-command">
-              <code>{skill.install_command}</code>
-              <button
-                type="button"
-                onClick={() => {
-                  void install_fun(skill.id, skill.install_command);
-                }}
-                title="copy the add command"
-              >
-                {copied === skill.id ? <Check size={16} /> : <Copy size={16} />}
-                {copied === skill.id ? "COPIED" : "COPY"}
-              </button>
-            </div>
-            <div class="skill-install-command">
-              <code>{skill.list_command}</code>
-              <button
-                type="button"
-                onClick={() => {
-                  void install_fun(`${skill.id}_list`, skill.list_command);
-                }}
-                title="copy the list command"
-              >
-                {copied === `${skill.id}_list` ? (
-                  <Check size={16} />
-                ) : (
-                  <Copy size={16} />
-                )}
-                {copied === `${skill.id}_list` ? "COPIED" : "COPY"}
-              </button>
-            </div>
+            <button
+              type="button"
+              class="skill-install-copy"
+              onClick={() => {
+                void install_fun(skill.id, skill.copy_message);
+              }}
+              title="copy the install and list instructions"
+            >
+              {copied === skill.id ? <Check size={16} /> : <Copy size={16} />}
+              {copied === skill.id ? "COPIED" : "COPY INSTRUCTIONS"}
+            </button>
           </div>
         ))}
       </div>
