@@ -7,7 +7,7 @@
 // the url is base_url + ENDPOINT_PATHS[key], plus ?key=value&... when
 // `query` is supplied. `body`, when supplied, is JSON.stringified and
 // sent with content-type: application/json — omit for GET /
-// DELETE-with-no-body. `options` carries the session token.
+// DELETE-with-no-body. `options` carries the api key.
 //
 // --- WHY --- the base url is a parameter, not a constant. the frontend
 // passes the origin of the page it is served from; a bin passes
@@ -17,6 +17,12 @@
 // --- WHY --- the query builder drops undefined/null/"" but keeps false
 // and 0. our routes read those two as real values, so dropping them
 // would silently change what the route does.
+//
+// --- WHY --- `path` OVERRIDES the endpoint map. some of our routes put
+// a piece in the MIDDLE of the path — `/tx-queue/{queue_id}/accounts` —
+// so the whole path cannot live in ENDPOINT_PATHS. the wrapper builds
+// the path and hands it over, and the map stays the list of the routes
+// whose path is fixed.
 //
 // the `url` + `method` are passed through to parse_error() on failure
 // so the error log block can show exactly which request blew up.
@@ -29,6 +35,10 @@ import { build_headers, type REQUEST_OPTIONS } from "./request_options";
 export interface API_CALL_PARAMS {
   base_url: string;
   key: EndpointKey;
+  // the full path of the route, when it is not a fixed one. it wins
+  // over ENDPOINT_PATHS[key]. e.g. the queue routes, whose path holds
+  // a queue_id in the middle.
+  path?: string;
   query?: Record<string, string | number | boolean | undefined>;
   method: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
@@ -42,6 +52,7 @@ export interface API_CALL_PARAMS {
 export async function api_call<T = unknown>({
   base_url,
   key,
+  path,
   query,
   method,
   body,
@@ -50,7 +61,7 @@ export async function api_call<T = unknown>({
   fallback,
 }: API_CALL_PARAMS): Promise<T> {
   // ========================================
-  let url = `${base_url}${ENDPOINT_PATHS[key]}`;
+  let url = `${base_url}${path ?? ENDPOINT_PATHS[key]}`;
   if (query) {
     const entries = Object.entries(query).filter(
       (entry): entry is [string, string | number | boolean] =>

@@ -1,25 +1,30 @@
 // ========================================
-// API_SHIT_1170_SESSIONS_POST
-// runnable bin for POST /api/shit-1170/sessions via middleman. the
+// API_SHIT_1170_API_KEYS_POST
+// runnable bin for POST /api/shit-1170/api-keys via middleman. the
 // middleman logs the framed request + response, so this bin only adds
 // a one-line summary.
 //
 // the accounts come from a json file, so a real signed message can be
 // posted without a wallet in the loop:
 //
-//   bun middleman/bin/shit-1170/api_shit_1170_sessions_post.ts \
+//   bun middleman/bin/shit-1170/api_shit_1170_api_keys_post.ts \
 //     --accounts <path-to-json>
 //
 // the file holds the accounts array, either as the array itself or as
 // the whole request body:
 //   { "accounts": [ { "accountId": "...", "publicKey": "...", ... } ] }
+//
+// --- WHY --- the bin is named after the API KEY and not after the
+// session: the credential in it is not a browser session. the user
+// signs in once and hands the key to an agent, and the agent holds it
+// as a bearer token for as long as it lives.
 // ========================================
 
 import { readFileSync } from "node:fs";
-import { api_shit_1170_sessions_post } from "@huggies/shit-1170-rex-engine-middleman";
+import { api_shit_1170_api_keys_post } from "@huggies/shit-1170-rex-engine-middleman";
 import type {
+  SHIT_1170_API_KEYS_REQUEST,
   SHIT_1170_SIGNED_ACCOUNT,
-  SHIT_1170_SESSIONS_REQUEST,
 } from "@huggies/shit-1170-rex-engine-middleman";
 import { resolve_base_url } from "../fun/resolve_base_url";
 
@@ -38,25 +43,25 @@ const accounts_path =
   accounts_flag === -1 ? undefined : argv[accounts_flag + 1];
 if (accounts_path === undefined || accounts_path.length === 0) {
   console.error(
-    "usage: api_shit_1170_sessions_post.ts [--base-url <url>] --accounts <file.json>",
+    "usage: api_shit_1170_api_keys_post.ts [--base-url <url>] --accounts <file.json>",
   );
   process.exit(1);
 }
 
 const raw = readFileSync(accounts_path, "utf8");
 const parsed = JSON.parse(raw) as
-  SHIT_1170_SESSIONS_REQUEST | SHIT_1170_SIGNED_ACCOUNT[];
+  SHIT_1170_API_KEYS_REQUEST | SHIT_1170_SIGNED_ACCOUNT[];
 // the file may hold the accounts array on its own or the whole body.
 const accounts = Array.isArray(parsed) ? parsed : parsed.accounts;
 
-const sessions = await api_shit_1170_sessions_post(base_url, { accounts });
+const keys = await api_shit_1170_api_keys_post(base_url, { accounts });
 
-console.log(`SESSIONS: ${sessions.keys.length} account(s)`);
-for (const entry of sessions.keys) {
+console.log(`API KEYS: ${keys.keys.length} account(s)`);
+for (const entry of keys.keys) {
   console.log(
     `  ${entry.accountId}  ${
       entry.created ? "created" : "existing"
-    }  key: ${entry.sessionKey.slice(0, 8)}…`,
+    }  key: ${entry.apiKey.slice(0, 8)}…`,
   );
 }
 // ========================================
