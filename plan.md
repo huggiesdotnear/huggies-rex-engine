@@ -149,6 +149,41 @@ list — it is one list of one row per account, exactly as you described.
 is an open offer: anyone who sees it can send it, and their account
 joins the WHO list when they do.
 
+### THE RULE THAT MATTERS MOST — WHO MAY BE NAMED
+
+there are **two different rules** here, and they pull in opposite
+directions. keeping them apart is the whole security story of the queue.
+
+| | who it is | the rule |
+|---|---|---|
+| **NAMING** | the **agent** queues a tx and names the accounts it is for | the agent may name **ONLY accounts whose api key it holds** |
+| **SIGNING** | a **user** sees a tx in their feed and signs it | any signed-in user may sign **any** queue they can see |
+
+**why the naming rule exists.** the WHO list is what puts a tx in
+somebody's feed. if an agent could name any account id it liked, agent A
+could fill agent B's users' feeds with txs they never asked for — and
+the ui filters by account, so those users would keep seeing them. one
+agent would be spamming another agent's users through the queue.
+
+**so the agent's WHO list is its OWN users, and only its own users.**
+the agent holds an api key per user it serves. it may name those. it may
+not name anybody else. the backend checks this at queue time: every
+account in the `accounts` list must resolve to a key the calling agent
+holds, and one that does not is a `400`.
+
+**why the signing rule is still open.** the queue is an open offer. a
+user who sees a tx may send it, and their account joins the WHO list.
+that is a user acting for themselves with their own key — no agent is
+putting it in front of them, they found it and chose it.
+
+**the two rules together:**
+
+- an agent can only ever address **its own** users
+- a user can act on **any** tx, including one another agent queued
+
+so the queue never becomes a spam channel between agents, and it never
+becomes a closed club either.
+
 ### the STATUS — four states, on the account row
 
 | status | meaning |
@@ -369,6 +404,7 @@ src/backend/logic/endpoint_shit_1170_tx_queue/
   tx_queue_args_fun.rs              — the args json <-> column
   tx_queue_row_to_json_fun.rs       — a row -> the wire shape
   tx_queue_auth_fun.rs              — the shared "whose queue is this" check
+  tx_queue_named_accounts_fun.rs    — the NAMING rule: the accounts the agent may name
   tx_queue_uuid_fun.rs              — the uuid maker
   mod.rs
 ```
@@ -387,6 +423,13 @@ queue. that check is written once.
 account row and nowhere else, so there is no rule to write down and no
 level that can disagree with another. the account row's status IS the
 status.
+
+**why `tx_queue_named_accounts_fun.rs` exists.** the NAMING rule — an
+agent may only name accounts whose api key it holds — is a check over
+a list, and it is used by the queue route. the file takes the agent's
+own account and the list of accounts it wants to name, and answers with
+the ones it is allowed to name. the check lives in one place so the rule
+cannot be written two ways.
 
 ---
 
@@ -478,9 +521,13 @@ list is the order the transactions are sent in, and it becomes the
 `position` column.
 
 `accounts` is the WHO — the accounts the agent is queuing this for. it
-is **optional**, and every account in it must be one the agent holds an
-api key for. those accounts get rows with `status = pending`, so they
-see the tx in their feed before anyone has signed it.
+is **optional**, and **every account in it must be one the agent holds an
+api key for** — the NAMING rule above. an account the agent has no key
+for is refused with a `400`, so an agent cannot drop a tx into somebody
+else's feed.
+
+those accounts get rows with `status = pending`, so they see the tx in
+their feed before anyone has signed it.
 
 **the cap.** at most **50** transactions in one batch. a wallet popup
 with 200 transactions is unreadable and slow. more than 50 is a `400`.
@@ -528,7 +575,9 @@ and hash for each.
 - `401` — no api key, or the key is not one of ours
 - `400` — no transactions, more than 50, a transaction had no contract
   id, no method, or args that were not a json object, or the `accounts`
-  list named an account the agent holds no key for
+  list named an account the agent holds **no api key for** — the
+  NAMING rule, and the one that stops one agent spamming another
+  agent's users
 - `500` — the db could not be reached
 
 ### `GET /api/shit-1170/tx-queue` — the list
@@ -957,7 +1006,8 @@ the repo has real tests against a real sqlite file
 - a batch of three transactions is queued and read back whole
 - the sent route sets the hash on the right transaction only
 - more than 50 transactions is refused
-- a named account the agent holds no key for is refused
+- a named account the agent holds no key for is refused — the NAMING rule
+- a named account the agent DOES hold a key for is accepted
 - an account signing a queue it was not named on joins the WHO list
 - adding an account with another account's key is refused
 - the sent route writes the outcome when one is given
@@ -1012,6 +1062,8 @@ why, without scrolling back.
 | a queue-level status | **none**. a queue is never done — anyone can always join and send it |
 | a transaction-level status | **none**. the truth is the account rows |
 | who is on a queue | the accounts the agent named (status `pending`) AND the accounts that sent it (status `sent`/`succeeded`/`failed`) |
+| **who the agent may NAME** | **only accounts whose api key it holds.** it cannot name a stranger's account, so it cannot put a tx in another agent's user's feed |
+| who may SIGN | any signed-in user, on any queue they can see. the queue is an open offer |
 | signing a queue you were not named on | allowed. the account row is created and it joins the WHO list |
 | adding an account | the route stays, but it only ever adds **your own** account |
 | removing an account | your own account, and only while it has no hash. a sent row is history |
@@ -1051,6 +1103,7 @@ src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_accounts_store.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_args_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_row_to_json_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_auth_fun.rs
+src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_named_accounts_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_uuid_fun.rs
 src/backend/logic/endpoint_shit_1170_tx_queue/tx_queue_store_test.rs
 ```
