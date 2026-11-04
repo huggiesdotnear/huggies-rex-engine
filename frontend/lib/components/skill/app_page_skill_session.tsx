@@ -1,6 +1,6 @@
 // ========================================
-// the skill page's SESSION MANAGEMENT card: the accounts the browser is
-// signed in with, and the session key each one has.
+// the skill page's API KEY card: the accounts the browser is signed in
+// with, and the api key each one has.
 //
 // the card shows ONE CARD PER ACCOUNT. every account has its own key,
 // because a key has to be narrowable to one wallet.
@@ -14,7 +14,8 @@
 //
 // --- WHY --- there is a COPY button: a 74-character key cannot be
 // picked out of a line of text by hand, and typing it is how it gets
-// wrong.
+// wrong. the copy gives the agent the key and the instructions for
+// using it to queue transactions.
 //
 // --- WHY --- there is a COPY ALL button: a reader with several accounts
 // would otherwise have to copy each key one at a time, and the whole
@@ -40,8 +41,15 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
   if (page_data === null) return null;
 
   const copy_fun = async (account_id: string, api_key: string) => {
+    const copy_message = [
+      "Here is my SHIT-1170 API key for queuing transactions on https://shit-1170.com/:",
+      "",
+      api_key,
+      "",
+      "Use this with the shit-1170-rex-engine-skills skill to propose and queue transactions for my account. Ask me before queueing any transaction.",
+    ].join("\n");
     try {
-      await navigator.clipboard.writeText(api_key);
+      await navigator.clipboard.writeText(copy_message);
       set_copied(account_id);
       // the tick goes away on its own, so the card does not need a
       // timer to clean it up.
@@ -56,12 +64,19 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
       .map((account) =>
         account.api_key === null
           ? null
-          : `${account.account_id} ${account.api_key}`,
+          : `${account.account_id}\n${account.api_key}`,
       )
       .filter((line): line is string => line !== null);
     if (keys.length === 0) return;
+    const copy_message = [
+      "Here are my SHIT-1170 API keys for queuing transactions on https://shit-1170.com/:",
+      "",
+      ...keys,
+      "",
+      "Use these with the shit-1170-rex-engine-skills skill to propose and queue transactions for my accounts. Ask me before queueing any transaction.",
+    ].join("\n");
     try {
-      await navigator.clipboard.writeText(keys.join("\n"));
+      await navigator.clipboard.writeText(copy_message);
       set_copied("__all__");
       setTimeout(() => set_copied(""), 2000);
     } catch (err) {
@@ -75,7 +90,11 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
 
   return (
     <section>
-      <h2>SESSION MANAGEMENT</h2>
+      <h2>API KEY</h2>
+      <p>
+        GIVE THIS KEY TO YOUR AGENT SO IT CAN PROPOSE AND QUEUE TRANSACTIONS FOR
+        YOU.
+      </p>
       {page_data.accounts.length === 0 ? (
         <p>NO ACCOUNTS SIGNED IN</p>
       ) : (
@@ -102,7 +121,7 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
                             account.api_key ?? "",
                           );
                         }}
-                        title="copy the api key"
+                        title="copy the api key with instructions for your agent"
                         disabled={page_data.rotating}
                       >
                         {copied === account.account_id ? (
@@ -110,7 +129,9 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
                         ) : (
                           <Copy size={16} />
                         )}
-                        {copied === account.account_id ? "COPIED" : "COPY KEY"}
+                        {copied === account.account_id
+                          ? "COPIED"
+                          : "COPY FOR AGENT"}
                       </button>
                       <button
                         type="button"
@@ -135,16 +156,12 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION_FUN() {
             onClick={() => {
               void copy_all_fun();
             }}
-            title="copy every account's key"
+            title="copy every account's key with instructions for your agent"
             disabled={page_data.rotating}
           >
             {copied === "__all__" ? <Check size={16} /> : <Copy size={16} />}
-            {copied === "__all__" ? "COPIED ALL" : "COPY ALL KEYS"}
+            {copied === "__all__" ? "COPIED ALL" : "COPY ALL FOR AGENT"}
           </button>
-          <p class="skill-session-note">
-            ONE KEY PER ACCOUNT. THE SAME KEY ON EVERY DEVICE THAT ACCOUNT SIGNS
-            IN FROM.
-          </p>
         </>
       )}
       {page_data.error !== null && (

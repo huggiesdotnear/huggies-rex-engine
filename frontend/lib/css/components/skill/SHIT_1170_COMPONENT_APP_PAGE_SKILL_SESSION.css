@@ -1,7 +1,7 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION
-   the session management card: one card per signed-in account, each with
-   its own session key.
+   the api key card: one card per signed-in account, each with its own
+   api key.
 
    the accounts are stacked, not side by side: each one carries a
    74-character key, and a row of them side by side would squeeze the
@@ -68,8 +68,8 @@
   color: #474747;
 }
 /*----------------------*/
-/* the session key. it wraps inside the code element so a 74-character
-   key never widens the card. */
+/* the api key. it wraps inside the code element so a 74-character key
+   never widens the card. */
 #SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION code {
   display: block;
   margin: 0 0 0.5rem;
@@ -116,13 +116,6 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-/*----------------------*/
-/* the note under the buttons and the error under the card. */
-#SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION .skill-session-note {
-  margin: 0.4rem 0 0;
-  text-align: left;
-  color: #474747;
 }
 /*----------------------*/
 /* the error under the card. the page's own error red is too light to

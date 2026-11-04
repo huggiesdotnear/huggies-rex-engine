@@ -1,20 +1,5 @@
 /*==================================*/
 /* the skill page's css: the components it mounts. */
 @import url(./components/skill/SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION.css);
-/*==================================*/
-/* the page's coming soon note. it sits under the session card and is
-   plain text, so it is styled here rather than in a component's css.
-
-   the body's font is 20px, which is a headline size. a note is not a
-   headline, so it is set smaller and dimmer, and it is given room
-   above it so it reads as a separate thought and not as part of the
-   card. */
-main > p {
-  margin: 1.2rem 0 0;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
-  opacity: 0.85;
-  text-align: left;
-}
+@import url(./components/skill/SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS.css);
 /*==================================*/
