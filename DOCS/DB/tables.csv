@@ -28,3 +28,22 @@ tx_queue_accounts,status,TEXT,no,"'pending'","where the account is with this tra
 tx_queue_accounts,tx_hash,TEXT,yes,,"the hash of the transaction the account sent. null until somebody sends. a row with a hash is history and is never deleted"
 tx_queue_accounts,created_at,INTEGER,no,,when the row was created in ms since the epoch
 tx_queue_accounts,updated_at,INTEGER,no,,when the row was last touched in ms since the epoch
+swap_queue,swap_id,TEXT,no,,the uuid v4 that names the queued swap. it is the PRIMARY KEY and it is what goes in the url
+swap_queue,what,TEXT,yes,,what the swap does in words. null says there was no what
+swap_queue,when,TEXT,yes,,"when it should happen in words. the column is quoted because `when` is a reserved word in sqlite"
+swap_queue,why,TEXT,yes,,why the user wants it
+swap_queue,when_at,INTEGER,yes,,the machine-readable version of `when` in epoch ms. null when there is no moment
+swap_queue,token_in,TEXT,no,,the token being sold
+swap_queue,amount_in,TEXT,no,,"the raw amount of the token in that is sold, in the token's smallest unit. TEXT and not INTEGER because the amount can be far past what an i64 holds"
+swap_queue,token_out,TEXT,no,,the token being bought
+swap_queue,amount_out,TEXT,yes,,"the quoted amount out, in the output token's smallest unit. null when nothing was quoted yet. it is the FALLBACK — the feed asks the router for a live quote"
+swap_queue,dex_id,TEXT,yes,,the dex the stored quote came from. it is the dex of the QUOTE and not the dex the swap will use
+swap_queue,created_at,INTEGER,no,,when the swap was queued in ms since the epoch
+swap_queue,updated_at,INTEGER,no,,when the swap was last touched in ms since the epoch
+swap_queue_accounts,swap_id,TEXT,no,"the queued swap the account is on. it is part of the PRIMARY KEY (swap_id, account_id) and a FOREIGN KEY to swap_queue(swap_id) ON DELETE CASCADE"
+swap_queue_accounts,account_id,TEXT,no,,the account. part of the PRIMARY KEY (swap_id, account_id)
+swap_queue_accounts,status,TEXT,no,"'pending'","where the account is with this swap: pending / sent / succeeded / failed. the ONLY place a status lives — there is none on swap_queue"
+swap_queue_accounts,tx_hash,TEXT,yes,,"the hash of the transaction the account sent. null until somebody sends. a row with a hash is history and is never deleted"
+swap_queue_accounts,amount_out,TEXT,yes,,"the amount that came out of THAT send, in the output token's smallest unit. it lives here and not on the swap because two accounts sending the same queued swap get two different amounts out"
+swap_queue_accounts,created_at,INTEGER,no,,when the row was created in ms since the epoch
+swap_queue_accounts,updated_at,INTEGER,no,,when the row was last touched in ms since the epoch

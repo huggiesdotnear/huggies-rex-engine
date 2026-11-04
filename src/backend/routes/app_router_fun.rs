@@ -31,6 +31,11 @@ use super::tx_queue_route::{tx_queue_get_route, tx_queue_post_route};
 use super::tx_queue_sent_route::tx_queue_sent_route;
 use super::tx_queue_stats_contracts_route::tx_queue_stats_contracts_route;
 use super::tx_queue_stats_methods_route::tx_queue_stats_methods_route;
+use super::swap_queue_accounts_delete_route::swap_queue_accounts_delete_route;
+use super::swap_queue_accounts_route::swap_queue_accounts_route;
+use super::swap_queue_one_route::swap_queue_one_route;
+use super::swap_queue_route::{swap_queue_get_route, swap_queue_post_route};
+use super::swap_queue_sent_route::swap_queue_sent_route;
 // ====================================
 // CORS preflight middleware — intercepts every OPTIONS request before
 // any handler runs and answers 204 with CORS headers.
@@ -126,6 +131,27 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         .route(
             "/api/shit-1170/tx-queue/{queue_id}/sent",
             post(tx_queue_sent_route),
+        )
+        // the swap queue. a queued swap is NOT a queued batch of
+        // transactions: the agent names the token in, the amount in and
+        // the token out, and the route is worked out when it is
+        // executed.
+        .route(
+            "/api/shit-1170/swap-queue",
+            post(swap_queue_post_route).get(swap_queue_get_route),
+        )
+        .route("/api/shit-1170/swap-queue/{swap_id}", get(swap_queue_one_route))
+        .route(
+            "/api/shit-1170/swap-queue/{swap_id}/accounts",
+            post(swap_queue_accounts_route),
+        )
+        .route(
+            "/api/shit-1170/swap-queue/{swap_id}/accounts/{account_id}",
+            delete(swap_queue_accounts_delete_route),
+        )
+        .route(
+            "/api/shit-1170/swap-queue/{swap_id}/sent",
+            post(swap_queue_sent_route),
         )
         .route("/api/trezu/user/treasuries", get(trezu_treasuries_route));
     // --------------------------------------------------------

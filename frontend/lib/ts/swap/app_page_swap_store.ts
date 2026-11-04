@@ -14,6 +14,7 @@
 import { SHIT_1170_APP_PAGE_SWAP_URL } from "./app_page_swap_url";
 import { SHIT_1170_APP_PAGE_SWAP_BALANCES } from "./app_page_swap_balances";
 import { SHIT_1170_APP_PAGE_SWAP_ROUTES } from "./app_page_swap_routes";
+import { SHIT_1170_APP_PAGE_SWAP_QUEUE } from "./app_page_swap_queue";
 import { SHIT_1170_TOKEN_INFO } from "../shared/token_info";
 import { SHIT_1170_AUTH } from "../shared/auth_status";
 import { SHIT_1170_NEAR_ID } from "../shared/token_near";
@@ -21,6 +22,7 @@ import { human_to_unit_fun, unit_to_human_fun } from "./app_page_swap_amount";
 import type { SHIT_1170_TOKEN_INFO as TOKEN_INFO } from "../shared/token_info";
 import type { SHIT_1170_SWAP_ROUTE } from "./app_page_swap_routes";
 import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
+import type { SHIT_1170_SWAP_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -58,6 +60,15 @@ export interface SHIT_1170_APP_PAGE_SWAP_STATE {
   swapping: boolean;
   // the message for the reader, when something failed.
   error: string | null;
+  // the queued swap the url points at, or null when the page was opened
+  // on a plain swap.
+  //
+  // --- WHY --- IT IS HELD AND NOT MERGED INTO THE PAGE'S OWN STATE: the
+  // page's state is the READER's trade — the tokens, the amount, the
+  // routes. the queued swap is a RECORD of something somebody else put
+  // up. the reader can change the trade, and the record stays what it
+  // was. so they are two things, and the page holds both.
+  queued_swap: SHIT_1170_SWAP_QUEUE | null;
 }
 // ========================================
 // ========================================
@@ -89,6 +100,7 @@ let state: SHIT_1170_APP_PAGE_SWAP_STATE = {
   loading_balances: false,
   swapping: false,
   error: null,
+  queued_swap: null,
 };
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
@@ -449,6 +461,58 @@ async function load_fun(): Promise<void> {
   // the amount the link carried is quoted, so the page opens with the
   // routes already on screen.
   await quote_fun();
+  // --- WHY --- THE QUEUED SWAP IS LOADED LAST: it is the RECORD of a
+  // swap somebody else put up, and the page's own trade comes first. a
+  // link to a queued swap that is not there any more still opens a
+  // working swap page.
+  await load_queued_swap_fun();
+}
+
+// ========================================
+// ========================================
+// --- QUEUED SWAP -----------------------
+// load the queued swap the url points at.
+//
+// --- WHY --- A FAILED LOAD IS SWALLOWED: a swap id that is not there is
+// not a broken page. the page opens on a plain swap and the reader does
+// what they came to do.
+async function load_queued_swap_fun(): Promise<void> {
+  const swap_id = SHIT_1170_APP_PAGE_SWAP_URL.read_swap();
+  if (swap_id === null) {
+    set_state_fun({ ...state, queued_swap: null });
+    return;
+  }
+  const queued = await SHIT_1170_APP_PAGE_SWAP_QUEUE.get(swap_id);
+  set_state_fun({ ...state, queued_swap: queued });
+}
+
+// ========================================
+// ========================================
+// --- REPORT ---------------------------
+// report that the queued swap went out, so the feed can show it.
+//
+// --- WHY --- THE REPORT IS A SEPARATE ACTION AND NOT PART OF THE
+// EXECUTE: the execution is the swap, and it goes through the wallet
+// and the aggregator. the report is a bookkeeping call to our own
+// backend, and it must not be able to fail the swap.
+//
+// --- WHY --- THE HASH IS NEEDED AND THE OUTCOME MAY NOT BE KNOWN: the
+// outcome is read off the chain, and a swap that went out but whose
+// outcome could not be read is `sent` — which is a real state.
+async function report_queued_swap_fun(
+  tx_hash: string | null,
+  status: "succeeded" | "failed" | "sent",
+  amount_out: string | null,
+): Promise<void> {
+  const queued = state.queued_swap;
+  if (queued === null) return;
+  if (tx_hash === null) return;
+  await SHIT_1170_APP_PAGE_SWAP_QUEUE.report(
+    queued.swapId,
+    tx_hash,
+    status,
+    amount_out,
+  );
 }
 // ========================================
 // quote the swap: the routes for the current pair and amount, and the
@@ -824,6 +888,7 @@ function reset_fun(): void {
     loading_balances: false,
     swapping: false,
     error: null,
+    queued_swap: state.queued_swap,
   });
 }
 // ========================================
@@ -837,6 +902,7 @@ export const SHIT_1170_APP_PAGE_SWAP_STORE = {
   switch_direction: switch_direction_fun,
   select_route: select_route_fun,
   reset: reset_fun,
+  report_queued_swap: report_queued_swap_fun,
   subscribe: subscribe_fun,
   get: get_fun,
   get_selected_route: selected_route_fun,

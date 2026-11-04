@@ -102,7 +102,7 @@ everything for that page. no component fetches anything.
 - [`frontend.app.burn.md`](./frontend.app.burn.md) - `frontend/app/burn.html` - BURN
 - [`frontend.app.skill.md`](./frontend.app.skill.md) - `frontend/app/skill.html`
 - [`frontend.app.unit-conversion.md`](./frontend.app.unit-conversion.md) - `frontend/app/unit-conversion.html` - ?ca= ?human= ?unit= - UNIT CONVERSION
-- [`frontend.app.swap.md`](./frontend.app.swap.md) - `frontend/app/swap.html` - SWAP
+- [`frontend.app.swap.md`](./frontend.app.swap.md) - `frontend/app/swap.html` - ?in= - ?out= - ?amount_in= - ?amount_out= - ?swap= - SWAP
 - [`frontend.app.game.md`](./frontend.app.game.md) - `frontend/app/game.html`
 - [`frontend.app.account.md`](./frontend.app.account.md) - `frontend/app/account.html` - ?id= - ?tab=
 - [`frontend.app.tx.md`](./frontend.app.tx.md) - `frontend/app/tx.html` - ?tx= - TRANSACTION

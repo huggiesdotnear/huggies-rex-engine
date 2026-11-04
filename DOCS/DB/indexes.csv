@@ -7,3 +7,6 @@ tx_queue_transactions_created_at_idx,tx_queue_transactions,created_at,no,"the fe
 tx_queue_accounts_account_id_idx,tx_queue_accounts,account_id,no,"""the txs for THIS account"" — the account_id filter of the queue list"
 tx_queue_accounts_queue_id_idx,tx_queue_accounts,queue_id,no,"the accounts on this queue — the WHO of a batch"
 tx_queue_accounts_status_idx,tx_queue_accounts,status,no,"""the txs this account has not sent yet"""
+swap_queue_accounts_account_id_idx,swap_queue_accounts,account_id,no,"""the swaps for THIS account"" — the account_id filter of the swap list"
+swap_queue_accounts_swap_id_idx,swap_queue_accounts,swap_id,no,"the accounts on this swap — the WHO of a queued swap"
+swap_queue_accounts_status_idx,swap_queue_accounts,status,no,"""the swaps this account has not sent yet"""

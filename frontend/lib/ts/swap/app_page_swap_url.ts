@@ -40,6 +40,7 @@ const URL_IN_PARAM = "in";
 const URL_OUT_PARAM = "out";
 const URL_AMOUNT_IN_PARAM = "amount_in";
 const URL_AMOUNT_OUT_PARAM = "amount_out";
+const URL_SWAP_PARAM = "swap";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -126,6 +127,23 @@ function read_url_amount_fun(): SHIT_1170_SWAP_URL_AMOUNT {
 }
 // ========================================
 // ========================================
+// --- SWAP ------------------------------
+// the `?swap=` off the current url, or null when there is none.
+//
+// --- WHY --- THE QUEUED SWAP'S ID RIDES ON THE URL: the feed links to
+// the swap page with the queued swap's id, and the page needs it for
+// two things: to show the reader the exact trade that was queued, and
+// to report the result back to THAT queued swap when they execute it.
+// a link with only the pair and the amount would be a link to a fresh
+// swap, and the reader's send would be recorded against nothing.
+function read_url_swap_fun(): string | null {
+  if (typeof window === "undefined" || typeof window.location === "undefined") {
+    return null;
+  }
+  const params = new URLSearchParams(window.location.search);
+  return normalize_token_id_fun(params.get(URL_SWAP_PARAM));
+}
+// ========================================
 // --- WRITE -----------------------------
 // put both tokens on the url, without a reload.
 //
@@ -208,6 +226,7 @@ export const SHIT_1170_APP_PAGE_SWAP_URL = {
   read_in: read_url_in_fun,
   read_out: read_url_out_fun,
   read_amount: read_url_amount_fun,
+  read_swap: read_url_swap_fun,
   write: write_url_tokens_fun,
   write_amount: write_url_amount_fun,
   normalize: normalize_token_id_fun,

@@ -1,8 +1,9 @@
 # frontend/app/index.html ?account={<id>} ?hide_sent=1 ?sort={<newest|most_accounts>}
 
-the feed. the app's front door, and a social feed of the transactions
-that are queued and waiting to be signed: one post per queued batch, a
-filter bar above them, and the reader's own status on each one.
+the feed. the app's front door, and a social feed of the work that is
+queued and waiting to be signed: one post per queued batch of
+transactions, one post per queued swap, a filter bar above them, and the
+reader's own status on each one.
 
 ```html
 <body>

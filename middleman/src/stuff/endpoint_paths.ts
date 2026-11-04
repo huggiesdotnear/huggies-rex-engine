@@ -19,6 +19,13 @@ export const ENDPOINT_PATHS = {
     "/api/shit-1170/tx-queue/stats/contracts",
   api_shit_1170_tx_queue_stats_methods: "/api/shit-1170/tx-queue/stats/methods",
 
+  // --- the swap queue ---
+  // --- WHY --- the swap queue routes that carry a swap_id are NOT in
+  // this map: their path has a piece in the middle of it, so they are
+  // built by the wrapper and handed to api_call as a full path. see
+  // api_shit_1170_swap_queue_one_get.ts.
+  api_shit_1170_swap_queue: "/api/shit-1170/swap-queue",
+
   // --- /api/trezu/* — our proxy for the trezu api ---
   api_trezu_treasuries: "/api/trezu/user/treasuries",
 } as const;

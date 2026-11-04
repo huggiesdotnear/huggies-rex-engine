@@ -13,6 +13,8 @@
 pub mod db_open_fun;
 pub mod db_schema_run_fun;
 pub mod db_table_api_keys_fun;
+pub mod db_table_swap_queue_accounts_fun;
+pub mod db_table_swap_queue_fun;
 pub mod db_table_tx_queue_accounts_fun;
 pub mod db_table_tx_queue_fun;
 pub mod db_table_tx_queue_transactions_fun;

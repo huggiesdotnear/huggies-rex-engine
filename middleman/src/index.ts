@@ -18,6 +18,12 @@ export * from "./fun/api_shit_1170_api_key_me_get";
 export * from "./fun/api_shit_1170_api_key_rotate_post";
 export * from "./fun/api_shit_1170_api_keys_post";
 export * from "./fun/api_shit_1170_ping_get";
+export * from "./fun/api_shit_1170_swap_queue_accounts_delete";
+export * from "./fun/api_shit_1170_swap_queue_accounts_post";
+export * from "./fun/api_shit_1170_swap_queue_get";
+export * from "./fun/api_shit_1170_swap_queue_one_get";
+export * from "./fun/api_shit_1170_swap_queue_post";
+export * from "./fun/api_shit_1170_swap_queue_sent_post";
 export * from "./fun/api_shit_1170_tx_queue_accounts_delete";
 export * from "./fun/api_shit_1170_tx_queue_accounts_post";
 export * from "./fun/api_shit_1170_tx_queue_get";
@@ -49,6 +55,16 @@ export type {
   SHIT_1170_API_KEY_ME,
   SHIT_1170_SIGNED_ACCOUNT,
 } from "./types/shit_1170_api_keys";
+export type {
+  SHIT_1170_SWAP_QUEUE,
+  SHIT_1170_SWAP_QUEUE_ACCOUNT,
+  SHIT_1170_SWAP_QUEUE_ACCOUNT_REQUEST,
+  SHIT_1170_SWAP_QUEUE_LIST,
+  SHIT_1170_SWAP_QUEUE_QUERY,
+  SHIT_1170_SWAP_QUEUE_REQUEST,
+  SHIT_1170_SWAP_QUEUE_SENT_REQUEST,
+  SHIT_1170_SWAP_QUEUE_STATUS,
+} from "./types/shit_1170_swap_queue";
 export type {
   SHIT_1170_TX_QUEUE,
   SHIT_1170_TX_QUEUE_ACCOUNT,

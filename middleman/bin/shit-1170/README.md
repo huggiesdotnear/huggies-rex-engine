@@ -220,6 +220,114 @@ bun middleman/bin/shit-1170/api_trezu_treasuries_get.ts sleet.near --include-hid
 bun middleman/bin/shit-1170/api_trezu_treasuries_get.ts sleet.near --base-url http://my-host:54733
 ```
 
+## the swap queue
+
+a `swap_id` is a SWAP, not a batch of transactions. the agent does not
+know the route — it names the token in, the amount in and the token out,
+and the route is worked out when the swap is executed.
+
+`--amount-in` is the RAW unit amount — the token's smallest unit — and
+not a human amount. a human amount only means something next to the
+token it belongs to.
+
+## api_shit_1170_swap_queue_post
+
+POST /api/shit-1170/swap-queue — queue a swap.
+
+`--account` names the WHO — the accounts the swap is for. each one must
+be an account the api key belongs to.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_post.ts \
+  --api-key shit_1170_abc123... \
+  --token-in usdt.tether-token.near \
+  --amount-in 100000000 \
+  --token-out near \
+  --what "swap 100 USDC for NEAR" \
+  --why "you asked for it" \
+  --account alice.near
+```
+
+## api_shit_1170_swap_queue_get
+
+GET /api/shit-1170/swap-queue — the swap list, filterable.
+
+- `--account-id` — only the swaps this account is on
+- `--hide-sent` — with the account, drop the ones it has already sent
+- `--token-in` — only the swaps that sell this token
+- `--token-out` — only the swaps that buy this token
+- `--limit` — how many, default 50
+- `--offset` — where to start, default 0
+
+`--hide-sent` stands alone, it takes no value. it needs `--account-id`
+— it is a filter on ONE account's view.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_get.ts --api-key shit_1170_abc123...
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_get.ts \
+  --api-key shit_1170_abc123... \
+  --account-id alice.near \
+  --hide-sent \
+  --limit 20
+```
+
+## api_shit_1170_swap_queue_one_get
+
+GET /api/shit-1170/swap-queue/{swap_id} — one queued swap, with its
+accounts.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_one_get.ts \
+  --api-key shit_1170_abc123... \
+  --swap-id 8f14e45f-ceea-467a-9b0d-2b1c2e6c1a11
+```
+
+## api_shit_1170_swap_queue_accounts_post
+
+POST /api/shit-1170/swap-queue/{swap_id}/accounts — add YOUR OWN
+account to a queued swap. the api key must belong to that account.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_accounts_post.ts \
+  --api-key shit_1170_abc123... \
+  --swap-id 8f14e45f-ceea-467a-9b0d-2b1c2e6c1a11 \
+  --account-id alice.near
+```
+
+## api_shit_1170_swap_queue_accounts_delete
+
+DELETE /api/shit-1170/swap-queue/{swap_id}/accounts/{account_id} —
+remove YOUR OWN account from a queued swap. a row that already carries a
+hash is history and is not deleted.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_accounts_delete.ts \
+  --api-key shit_1170_abc123... \
+  --swap-id 8f14e45f-ceea-467a-9b0d-2b1c2e6c1a11 \
+  --account-id alice.near
+```
+
+## api_shit_1170_swap_queue_sent_post
+
+POST /api/shit-1170/swap-queue/{swap_id}/sent — record that the swap
+was sent. THIS is the route the swap page calls after it executes a
+queued swap.
+
+a queued swap is ONE swap, so there is ONE hash and not a list.
+
+`--status` is optional: without it the status is `sent`, which means
+"it went out and nobody knows how it went yet". `--amount-out` is the
+amount that came out, in the output token's smallest unit.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_swap_queue_sent_post.ts \
+  --api-key shit_1170_abc123... \
+  --swap-id 8f14e45f-ceea-467a-9b0d-2b1c2e6c1a11 \
+  --tx-hash 9hN3lq... \
+  --status succeeded \
+  --amount-out 4999000000000000000000000
+```
+
 ========================================
 <br/>
 copyright 2026 by sleet.near

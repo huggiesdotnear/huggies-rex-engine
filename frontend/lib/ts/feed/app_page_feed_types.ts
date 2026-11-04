@@ -4,7 +4,11 @@
 // the types live in their own file so the store, the loader, the url
 // and the components can all speak about the same things without one
 // of them importing another.
-import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
+import type {
+  SHIT_1170_SWAP_QUEUE,
+  SHIT_1170_TX_QUEUE,
+} from "@huggies/shit-1170-rex-engine-middleman";
+import type { SHIT_1170_SWAP_QUOTE } from "../shared/swap_quote";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -36,6 +40,12 @@ export interface SHIT_1170_APP_PAGE_FEED_STATE {
   sort: SHIT_1170_FEED_SORT;
   // the queues on screen.
   queues: ReadonlyArray<SHIT_1170_TX_QUEUE>;
+  // the queued swaps on screen.
+  swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
+  // the live quote of each swap, in the SAME order as `swaps`. an entry
+  // is null when the router could not answer, and the swap then shows
+  // the quote the backend stored.
+  swap_quotes: ReadonlyArray<SHIT_1170_SWAP_QUOTE | null>;
   // true while a load is running.
   loading: boolean;
   // the message for the reader, when something failed.

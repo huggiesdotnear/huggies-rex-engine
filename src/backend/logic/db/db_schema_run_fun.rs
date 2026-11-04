@@ -52,6 +52,8 @@ use sqlx::{Connection, Executor, SqliteConnection};
 // statement as a constant and the runner executes them itself.
 pub async fn db_schema_run_fun(connection: &mut SqliteConnection) -> Result<(), sqlx::Error> {
     use crate::backend::logic::db::db_table_api_keys_fun::SHIT_1170_DB_TABLE_API_KEYS;
+    use crate::backend::logic::db::db_table_swap_queue_accounts_fun::SHIT_1170_DB_TABLE_SWAP_QUEUE_ACCOUNTS;
+    use crate::backend::logic::db::db_table_swap_queue_fun::SHIT_1170_DB_TABLE_SWAP_QUEUE;
     use crate::backend::logic::db::db_table_tx_queue_accounts_fun::SHIT_1170_DB_TABLE_TX_QUEUE_ACCOUNTS;
     use crate::backend::logic::db::db_table_tx_queue_fun::SHIT_1170_DB_TABLE_TX_QUEUE;
     use crate::backend::logic::db::db_table_tx_queue_transactions_fun::SHIT_1170_DB_TABLE_TX_QUEUE_TRANSACTIONS;
@@ -72,6 +74,14 @@ pub async fn db_schema_run_fun(connection: &mut SqliteConnection) -> Result<(), 
     // the account rows. they point at the transactions.
     transaction
         .execute(SHIT_1170_DB_TABLE_TX_QUEUE_ACCOUNTS)
+        .await?;
+
+    // the swap queue. the account rows point at it.
+    transaction.execute(SHIT_1170_DB_TABLE_SWAP_QUEUE).await?;
+
+    // the account rows of a swap. they point at the swap.
+    transaction
+        .execute(SHIT_1170_DB_TABLE_SWAP_QUEUE_ACCOUNTS)
         .await?;
 
     transaction.commit().await?;

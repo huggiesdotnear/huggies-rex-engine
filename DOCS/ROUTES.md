@@ -75,6 +75,34 @@ user info, api key managmnets and the tx queue
 
   see [`ROUTES/shit-1170-tx-queue-stats.md`](./ROUTES/shit-1170-tx-queue-stats.md)
 
+- `/api/shit-1170/swap-queue` - the swap queue. `POST` queues a SWAP -
+  the token in, the amount in and the token out, and NOT the route -
+  and `GET` is the filterable list of them. a swap is never done, so the
+  status lives on the account row.
+
+  see [`ROUTES/shit-1170-swap-queue.md`](./ROUTES/shit-1170-swap-queue.md)
+
+- `/api/shit-1170/swap-queue/{swap_id}` - one queued swap, with its
+  accounts. `GET`.
+
+  see [`ROUTES/shit-1170-swap-queue.md`](./ROUTES/shit-1170-swap-queue.md)
+
+- `/api/shit-1170/swap-queue/{swap_id}/accounts` - add YOUR OWN account
+  to a queued swap. `POST`.
+
+  see [`ROUTES/shit-1170-swap-queue-accounts.md`](./ROUTES/shit-1170-swap-queue-accounts.md)
+
+- `/api/shit-1170/swap-queue/{swap_id}/accounts/{account_id}` - remove
+  YOUR OWN account from a queued swap. `DELETE`.
+
+  see [`ROUTES/shit-1170-swap-queue-accounts.md`](./ROUTES/shit-1170-swap-queue-accounts.md)
+
+- `/api/shit-1170/swap-queue/{swap_id}/sent` - record that the swap was
+  sent - the hash, the outcome and the amount that came out. `POST`.
+  this is the route the swap page calls after it executes a queued swap.
+
+  see [`ROUTES/shit-1170-swap-queue-sent.md`](./ROUTES/shit-1170-swap-queue-sent.md)
+
 the api key travels in the `x-api-key` header. the old `x-session-token`
 header is still accepted during the beta — `x-api-key` is read FIRST and
 the old name is the fallback.

@@ -5,6 +5,10 @@
 // the post is SMALL on purpose: it answers "is this worth my attention?"
 // and the queue page answers "exactly what is this?".
 //
+// --- WHY THE POSTS ARE ONE LIST AND NOT TWO: the reader reads one
+// feed. two lists would mean two scrolls, two "nothing here" messages
+// and two orders to think about. one list, two kinds of card.
+//
 // --- WHY THE WHAT IS THE HEADLINE: it is the agent's own sentence
 // about the batch, and it is the one thing about a batch that needs no
 // explaining.
@@ -41,19 +45,14 @@ import {
   shit_1170_feed_send_fun,
 } from "../../ts/feed/app_page_feed_actions";
 import { SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN } from "./app_page_feed_transactions";
+import { SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN } from "./app_page_feed_swap_post";
 import { tx_detail_href_fun } from "../../ts/shared/tx_link";
 import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_QUEUE_READER_STATUS } from "../../ts/feed/app_page_feed_actions";
+import type { SHIT_1170_FEED_POST } from "../../ts/feed/app_page_feed_posts";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the account id for a chip.
-//
-// --- WHY --- THE WHOLE ID AND NOT A CUT ONE: a cut id ("slee…") is
-// not an id. the reader cannot tell who is on the queue from it, and
-// the chip is the one place the WHO is shown. a chip is a little longer
-// than a cut id, and the css lets it wrap.
-
 // the headline of the post: the agent's WHAT, or the first call's
 // method when there is no WHAT.
 //
@@ -140,21 +139,6 @@ function post_status_fun(
       )}
     </span>
   );
-}
-
-// ========================================
-// --- POST STATUS ------------------------
-// the reader's status on one post.
-//
-// --- WHY IT IS A COMPONENT AND NOT A CALL: it draws its own markup,
-// and a plain call would be fine — but the component keeps the props
-// named and the drawing in one place.
-function PostStatus(props: {
-  queue: SHIT_1170_TX_QUEUE;
-  account_id: string | null;
-  status: SHIT_1170_QUEUE_READER_STATUS;
-}) {
-  return post_status_fun(props.queue, props.account_id, props.status);
 }
 
 // ========================================
@@ -285,21 +269,49 @@ function Post(props: { queue: SHIT_1170_TX_QUEUE }) {
     </article>
   );
 }
+
 // ========================================
+// --- POST STATUS ------------------------
+// the reader's status on one post.
+//
+// --- WHY IT IS A COMPONENT AND NOT A CALL: it draws its own markup,
+// and a plain call would be fine — but the component keeps the props
+// named and the drawing in one place.
+function PostStatus(props: {
+  queue: SHIT_1170_TX_QUEUE;
+  account_id: string | null;
+  status: SHIT_1170_QUEUE_READER_STATUS;
+}) {
+  return post_status_fun(props.queue, props.account_id, props.status);
+}
+
 // ========================================
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_POST_FUN() {
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
   if (state.error !== null) return null;
-  if (state.queues.length === 0) {
+  const posts = SHIT_1170_APP_PAGE_FEED_STORE.get_posts();
+  if (posts.length === 0) {
     if (state.loading) return <p class="feed-empty">LOADING THE FEED…</p>;
     return <p class="feed-empty">NO QUEUED BATCHES</p>;
   }
   return (
     <div class="feed-posts">
-      {state.queues.map((queue) => (
-        <Post key={queue.queueId} queue={queue} />
-      ))}
+      {/* --- WHY --- THE TWO KINDS OF CARD ARE DRAWN FROM ONE LIST: the
+          reader reads one feed, and the order of the cards is the
+          feed's business. a swap is not a batch, so it gets its own
+          card — but it sits in the same list, in the same order. */}
+      {posts.map((post: SHIT_1170_FEED_POST) =>
+        post.kind === "queue" ? (
+          <Post key={post.queue.queueId} queue={post.queue} />
+        ) : (
+          <SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN
+            key={post.swap.swapId}
+            swap={post.swap}
+            quote={post.quote}
+          />
+        ),
+      )}
     </div>
   );
 }

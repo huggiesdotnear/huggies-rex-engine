@@ -218,3 +218,48 @@
   letter-spacing: 0.06em;
 }
 /*==================================*/
+/*==================================*/
+/* A QUEUED SWAP's card.
+   the swap card is the same shape as the batch card — headline, the
+   line under it, the chips and the status, the actions — but the line
+   under the headline is a TRADE and not a call.
+
+   --- WHY --- the card is marked `is-swap`: a swap is a different kind
+   of thing from a batch of calls, and a reader who knows the feed can
+   tell them apart at a glance. the marker is the only thing that says
+   so, and it says it without a label. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post.is-swap {
+  border-color: rgba(0, 154, 171, 0.45);
+  background: rgba(0, 154, 171, 0.06);
+}
+/*==================================*/
+/* the trade line: what goes in, an arrow, and what comes out.
+   --- WHY --- THE ARROW IS ITS OWN ELEMENT: it is a direction, not a
+   token, and it is what tells the reader at a glance that this card
+   holds two sides rather than one call. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-swap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-swap-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-swap-arrow {
+  color: var(--color-middle);
+  font-size: 16px;
+  font-weight: 700;
+}
+/*==================================*/
+/* the SWAP IT link is the card's main action, so it carries the same
+   rules the DETAIL link carries — a swap cannot be signed from the
+   feed, so the link IS the action. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail.is-swap {
+  border-color: var(--color-middle);
+}
+/*==================================*/

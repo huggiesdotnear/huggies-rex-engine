@@ -12,7 +12,9 @@
 // looking at a feed that does not match the bar above it.
 import { SHIT_1170_APP_PAGE_FEED_LOAD } from "./app_page_feed_load";
 import { SHIT_1170_APP_PAGE_FEED_FILTER } from "./app_page_feed_filter";
+import { SHIT_1170_APP_PAGE_FEED_SWAPS } from "./app_page_feed_swaps";
 import { SHIT_1170_APP_PAGE_FEED_URL } from "./app_page_feed_url";
+import { shit_1170_feed_posts_fun } from "./app_page_feed_posts";
 import { SHIT_1170_AUTH } from "../shared/auth_status";
 import type {
   SHIT_1170_APP_PAGE_FEED_STATE,
@@ -20,7 +22,11 @@ import type {
   SHIT_1170_FEED_VIEW,
 } from "./app_page_feed_types";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
-import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
+import type {
+  SHIT_1170_SWAP_QUEUE,
+  SHIT_1170_TX_QUEUE,
+} from "@huggies/shit-1170-rex-engine-middleman";
+import type { SHIT_1170_FEED_POST } from "./app_page_feed_posts";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -28,6 +34,8 @@ import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman
 export interface SHIT_1170_APP_PAGE_FEED_STORE_STATE extends SHIT_1170_APP_PAGE_FEED_STATE {
   // the token metadata for the transfers the batches make.
   tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+  // the token metadata for the two tokens each swap names.
+  swap_tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
 }
 // ========================================
 // ========================================
@@ -39,7 +47,10 @@ let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
   hide_sent: false,
   sort: "newest",
   queues: [],
+  swaps: [],
+  swap_quotes: [],
   tokens: new Map(),
+  swap_tokens: new Map(),
   loading: false,
   error: null,
 };
@@ -82,30 +93,21 @@ function set_state_fun(next: SHIT_1170_APP_PAGE_FEED_STORE_STATE): void {
 }
 // ========================================
 // ========================================
-// --- SORT ------------------------------
-// the batches, ordered the way the reader asked for.
+// ========================================
+// ========================================
+// --- POSTS ------------------------------
+// the batches and the swaps in ONE ordered list.
 //
-// --- WHY THE SORT IS DONE HERE AND NOT BY THE API: the api has no
-// sort parameter for the queue list, and the loaded list is small
-// enough that sorting it costs nothing.
-//
-// --- WHY NEWEST IS BY CREATION TIME: that is when the batch was
-// queued, and a feed of queued work reads newest-first.
-//
-// --- WHY MOST ACCOUNTS IS BY THE NUMBER OF ACCOUNTS: a queue with more
-// accounts on it has more people waiting for it, and that is what a
-// social feed measures.
-function sorted_queues_fun(
-  queues: ReadonlyArray<SHIT_1170_TX_QUEUE>,
-  sort: SHIT_1170_FEED_SORT,
-): ReadonlyArray<SHIT_1170_TX_QUEUE> {
-  const out = [...queues];
-  if (sort === "most_accounts") {
-    out.sort((a, b) => b.accounts.length - a.accounts.length);
-    return out;
-  }
-  out.sort((a, b) => b.createdAt - a.createdAt);
-  return out;
+// --- WHY THE POSTS ARE HELD IN THE STORE AND NOT BUILT BY THE
+// COMPONENT: the component draws the cards, and the ORDER of the cards
+// is the feed's business. one list, built once, read by every card.
+function build_posts_fun(): SHIT_1170_FEED_POST[] {
+  return shit_1170_feed_posts_fun(
+    state.queues,
+    state.swaps,
+    state.swap_quotes,
+    state.sort,
+  );
 }
 // ========================================
 // ========================================
@@ -142,6 +144,16 @@ async function load_fun(): Promise<void> {
       account_id,
       filter.hide_sent,
     );
+    // --- WHY --- THE SWAPS ARE LOADED SEPARATELY AND NOT INSIDE THE
+    // QUEUE LOAD: a queued swap is a different resource with a
+    // different shape, and the queue loader fetches queues. the two
+    // loads run together so the reader sees one batch of work.
+    //
+    // --- WHY --- A FAILED SWAP LOAD DOES NOT FAIL THE FEED: the queues
+    // are the feed's heart, and the swaps are an addition to it. a
+    // router that is down must not take the queued batches off the
+    // screen with it.
+    const swaps_loaded = await load_swaps_fun(account_id);
     // a load for an older filter must not overwrite a newer one.
     if (loaded_for !== key) return;
     loading = false;
@@ -151,8 +163,11 @@ async function load_fun(): Promise<void> {
       account_id: filter.account_id,
       hide_sent: filter.hide_sent,
       sort: filter.sort,
-      queues: sorted_queues_fun(loaded.queues, filter.sort),
+      queues: loaded.queues,
       tokens: loaded.tokens,
+      swaps: swaps_loaded.swaps,
+      swap_quotes: swaps_loaded.quotes,
+      swap_tokens: swaps_loaded.tokens,
       loading: false,
       error: null,
     });
@@ -162,12 +177,40 @@ async function load_fun(): Promise<void> {
     set_state_fun({
       ...state,
       queues: [],
+      swaps: [],
+      swap_quotes: [],
       tokens: new Map(),
+      swap_tokens: new Map(),
       loading: false,
       error: err instanceof Error ? err.message : String(err),
     });
   }
 } // ========================================
+// ========================================
+// --- SWAPS ------------------------------
+// the queued swaps, and their live quotes.
+//
+// --- WHY --- THE FAILURE IS SWALLOWED AND NOT PROPAGATED: the swaps are
+// an addition to the feed, and a swap queue that is down must not take
+// the queued batches off the screen with it. the reader gets the batches
+// and no swaps, and the swaps come back on the next load.
+async function load_swaps_fun(account_id: string | null): Promise<{
+  swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
+  quotes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_quotes"];
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+}> {
+  try {
+    const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(account_id);
+    return {
+      swaps: loaded.swaps,
+      quotes: loaded.quotes,
+      tokens: loaded.tokens,
+    };
+  } catch (err) {
+    console.warn("[app_page_feed_store] the swaps could not be loaded", err);
+    return { swaps: [], quotes: [], tokens: new Map() };
+  }
+}
 // ========================================
 // --- SET -------------------------------
 // put the filter on the url.
@@ -271,7 +314,6 @@ function set_sort_fun(sort: SHIT_1170_FEED_SORT): void {
   set_state_fun({
     ...state,
     sort,
-    queues: sorted_queues_fun(state.queues, sort),
   });
   write_url_fun(
     state.view,
@@ -302,6 +344,11 @@ function token_of_fun(token_id: string): SHIT_1170_TRANSFER_TOKEN | null {
   return state.tokens.get(token_id) ?? null;
 }
 // ========================================
+// the token metadata for one swap token id, or null when it is unknown.
+function swap_token_of_fun(token_id: string): SHIT_1170_TRANSFER_TOKEN | null {
+  return state.swap_tokens.get(token_id) ?? null;
+}
+// ========================================
 // --- WATCH -----------------------------
 // follow the auth state, so a sign-in or a sign-out moves the feed.
 //
@@ -326,6 +373,8 @@ export const SHIT_1170_APP_PAGE_FEED_STORE = {
   subscribe: subscribe_fun,
   get: get_fun,
   get_token: token_of_fun,
+  get_swap_token: swap_token_of_fun,
+  get_posts: build_posts_fun,
   watch: watch_fun,
 };
 // ========================================

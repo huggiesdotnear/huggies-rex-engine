@@ -51,6 +51,10 @@ async fn columns_of_fun(pool: &sqlx::SqlitePool, table: &str) -> Vec<String> {
             "SELECT name FROM pragma_table_info('tx_queue_transactions')"
         }
         "tx_queue_accounts" => "SELECT name FROM pragma_table_info('tx_queue_accounts')",
+        "swap_queue" => "SELECT name FROM pragma_table_info('swap_queue')",
+        "swap_queue_accounts" => {
+            "SELECT name FROM pragma_table_info('swap_queue_accounts')"
+        }
         _ => panic!("no such table: {table}"),
     };
 
@@ -88,6 +92,8 @@ async fn the_db_opens_and_every_table_is_there() {
         "tx_queue",
         "tx_queue_transactions",
         "tx_queue_accounts",
+        "swap_queue",
+        "swap_queue_accounts",
     ] {
         assert!(
             tables.contains(&name.to_string()),
@@ -196,12 +202,191 @@ async fn the_indexes_are_there() {
         "tx_queue_accounts_account_id_idx",
         "tx_queue_accounts_queue_id_idx",
         "tx_queue_accounts_status_idx",
+        "swap_queue_accounts_account_id_idx",
+        "swap_queue_accounts_swap_id_idx",
+        "swap_queue_accounts_status_idx",
     ] {
         assert!(
             indexes.contains(&name.to_string()),
             "the {name} index should exist"
         );
     }
+}
+
+#[tokio::test]
+async fn the_swap_queue_table_has_its_columns() {
+    let db = TEMP_DB::new_fun("swap-queue");
+    let pool = db.pool_fun().await;
+
+    assert_eq!(
+        columns_of_fun(&pool, "swap_queue").await,
+        vec![
+            "swap_id",
+            "what",
+            "when",
+            "why",
+            "when_at",
+            "token_in",
+            "amount_in",
+            "token_out",
+            "amount_out",
+            "dex_id",
+            "created_at",
+            "updated_at"
+        ]
+    );
+}
+
+#[tokio::test]
+async fn the_swap_queue_accounts_table_has_its_columns() {
+    let db = TEMP_DB::new_fun("swap-queue-accounts");
+    let pool = db.pool_fun().await;
+
+    assert_eq!(
+        columns_of_fun(&pool, "swap_queue_accounts").await,
+        vec![
+            "swap_id",
+            "account_id",
+            "status",
+            "tx_hash",
+            "amount_out",
+            "created_at",
+            "updated_at"
+        ]
+    );
+}
+
+#[tokio::test]
+async fn a_swap_account_row_without_its_swap_is_refused() {
+    let db = TEMP_DB::new_fun("swap-bad-fk");
+    let pool = db.pool_fun().await;
+
+    let result = sqlx::query(
+        "INSERT INTO swap_queue_accounts
+           (swap_id, account_id, status, created_at, updated_at)
+         VALUES (?1, ?2, 'pending', 1, 1)",
+    )
+    .bind("swap-does-not-exist")
+    .bind("alice.near")
+    .execute(&pool)
+    .await;
+
+    assert!(
+        result.is_err(),
+        "an account row pointing at a missing swap must fail"
+    );
+}
+
+#[tokio::test]
+async fn the_same_account_on_the_same_swap_twice_is_refused() {
+    let db = TEMP_DB::new_fun("swap-dup-account");
+    let pool = db.pool_fun().await;
+
+    sqlx::query(
+        "INSERT INTO swap_queue
+           (swap_id, token_in, amount_in, token_out, created_at, updated_at)
+         VALUES (?1, 'near', '1', 'usdt.tether-token.near', 1, 1)",
+    )
+    .bind("swap-1")
+    .execute(&pool)
+    .await
+    .expect("the swap should save");
+
+    let insert = || {
+        sqlx::query(
+            "INSERT INTO swap_queue_accounts
+               (swap_id, account_id, status, created_at, updated_at)
+             VALUES (?1, ?2, 'pending', 1, 1)",
+        )
+        .bind("swap-1")
+        .bind("alice.near")
+        .execute(&pool)
+    };
+
+    insert().await.expect("the first account row should save");
+
+    let second = insert().await;
+    assert!(
+        second.is_err(),
+        "the same account on the same swap twice must fail"
+    );
+}
+
+#[tokio::test]
+async fn deleting_a_swap_takes_its_account_rows_with_it() {
+    let db = TEMP_DB::new_fun("swap-cascade");
+    let pool = db.pool_fun().await;
+
+    sqlx::query(
+        "INSERT INTO swap_queue
+           (swap_id, token_in, amount_in, token_out, created_at, updated_at)
+         VALUES (?1, 'near', '1', 'usdt.tether-token.near', 1, 1)",
+    )
+    .bind("swap-1")
+    .execute(&pool)
+    .await
+    .expect("the swap should save");
+
+    sqlx::query(
+        "INSERT INTO swap_queue_accounts
+           (swap_id, account_id, status, created_at, updated_at)
+         VALUES (?1, ?2, 'pending', 1, 1)",
+    )
+    .bind("swap-1")
+    .bind("alice.near")
+    .execute(&pool)
+    .await
+    .expect("the account row should save");
+
+    sqlx::query("DELETE FROM swap_queue WHERE swap_id = ?1")
+        .bind("swap-1")
+        .execute(&pool)
+        .await
+        .expect("the swap should delete");
+
+    let accounts: (i64,) = sqlx::query_as("SELECT COUNT(1) FROM swap_queue_accounts")
+        .fetch_one(&pool)
+        .await
+        .expect("the count should read");
+    assert_eq!(accounts.0, 0, "the account row should be cascaded away");
+}
+
+#[tokio::test]
+async fn a_swap_account_row_starts_out_pending() {
+    let db = TEMP_DB::new_fun("swap-default-status");
+    let pool = db.pool_fun().await;
+
+    sqlx::query(
+        "INSERT INTO swap_queue
+           (swap_id, token_in, amount_in, token_out, created_at, updated_at)
+         VALUES (?1, 'near', '1', 'usdt.tether-token.near', 1, 1)",
+    )
+    .bind("swap-1")
+    .execute(&pool)
+    .await
+    .expect("the swap should save");
+
+    // the status is left out. it has to default to pending.
+    sqlx::query(
+        "INSERT INTO swap_queue_accounts
+           (swap_id, account_id, created_at, updated_at)
+         VALUES (?1, ?2, 1, 1)",
+    )
+    .bind("swap-1")
+    .bind("alice.near")
+    .execute(&pool)
+    .await
+    .expect("the account row should save");
+
+    let status: (String,) = sqlx::query_as(
+        "SELECT status FROM swap_queue_accounts WHERE swap_id = ?1 AND account_id = ?2",
+    )
+    .bind("swap-1")
+    .bind("alice.near")
+    .fetch_one(&pool)
+    .await
+    .expect("the status should read");
+    assert_eq!(status.0, "pending");
 }
 
 #[tokio::test]

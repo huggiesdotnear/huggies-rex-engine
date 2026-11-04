@@ -29,6 +29,7 @@ import {
 } from "../../ts/swap/app_page_swap_amount";
 import { swap_box_amount_fun } from "../../ts/swap/app_page_swap_box_amount";
 import type { SHIT_1170_TOKEN_INFO } from "../../ts/shared/token_info";
+import type { SHIT_1170_SWAP_EXECUTION } from "../../ts/swap/app_page_swap_execute";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -123,6 +124,36 @@ function amount_note_fun(
   );
 }
 // ========================================
+// ========================================
+// --- REPORT ---------------------------
+// tell the backend that the queued swap went out.
+//
+// --- WHY --- THE OUTCOME IS DERIVED FROM THE RESULT: the result says
+// whether the swap succeeded, whether it failed, or whether it went out
+// and nobody knows. those are the three states the backend records.
+//
+// --- WHY --- A FAILED REPORT IS SWALLOWED: the swap DID go out. the
+// report is the backend's record of it, and a backend that cannot be
+// reached must not turn a working swap into a failure in the reader's
+// eyes.
+async function report_queued_swap_fun(
+  result: SHIT_1170_SWAP_EXECUTION,
+): Promise<void> {
+  const status = result.succeeded
+    ? "succeeded"
+    : result.unknown
+      ? "sent"
+      : "failed";
+  try {
+    await SHIT_1170_APP_PAGE_SWAP_STORE.report_queued_swap(
+      result.tx_hash,
+      status,
+      result.amount_out,
+    );
+  } catch (err) {
+    console.warn("[app_page_swap_form] the swap could not be reported", err);
+  }
+}
 // ========================================
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_SWAP_FORM_FUN() {
@@ -231,6 +262,13 @@ export function SHIT_1170_COMPONENT_SWAP_FORM_FUN() {
       page.token_out,
       account_id,
     );
+    // --- WHY --- THE QUEUED SWAP IS REPORTED BEFORE THE TOAST: the
+    // report is what puts the swap's hash and its outcome on the feed,
+    // and the reader is about to be told the swap went out. so the
+    // record is made first, and a failure of the report is swallowed —
+    // the swap DID go out, and a backend that cannot be reached must
+    // not turn a working swap into a failure in the reader's eyes.
+    await report_queued_swap_fun(result);
     if (result.succeeded) {
       SHIT_1170_TOAST_STORE.show(
         "success",
