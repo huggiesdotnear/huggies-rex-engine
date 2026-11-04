@@ -8,10 +8,14 @@
 // display. the filter bar changes a filter, the store re-reads the feed,
 // and the bar never talks to the api.
 //
-// --- WHY THE SORT IS A PLAIN DROPDOWN AND NOT THE SHARED SORT CONTROL:
-// the shared control is a row of small buttons with a direction toggle.
-// the feed's sort is a named set with no direction — "newest" and "most
-// accounts" are two entries, not two directions of one key.
+// --- WHY THE SORT IS A BUTTON AND NOT A DROPDOWN: a dropdown is a
+// different shape from the buttons beside it, and a row that mixes a
+// dropdown with buttons does not line up — the dropdown is taller and
+// the "SORT" label in front of it pushes it out of the row. the sort is
+// a button that says what it will do, like the other three.
+//
+// --- WHY THE BUTTON CYCLES THROUGH THE SORTS: there are two of them,
+// and a button that cycles is one control instead of two.
 //
 // mounts into <div id="SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS">.
 import { render } from "preact";
@@ -23,20 +27,39 @@ import type { SHIT_1170_FEED_SORT } from "../../ts/feed/app_page_feed_types";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// the sorts the dropdown offers.
-interface SHIT_1170_FEED_SORT_OPTION {
-  key: SHIT_1170_FEED_SORT;
-  label: string;
-}
-
+// the sorts the button cycles through.
+//
 // --- WHY THE LABELS ARE UPPERCASE: the app's controls are uppercase
 // everywhere, and a mixed-case label next to an uppercase button reads
 // as a different thing.
-const SHIT_1170_FEED_SORT_OPTIONS: ReadonlyArray<SHIT_1170_FEED_SORT_OPTION> = [
+//
+// --- WHY EACH ONE SAYS WHAT IT WILL DO: the button shows the sort that
+// is NOT on — the one clicking it will switch to — so the reader
+// knows what they get before they click.
+const SHIT_1170_FEED_SORT_OPTIONS: ReadonlyArray<{
+  key: SHIT_1170_FEED_SORT;
+  label: string;
+}> = [
   { key: "newest", label: "NEWEST" },
   { key: "most_accounts", label: "MOST ACCOUNTS" },
 ];
 // ========================================
+// ========================================
+// --- HELPERS ----------------------------
+// the sort the reader gets when they click the sort button.
+//
+// --- WHY --- IT CYCLES IN THE ORDER THE OPTIONS ARE LISTED: the list is
+// the order the sorts are offered in, so the cycle follows it.
+function next_sort_fun(current: SHIT_1170_FEED_SORT): {
+  key: SHIT_1170_FEED_SORT;
+  label: string;
+} {
+  const index = SHIT_1170_FEED_SORT_OPTIONS.findIndex(
+    (option) => option.key === current,
+  );
+  const next_index = (index + 1) % SHIT_1170_FEED_SORT_OPTIONS.length;
+  return SHIT_1170_FEED_SORT_OPTIONS[next_index]!;
+}
 // ========================================
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
@@ -51,6 +74,11 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
   // has none. the control is greyed out and the url's hide_sent is
   // ignored.
   const hide_sent_disabled = state.view !== "mine";
+  // --- WHY --- THE BUTTON SHOWS THE NEXT SORT AND NOT THE CURRENT ONE:
+  // the button is the one the reader clicks, and it says what clicking
+  // it will do. a button that reads "NEWEST" while the feed is already
+  // newest is a label, not a control.
+  const next_sort = next_sort_fun(state.sort);
 
   return (
     <div class="feed-filters">
@@ -105,26 +133,20 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
       >
         HIDE SENT
       </button>
-      <div class="feed-filters-sort-wrap">
-        <label class="feed-filters-sort">
-          <span class="feed-filters-sort-label">SORT</span>
-          <select
-            class="feed-filters-select"
-            value={state.sort}
-            onChange={(event) => {
-              const next = (event.currentTarget as HTMLSelectElement)
-                .value as SHIT_1170_FEED_SORT;
-              SHIT_1170_APP_PAGE_FEED_STORE.set_sort(next);
-            }}
-          >
-            {SHIT_1170_FEED_SORT_OPTIONS.map((option) => (
-              <option key={option.key} value={option.key}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <button
+        type="button"
+        class="feed-filter-button feed-filter-sort"
+        title={
+          next_sort.label === "NEWEST"
+            ? "sort by newest"
+            : "sort by most accounts"
+        }
+        onClick={() => {
+          SHIT_1170_APP_PAGE_FEED_STORE.set_sort(next_sort.key);
+        }}
+      >
+        {next_sort.label}
+      </button>
     </div>
   );
 }

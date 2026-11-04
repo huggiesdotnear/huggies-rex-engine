@@ -2,9 +2,10 @@
 /* SHIT_1170_COMPONENT_QUEUE_ACTIONS
    the queue page's buttons: SEND and ADD / REMOVE.
 
-   the buttons are the base app buttons, only narrower here, because the
-   queue page's column is narrow and two full-width buttons would not
-   sit side by side. */
+   the buttons are the base app buttons and they keep the base's full
+   width — the width of the page column. they each take a whole row,
+   so they are the same width and they line up with the cards above
+   them. the feed's posts carry the same two buttons the same way. */
 #SHIT_1170_COMPONENT_QUEUE_ACTIONS .queue-actions {
   display: flex;
   align-items: center;
@@ -18,11 +19,9 @@
 /*==================================*/
 #SHIT_1170_COMPONENT_QUEUE_ACTIONS .queue-action-send,
 #SHIT_1170_COMPONENT_QUEUE_ACTIONS .queue-action-queue {
-  width: auto;
-  min-width: 110px;
-  padding: 8px 16px;
-  font-size: 13px;
-  letter-spacing: 0.08em;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
 }
 /*==================================*/
 /* the hint under the buttons — why the SEND is off. */

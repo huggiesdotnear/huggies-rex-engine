@@ -44,53 +44,29 @@ import {
   shit_1170_transfer_icon_fun,
 } from "../shared/transfer_amount";
 import { shit_1170_queue_first_transfer_fun } from "../../ts/shared/queue_transfers";
+import { shit_1170_code_block_fun } from "../tx/code_block";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
 import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// one argument's value, as a short piece of text.
+// the args of one call, as the json to put in the code block.
 //
-// --- WHY --- A NESTED OBJECT IS ITS OWN JSON: the value of a nested
-// key is a thing of its own, and printing it as `[object Object]` would
-// hide it. it is flattened too, so it stays on the line.
-function arg_value_fun(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-  if (value === null) return "null";
-  if (typeof value === "object") {
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return "";
-    }
-  }
-  return String(value);
-}
-
-// the args of one call, flattened to one line, or null when there are
-// none.
+// --- WHY --- THE WHOLE OBJECT AND NOT A SUMMARY: the reader is about
+// to SIGN this. the args are what the call asks with, and a summary
+// that leaves out a key is a call the reader has not fully read.
 //
-// --- WHY --- THE ORDER IS FIXED AND NOT THE OBJECT'S OWN: the order the
-// agent wrote the args in is not meaningful, and a post whose line
-// changed shape between loads would be unreadable.
-//
-// --- WHY --- A LONG VALUE IS CUT: a memo or a blob of json can be very
-// long, and the queue page carries it whole.
-function args_flat_fun(args: Record<string, unknown>): string | null {
+// --- WHY --- THE KEYS ARE SORTED: the order the agent wrote the args in
+// is not meaningful, and a post whose block changed shape between loads
+// would be unreadable.
+function args_json_fun(args: Record<string, unknown>): string | null {
   const keys = Object.keys(args).sort();
-  const parts: string[] = [];
+  if (keys.length === 0) return null;
+  const sorted: Record<string, unknown> = {};
   for (const key of keys) {
-    const value = args[key];
-    if (value === undefined) continue;
-    const text = arg_value_fun(value);
-    if (text.length === 0) continue;
-    parts.push(`${key}=${text.length > 40 ? `${text.slice(0, 40)}…` : text}`);
+    sorted[key] = args[key];
   }
-  if (parts.length === 0) return null;
-  return parts.join("  ");
+  return JSON.stringify(sorted, null, 2);
 }
 // ========================================
 // --- COMPONENT --------------------------
@@ -103,7 +79,7 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN(props: {
   // a batch with no calls has nothing to show here.
   if (first === undefined) return null;
   const transfer = shit_1170_queue_first_transfer_fun(props.queue);
-  const args_flat = args_flat_fun(first.args ?? {});
+  const args_json = args_json_fun(first.args ?? {});
 
   return (
     <div class="feed-call">
@@ -121,10 +97,11 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN(props: {
           </span>
         )}
       </div>
-      {/* --- WHY --- THE ARGS ARE THEIR OWN LINE: they are what the call
-          asks WITH, and they are long. one line of `key=value` pairs
-          reads where a json block does not. */}
-      {args_flat !== null && <code class="feed-call-args">{args_flat}</code>}
+      {/* --- WHY --- THE ARGS ARE A CODE BLOCK AND NOT PLAIN TEXT: it is
+          the same box every other piece of json in the app sits in, so
+          a queued call's args and a finished transaction's args look
+          the same. */}
+      {args_json !== null && shit_1170_code_block_fun({ code: args_json })}
       {/* --- WHY --- THE TOKEN LINE IS ONLY DRAWN FOR A CALL THAT MOVES
           ONE: there is nothing to say about the tokens of a call that
           moves none. */}

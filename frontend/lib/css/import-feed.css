@@ -1,5 +1,7 @@
 /*==================================*/
 /* the feed page's css: the components it mounts. */
+@import url(./components/tx/code_block.css);
+@import url(./components/shared/transfer_amount.css);
 @import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS.css);
 @import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_POST.css);
 @import url(./components/feed/SHIT_1170_COMPONENT_APP_PAGE_FEED_STATUS.css);

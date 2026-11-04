@@ -34,20 +34,6 @@
   opacity: 0.8;
 }
 /*==================================*/
-/* the args, flattened to one line.
-
-   --- WHY --- they WRAP and are not cut off: an arg value can be long,
-   and the reader has to be able to read what the call asks for. the
-   line breaks at any point rather than running off the card. */
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-args {
-  font-family: monospace;
-  font-size: 11px;
-  opacity: 0.7;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  max-width: 100%;
-}
-/*==================================*/
 /* the "+N more" note, for a batch with more than one call. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-more {
   font-family: monospace;
@@ -59,13 +45,25 @@
 
    --- WHY --- it is ITS OWN LINE and not on the contract's line: it is a
    different kind of thing. the contract and the args say what the call
-   asks for; this says what that means in money. */
+   asks for; this says what that means in money.
+
+   --- WHY --- THE AMOUNT GETS ITS OWN SPACE: the amount is an inline
+   flex box of its own, and without a gap the icon, the number, the
+   symbol and the receiver all but up against each other and read as one
+   word. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-token {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   min-width: 0;
+  max-width: 100%;
+}
+/*==================================*/
+/* the amount box needs room of its own too — it is an inline flex of
+   the icon, the number, the symbol and the worth. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-token .tx-token-amount {
+  gap: 6px;
 }
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-token-to {

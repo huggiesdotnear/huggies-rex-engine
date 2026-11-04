@@ -98,14 +98,24 @@
   margin-top: 2px;
 }
 /*==================================*/
-/* the buttons are the base app buttons, only narrower here. */
+/* the buttons are the base app buttons and they keep the base's full
+   width.
+
+   --- WHY --- and not the narrower ones: the base button is 500px —
+   the width of the page column — and the queue page's buttons are
+   that wide. the post's buttons were narrowed to sit side by side, and
+   they came out looking like a row of little pills under a wide card.
+
+   --- WHY --- the row WRAPS and the buttons are NOT squeezed: the SEND
+   and the ADD / REMOVE each take a whole row, so they are the same
+   width and they line up with the card's edges. two buttons that each
+   take half a row would be narrower than the card and the DETAIL link
+   would have nowhere to go. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-send,
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-queue {
-  width: auto;
-  min-width: 96px;
-  padding: 8px 14px;
-  font-size: 13px;
-  letter-spacing: 0.08em;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
 }
 /*==================================*/
 /* the DETAIL link is a plain link, so it carries the page's link rules
