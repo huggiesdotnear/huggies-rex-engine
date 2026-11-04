@@ -120,8 +120,10 @@ async function load_fun(): Promise<void> {
   const filter = SHIT_1170_APP_PAGE_FEED_FILTER.read();
   const account_id = filter.view === "mine" ? filter.account_id : null;
   // the url is written so a link the reader copies says the same thing
-  // the screen does.
-  write_url_fun(account_id, filter.hide_sent, filter.sort);
+  // the screen does. the VIEW goes on the url too, so a link to the ALL
+  // view opens the ALL view and not the reader's own queues — and the
+  // ACCOUNT stays on it, so the reader can flip back to MINE.
+  write_url_fun(filter.view, filter.account_id, filter.hide_sent, filter.sort);
   const key = `${account_id ?? ""}|${filter.hide_sent ? "1" : "0"}`;
   if (loading && loaded_for === key) return;
   loaded_for = key;
@@ -182,6 +184,7 @@ async function load_fun(): Promise<void> {
 // link with no account would open the ALL view for whoever opened it,
 // and the reader's own view is the one they meant to share.
 function write_url_fun(
+  view: SHIT_1170_FEED_VIEW,
   account_id: string | null,
   hide_sent: boolean,
   sort: SHIT_1170_FEED_SORT,
@@ -192,7 +195,12 @@ function write_url_fun(
       : SHIT_1170_APP_PAGE_FEED_FILTER.sort_is_known(sort)
         ? sort
         : null;
-  SHIT_1170_APP_PAGE_FEED_URL.write_filter(account_id, hide_sent, sort_value);
+  SHIT_1170_APP_PAGE_FEED_URL.write_filter(
+    view,
+    account_id,
+    hide_sent,
+    sort_value,
+  );
 }
 
 // ========================================
@@ -213,10 +221,19 @@ async function set_view_fun(view: SHIT_1170_FEED_VIEW): Promise<void> {
     const account_id = SHIT_1170_AUTH.get_account_id();
     if (account_id === null) return;
     set_state_fun({ ...state, view, account_id });
-    write_url_fun(account_id, state.hide_sent, state.sort);
+    write_url_fun(view, account_id, state.hide_sent, state.sort);
   } else {
-    set_state_fun({ ...state, view, account_id: null, hide_sent: false });
-    write_url_fun(null, false, state.sort);
+    // --- WHY --- THE ACCOUNT IS KEPT AND NOT CLEARED: the account is the
+    // reader's own, and it is what the MINE view filters by. clearing it
+    // would lose the reader's account when they flip back.
+    //
+    // --- WHY --- IT GOES ON THE URL IN THE ALL VIEW TOO: the url's
+    // account says whose queues the MINE view would show, and the view
+    // param says which question is being asked. the api is asked with
+    // NO account in the ALL view — that is the request — but the url
+    // keeps the account so the reader can flip back.
+    set_state_fun({ ...state, view, hide_sent: false });
+    write_url_fun(view, state.account_id, false, state.sort);
   }
   await load_fun();
 }
@@ -235,6 +252,7 @@ async function set_hide_sent_fun(hide_sent: boolean): Promise<void> {
   if (hide_sent === state.hide_sent) return;
   set_state_fun({ ...state, hide_sent });
   write_url_fun(
+    state.view,
     SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     hide_sent,
     state.sort,
@@ -256,6 +274,7 @@ function set_sort_fun(sort: SHIT_1170_FEED_SORT): void {
     queues: sorted_queues_fun(state.queues, sort),
   });
   write_url_fun(
+    state.view,
     SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     sort,

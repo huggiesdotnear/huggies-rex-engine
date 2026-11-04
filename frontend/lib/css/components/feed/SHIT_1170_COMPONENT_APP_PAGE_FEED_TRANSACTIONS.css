@@ -35,3 +35,23 @@
   opacity: 0.6;
 }
 /*==================================*/
+/* the args, as a short line under the call.
+
+   --- WHY --- they are ON THEIR OWN LINE: the call line is a row of
+   amounts and names, and the args are the detail under it. a row that
+   carried both would be too wide to read. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-args {
+  flex-basis: 100%;
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the "+N more" note, for a batch with more than one call. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-more {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.6;
+}
+/*==================================*/

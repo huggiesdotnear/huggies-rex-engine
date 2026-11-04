@@ -55,12 +55,25 @@ export function shit_1170_feed_filter_read_fun(): {
 } {
   const account_id = SHIT_1170_APP_PAGE_FEED_URL.read_account();
   const signed_in = SHIT_1170_AUTH.get_account_id();
-  // --- WHY --- THE MINE VIEW IS THE DEFAULT WHEN THERE IS AN ACCOUNT:
-  // the url's account says whose queues are shown, and the signed-in
-  // account is the fallback for a link that names none. a reader who is
-  // signed out has no queue of their own, so they land on the ALL view.
+  // --- WHY --- THE VIEW COMES OFF THE URL AND IS NOT GUESSED FROM THE
+  // ACCOUNT: the reader picks ALL, the url says so, and the account
+  // stays on the url because it still says whose queues the MINE view
+  // would show. if the view were guessed from the account, picking ALL
+  // would be undone the moment the url was read back.
+  //
+  // --- WHY --- THE ACCOUNT IS THE FALLBACK FOR A LINK THAT NAMES NO
+  // VIEW: a link with no view param is a link made before the view was
+  // a parameter of its own, and it means "the reader's own queues".
+  const url_view = SHIT_1170_APP_PAGE_FEED_URL.read_view();
   const mine_account = account_id ?? signed_in;
-  const view: SHIT_1170_FEED_VIEW = mine_account === null ? "all" : "mine";
+  const view: SHIT_1170_FEED_VIEW =
+    url_view === "all"
+      ? "all"
+      : url_view === "mine"
+        ? "mine"
+        : mine_account === null
+          ? "all"
+          : "mine";
   const hide_sent =
     view === "mine" ? SHIT_1170_APP_PAGE_FEED_URL.read_hide_sent() : false;
   const sort_raw = SHIT_1170_APP_PAGE_FEED_URL.read_sort(
@@ -70,7 +83,10 @@ export function shit_1170_feed_filter_read_fun(): {
     sort_raw === null ? "newest" : (sort_raw as SHIT_1170_FEED_SORT);
   return {
     view,
-    account_id: view === "mine" ? mine_account : null,
+    // --- WHY --- THE ACCOUNT IS KEPT IN THE ALL VIEW TOO: it is the
+    // reader's own account, and it is what the MINE view filters by.
+    // dropping it would lose the reader's account when they flip back.
+    account_id: mine_account,
     hide_sent,
     sort,
   };
@@ -80,10 +96,11 @@ export function shit_1170_feed_filter_read_fun(): {
 // --- WRITE -----------------------------
 // the account the feed is about, or null for the ALL view.
 //
-// --- WHY --- THE MINE VIEW CARRIES THE ACCOUNT AND THE ALL VIEW
-// CARRIES NONE: the url's account says whose queues are shown, and in
-// the ALL view there is no such account. writing one would put a
-// filter on the link that the page does not apply.
+// --- WHY --- THE ACCOUNT IS ONLY SENT IN THE MINE VIEW: the api filters
+// the queues by account, and in the ALL view there is no account to
+// filter by. the url still carries the account — it is the reader's,
+// and it is what the MINE view filters by when they flip back — but
+// the REQUEST does not.
 export function shit_1170_feed_account_of_fun(
   state: SHIT_1170_APP_PAGE_FEED_STATE,
 ): string | null {

@@ -105,24 +105,26 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
       >
         HIDE SENT
       </button>
-      <label class="feed-filters-sort">
-        <span class="feed-filters-sort-label">SORT</span>
-        <select
-          class="feed-filters-select"
-          value={state.sort}
-          onChange={(event) => {
-            const next = (event.currentTarget as HTMLSelectElement)
-              .value as SHIT_1170_FEED_SORT;
-            SHIT_1170_APP_PAGE_FEED_STORE.set_sort(next);
-          }}
-        >
-          {SHIT_1170_FEED_SORT_OPTIONS.map((option) => (
-            <option key={option.key} value={option.key}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div class="feed-filters-sort-wrap">
+        <label class="feed-filters-sort">
+          <span class="feed-filters-sort-label">SORT</span>
+          <select
+            class="feed-filters-select"
+            value={state.sort}
+            onChange={(event) => {
+              const next = (event.currentTarget as HTMLSelectElement)
+                .value as SHIT_1170_FEED_SORT;
+              SHIT_1170_APP_PAGE_FEED_STORE.set_sort(next);
+            }}
+          >
+            {SHIT_1170_FEED_SORT_OPTIONS.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
     </div>
   );
 }

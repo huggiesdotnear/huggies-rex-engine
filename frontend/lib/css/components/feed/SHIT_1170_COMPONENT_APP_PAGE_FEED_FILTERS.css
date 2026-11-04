@@ -13,7 +13,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  width: 500px;
+  width: 100%;
   max-width: 90vw;
   box-sizing: border-box;
   margin: 12px auto;
@@ -44,11 +44,32 @@
   border-color: #009aab;
 }
 /*==================================*/
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort {
+/* the sort sits at the RIGHT of the bar, on the SAME line as the
+   toggles.
+
+   --- WHY --- the `margin-left: auto` IS ON A WRAPPER AND NOT ON THE
+   GROUP: the bar is a flex row that WRAPS. when the row is wide enough
+   for everything, the auto margin pushes the sort to the right edge.
+   when it is not, the sort wraps onto the next line — and with the
+   auto margin on the group itself, the wrapped line still had the
+   margin, so the sort sat far right and away from the toggles, which
+   is the out-of-line look.
+
+   the wrapper carries the margin, so the sort group's own line starts
+   at the LEFT when it wraps. the sort stays hard against the right
+   edge of the bar, and it stays on the toggles' line when there is
+   room. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
   margin-left: auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort-label {

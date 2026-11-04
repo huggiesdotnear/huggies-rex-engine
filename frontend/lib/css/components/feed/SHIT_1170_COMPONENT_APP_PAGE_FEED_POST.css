@@ -57,9 +57,13 @@
   flex-wrap: wrap;
 }
 /*==================================*/
-/* a chip is a small rounded label with the account id cut to a few
-   characters. a chip with a tick on it is an account that has sent the
-   batch. */
+/* a chip is a small rounded label carrying the WHOLE account id. a chip
+   with a tick on it is an account that has sent the batch.
+
+   --- WHY --- the id WRAPS and is not cut: a cut id is not an id, and the
+   chip is the one place the WHO is shown. the reader has to be able to
+   read who is on the queue. the chip breaks at the dot so a long id
+   folds into two lines instead of running off the card. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-chip {
   display: inline-flex;
   align-items: center;
@@ -70,6 +74,9 @@
   font-family: monospace;
   font-size: 11px;
   opacity: 0.75;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-chip.is-sent {

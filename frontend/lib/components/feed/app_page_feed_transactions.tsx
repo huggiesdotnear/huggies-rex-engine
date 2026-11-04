@@ -31,6 +31,36 @@ import type { SHIT_1170_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
 import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 // ========================================
 // ========================================
+// --- HELPERS ----------------------------
+// the args of one call, as a short readable line, or null when there are
+// none.
+//
+// --- WHY --- THE ARGS ARE SUMMARISED AND NOT DUMPED: a call's args can
+// be a dozen keys, and the post is small. the keys that carry the
+// meaning are the ones that are money and the ones that are people —
+// the amount, the receiver, the token, the sender. those are shown.
+//
+// --- WHY --- THE ORDER IS FIXED AND NOT THE OBJECT'S OWN: the order the
+// agent wrote the args in is not meaningful, and a post whose lines
+// changed shape between loads would be unreadable.
+//
+// --- WHY --- A LONG VALUE IS CUT: a memo or a blob of json can be very
+// long, and the queue page carries it whole.
+function args_summary_fun(args: Record<string, unknown>): string | null {
+  const keys = ["amount", "receiver_id", "token_in", "token_out", "sender_id"];
+  const parts: string[] = [];
+  for (const key of keys) {
+    const value = args[key];
+    if (value === undefined || value === null) continue;
+    if (typeof value === "object") continue;
+    const text = String(value);
+    if (text.length === 0) continue;
+    parts.push(`${key}=${text.length > 24 ? `${text.slice(0, 24)}…` : text}`);
+  }
+  if (parts.length === 0) return null;
+  return parts.join("  ");
+}
+// ========================================
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN(props: {
   queue: SHIT_1170_TX_QUEUE;
@@ -66,6 +96,27 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN(props: {
             &rarr;
           </span>
           <code>{first.contractId}</code>
+          <span class="feed-call-method">{first.method}</span>
+        </span>
+      )}
+      {/* --- WHY --- THE ARGS ARE ON THE POST: the reader is about to
+          SIGN this. the amount says how much moves, and the args say
+          what the call actually asks for — the receiver, the token, the
+          memo. a post that showed the amount but not the args would
+          leave the reader signing something they have not read.
+
+          --- WHY --- THE ARGS ARE SHOWN AS ONE LINE AND NOT A JSON BLOCK:
+          the post is small. the queue page carries the full args of
+          every call. */}
+      {args_summary_fun(first.args) !== null && (
+        <code class="feed-call-args">{args_summary_fun(first.args)}</code>
+      )}
+      {/* --- WHY --- THE COUNT IS SHOWN ONLY FOR A BATCH: one call needs
+          no count. a batch of three says so, so the reader knows the
+          post is showing one of three. */}
+      {props.queue.transactions.length > 1 && (
+        <span class="feed-call-more">
+          +{props.queue.transactions.length - 1} more
         </span>
       )}
     </div>

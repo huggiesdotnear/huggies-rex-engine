@@ -47,15 +47,12 @@ import type { SHIT_1170_QUEUE_READER_STATUS } from "../../ts/feed/app_page_feed_
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the shortened account id for a chip.
+// the account id for a chip.
 //
-// --- WHY --- the id is CUT and not shown whole: a chip is a small
-// rounded label, and a full account id is 40 characters. the first few
-// are enough to tell the reader's own id apart from the others.
-function short_account_fun(account_id: string): string {
-  if (account_id.length <= 6) return account_id;
-  return `${account_id.slice(0, 4)}…`;
-}
+// --- WHY --- THE WHOLE ID AND NOT A CUT ONE: a cut id ("slee…") is
+// not an id. the reader cannot tell who is on the queue from it, and
+// the chip is the one place the WHO is shown. a chip is a little longer
+// than a cut id, and the css lets it wrap.
 
 // the headline of the post: the agent's WHAT, or the first call's
 // method when there is no WHAT.
@@ -239,7 +236,7 @@ function Post(props: { queue: SHIT_1170_TX_QUEUE }) {
               }
               title={account.accountId}
             >
-              {short_account_fun(account.accountId)}
+              {account.accountId}
               {account.status !== "pending" && (
                 <span class="feed-chip-tick" aria-hidden="true">
                   ✓
