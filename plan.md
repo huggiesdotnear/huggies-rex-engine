@@ -495,6 +495,26 @@ account row is built around.
 primary key's second half, so the lookup finds the account's rows and
 walks them.
 
+**the `?1` bind syntax, and why one parameter can be used twice.**
+the query uses `?1` and `?2` — the numbered form the sessions store
+already uses — and the SAME `?1` appears three times in it, because
+the account id is wanted in the `EXISTS` and again in the `NOT EXISTS`.
+
+that works, and it is worth knowing why. sqlx's sqlite driver reads the
+bind parameter NAMES off the statement, and when a name is `?NNN` it
+binds argument NNN to that slot. so `?1` is not "the next argument" —
+it is "argument one" — and it can be written as many times as the query
+wants. a plain `?` would be positional and could not be reused.
+
+**the optional filters bind an `Option`.** `?1 IS NULL` is the test for
+"this filter was not given". so the account id binds as
+`Option<&str>` — `None` when there is no filter, `Some` when there is
+one — and the same bind works for both shapes of the query without two
+statements.
+
+this was checked against sqlx 0.9 with a real query before the plan was
+written, not assumed.
+
 **why the queue's own `status` column is not in this.** there is none.
 the whole point is that the status lives on the account rows, and this
 query reads them where they are.
