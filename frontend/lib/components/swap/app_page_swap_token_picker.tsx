@@ -7,9 +7,10 @@
 // search hits the api's /tokens/search, so a token outside the loaded
 // page is still findable.
 //
-// --- WHY IT IS A SEPARATE COMPONENT: the swap form has two token
-// cards and both of them open the same picker. one component serves
-// both, and it says which side it is picking for.
+// --- WHY IT IS A SEPARATE COMPONENT: a page with token cards and more
+// than one card opens the same picker. one component serves the swap
+// page's two cards and the unit conversion page's one, and each page passes in
+// what a pick means to it.
 //
 // --- WHY IT IS THE SHARED LIST AND NOT A COPY OF IT: the picker used
 // to have its own rows, its own css class names and its own idea of

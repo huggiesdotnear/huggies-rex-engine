@@ -95,6 +95,7 @@ export const SHIT_1170_MOUNT_ID = {
     "SHIT_1170_COMPONENT_TOKEN_PAGE_SHIT_1170_METADATA",
   SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION:
     "SHIT_1170_COMPONENT_APP_PAGE_SKILL_SESSION",
+  SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM: "SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM",
 } as const;
 // ========================================
 // union of mount-id values, for typing mount lookups.

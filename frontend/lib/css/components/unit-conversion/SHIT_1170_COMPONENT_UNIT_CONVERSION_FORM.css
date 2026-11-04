@@ -1,0 +1,165 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM
+   the unit conversion form: ONE token card and TWO amount inputs.
+
+   one amount, seen two ways: the human amount ("1.5") and the unit
+   amount ("1500000000000000000000000"). the reader types into either
+   box and the other shows the conversion.
+
+   the token card opens the swap page's token picker, whose css the
+   page's import file lists next to this one. */
+/*==================================*/
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.16);
+}
+/*==================================*/
+/* the token card: the icon, the symbol and the contract address. it is
+   a button, so it gets the app's button look, but a squarer one so it
+   reads as a field rather than an action. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  text-align: left;
+  border: 2px solid var(--color-middle);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--color-fontend);
+}
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token:hover {
+  background: rgba(0, 198, 215, 0.22);
+  border-color: #009aab;
+}
+/* the chevron sits at the right end of the card, so it does not wrap. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token > svg {
+  margin-left: auto;
+  flex: 0 0 auto;
+  opacity: 0.7;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token-icon.is-empty {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+}
+/* the symbol and the contract address under it. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token-copy strong {
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the contract address is long and technical, so it is small, quiet
+   and ellipsized — the full value is on the title attribute. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-token-copy span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/*==================================*/
+/* one amount box: the label over the input. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+}
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.6;
+}
+/* the inputs are the big numbers, so they get the big type — the
+   reader's number is the thing they are looking at. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 2px;
+  font-family: inherit;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: right;
+  color: var(--color-fontend);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0;
+}
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-middle);
+}
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+/* the unit amount runs to dozens of digits, so it is set smaller and
+   in the monospace face — a column of digits the reader can scan, not
+   a headline. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-input.is-unit {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0.9;
+}
+/*==================================*/
+/* the double arrow between the two boxes: the conversion goes both
+   ways, and the arrow says so. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-flip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+/*==================================*/
+/* the small line under the boxes: the token's decimals, the one fact
+   the conversion turns on. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-note {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  text-align: center;
+}
+/* the error, when the token's info could not be had. */
+#SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-error {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--color-backend);
+}
+/*==================================*/

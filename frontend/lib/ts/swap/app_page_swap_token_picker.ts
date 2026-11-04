@@ -2,8 +2,11 @@
 // the token picker's state: which side is picking, the rows on screen,
 // and the search.
 //
-// the picker is part of the swap page, so its fetching lives with the
-// page's other fetching. it reuses the discover page's search — the
+// the picker is reused by the pages that pick a token — the swap page
+// picks the two sides of its pair, the unit conversion page picks the one
+// token it converts — so its fetching lives with the swap page's and
+// the pages pass their own pick target in when they open it. it reuses
+// the discover page's search — the
 // api has a real search index behind /tokens/search — so a token
 // outside the loaded list is still findable.
 //
@@ -49,6 +52,22 @@ export interface SHIT_1170_SWAP_PICKER_STATE {
   // the direction the rows on screen are in.
   direction: SHIT_1170_TOKEN_SORT_DIRECTION;
 }
+// what a page passes in when it opens the picker.
+//
+// --- WHY --- the pick target is a callback and not a flag: the swap
+// page takes the token for one of its two sides, the unit conversion page takes
+// it as the one token it converts, and a page that existed tomorrow
+// would take it some fourth way. a callback says what the pick MEANS to
+// the page that asked for it, and the picker stays out of that
+// decision. the label is here for the same reason — the swap page
+// names the side, the unit conversion page names the token.
+export interface SHIT_1170_SWAP_PICKER_OPEN {
+  // the heading on the popup; defaults to the side's name.
+  label?: string;
+  // what the chosen token means to the page that opened the picker;
+  // defaults to the swap page's pair.
+  on_pick?: (token_id: string) => void;
+}
 // ========================================
 // ========================================
 // --- CONFIG -----------------------------
@@ -73,6 +92,16 @@ let state: SHIT_1170_SWAP_PICKER_STATE = {
 };
 // the plain array so subscribe/unsubscribe ordering is stable.
 const listeners: Array<() => void> = [];
+// the pick target the page that opened the picker passed in, or null
+// when the picker is doing its default job — handing the token to the
+// swap page's pair.
+//
+// --- WHY --- it is a module-level variable and not part of the state:
+// it is a function, and the state is broadcast to every subscriber —
+// putting a function in it would make every state write depend on
+// comparing functions. it is set when the picker opens and cleared
+// when it closes, so a stale handler can never receive a later pick.
+let on_pick_handler: ((token_id: string) => void) | null = null;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -235,17 +264,28 @@ async function search_fun(query: string): Promise<void> {
 // ========================================
 // ========================================
 // --- OPEN ------------------------------
-// open the picker for one side of the swap.
+// open the picker for one side of a page.
 //
 // --- WHY --- the list is loaded when the picker OPENS and not when the
 // page loads: a reader who never opens the picker never pays for the
 // list, and the list is the one request the picker makes on its own.
-async function open_fun(side: "in" | "out"): Promise<void> {
+//
+// --- WHY --- THE LABEL AND THE PICK TARGET COME FROM THE CALLER: the
+// page that opens the picker knows what the token is for, so it names
+// the popup and it says what a pick means. without them the picker
+// does its original job — the swap page's pair, with the side in the
+// heading.
+async function open_fun(
+  side: "in" | "out",
+  options?: SHIT_1170_SWAP_PICKER_OPEN,
+): Promise<void> {
+  on_pick_handler = options?.on_pick ?? null;
   set_state_fun({
     ...state,
     open: true,
     side,
-    label: side === "in" ? "TOKEN IN" : "TOKEN OUT",
+    label:
+      options?.label ?? (side === "in" ? "TOKEN IN" : "TOKEN OUT"),
   });
   await load_default_tokens_fun();
 }
@@ -253,13 +293,21 @@ async function open_fun(side: "in" | "out"): Promise<void> {
 // close the picker.
 function close_fun(): void {
   if (!state.open) return;
+  on_pick_handler = null;
   set_state_fun({ ...state, open: false });
 }
 // ========================================
-// the reader chose a token: hand it to the swap store and close.
+// the reader chose a token: hand it to the pick target the page
+// passed in — or to the swap page's pair — and close.
 function pick_fun(token_id: string): void {
   const side = state.side;
+  const handler = on_pick_handler;
+  on_pick_handler = null;
   set_state_fun({ ...state, open: false });
+  if (handler !== null) {
+    handler(token_id);
+    return;
+  }
   void SHIT_1170_APP_PAGE_SWAP_STORE.set_token(side, token_id);
 }
 // ========================================

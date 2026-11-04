@@ -3,8 +3,8 @@
 //
 // --- WHY --- the nav only shows four pages, so a page that is not in
 // the nav has no way in. this section is where every page gets a card,
-// so a reader can reach the swap page and the skill page from the
-// discover page.
+// so a reader can reach the swap page, the unit conversion page and the
+// skill page from the discover page.
 //
 // --- WHY --- each card carries the SAME lucide icon the nav uses for
 // that page, so the page looks the same in the nav and on the card.
@@ -12,9 +12,10 @@
 // --- WHY --- the list is a constant. a page list changes when the
 // pages change, and a constant keeps the cards honest: there is one
 // place to add a page.
+// ========================================
 import { render } from "preact";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { ArrowLeftRight, GraduationCap } from "lucide-preact";
+import { ArrowDownUp, ArrowLeftRight, GraduationCap } from "lucide-preact";
 import type { ComponentType } from "preact";
 // ========================================
 // ========================================
@@ -26,6 +27,7 @@ interface SHIT_1170_PAGE_LINK_CARD {
 }
 const SHIT_1170_PAGE_LINK_CARDS: ReadonlyArray<SHIT_1170_PAGE_LINK_CARD> = [
   { href: "swap.html", label: "SWAP", Icon: ArrowLeftRight },
+  { href: "unit-conversion.html", label: "UNIT CONVERSION", Icon: ArrowDownUp },
   { href: "skill.html", label: "SKILL", Icon: GraduationCap },
 ];
 // ========================================
