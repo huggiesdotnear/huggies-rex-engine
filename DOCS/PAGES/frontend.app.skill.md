@@ -55,8 +55,9 @@ several accounts does one copy-paste and not ten.
 ## THE SKILL INSTALL CARDS
 
 the page has one card for the general NEAR contract skills and one for
-the shit-1170 rex engine skills. each card has one copy button that
-copies the add and list commands together with a short message.
+the shit-1170 rex engine skills. each card links to the skill
+repository, shows the add and list commands in a code block, and has one
+copy button that copies the commands together with a short message.
 
 =====================
 <br/>

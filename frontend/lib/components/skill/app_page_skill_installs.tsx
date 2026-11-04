@@ -5,7 +5,7 @@
 // the cards are static: they show the commands for installing and listing
 // each skill package. they do not fetch.
 import { render } from "preact";
-import { Copy, Check } from "lucide-preact";
+import { Copy, Check, ExternalLink } from "lucide-preact";
 import { useState as use_state } from "preact/hooks";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 // ========================================
@@ -28,6 +28,8 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
       id: "near-kit-tool-box-skills",
       title: "NEAR KIT TOOL BOX SKILLS",
       description: "GENERAL SKILLS FOR INTERACTING WITH NEAR SMART CONTRACTS.",
+      repository_url:
+        "https://github.com/sleetplayground/near-kit-tool-box-skills",
       install_command:
         "bunx skills add sleetplayground/near-kit-tool-box-skills",
       list_command:
@@ -47,6 +49,8 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
       title: "SHIT-1170 REX ENGINE SKILLS",
       description:
         "SPECIFIC SKILLS FOR INTERACTING WITH NEAR SMART CONTRACTS VIA THE SHIT-1170 REX ENGINE.",
+      repository_url:
+        "https://github.com/huggiesdotnear/shit-1170-rex-engine-skills",
       install_command:
         "bunx skills add huggiesdotnear/shit-1170-rex-engine-skills",
       list_command:
@@ -74,6 +78,25 @@ function SHIT_1170_COMPONENT_APP_PAGE_SKILL_INSTALLS_FUN() {
           <div key={skill.id} class="skill-install-card">
             <h3>{skill.title}</h3>
             <p>{skill.description}</p>
+            <a
+              class="skill-install-repository"
+              href={skill.repository_url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              VIEW SKILL REPOSITORY
+              <ExternalLink size={14} />
+            </a>
+            <div class="skill-install-code-block">
+              <code>
+                <span class="skill-install-code-label"># add</span>
+                {skill.install_command}
+              </code>
+              <code>
+                <span class="skill-install-code-label"># --list</span>
+                {skill.list_command}
+              </code>
+            </div>
             <button
               type="button"
               class="skill-install-copy"
