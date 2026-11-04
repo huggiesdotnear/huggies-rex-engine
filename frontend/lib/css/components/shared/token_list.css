@@ -2,7 +2,7 @@
 /* the shared token list: the search box, the sort row, the rows and the
    notes.
 
-   it is used by the discover page's token list and the swap page's
+   it is used by the discover page's token list and the shared
    token picker, so a token looks the same in both. the css is by class
    only — the list has no mount id of its own, so the pages that use it
    scope it however they need to. */

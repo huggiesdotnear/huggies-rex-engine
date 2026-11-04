@@ -14,7 +14,7 @@
 import { render } from "preact";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
-import { SHIT_1170_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
+import { SHIT_1170_TOKEN_PICKER } from "../../ts/shared/token_picker";
 import { SHIT_1170_APP_PAGE_SWAP_EXECUTE } from "../../ts/swap/app_page_swap_execute";
 import { SHIT_1170_TOAST_STORE } from "../../ts/swap/app_page_swap_toast_store";
 import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
@@ -67,7 +67,12 @@ function token_card_fun(
       type="button"
       class="swap-token"
       onClick={() => {
-        void SHIT_1170_SWAP_TOKEN_PICKER.open(side);
+        void SHIT_1170_TOKEN_PICKER.open({
+          label: side === "in" ? "TOKEN IN" : "TOKEN OUT",
+          on_pick: (token_id) => {
+            void SHIT_1170_APP_PAGE_SWAP_STORE.set_token(side, token_id);
+          },
+        });
       }}
       title={`choose the ${side === "in" ? "token in" : "token out"}`}
     >

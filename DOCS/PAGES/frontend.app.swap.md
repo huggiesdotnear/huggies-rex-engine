@@ -33,7 +33,7 @@ the swap page trades one token for another over the intear dex-aggregator. it is
   <script src="../lib/ts/import-swap.ts"></script>
   <!--script-->
   <!--==========================================-->
-  <div id="SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER"></div>
+  <div id="SHIT_1170_COMPONENT_TOKEN_PICKER"></div>
   <!--==========================================-->
 </body>
 ```

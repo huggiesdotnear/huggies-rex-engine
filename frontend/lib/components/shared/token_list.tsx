@@ -3,7 +3,7 @@
 // scroll paging, in one piece.
 //
 // it is used by more than one page — the discover page's token list and
-// the swap page's token picker — so it lives in shared/.
+// the shared token picker — so it lives in shared/.
 //
 // --- WHY --- THE DISCOVER PAGE'S LIST AND THE SWAP PICKER ARE THE SAME
 // THING: both are a searchable list of tokens, and both were written

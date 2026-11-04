@@ -6,7 +6,7 @@
    amount ("1500000000000000000000000"). the reader types into either
    box and the other shows the conversion.
 
-   the token card opens the swap page's token picker, whose css the
+   the token card opens the shared token picker, whose css the
    page's import file lists next to this one. */
 /*==================================*/
 #SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM .unit-conversion-form {

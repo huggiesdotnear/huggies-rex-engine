@@ -6,8 +6,8 @@
 // the chain trades ("1500000000000000000000000"). the reader types into
 // EITHER box and the other shows the conversion, live.
 //
-// the token card opens the swap page's token picker, reused: it is the
-// app's one token picker, and the unit conversion page passes in what a pick
+// the token card opens the shared token picker: it is the app's one
+// token picker, and the unit conversion page passes in what a pick
 // means to it — the one token it converts.
 //
 // mounts into <div id="SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM">.
@@ -15,7 +15,7 @@ import { render } from "preact";
 import { ArrowDownUp, ChevronDown } from "lucide-preact";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_UNIT_CONVERSION_STORE } from "../../ts/unit-conversion/app_page_unit_conversion_store";
-import { SHIT_1170_SWAP_TOKEN_PICKER } from "../../ts/swap/app_page_swap_token_picker";
+import { SHIT_1170_TOKEN_PICKER } from "../../ts/shared/token_picker";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 // ========================================
 // ========================================
@@ -40,7 +40,7 @@ export function SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM_FUN() {
         type="button"
         class="unit-conversion-token"
         onClick={() => {
-          void SHIT_1170_SWAP_TOKEN_PICKER.open("in", {
+          void SHIT_1170_TOKEN_PICKER.open({
             label: "TOKEN",
             on_pick: (token_id) => {
               void SHIT_1170_APP_PAGE_UNIT_CONVERSION_STORE.set_token(token_id);

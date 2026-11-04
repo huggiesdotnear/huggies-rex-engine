@@ -10,12 +10,12 @@
 // 3. the components mount last and read what the load brought back.
 //
 // --- WHY --- the token picker rides along: the page picks ONE token,
-// and the picker it uses is the swap page's, reused — it opens over
+// and the picker it uses is the shared token picker — it opens over
 // the page the same way it opens over the swap form.
 import "./import-app-wide";
 import "./unit-conversion/app_page_unit_conversion_start";
 import "../components/unit-conversion/app_page_unit_conversion_form";
-import "../components/swap/app_page_swap_token_picker";
+import "../components/shared/token_picker";
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

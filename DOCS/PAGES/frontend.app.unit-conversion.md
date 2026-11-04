@@ -23,7 +23,7 @@ the unit conversion page turns a human amount into the token's smallest unit and
   <script src="../lib/ts/import-unit-conversion.ts"></script>
   <!--script-->
   <!--==========================================-->
-  <div id="SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER"></div>
+  <div id="SHIT_1170_COMPONENT_TOKEN_PICKER"></div>
   <!--==========================================-->
 </body>
 ```

@@ -17,7 +17,7 @@ import "./import-app-wide";
 import "./swap/app_page_swap_start";
 import "../components/swap/app_page_swap_form";
 import "../components/swap/app_page_swap_routes";
-import "../components/swap/app_page_swap_token_picker";
+import "../components/shared/token_picker";
 import "../components/swap/app_page_swap_toasts";
 // ========================================
 // copyright 2026 by sleet.near

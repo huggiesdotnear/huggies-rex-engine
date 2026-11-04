@@ -9,7 +9,7 @@
 // asks for one page of rows at a time and asks for the next one when the
 // reader scrolls to the bottom.
 //
-// --- WHY --- THE LIST ITSELF IS THE SHARED ONE: the swap page's token
+// --- WHY --- THE LIST ITSELF IS THE SHARED ONE: the shared token
 // picker shows the same list of tokens, so the rows, the search box and
 // the sort row live in one shared piece (components/shared/token_list.tsx)
 // and both pages draw it. this component is what the discover page does

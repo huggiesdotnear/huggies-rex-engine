@@ -3,7 +3,7 @@
    the searchable token list on the discover page.
 
    the list itself is the SHARED one (components/shared/token_list.css),
-   so the swap page's token picker draws the same rows. this file holds
+   so the shared token picker draws the same rows. this file holds
    only what the DISCOVER page adds around it.
 
    the page's CONTRACTS and TOKENS sections are plain <section>

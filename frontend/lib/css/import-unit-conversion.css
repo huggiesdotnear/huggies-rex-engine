@@ -1,5 +1,5 @@
 /*==================================*/
 /* the unit conversion page's css: the components it mounts. */
 @import url(./components/unit-conversion/SHIT_1170_COMPONENT_UNIT_CONVERSION_FORM.css);
-@import url(./components/swap/SHIT_1170_COMPONENT_SWAP_TOKEN_PICKER.css);
+@import url(./components/shared/SHIT_1170_COMPONENT_TOKEN_PICKER.css);
 /*==================================*/
