@@ -1,7 +1,7 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS
-   the post's ONE call line: the first transaction of the batch, with its
-   token amount when it has one.
+   the post's ONE call line: the contract and the method, the args, and
+   the token the call moves.
 
    --- WHY THE RULES ARE SCOPED UNDER THE POST: the call line is drawn
    INSIDE the post, so it lives under the post's mount element. one
@@ -10,14 +10,17 @@
    where it is drawn. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
+  min-width: 0;
+  width: 100%;
 }
 /*==================================*/
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-contract {
+/* the contract and the method, on one line. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-line {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -31,21 +34,18 @@
   opacity: 0.8;
 }
 /*==================================*/
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-arrow {
-  opacity: 0.6;
-}
-/*==================================*/
-/* the args, as a short line under the call.
+/* the args, flattened to one line.
 
-   --- WHY --- they are ON THEIR OWN LINE: the call line is a row of
-   amounts and names, and the args are the detail under it. a row that
-   carried both would be too wide to read. */
+   --- WHY --- they WRAP and are not cut off: an arg value can be long,
+   and the reader has to be able to read what the call asks for. the
+   line breaks at any point rather than running off the card. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-args {
-  flex-basis: 100%;
   font-family: monospace;
   font-size: 11px;
   opacity: 0.7;
   overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
 }
 /*==================================*/
 /* the "+N more" note, for a batch with more than one call. */
@@ -53,5 +53,25 @@
   font-family: monospace;
   font-size: 11px;
   opacity: 0.6;
+}
+/*==================================*/
+/* the token the call moves: the icon, the amount, and where it goes.
+
+   --- WHY --- it is ITS OWN LINE and not on the contract's line: it is a
+   different kind of thing. the contract and the args say what the call
+   asks for; this says what that means in money. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-token {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-call-token-to {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.7;
+  overflow-wrap: anywhere;
 }
 /*==================================*/

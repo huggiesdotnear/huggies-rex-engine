@@ -2,9 +2,7 @@
 /* SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS
    the feed's filter bar: ALL / MINE, HIDE SENT and the sort.
 
-   the bar sits across the top of the feed, above the posts. it is one
-   row, and it wraps on a narrow screen so the sort does not push the
-   toggles off the edge.
+   the bar sits across the top of the feed, above the posts.
 
    the active button is the filled-in one, and a disabled one is greyed
    out by the base button rules. */
@@ -20,6 +18,24 @@
   text-align: left;
 }
 /*==================================*/
+/* the toggles and the sort are TWO rows.
+
+   --- WHY --- and not one row: the page's column is 500px wide, and the
+   four controls do not fit across it. they were made to fit by giving
+   the buttons a smaller minimum width, and the result was a row that
+   wrapped in the middle — the sort dropped to a second line and sat
+   at the far right, away from the toggles it belongs with.
+
+   two rows is the honest shape for four controls in a 500px column: the
+   toggles on the first row, the sort on the second, and the sort
+   starts at the LEFT so it lines up with the toggles above it. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-basis: 100%;
+}
+/*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-toggle {
   display: flex;
   gap: 6px;
@@ -30,10 +46,10 @@
    buttons would take a whole screen each. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-button {
   width: auto;
-  min-width: 88px;
-  padding: 8px 14px;
+  min-width: 84px;
+  padding: 8px 12px;
   font-size: 13px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 /*==================================*/
 /* the active one is filled in, so the reader can see which view is
@@ -42,28 +58,6 @@
   background-color: var(--color-middle);
   color: var(--color-fontend);
   border-color: #009aab;
-}
-/*==================================*/
-/* the sort sits at the RIGHT of the bar, on the SAME line as the
-   toggles.
-
-   --- WHY --- the `margin-left: auto` IS ON A WRAPPER AND NOT ON THE
-   GROUP: the bar is a flex row that WRAPS. when the row is wide enough
-   for everything, the auto margin pushes the sort to the right edge.
-   when it is not, the sort wraps onto the next line — and with the
-   auto margin on the group itself, the wrapped line still had the
-   margin, so the sort sat far right and away from the toggles, which
-   is the out-of-line look.
-
-   the wrapper carries the margin, so the sort group's own line starts
-   at the LEFT when it wraps. the sort stays hard against the right
-   edge of the bar, and it stays on the toggles' line when there is
-   room. */
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
 }
 /*==================================*/
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-sort {
