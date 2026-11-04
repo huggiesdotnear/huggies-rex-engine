@@ -47,25 +47,33 @@ DOCS/PAGES/README.md                   (changed — the queue page is listed)
 
 ### what a feed item is
 
-each queued batch is **one post**. a post carries:
+each queued batch is **one post**. a post is SMALL — it is the summary,
+and the queue page is the detail:
 
-- **the what / when / why** — the agent's words, the headline of the post
-- **the transactions** — what will be sent, in order
-- **the WHO** — who it is for, and who has sent it
+- **the WHAT** — the agent's headline
+- **one call line** — the first transaction, with its token amount
+- **the WHO** — the accounts, as chips
 - **the actions** — the buttons
 
-the post is the social part: the reader sees what somebody's agent wants
-them to do, and they act on it.
+**why the post is small.** the queue page has everything — every
+transaction, every arg, every account, every hash. a post that carried
+all of it would be a wall of text, and a feed of walls is not a feed.
+the post answers "is this worth my attention?" and the queue page answers
+"exactly what is this?".
 
 ### the filter and sort bar, at the top
 
-a bar across the top of the feed, above the posts. it holds:
+a bar across the top of the feed, above the posts:
 
-| control | what it does |
-|---|---|
-| **ACCOUNT** | filter to the queues this account is on. defaults to the signed-in account |
-| **HIDE SENT** | hide the queues this account has already sent |
-| **SORT** | newest first / oldest first / most accounts |
+```
+[ ALL ] [ MINE ]   [ HIDE SENT ]   [ NEWEST ▾ ]
+```
+
+| control | what it does | where it lives |
+|---|---|---|
+| **ALL / MINE** | all the queues, or only the ones the reader is on | the url's `account` |
+| **HIDE SENT** | hide the queues the reader has already sent | the url's `hide_sent` |
+| **NEWEST / MOST ACCOUNTS** | the sort | the url's `sort` |
 
 **the filter lives in the url**, so a filtered feed is a link somebody
 can paste:
@@ -80,23 +88,47 @@ do it. a feed that cannot be linked is a feed that cannot be shared, and
 sharing a feed of txs is the whole point of a social feed.
 
 **why "HIDE SENT" and not a "SENT" filter.** a reader who has already
-sent a tx does not want to see it again in their feed — it is done, it
-is not actionable. but they might want to look at what they sent, so
-hiding is a toggle and not a filter that replaces the list. the same
-pattern the discover page's "marked" filter uses.
+sent a tx does not want to see it again — it is done, it is not
+actionable. but they might want to look at what they sent, so hiding is
+a toggle and not a filter that replaces the list.
 
-**why "MOST ACCOUNTS" is a sort.** it is the question "what is popular",
-and it is the one question a social feed answers that a tx list does
-not. it is a sort by the size of the WHO list.
+**why "MINE" is the default when the reader is signed in.** a reader who
+signs in wants their own queue. a reader who is signed out gets all of
+it.
+
+**why the account filter is not a search box.** the reader filters by
+*themselves*. the "which account" question is answered by the sign-in,
+not typed. that is the whole point of the account filter — it is not a
+search box, it is "mine or everyone's".
+
+**why the sort is a dropdown and not the shared sort control.** the
+shared `sort_keys_control` is a row of small buttons with a direction
+toggle. the feed's sort is a named set with no direction — "newest" and
+"most accounts" are two entries, not two directions of one key. so it
+is a plain dropdown.
+
+### the url
+
+```
+/app/index.html?account=alice.near&hide_sent=1&sort=newest
+```
+
+| parameter | values | default |
+|---|---|---|
+| `account` | an account id, or absent for all | the signed-in account |
+| `hide_sent` | `1` | absent |
+| `sort` | `newest`, `most_accounts` | `newest` |
+
+**why the defaults are not written to the url.** a url that always
+carries its defaults is noisy, and a link to the plain feed should open
+the plain feed. the url only carries what the reader changed.
 
 ### the post's actions
 
-each post carries three actions:
-
 | action | what it does |
 |---|---|
-| **ADD** / **REMOVE** | add YOUR account to the queue, or take it off |
 | **SEND** | send the transactions in the wallet popup |
+| **ADD** / **REMOVE** | add YOUR account to the queue, or take it off |
 | **DETAIL** | go to the queue page |
 
 **the ADD / REMOVE button is one button that says the opposite of what
@@ -110,49 +142,43 @@ which is always wrong, is worse than one button that says what it will
 do. the app does this already with the account dropdown's ✕ and with
 the token picker's swap.
 
+**why ADD is hidden when the reader is signed out.** a button that
+cannot work is noise. the reader sees the feed and can send nothing.
+
 **the SEND button is the big one.** it is the primary action of the
 post, so it is the one that looks like a button.
 
-### the post's status line
+### the post's status
 
-a post says where it stands, in the reader's own terms:
+a post says where **the reader's account** stands on it:
 
-- **not on the queue** — "ADD ME" or the ADD button
+- **not on the queue** — the ADD button
 - **on the queue, not sent** — "WAITING" and a SEND button
 - **sent, outcome unknown** — "SENT" with a link to the transaction
 - **sent and worked** — a green tick and the link
 - **sent and failed** — a red cross and the link
 
-**why the status is per account and not per post.** a post can be sent by
-alice and not by bob. the status line is about **the reader's** account
-on that post, because that is the only status that means something to
-them. the other accounts are listed on the post, but their statuses are
-not the headline.
+**why the status is about the reader and not about the post.** a post can
+be sent by alice and not by bob. the status line is about **the
+reader's** account on that post, because that is the only status that
+means something to them. the other accounts are the chips, and their
+statuses are a tick and not a tick.
 
-### the layout of a post
+### the WHO chips
+
+the accounts on the queue, as small rounded labels with the id cut to a
+few characters:
 
 ```
-┌─────────────────────────────────────────┐
-│ WHAT                                    │  the agent's headline
-│                                         │
-│ 1. ref.finance.near  ft_swap            │  the transactions, in order
-│ 2. ref.finance.near  ft_resolve_transfer│
-│                                         │
-│ WHEN  when the price is right            │
-│ WHY   you said to move half your usdc     │
-│                                         │
-│ for: alice.near, bob.near                │  the WHO
-│ ✓ alice.near  ·  ○ bob.near               │
-│                                         │
-│ [ SEND ]  [ REMOVE ]  [ DETAIL ]         │  the actions
-└─────────────────────────────────────────┘
+(ali…) (bob…) ✓
 ```
 
-**why the transactions are listed and not hidden behind DETAIL.** a
-reader signs a transaction. they must be able to see WHAT they are
-signing before they sign it — the contract, the method, and the args.
-that is the same rule the swap page follows: the route is shown before
-it is taken.
+**why chips and not a count.** a count says "2 accounts" and tells the
+reader nothing about whether they are one of them. a chip with their own
+id on it tells them at a glance.
+
+**why the tick.** a chip with a tick on it is an account that has sent
+it. that is the whole status, in one mark.
 
 ---
 
@@ -294,30 +320,58 @@ wallet for the outcomes as well, the way the swap page's
 `result.swap_outcomes`, which are the full near-kit
 `FinalExecutionOutcome` objects.
 
-**this is a real difference from the swap page.** the swap page's
-dex-aggregator returns the full outcomes. the toolbox's generic wallet
-helper does not. so there are two options:
+**so the feed reads the outcomes itself — option A.** it calls
+`wallet.signAndSendTransactions` the way the toolbox does internally, and
+reads both the hash and the outcome from the full outcomes it gets back.
 
-| | how | what it costs |
-|---|---|---|
-| **A** | the feed calls `wallet.signAndSendTransactions` itself, the way the toolbox does internally, and reads both the hash and the outcome from what it gets back | the feed reimplements the toolbox's ~30 lines, and keeps its shape |
-| **B** | the feed calls `generic_contract_call_wallet` for the hashes, and then asks the **transaction page's** api for the outcome | the outcome is one more request per transaction, and it is not immediate |
+```ts
+const connector = near_connect_client();
+const wallet = await connector.wallet();
+const outcomes = await wallet.signAndSendTransactions({
+  signerId: account_id,
+  transactions: wallet_transactions,
+});
+```
 
-**A is the better one** — the outcome is known at once, with no extra
-request, and the batch is still one popup. but it means the feed is not
-using the toolbox's helper, which is against the grain of the plan.
+**why this and not the toolbox's helper.** the toolbox's helper throws
+the outcome away after taking the hash, and the outcome is the thing the
+queue records. so the feed does the one step the toolbox does and keeps
+the rest.
 
-**this is question 10 in the list below.** it changes the send flow.
+**why it is not a reimplementation of the whole toolbox.** the toolbox's
+helper does three things: it converts the generic action into the
+wallet's action shape, it calls the wallet, and it pulls the hash out of
+each outcome. the feed needs the first two and does the third itself.
+the conversion is a small, well-defined piece of work:
 
-**the hash comes out the same way either way.** a near-kit outcome
+```ts
+// the generic transaction -> the wallet's transaction shape.
+{
+  receiverId: transaction.contract_id,
+  actions: [{
+    type: "FunctionCall",
+    params: { methodName: method, args, gas, deposit },
+  }],
+}
+```
+
+**why the gas and deposit need converting.** the toolbox converts a gas
+of `"30 Tgas"` into raw gas units and a deposit of `"1 NEAR"` into
+yoctoNEAR, because the wallet wants raw numbers. the queue stores what
+the agent wrote, so the feed does the same conversion — a gas of
+`"30000000000000"` passes through, and a gas of `"30 Tgas"` is
+converted. the toolbox's `to_gas` and `to_deposit` are not exported, so
+the feed carries its own small versions.
+
+**why the hash comes out the same way either way.** a near-kit outcome
 carries its hash under `transaction.hash`, and the swap page's
 `outcome_hash_fun` already knows that. so that helper moves to
 `lib/ts/shared/` and both pages use it.
 
-**why it is shared and not copied.** the swap page knows that a near-kit
-outcome carries its hash under `transaction.hash`. copying it into the
-feed would be two copies of the same knowledge, and one of them would
-drift.
+**why the hash helper is shared and not copied.** the swap page knows
+that a near-kit outcome carries its hash under `transaction.hash`.
+copying it into the feed would be two copies of the same knowledge, and
+one of them would drift. so it moves to `lib/ts/shared/`.
 
 ### the backend is told
 
@@ -444,6 +498,8 @@ frontend/lib/ts/shared/session.ts        → api_key.ts        (renamed)
 frontend/lib/ts/shared/session_token.ts  → api_key_token.ts  (renamed)
 frontend/lib/ts/shared/outcome_hash.ts   NEW  ← outcome_hash_fun, moved out of
                                                   app_page_swap_execute.ts
+frontend/lib/ts/shared/gas_deposit.ts    NEW  ← the gas and deposit conversion the
+                                                  toolbox does internally
 frontend/lib/components/swap/app_page_swap_toasts.tsx
                                       → components/shared/toast_layer.tsx  (moved)
 frontend/lib/ts/swap/app_page_swap_toast_store.ts
@@ -518,65 +574,162 @@ the feed.
 
 ---
 
-## 5. THE FILTER BAR, IN DETAIL
+## 5. THE FILTER BAR IN DETAIL
+
+the filter bar is its own component:
+`SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS`. it reads the filter state
+from the store and writes it back through the store's setters.
+
+**it does not fetch.** that is the app's rule — the ts files fetch, the
+components display. the filter bar changes a filter, the store re-reads
+the feed, and the bar never talks to the api.
 
 ### the controls
 
 ```
-┌──────────────────────────────────────────────────────┐
+┌───────────────────────────────────────┐
 │ [ ALL ] [ MINE ]   [ HIDE SENT ]   [ NEWEST ▾ ]     │
-└──────────────────────────────────────────────────────┘
+└────────────────────────────────────────┘
 ```
 
-| control | what it does | where it lives |
-|---|---|---|
-| **ALL / MINE** | all the queues, or only the ones the reader is on | the url's `account` |
-| **HIDE SENT** | hide the queues the reader has already sent | the url's `hide_sent` |
-| **NEWEST / OLDEST / MOST ACCOUNTS** | the sort | the url's `sort` |
+**"ALL / MINE" is a two-button toggle**, the same shape the token page's
+holder filters use — one button is filled in and the other is not.
 
-**"MINE" is the default when the reader is signed in.** a reader who
-signs in wants their own queue. a reader who is signed out gets all of
-it.
+**"HIDE SENT" is a checkbox-ish button** that is filled in when it is on.
+it is off by default.
 
-**the account filter is the reader's account, not a free-text box.** the
-reader filters by *themselves*. the "which account" question is answered
-by the sign-in, not typed. that is the whole point of the account
-filter — it is not a search box, it is "mine or everyone's".
+**the sort is a plain dropdown**, because it is a named set with no
+direction. the shared `sort_keys_control` is a row of buttons with a
+direction toggle, which is the wrong shape for it.
 
-**why the sort is a dropdown and not the shared sort control.** the
-shared `sort_keys_control` is a row of small buttons with a direction
-toggle. the feed's sort is a named set with no direction — "newest" and
-"oldest" are two entries, not two directions of one key. so it is a
-plain dropdown.
+### the store owns the filter
 
-### the url
+the filter state lives in the feed's store, and the url holds it between
+reloads. so:
 
-```
-/app/index.html?account=alice.near&hide_sent=1&sort=newest
-```
+- the reader picks a filter → the store is written → the url is
+  written → the feed is re-read
+- the url changes → the store is written → the feed is re-read
 
-| parameter | values | default |
-|---|---|---|
-| `account` | an account id, or absent for all | the signed-in account |
-| `hide_sent` | `1` | absent |
-| `sort` | `newest`, `oldest`, `most_accounts` | `newest` |
+**why the url is written and not just read.** a reader who filters the
+feed and copies the url gets the same feed. that is the app's rule for
+every page that has state.
 
-**why the defaults are not written to the url.** a url that always
-carries its defaults is noisy, and a link to the plain feed should open
-the plain feed. the url only carries what the reader changed.
+**why the store re-reads the feed on a filter change.** the filters are
+the request. `account_id` and `contract_id` and `method` go to the api as
+query parameters, so a new filter IS a new request — the same way a new
+sort is a new request on the discover page.
 
-### the filter bar is its own component
+### the "HIDE SENT" filter is done on the client
 
-`SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS` reads the filter state and
-writes it back. it does not fetch — it reads the store and calls the
-store's setters. that is the app's rule: the ts files fetch, the
-components display.
+the api has no `hide_sent` parameter — the backend has no global
+status to filter on, because a queue is never done. so the list comes
+back whole and the feed drops the ones the reader has sent.
+
+**why the api does not do it.** it cannot. the "has this account sent
+it" question is per account and per transaction, and the api does not
+know which account the reader is unless it is told. doing it on the
+client means one request and a local filter, and the reader's own
+account is already known in the browser.
+
+**why the filter is not on the api at all.** it would need the account
+id in the query — which the api already takes for the `account_id`
+filter. so "hide sent" is really "the queues I am on, minus the ones I
+have sent". it could be an api filter, and the reason it is not is that
+the client already has both halves. the api filter is a later thing if
+the list gets long.
 
 ---
 
 ## 6. THE TOKEN READING — HOW THE ARGS BECOME AMOUNTS
 
-this is the deepest part of the ui, and it is worth writing down.
+this is the deepest part of the ui, and the research turned up something
+that makes it much simpler than it looked.
+
+### the research: it is NOT as complicated as it looked
+
+the NEP-141 standard fixes the argument names for the three standard ft
+methods. there is no guessing:
+
+```
+ft_transfer         (receiver_id, amount, memo?)
+ft_transfer_call    (receiver_id, amount, memo?, msg)
+ft_resolve_transfer (sender_id, receiver_id, amount)
+ft_on_transfer      (sender_id, amount, msg)
+```
+
+and the token is **the contract being called**. `ft_transfer` on
+`usdt.tether-token.near` transfers USDC. the contract IS the token, so
+there is no `token_id` arg to hunt for — the token is right there in
+the `contract_id` the queue already stores.
+
+**so the minimal reading is three lines of logic:**
+
+```
+the method is one of the three ft methods
+  → the token is the contract_id
+  → the amount is args.amount
+  → the receiver is args.receiver_id
+```
+
+**that is the minimal way to show the token metadata**, and it is enough
+for the feed. `ft_transfer` on `usdt.tether-token.near` with
+`amount: "1500000"` renders as **1.5 USDC** with the token's icon —
+because the contract id names the token and the token registry knows its
+decimals.
+
+**why this was not obvious from the start.** the tx page's parser reads a
+**finished transaction**, where the transfers are in the chain's own
+records. a queued transaction has no chain records yet — only the args
+somebody wrote. so the two are different sources. but the ft methods are
+a standard, and the standard's arg names are fixed.
+
+### the reader table
+
+```
+method                token          amount        receiver
+ft_transfer           the contract   amount        receiver_id
+ft_transfer_call      the contract   amount        receiver_id
+ft_resolve_transfer   the contract   amount        receiver_id
+```
+
+**why `ft_resolve_transfer` is in the list.** it is the other half of an
+ft transfer — the swap does `ft_transfer_call` and then
+`ft_resolve_transfer`, and the reader sees both. it moves tokens the
+other way, so showing it is right.
+
+**why `ft_on_transfer` is NOT in the list.** it is a method the token
+contract calls on the RECEIVER, and it never moves tokens itself — it
+decides how many of the attached tokens to keep. the reader never sends
+it. it is a callback, not a transfer.
+
+### the swap methods — the second tier
+
+a swap is not an ft transfer. `ft_swap` on a dex has its own args:
+`token_in`, `token_out`, `amount_in`, `min_amount_out`. the toolbox
+already knows them:
+
+```ts
+// from @near-kit-tool-box/fun, rhea_ammv2_args
+export interface rhea_ammv2_args {
+  token_id: string;
+  amount: string;
+  token_in: string;
+  amount_in: string;
+  token_out: string;
+  min_amount_out: string;
+}
+```
+
+**why the swap reading is a second tier and not part of the minimal one.**
+a swap has a token in AND a token out, and an amount in and a minimum
+amount out. the reader can show the token in and the amount in, but the
+amount out is a promise the chain settles — a queued swap does not know
+what it will get. showing a "1.5 USDC → 4 NEAR" row before the tx is
+sent would be showing a number nobody knows yet.
+
+**so the swap row shows what is known:** the token in, the amount in, and
+the token out. the amount out is not shown.
 
 ### the two readings of a transaction
 
@@ -593,36 +746,21 @@ the TRANSFERS component       the TOKENS
   receiver                     alice.near
 ```
 
-### how a transfer is found in the args
-
-a small reader per known method. each one knows which arg is the token
-and which arg is the amount:
-
-```ts
-// what a queued ft transfer looks like, per method.
-const SHIT_1170_QUEUE_TRANSFER_READERS = [
-  { method: "ft_transfer",       token_arg: null,       amount_arg: "amount", receiver_arg: "receiver_id" },
-  { method: "ft_transfer_call",  token_arg: "token_id", amount_arg: "amount", receiver_arg: "receiver_id" },
-  { method: "ft_resolve_transfer", token_arg: "token_id", amount_arg: "amount", receiver_arg: "receiver_id" },
-];
-```
-
-**why the reader is per method and not a guess.** the arg names are not
-the same on every contract — some call it `token_id`, some call it
-`token`, some leave it out for a native token. a guess that looks for
-`token_id` on a contract that calls it `token` finds nothing, and a
-transfer that is not shown is a transfer the reader cannot see before
-they sign it.
+**why they are two components and not one.** the transactions list is
+about the **calls** — the contract, the method, the raw args. the
+transfers component is about the **tokens** — what moves, how much, and
+what it is worth. two readings of the same transaction, laid out
+differently.
 
 **why an unrecognised method shows no transfer.** the honest answer. the
 transactions list still shows the raw args, so nothing is hidden — the
 reader can see the call, they just do not get a pretty amount for it.
 
-**why this is not the tx page's parser.** the tx page parses a
-**finished transaction** — the chain's own records of what moved. this
-reads a **queued call** — the args somebody wrote. they are different
-sources and a different shape, so they are different readers. the
-**rendering** is shared, which is the part that must not drift.
+**why the rendering is shared with the tx page.** the token's icon, the
+amount divided by its decimals, the symbol, the usd worth and the raw
+integer in the title all come from the shared
+`shit_1170_transfer_amount_fun` and `SHIT_1170_TRANSFER_TOKENS_STORE`.
+the tx page and the queue page must not drift on how an amount reads.
 
 ### the token info is fetched for the whole batch
 
@@ -630,7 +768,7 @@ one call for all the tokens in all the transactions, the same way the tx
 page does it:
 
 ```ts
-const ids = [...new Set(transactions.flatMap(transfer_token_ids_fun))];
+const ids = [...new Set(transactions.map((tx) => tx.contract_id))];
 const tokens = await SHIT_1170_TOKEN_INFO.get(ids);
 ```
 
@@ -669,55 +807,45 @@ nothing is broken along the way.
 
 ---
 
-## 8. THE THINGS I AM NOT SURE ABOUT — TELL ME IF I AM WRONG
+## 8. THE DECISIONS THAT WERE MADE
 
-1. **the feed page replaces "COMING SOON!"** — it becomes the queue
-   feed. is that right, or does the feed stay a landing page and the
-   queue feed gets its own page?
+| # | the question | the answer |
+|---|---|---|
+| 1 | does the feed replace "COMING SOON!"? | **yes.** the feed page IS the queue feed |
+| 2 | the sort options | **NEWEST** (default) and **MOST ACCOUNTS**. "most accounts" is the popularity sort a social feed answers that a tx list does not |
+| 3 | the "hide sent" control | **one toggle**, HIDE SENT. off by default, so everything shows until the reader says otherwise |
+| 4 | how are the ft transfers read? | **the standard.** the three ft methods have fixed arg names, and the token is the contract being called. no guessing — see section 6 |
+| 5 | the queue page's url | **`?queue=<queue_id>`**. it says what the page is about and does not collide with the token page's `?id=` |
+| 6 | one popup per account | **yes.** the reader signs the whole batch for their own account. the other accounts on the queue sign separately |
+| 7 | the toast | **the existing system, moved to `shared/`.** one store, one component, each page mounts its own layer element. only one page is ever on screen |
+| 8 | the ADD button when signed out | **hidden.** a button that cannot work is noise |
+| 9 | the transactions list on the feed | **the head, the what, the WHO and the buttons.** the calls live on the queue page — see section 1 |
+| 10 | the outcome reading | **A** — the feed calls `wallet.signAndSendTransactions` itself and reads both the hash and the outcome |
+| 11 | the post's tabs | **no tabs.** the what is the headline, the who is the meta line, the how is the queue page |
+| 12 | the post's size | **headline + one call line + the WHO chips + the buttons.** everything else is the queue page |
 
-2. **the sort options** — newest, oldest, most accounts. is "most
-   accounts" the popularity sort you want, or something else?
+### the post, decided
 
-3. **the "hide sent" toggle** — is it one toggle, or do you want a
-   three-way: ALL / MINE / NOT SENT BY ME?
+```
+┌────────────────────────────────────┐
+│ swap 100 USDC for NEAR on the ref finance dex      │  <- the WHAT
+│                                                        │
+│ [icon] 1.5 USDC  →  ref.finance.near              │  <- the one call line
+│                                                        │
+│ (ali…) (bob…) ✓                  ● WAITING │  <- the WHO chips + your status
+│                                                        │
+│ [ SEND ]  [ REMOVE ]                       [ DETAIL ] │  <- the actions
+└───────────────────────────────────┘
+```
 
-4. **the ft transfer reading** — the readers per method above are a
-   start. the real list depends on which contracts you care about. do
-   you want the reader to be a growing list of known methods, or should
-   it try to guess from the arg names?
+**the one call line shows the amount when there is one.** a queued
+`ft_transfer` has a token amount and it is the most useful thing on the
+card, so it leads. a queued `ft_swap` has an amount too, but it has no
+certain output, so the line shows what it knows — the amount in.
 
-5. **the queue page's url** — `?queue=<queue_id>`. it could also be
-   `?id=<queue_id>` to match the token page. `?queue=` says what it is.
-
-6. **one popup per account** — the reader signs the whole batch for
-   their own account. the other accounts on the queue sign separately.
-   is that the flow?
-
-7. **the toast on the queue page** — the queue page has its own toast
-   layer, or does it share the feed's? the toast layer is a fixed
-   overlay, so one per page is enough.
-
-8. **the ADD button when the reader is signed out** — the button is
-   there but says SIGN IN TO ADD? or is it hidden?
-
-9. **the transactions list on the feed** — the full list, or the first
-   two with "and 1 more"? a batch can be 50 transactions and the feed
-   post is small.
-
-10. **the outcome reading** — this is the one that matters. the
-    toolbox's `generic_contract_call_wallet` returns **only the hashes**,
-    so the success or failure cannot be read from it. the feed either:
-
-    - **A** — calls `wallet.signAndSendTransactions` itself and reads
-      both the hash and the outcome from the full outcomes. one popup, the
-      outcome known at once, no extra request. but the feed reimplements
-      the toolbox's helper.
-    - **B** — calls the toolbox helper for the hashes, then asks the
-      fastnear api for the outcome. the toolbox stays the toolbox, but it
-      is an extra request per transaction and the outcome is not immediate.
-
-    A is better on the merits. B keeps the toolbox as the only way a
-    transaction is sent. which one?
+**the WHO chips are the shortened account ids.** the app has no avatar
+system, so a chip is a small rounded label with the id cut to a few
+characters. a chip with a tick on it is an account that has sent it.
 
 ---
 
@@ -776,6 +904,7 @@ frontend/lib/css/import-queue.css
 
 ```
 frontend/lib/ts/shared/outcome_hash.ts
+frontend/lib/ts/shared/gas_deposit.ts
 frontend/lib/ts/shared/toast_store.ts
 frontend/lib/components/shared/toast_layer.tsx
 ```
