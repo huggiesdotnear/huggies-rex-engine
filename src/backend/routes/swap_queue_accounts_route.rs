@@ -133,12 +133,7 @@ pub async fn swap_queue_accounts_route(
     // --- WHY --- THE SAME ITEM THAT IS ANSWERED WITH: the client's live
     // post has to be byte-for-byte what a refetch would give it, and
     // reading the row again could read a different one.
-    feed_ws_publish_fun(
-        &state.feed_ws,
-        FEED_WS_EVENT::Swap {
-            swap: item.clone(),
-        },
-    );
+    feed_ws_publish_fun(&state.feed_ws, FEED_WS_EVENT::Swap { swap: item.clone() });
 
     (StatusCode::OK, Json(item)).into_response()
 }

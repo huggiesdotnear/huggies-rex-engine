@@ -278,9 +278,7 @@ pub async fn tx_queue_accounts_set_sent_fun(
 // PAGE in one query — that is the batched read that keeps the feed's
 // answer at two queries instead of two per batch — and that read lives
 // in `tx_queue_store`. so the row reader has to be reachable from there.
-pub fn row_to_tx_queue_account_fun(
-    row: &sqlx::sqlite::SqliteRow,
-) -> TX_QUEUE_ACCOUNT_ROW {
+pub fn row_to_tx_queue_account_fun(row: &sqlx::sqlite::SqliteRow) -> TX_QUEUE_ACCOUNT_ROW {
     TX_QUEUE_ACCOUNT_ROW {
         queue_id: row.get("queue_id"),
         tx_id: row.get("tx_id"),

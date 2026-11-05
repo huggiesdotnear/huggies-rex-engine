@@ -26,7 +26,10 @@ struct TEMP_DB {
 impl TEMP_DB {
     fn new_fun(name: &str) -> Self {
         let mut path = std::env::temp_dir();
-        path.push(format!("shit-1170-tx-route-{name}-{:?}.db", std::process::id()));
+        path.push(format!(
+            "shit-1170-tx-route-{name}-{:?}.db",
+            std::process::id()
+        ));
         // a leftover from a previous run would make the test read old rows.
         let _ = std::fs::remove_file(&path);
         TEMP_DB { path }
@@ -89,11 +92,7 @@ struct THE_REPLY {
 
 // a POST to the queue with the given api key (or none) and the given
 // body.
-async fn post_queue_fun(
-    base_url: &str,
-    api_key: Option<&str>,
-    body: &Value,
-) -> THE_REPLY {
+async fn post_queue_fun(base_url: &str, api_key: Option<&str>, body: &Value) -> THE_REPLY {
     let mut request = reqwest::Client::new()
         .post(format!("{base_url}/api/shit-1170/tx-queue"))
         .json(body);
@@ -104,12 +103,7 @@ async fn post_queue_fun(
 }
 
 // a POST to the sent route of one queue.
-async fn post_sent_fun(
-    base_url: &str,
-    api_key: &str,
-    queue_id: &str,
-    body: &Value,
-) -> THE_REPLY {
+async fn post_sent_fun(base_url: &str, api_key: &str, queue_id: &str, body: &Value) -> THE_REPLY {
     let request = reqwest::Client::new()
         .post(format!("{base_url}/api/shit-1170/tx-queue/{queue_id}/sent"))
         .header("x-api-key", api_key)
@@ -125,7 +119,9 @@ async fn post_account_fun(
     account_id: &str,
 ) -> THE_REPLY {
     let request = reqwest::Client::new()
-        .post(format!("{base_url}/api/shit-1170/tx-queue/{queue_id}/accounts"))
+        .post(format!(
+            "{base_url}/api/shit-1170/tx-queue/{queue_id}/accounts"
+        ))
         .header("x-api-key", api_key)
         .json(&json!({ "accountId": account_id }));
     answer_fun(request.send().await.expect("the route should answer")).await
@@ -148,8 +144,8 @@ async fn delete_account_fun(
 
 // a GET of the queue list, with the given query string.
 async fn get_list_fun(base_url: &str, api_key: Option<&str>, query: &str) -> THE_REPLY {
-    let mut request = reqwest::Client::new()
-        .get(format!("{base_url}/api/shit-1170/tx-queue?{query}"));
+    let mut request =
+        reqwest::Client::new().get(format!("{base_url}/api/shit-1170/tx-queue?{query}"));
     if let Some(api_key) = api_key {
         request = request.header("x-api-key", api_key);
     }
@@ -257,7 +253,9 @@ async fn a_batch_of_two_is_queued_and_the_transactions_keep_their_order() {
 
     assert_eq!(answer.status, 201, "body was: {}", answer.body);
 
-    let transactions = answer.body["transactions"].as_array().expect("transactions");
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
     assert_eq!(transactions.len(), 2, "the batch holds two transactions");
     assert_eq!(transactions[0]["position"], 0);
     assert_eq!(transactions[0]["method"], "ft_swap");
@@ -379,7 +377,7 @@ async fn a_named_account_the_agent_holds_no_key_for_is_refused() {
     let base_url = serve_fun(pool).await;
 
     let mut body = one_tx_body_fun();
-    body["accounts"] = json!([ "carol.near" ]);
+    body["accounts"] = json!(["carol.near"]);
 
     let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
 
@@ -397,7 +395,7 @@ async fn a_named_account_the_agent_holds_a_key_for_is_accepted() {
     let base_url = serve_fun(pool).await;
 
     let mut body = one_tx_body_fun();
-    body["accounts"] = json!([ "alice.near", "bob.near" ]);
+    body["accounts"] = json!(["alice.near", "bob.near"]);
 
     let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
 
@@ -441,7 +439,10 @@ async fn adding_an_account_with_another_accounts_key_is_refused() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     // bob's key, and bob's account — that is bob adding HIMSELF, which
     // is fine. so it is ALICE's key and ALICE's account that is tested
@@ -462,7 +463,10 @@ async fn adding_your_own_account_works_and_creates_a_row_under_every_transaction
     // the agent queues a batch with NOBODY named on it.
     let queued = post_queue_fun(&base_url, Some(&alice_key), &two_tx_body_fun()).await;
     assert_eq!(queued.status, 201, "body was: {}", queued.body);
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     // alice adds HERSELF.
     let answer = post_account_fun(&base_url, &alice_key, &queue_id, "alice.near").await;
@@ -476,10 +480,14 @@ async fn adding_your_own_account_works_and_creates_a_row_under_every_transaction
     assert_eq!(accounts[0]["status"], "pending");
 
     // and there is a row under EVERY transaction of the batch.
-    let transactions = answer.body["transactions"].as_array().expect("transactions");
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
     assert_eq!(transactions.len(), 2);
     for transaction in transactions {
-        let own = transaction["accounts"].as_array().expect("the transaction accounts");
+        let own = transaction["accounts"]
+            .as_array()
+            .expect("the transaction accounts");
         assert_eq!(own.len(), 1, "one row under every transaction");
         assert_eq!(own[0]["accountId"], "alice.near");
     }
@@ -493,7 +501,10 @@ async fn adding_an_account_twice_is_refused() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     let first = post_account_fun(&base_url, &alice_key, &queue_id, "alice.near").await;
     assert_eq!(first.status, 200, "body was: {}", first.body);
@@ -526,11 +537,14 @@ async fn the_sent_route_writes_the_hash_and_the_status_on_the_right_transaction(
     // alice is named on the batch, so she has a row under BOTH of its
     // transactions.
     let mut body = two_tx_body_fun();
-    body["accounts"] = json!([ "alice.near" ]);
+    body["accounts"] = json!(["alice.near"]);
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &body).await;
     assert_eq!(queued.status, 201, "body was: {}", queued.body);
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let first_tx_id = queued.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -544,7 +558,9 @@ async fn the_sent_route_writes_the_hash_and_the_status_on_the_right_transaction(
     assert_eq!(answer.status, 200, "body was: {}", answer.body);
 
     // the FIRST transaction carries the hash, and the second does not.
-    let transactions = answer.body["transactions"].as_array().expect("transactions");
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
     let first_accounts = transactions[0]["accounts"].as_array().expect("accounts");
     assert_eq!(first_accounts.len(), 1, "body was: {}", answer.body);
     assert_eq!(first_accounts[0]["status"], "succeeded");
@@ -569,7 +585,10 @@ async fn the_sent_route_creates_the_row_for_an_account_that_was_never_named() {
 
     // alice queues a batch for herself.
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let tx_id = queued.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -598,7 +617,10 @@ async fn the_sent_route_with_a_tx_id_from_another_queue_is_refused() {
     // two queues.
     let first = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
     let second = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let second_id = second.body["queueId"].as_str().expect("a queue id").to_string();
+    let second_id = second.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let other_tx_id = first.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -620,15 +642,12 @@ async fn the_sent_route_with_no_hashes_is_refused() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
-    let answer = post_sent_fun(
-        &base_url,
-        &alice_key,
-        &queue_id,
-        &json!({ "txHashes": [] }),
-    )
-    .await;
+    let answer = post_sent_fun(&base_url, &alice_key, &queue_id, &json!({ "txHashes": [] })).await;
 
     assert_eq!(answer.status, 400, "body was: {}", answer.body);
     assert_eq!(answer.body["error"]["code"], "no_tx_hashes");
@@ -642,7 +661,10 @@ async fn the_sent_route_with_a_bad_status_is_refused() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let tx_id = queued.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -667,10 +689,13 @@ async fn the_delete_route_removes_a_pending_row_but_not_a_row_with_a_hash() {
 
     // a batch with BOTH alice and bob named on it.
     let mut body = two_tx_body_fun();
-    body["accounts"] = json!([ "alice.near", "bob.near" ]);
+    body["accounts"] = json!(["alice.near", "bob.near"]);
     let queued = post_queue_fun(&base_url, Some(&alice_key), &body).await;
     assert_eq!(queued.status, 201, "body was: {}", queued.body);
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let first_tx_id = queued.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -687,7 +712,9 @@ async fn the_delete_route_removes_a_pending_row_but_not_a_row_with_a_hash() {
 
     assert_eq!(answer.status, 200, "body was: {}", answer.body);
 
-    let transactions = answer.body["transactions"].as_array().expect("transactions");
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
 
     // the row that carried a hash is STILL there — it is history.
     let first_accounts = transactions[0]["accounts"].as_array().expect("accounts");
@@ -714,7 +741,10 @@ async fn the_delete_route_with_another_accounts_key_is_refused() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     // bob tries to remove ALICE.
     let answer = delete_account_fun(&base_url, &bob_key, &queue_id, "alice.near").await;
@@ -731,7 +761,10 @@ async fn the_delete_route_for_an_account_that_is_not_on_the_queue_is_a_404() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     let answer = delete_account_fun(&base_url, &alice_key, &queue_id, "alice.near").await;
 
@@ -757,7 +790,8 @@ async fn the_list_with_hide_sent_and_no_account_id_is_refused_for_a_reader_with_
 }
 
 #[tokio::test]
-async fn the_list_with_hide_sent_as_the_number_one_and_no_account_id_is_refused_for_a_reader_with_no_account() {
+async fn the_list_with_hide_sent_as_the_number_one_and_no_account_id_is_refused_for_a_reader_with_no_account()
+ {
     let db = TEMP_DB::new_fun("list-hide-sent-one");
     let pool = db.pool_fun().await;
     let base_url = serve_fun(pool).await;
@@ -777,9 +811,12 @@ async fn the_list_with_hide_sent_as_the_number_one_and_an_account_drops_the_sent
     let base_url = serve_fun(pool).await;
 
     let mut body = one_tx_body_fun();
-    body["accounts"] = json!([ "alice.near" ]);
+    body["accounts"] = json!(["alice.near"]);
     let queued = post_queue_fun(&base_url, Some(&alice_key), &body).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let tx_id = queued.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -789,7 +826,9 @@ async fn the_list_with_hide_sent_as_the_number_one_and_an_account_drops_the_sent
     let sent_answer = post_sent_fun(&base_url, &alice_key, &queue_id, &sent).await;
     assert_eq!(sent_answer.status, 200, "body was: {}", sent_answer.body);
 
-    let answer = get_list_fun(&base_url, Some(&alice_key),
+    let answer = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         "account_id=alice.near&hide_sent=1",
     )
     .await;
@@ -808,14 +847,21 @@ async fn the_list_with_an_account_and_hide_sent_drops_the_sent_ones() {
 
     // two queues, both named for alice.
     let mut first_body = one_tx_body_fun();
-    first_body["accounts"] = json!([ "alice.near" ]);
+    first_body["accounts"] = json!(["alice.near"]);
     let mut second_body = one_tx_body_fun();
-    second_body["accounts"] = json!([ "alice.near" ]);
+    second_body["accounts"] = json!(["alice.near"]);
 
     let first = post_queue_fun(&base_url, Some(&alice_key), &first_body).await;
     let second = post_queue_fun(&base_url, Some(&alice_key), &second_body).await;
-    let first_id = first.body["queueId"].as_str().expect("a queue id").to_string();
-    let second_id = second.body["queueId"].as_str().expect("a queue id").to_string();    let first_tx_id = first.body["transactions"][0]["txId"]
+    let first_id = first.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
+    let second_id = second.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
+    let first_tx_id = first.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
         .to_string();
@@ -831,7 +877,12 @@ async fn the_list_with_an_account_and_hide_sent_drops_the_sent_ones() {
     assert_eq!(all.body["total"], 2);
 
     // and alice's hide-sent view holds only the one she has NOT sent.
-    let mine = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near&hide_sent=true").await;
+    let mine = get_list_fun(
+        &base_url,
+        Some(&alice_key),
+        "account_id=alice.near&hide_sent=true",
+    )
+    .await;
     assert_eq!(mine.status, 200, "body was: {}", mine.body);
     assert_eq!(mine.body["total"], 1);
     let items = mine.body["items"].as_array().expect("items");
@@ -839,7 +890,12 @@ async fn the_list_with_an_account_and_hide_sent_drops_the_sent_ones() {
 
     // --- WHY --- bob's view is NOT alice's view: the filter is about
     // ONE account, and bob never sent anything.
-    let bob_view = get_list_fun(&base_url, Some(&bob_key), "account_id=bob.near&hide_sent=true").await;
+    let bob_view = get_list_fun(
+        &base_url,
+        Some(&bob_key),
+        "account_id=bob.near&hide_sent=true",
+    )
+    .await;
     assert_eq!(bob_view.status, 200, "body was: {}", bob_view.body);
     assert_eq!(bob_view.body["total"], 0);
 }
@@ -852,9 +908,12 @@ async fn the_list_filters_by_account_and_by_contract() {
     let base_url = serve_fun(pool).await;
 
     let mut body = one_tx_body_fun();
-    body["accounts"] = json!([ "alice.near" ]);
+    body["accounts"] = json!(["alice.near"]);
     let queued = post_queue_fun(&base_url, Some(&alice_key), &body).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     let by_account = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near").await;
     assert_eq!(by_account.status, 200, "body was: {}", by_account.body);
@@ -907,7 +966,10 @@ async fn the_list_of_one_queue_is_open_and_needs_no_api_key() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     let request = reqwest::Client::new()
         .get(format!("{base_url}/api/shit-1170/tx-queue/{queue_id}"))
@@ -953,12 +1015,7 @@ async fn the_list_filtered_by_an_account_filters_by_the_account_that_was_named()
     let base_url = serve_fun(pool).await;
 
     // bob queues a batch for himself.
-    post_queue_fun(
-        &base_url,
-        Some(&bob_key),
-        &one_tx_body_for_fun("bob.near"),
-    )
-    .await;
+    post_queue_fun(&base_url, Some(&bob_key), &one_tx_body_for_fun("bob.near")).await;
 
     // alice asks for bob's queues by name.
     //
@@ -993,7 +1050,10 @@ async fn a_signed_in_readers_own_account_is_the_account_the_hide_sent_filter_is_
         &one_tx_body_for_fun("alice.near"),
     )
     .await;
-    let sent_id = sent.body["queueId"].as_str().expect("a queue id").to_string();
+    let sent_id = sent.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
     let sent_tx_id = sent.body["transactions"][0]["txId"]
         .as_str()
         .expect("a tx id")
@@ -1044,7 +1104,9 @@ async fn the_list_pages_with_a_cursor_and_the_cursor_is_handed_back() {
         .to_string();
 
     // the second page holds two more, and it does NOT repeat the first.
-    let second = get_list_fun(&base_url, Some(&alice_key),
+    let second = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         &format!("limit=2&cursor={cursor}"),
     )
     .await;
@@ -1076,7 +1138,9 @@ async fn the_list_pages_with_a_cursor_and_the_cursor_is_handed_back() {
         .as_str()
         .expect("a cursor")
         .to_string();
-    let third = get_list_fun(&base_url, Some(&alice_key),
+    let third = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         &format!("limit=2&cursor={last_cursor}"),
     )
     .await;
@@ -1114,12 +1178,7 @@ async fn the_list_filters_by_several_accounts_at_once() {
         &one_tx_body_for_fun("alice.near"),
     )
     .await;
-    post_queue_fun(
-        &base_url,
-        Some(&bob_key),
-        &one_tx_body_for_fun("bob.near"),
-    )
-    .await;
+    post_queue_fun(&base_url, Some(&bob_key), &one_tx_body_for_fun("bob.near")).await;
     post_queue_fun(
         &base_url,
         Some(&carol_key),
@@ -1128,7 +1187,9 @@ async fn the_list_filters_by_several_accounts_at_once() {
     .await;
 
     // alice OR bob is two queues, and carol's is not one of them.
-    let answer = get_list_fun(&base_url, Some(&alice_key),
+    let answer = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         "account_id=alice.near,bob.near",
     )
     .await;
@@ -1136,7 +1197,9 @@ async fn the_list_filters_by_several_accounts_at_once() {
     assert_eq!(answer.body["total"], 2);
 
     // and all three is three.
-    let all = get_list_fun(&base_url, Some(&alice_key),
+    let all = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         "account_id=alice.near,bob.near,carol.near",
     )
     .await;
@@ -1160,13 +1223,17 @@ async fn the_list_filters_by_several_contracts_at_once() {
         .to_string();
 
     // that contract is in the list, and a made-up one is not.
-    let hit = get_list_fun(&base_url, Some(&alice_key),
+    let hit = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         &format!("contract_id={contract_id}"),
     )
     .await;
     assert_eq!(hit.body["total"], 1);
 
-    let miss = get_list_fun(&base_url, Some(&alice_key),
+    let miss = get_list_fun(
+        &base_url,
+        Some(&alice_key),
         "contract_id=nothing.near,other.near",
     )
     .await;
@@ -1185,11 +1252,15 @@ async fn the_facets_route_lists_the_contracts_and_the_accounts() {
         .as_str()
         .expect("a contract")
         .to_string();
-    post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_for_fun("alice.near")).await;
+    post_queue_fun(
+        &base_url,
+        Some(&alice_key),
+        &one_tx_body_for_fun("alice.near"),
+    )
+    .await;
 
     // the route is OPEN — it needs no api key.
-    let request = reqwest::Client::new()
-        .get(format!("{base_url}/api/shit-1170/tx-queue/facets"));
+    let request = reqwest::Client::new().get(format!("{base_url}/api/shit-1170/tx-queue/facets"));
     let answer = answer_fun(request.send().await.expect("the route should answer")).await;
     assert_eq!(answer.status, 200, "body was: {}", answer.body);
 
@@ -1218,7 +1289,10 @@ async fn one_queue_is_read_back_and_a_queue_that_is_not_there_is_a_404() {
     let base_url = serve_fun(pool).await;
 
     let queued = post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
-    let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
+    let queue_id = queued.body["queueId"]
+        .as_str()
+        .expect("a queue id")
+        .to_string();
 
     let answer = get_one_fun(&base_url, &alice_key, &queue_id).await;
     assert_eq!(answer.status, 200, "body was: {}", answer.body);
@@ -1240,7 +1314,7 @@ async fn the_list_clamps_a_wild_limit_and_a_negative_offset() {
     let base_url = serve_fun(pool).await;
 
     let mut body = one_tx_body_fun();
-    body["accounts"] = json!([ "alice.near" ]);
+    body["accounts"] = json!(["alice.near"]);
     post_queue_fun(&base_url, Some(&alice_key), &body).await;
 
     let negative = get_list_fun(&base_url, Some(&alice_key), "limit=-1&offset=-5").await;
@@ -1268,7 +1342,11 @@ async fn the_stats_paths_are_not_swallowed_by_the_queue_id_path() {
             .get(format!("{base_url}/api/shit-1170/tx-queue/{path}"))
             .header("x-api-key", &alice_key);
         let answer = answer_fun(request.send().await.expect("the route should answer")).await;
-        assert_eq!(answer.status, 200, "path was {path}, body was: {}", answer.body);
+        assert_eq!(
+            answer.status, 200,
+            "path was {path}, body was: {}",
+            answer.body
+        );
         assert!(
             answer.body.get("items").is_some(),
             "path {path} must answer the stats shape, body was: {}",
@@ -1334,11 +1412,18 @@ async fn the_method_stats_carry_the_contract_id() {
 
     assert_eq!(answer.status, 200, "body was: {}", answer.body);
     let items = answer.body["items"].as_array().expect("items");
-    assert_eq!(items.len(), 2, "the same method on two contracts is two rows");
+    assert_eq!(
+        items.len(),
+        2,
+        "the same method on two contracts is two rows"
+    );
     for item in items {
         assert_eq!(item["method"], "ft_swap");
         assert_eq!(item["count"], 1);
-        assert!(item["contractId"].is_string(), "the contract id rides along");
+        assert!(
+            item["contractId"].is_string(),
+            "the contract id rides along"
+        );
     }
 }
 // ========================================

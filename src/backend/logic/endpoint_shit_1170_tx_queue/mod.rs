@@ -35,10 +35,10 @@ pub mod tx_queue_row_to_json_fun;
 pub mod tx_queue_stats_store;
 pub mod tx_queue_status_fun;
 pub mod tx_queue_store;
-pub mod tx_queue_transactions_store;
-pub mod tx_queue_uuid_fun;
 #[cfg(test)]
 pub mod tx_queue_store_test;
+pub mod tx_queue_transactions_store;
+pub mod tx_queue_uuid_fun;
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

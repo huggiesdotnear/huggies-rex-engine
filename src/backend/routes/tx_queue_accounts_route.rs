@@ -83,19 +83,19 @@ pub async fn tx_queue_accounts_route(
     }
 
     // --- ALREADY ON IT -------------------
-    let already = match tx_queue_accounts_has_for_account_fun(&pool, &queue_id, &body.account_id).await
-    {
-        Ok(already) => already,
-        Err(err) => {
-            eprintln!("[tx-queue] could not read the account rows: {err}");
-            return shit_1170_error_fun(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "db_unavailable",
-                "the accounts on the queue could not be read",
-            )
-            .into_response();
-        }
-    };
+    let already =
+        match tx_queue_accounts_has_for_account_fun(&pool, &queue_id, &body.account_id).await {
+            Ok(already) => already,
+            Err(err) => {
+                eprintln!("[tx-queue] could not read the account rows: {err}");
+                return shit_1170_error_fun(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "db_unavailable",
+                    "the accounts on the queue could not be read",
+                )
+                .into_response();
+            }
+        };
     if already {
         return shit_1170_error_fun(
             StatusCode::CONFLICT,

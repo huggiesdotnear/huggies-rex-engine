@@ -27,20 +27,20 @@ use super::api_key_rotate_route::api_key_rotate_route;
 use super::api_keys_route::api_keys_route;
 use super::feed_ws_route::feed_ws_route;
 use super::ping_route::ping_route;
-use super::trezu_treasuries_route::trezu_treasuries_route;
-use super::tx_queue_accounts_delete_route::tx_queue_accounts_delete_route;
-use super::tx_queue_accounts_route::tx_queue_accounts_route;
-use super::tx_queue_one_route::tx_queue_one_route;
-use super::tx_queue_route::{tx_queue_get_route, tx_queue_post_route};
-use super::tx_queue_sent_route::tx_queue_sent_route;
-use super::tx_queue_stats_contracts_route::tx_queue_stats_contracts_route;
-use super::tx_queue_stats_methods_route::tx_queue_stats_methods_route;
-use super::tx_queue_facets_route::tx_queue_facets_route;
 use super::swap_queue_accounts_delete_route::swap_queue_accounts_delete_route;
 use super::swap_queue_accounts_route::swap_queue_accounts_route;
 use super::swap_queue_one_route::swap_queue_one_route;
 use super::swap_queue_route::{swap_queue_get_route, swap_queue_post_route};
 use super::swap_queue_sent_route::swap_queue_sent_route;
+use super::trezu_treasuries_route::trezu_treasuries_route;
+use super::tx_queue_accounts_delete_route::tx_queue_accounts_delete_route;
+use super::tx_queue_accounts_route::tx_queue_accounts_route;
+use super::tx_queue_facets_route::tx_queue_facets_route;
+use super::tx_queue_one_route::tx_queue_one_route;
+use super::tx_queue_route::{tx_queue_get_route, tx_queue_post_route};
+use super::tx_queue_sent_route::tx_queue_sent_route;
+use super::tx_queue_stats_contracts_route::tx_queue_stats_contracts_route;
+use super::tx_queue_stats_methods_route::tx_queue_stats_methods_route;
 // ====================================
 // CORS preflight middleware — intercepts every OPTIONS request before
 // any handler runs and answers 204 with CORS headers.
@@ -135,15 +135,15 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         // filter bar offers. it comes BEFORE the `{queue_id}` route for
         // the same reason the stats routes do: `facets` would otherwise
         // be read as a queue id.
-        .route(
-            "/api/shit-1170/tx-queue/facets",
-            get(tx_queue_facets_route),
-        )
+        .route("/api/shit-1170/tx-queue/facets", get(tx_queue_facets_route))
         .route(
             "/api/shit-1170/tx-queue",
             post(tx_queue_post_route).get(tx_queue_get_route),
         )
-        .route("/api/shit-1170/tx-queue/{queue_id}", get(tx_queue_one_route))
+        .route(
+            "/api/shit-1170/tx-queue/{queue_id}",
+            get(tx_queue_one_route),
+        )
         .route(
             "/api/shit-1170/tx-queue/{queue_id}/accounts",
             post(tx_queue_accounts_route),
@@ -164,7 +164,10 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
             "/api/shit-1170/swap-queue",
             post(swap_queue_post_route).get(swap_queue_get_route),
         )
-        .route("/api/shit-1170/swap-queue/{swap_id}", get(swap_queue_one_route))
+        .route(
+            "/api/shit-1170/swap-queue/{swap_id}",
+            get(swap_queue_one_route),
+        )
         .route(
             "/api/shit-1170/swap-queue/{swap_id}/accounts",
             post(swap_queue_accounts_route),

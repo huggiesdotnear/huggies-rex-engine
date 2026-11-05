@@ -42,7 +42,10 @@ impl TEMP_DB {
         // the api keys store test uses the same `name` values, and two
         // test files that pick the same file name delete each other's db
         // out from under each other.
-        path.push(format!("shit-1170-tx-store-{name}-{:?}.db", std::process::id()));
+        path.push(format!(
+            "shit-1170-tx-store-{name}-{:?}.db",
+            std::process::id()
+        ));
         // a leftover from a previous run would make the test read old rows.
         let _ = std::fs::remove_file(&path);
         TEMP_DB { path }
@@ -79,9 +82,16 @@ async fn make_queue_fun(
     let queue_id = tx_queue_uuid_fun();
     let tx_id = tx_queue_uuid_fun();
 
-    tx_queue_insert_fun(pool, Some(what), Some("when the price is right"), Some("because"), None, &queue_id)
-        .await
-        .expect("the queue should save");
+    tx_queue_insert_fun(
+        pool,
+        Some(what),
+        Some("when the price is right"),
+        Some("because"),
+        None,
+        &queue_id,
+    )
+    .await
+    .expect("the queue should save");
 
     tx_queue_transactions_insert_fun(
         pool,
@@ -414,15 +424,9 @@ async fn a_pending_row_is_deleted_but_a_row_with_a_hash_is_history() {
     assert!(rows.is_empty());
 
     // now alice sends it, and the row comes back WITH a hash.
-    tx_queue_accounts_set_sent_fun(
-        &pool,
-        &made.tx_id,
-        "alice.near",
-        "9hN3lq",
-        "succeeded",
-    )
-    .await
-    .expect("the row should save");
+    tx_queue_accounts_set_sent_fun(&pool, &made.tx_id, "alice.near", "9hN3lq", "succeeded")
+        .await
+        .expect("the row should save");
 
     // the row with a hash does NOT go.
     let deleted_sent = tx_queue_accounts_delete_fun(&pool, &made.tx_id, "alice.near")
@@ -450,15 +454,10 @@ async fn set_sent_creates_the_row_when_it_is_not_there() {
 
     // alice was NEVER named on this queue. she signs it anyway and she
     // joins it.
-    let affected = tx_queue_accounts_set_sent_fun(
-        &pool,
-        &made.tx_id,
-        "alice.near",
-        "AbCdEf",
-        "sent",
-    )
-    .await
-    .expect("the row should save");
+    let affected =
+        tx_queue_accounts_set_sent_fun(&pool, &made.tx_id, "alice.near", "AbCdEf", "sent")
+            .await
+            .expect("the row should save");
     assert_eq!(affected, 1);
 
     let rows = tx_queue_accounts_list_by_queue_fun(&pool, &made.queue_id)

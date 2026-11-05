@@ -46,8 +46,7 @@ pub fn tx_queue_row_to_json_fun(
     transactions: &[TX_QUEUE_TRANSACTION_ROW],
     accounts: &[TX_QUEUE_ACCOUNT_ROW],
 ) -> Result<TX_QUEUE_ITEM, serde_json::Error> {
-    let mut wire_transactions: Vec<TX_QUEUE_TRANSACTION> =
-        Vec::with_capacity(transactions.len());
+    let mut wire_transactions: Vec<TX_QUEUE_TRANSACTION> = Vec::with_capacity(transactions.len());
 
     for transaction in transactions {
         let args = tx_queue_args_to_json_fun(&transaction.args)?;
@@ -114,7 +113,9 @@ fn queue_accounts_to_json_fun(accounts: &[TX_QUEUE_ACCOUNT_ROW]) -> Vec<TX_QUEUE
     let mut out: Vec<TX_QUEUE_ACCOUNT> = Vec::new();
 
     for account in accounts {
-        let existing = out.iter_mut().find(|one| one.account_id == account.account_id);
+        let existing = out
+            .iter_mut()
+            .find(|one| one.account_id == account.account_id);
 
         match existing {
             Some(one) => {

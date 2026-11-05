@@ -28,7 +28,10 @@ struct TEMP_DB {
 impl TEMP_DB {
     fn new_fun(name: &str) -> Self {
         let mut path = std::env::temp_dir();
-        path.push(format!("shit-1170-prefix-{name}-{:?}.db", std::process::id()));
+        path.push(format!(
+            "shit-1170-prefix-{name}-{:?}.db",
+            std::process::id()
+        ));
         // a leftover from a previous run would make the test read old rows.
         let _ = std::fs::remove_file(&path);
         TEMP_DB { path }

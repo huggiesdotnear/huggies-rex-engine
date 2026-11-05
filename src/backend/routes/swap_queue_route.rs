@@ -111,8 +111,7 @@ pub async fn swap_queue_post_route(
     let prepared = match prepared_swap_fun(&body) {
         Ok(prepared) => prepared,
         Err((code, message)) => {
-            return shit_1170_error_fun(StatusCode::BAD_REQUEST, &code, &message)
-                .into_response();
+            return shit_1170_error_fun(StatusCode::BAD_REQUEST, &code, &message).into_response();
         }
     };
 
@@ -147,9 +146,7 @@ pub async fn swap_queue_post_route(
             return shit_1170_error_fun(
                 StatusCode::BAD_REQUEST,
                 "account_not_named_by_agent",
-                &format!(
-                    "the agent holds no api key for {refused}, so it may not name it"
-                ),
+                &format!("the agent holds no api key for {refused}, so it may not name it"),
             )
             .into_response();
         }
@@ -216,12 +213,7 @@ pub async fn swap_queue_post_route(
     // --- WHY --- THE SAME ITEM THAT IS ANSWERED WITH: the client's live
     // post has to be byte-for-byte what a refetch would give it, and
     // reading the row again could read a different one.
-    feed_ws_publish_fun(
-        &state.feed_ws,
-        FEED_WS_EVENT::Swap {
-            swap: item.clone(),
-        },
-    );
+    feed_ws_publish_fun(&state.feed_ws, FEED_WS_EVENT::Swap { swap: item.clone() });
 
     (StatusCode::CREATED, Json(item)).into_response()
 }
@@ -484,7 +476,10 @@ fn prepared_swap_fun(body: &SWAP_QUEUE_REQUEST) -> Result<PREPARED_SWAP, (String
             "the swap has no amount in".to_string(),
         ));
     }
-    if !amount_in.chars().all(|character| character.is_ascii_digit()) {
+    if !amount_in
+        .chars()
+        .all(|character| character.is_ascii_digit())
+    {
         return Err((
             "bad_amount_in".to_string(),
             "the amount in is not a whole number of the token's smallest unit".to_string(),
@@ -504,8 +499,7 @@ fn prepared_swap_fun(body: &SWAP_QUEUE_REQUEST) -> Result<PREPARED_SWAP, (String
             if !raw.chars().all(|character| character.is_ascii_digit()) {
                 return Err((
                     "bad_amount_out".to_string(),
-                    "the amount out is not a whole number of the token's smallest unit"
-                        .to_string(),
+                    "the amount out is not a whole number of the token's smallest unit".to_string(),
                 ));
             }
             Some(raw.to_string())

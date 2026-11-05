@@ -84,19 +84,18 @@ pub async fn swap_queue_accounts_delete_route(
     };
 
     // --- WAS THE ACCOUNT ON IT -----------
-    let was_on =
-        match swap_queue_accounts_has_for_account_fun(&pool, &swap_id, &account_id).await {
-            Ok(was_on) => was_on,
-            Err(err) => {
-                eprintln!("[swap-queue] could not read the account rows: {err}");
-                return shit_1170_error_fun(
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "db_unavailable",
-                    "the accounts on the swap could not be read",
-                )
-                .into_response();
-            }
-        };
+    let was_on = match swap_queue_accounts_has_for_account_fun(&pool, &swap_id, &account_id).await {
+        Ok(was_on) => was_on,
+        Err(err) => {
+            eprintln!("[swap-queue] could not read the account rows: {err}");
+            return shit_1170_error_fun(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "db_unavailable",
+                "the accounts on the swap could not be read",
+            )
+            .into_response();
+        }
+    };
     if !was_on {
         return shit_1170_error_fun(
             StatusCode::NOT_FOUND,

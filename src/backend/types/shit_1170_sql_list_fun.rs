@@ -135,9 +135,7 @@ impl SqliteListStatement {
     // placeholders are numbered and the values are in the same order,
     // and sqlite reads them left to right. the two line up because they
     // were written together.
-    pub fn bind_all_fun<'q>(
-        self,
-    ) -> sqlx::query::Query<'q, Sqlite, sqlx::sqlite::SqliteArguments> {
+    pub fn bind_all_fun<'q>(self) -> sqlx::query::Query<'q, Sqlite, sqlx::sqlite::SqliteArguments> {
         let mut statement = sqlx::query(sqlx::AssertSqlSafe(self.sql.as_str()));
         for value in &self.values {
             statement = match value {

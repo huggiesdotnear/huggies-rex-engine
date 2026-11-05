@@ -103,14 +103,11 @@ async fn post_swap_fun(base_url: &str, api_key: Option<&str>, body: &Value) -> T
 }
 
 // a POST to the sent route of one swap.
-async fn post_sent_fun(
-    base_url: &str,
-    api_key: &str,
-    swap_id: &str,
-    body: &Value,
-) -> THE_REPLY {
+async fn post_sent_fun(base_url: &str, api_key: &str, swap_id: &str, body: &Value) -> THE_REPLY {
     let request = reqwest::Client::new()
-        .post(format!("{base_url}/api/shit-1170/swap-queue/{swap_id}/sent"))
+        .post(format!(
+            "{base_url}/api/shit-1170/swap-queue/{swap_id}/sent"
+        ))
         .header("x-api-key", api_key)
         .json(body);
     answer_fun(request.send().await.expect("the route should answer")).await
@@ -124,7 +121,9 @@ async fn post_account_fun(
     account_id: &str,
 ) -> THE_REPLY {
     let request = reqwest::Client::new()
-        .post(format!("{base_url}/api/shit-1170/swap-queue/{swap_id}/accounts"))
+        .post(format!(
+            "{base_url}/api/shit-1170/swap-queue/{swap_id}/accounts"
+        ))
         .header("x-api-key", api_key)
         .json(&json!({ "accountId": account_id }));
     answer_fun(request.send().await.expect("the route should answer")).await
@@ -147,9 +146,8 @@ async fn delete_account_fun(
 
 // a GET of the swap list, with the given query string.
 async fn get_list_fun(base_url: &str, api_key: Option<&str>, query: &str) -> THE_REPLY {
-    let mut request = reqwest::Client::new().get(format!(
-        "{base_url}/api/shit-1170/swap-queue?{query}"
-    ));
+    let mut request =
+        reqwest::Client::new().get(format!("{base_url}/api/shit-1170/swap-queue?{query}"));
     if let Some(api_key) = api_key {
         request = request.header("x-api-key", api_key);
     }
@@ -158,9 +156,8 @@ async fn get_list_fun(base_url: &str, api_key: Option<&str>, query: &str) -> THE
 
 // a GET of one swap.
 async fn get_one_fun(base_url: &str, api_key: Option<&str>, swap_id: &str) -> THE_REPLY {
-    let mut request = reqwest::Client::new().get(format!(
-        "{base_url}/api/shit-1170/swap-queue/{swap_id}"
-    ));
+    let mut request =
+        reqwest::Client::new().get(format!("{base_url}/api/shit-1170/swap-queue/{swap_id}"));
     if let Some(api_key) = api_key {
         request = request.header("x-api-key", api_key);
     }
@@ -236,7 +233,10 @@ async fn a_swap_is_queued_and_read_back() {
         reply.body.get("amountOut").and_then(|a| a.as_str()),
         Some("5000000000000000000000000")
     );
-    assert_eq!(reply.body.get("dexId").and_then(|d| d.as_str()), Some("Rhea"));
+    assert_eq!(
+        reply.body.get("dexId").and_then(|d| d.as_str()),
+        Some("Rhea")
+    );
 }
 
 #[tokio::test]
@@ -487,7 +487,10 @@ async fn the_list_filters_by_account_and_by_token() {
     // the alice view has the swap. the filter is always the CALLER's own
     // account, so it is alice's key that is used.
     let alice_view = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near").await;
-    assert_eq!(alice_view.body.get("total").and_then(|t| t.as_i64()), Some(1));
+    assert_eq!(
+        alice_view.body.get("total").and_then(|t| t.as_i64()),
+        Some(1)
+    );
 
     // --- WHY --- THE AGENT SEES IT TOO: the account filter is the
     // account the READER NAMED, and the reader is signed in. the agent
@@ -495,12 +498,18 @@ async fn the_list_filters_by_account_and_by_token() {
     // alice's swaps is the answer. a filter by account is a filter BY
     // account, and the caller's own account is not quietly added to it.
     let agent_view = get_list_fun(&base_url, Some(&agent_key), "account_id=alice.near").await;
-    assert_eq!(agent_view.body.get("total").and_then(|t| t.as_i64()), Some(1));
+    assert_eq!(
+        agent_view.body.get("total").and_then(|t| t.as_i64()),
+        Some(1)
+    );
 
     // and the agent's OWN swaps — nobody put the agent on one — is
     // still empty.
     let agent_own = get_list_fun(&base_url, Some(&agent_key), "account_id=agent.near").await;
-    assert_eq!(agent_own.body.get("total").and_then(|t| t.as_i64()), Some(0));
+    assert_eq!(
+        agent_own.body.get("total").and_then(|t| t.as_i64()),
+        Some(0)
+    );
 
     // the token filters find it, in the alice view.
     let by_token = get_list_fun(&base_url, Some(&alice_key), "token_in=near").await;
@@ -512,10 +521,16 @@ async fn the_list_filters_by_account_and_by_token() {
         "token_in=usdt.tether-token.near",
     )
     .await;
-    assert_eq!(by_token_in.body.get("total").and_then(|t| t.as_i64()), Some(1));
+    assert_eq!(
+        by_token_in.body.get("total").and_then(|t| t.as_i64()),
+        Some(1)
+    );
 
     let by_token_out = get_list_fun(&base_url, Some(&alice_key), "token_out=near").await;
-    assert_eq!(by_token_out.body.get("total").and_then(|t| t.as_i64()), Some(1));
+    assert_eq!(
+        by_token_out.body.get("total").and_then(|t| t.as_i64()),
+        Some(1)
+    );
 }
 
 #[tokio::test]
@@ -569,7 +584,10 @@ async fn the_list_filters_by_contract_on_either_side_of_the_swap() {
     // a contract nobody picked matches nothing.
     let by_nothing = get_list_fun(&base_url, None, "contract_id=nothing.near").await;
     assert_eq!(by_nothing.status, 200, "body was: {}", by_nothing.body);
-    assert_eq!(by_nothing.body.get("total").and_then(|t| t.as_i64()), Some(0));
+    assert_eq!(
+        by_nothing.body.get("total").and_then(|t| t.as_i64()),
+        Some(0)
+    );
 
     // and TWO contracts at once match the swaps touching EITHER of them.
     let by_two = get_list_fun(
@@ -658,7 +676,11 @@ async fn the_total_of_the_contract_filter_counts_the_swaps_the_list_shows() {
     let reply = get_list_fun(&base_url, None, "contract_id=usdt.tether-token.near").await;
     assert_eq!(reply.status, 200, "body was: {}", reply.body);
 
-    let total = reply.body.get("total").and_then(|t| t.as_i64()).unwrap_or(0);
+    let total = reply
+        .body
+        .get("total")
+        .and_then(|t| t.as_i64())
+        .unwrap_or(0);
     let items = reply
         .body
         .get("items")
@@ -753,7 +775,10 @@ async fn the_sent_route_writes_the_hash_the_status_and_the_amount_out() {
         .find(|account| account.get("accountId").and_then(|a| a.as_str()) == Some("alice.near"))
         .expect("alice should be on the swap");
 
-    assert_eq!(alice.get("status").and_then(|s| s.as_str()), Some("succeeded"));
+    assert_eq!(
+        alice.get("status").and_then(|s| s.as_str()),
+        Some("succeeded")
+    );
     assert_eq!(alice.get("txHash").and_then(|h| h.as_str()), Some("abc123"));
     assert_eq!(
         alice.get("amountOut").and_then(|a| a.as_str()),

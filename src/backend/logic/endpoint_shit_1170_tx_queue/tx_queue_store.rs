@@ -520,8 +520,7 @@ pub async fn tx_queue_page_children_fun(
             separated.push_bind(id.as_str());
         }
     }
-    account_builder
-        .push(") ORDER BY queue_id ASC, created_at ASC, tx_id ASC, account_id ASC");
+    account_builder.push(") ORDER BY queue_id ASC, created_at ASC, tx_id ASC, account_id ASC");
     let account_rows = account_builder.build().fetch_all(pool).await?;
 
     for row in &account_rows {

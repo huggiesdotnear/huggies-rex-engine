@@ -155,8 +155,7 @@ pub async fn tx_queue_post_route(
     // --- THE CALLS ------------------------
     // every call is checked BEFORE anything is written, so a batch that
     // is going to be refused never leaves half of itself in the db.
-    let mut prepared: Vec<PREPARED_TRANSACTION> =
-        Vec::with_capacity(body.transactions.len());
+    let mut prepared: Vec<PREPARED_TRANSACTION> = Vec::with_capacity(body.transactions.len());
     for (position, transaction) in body.transactions.iter().enumerate() {
         match prepared_transaction_fun(transaction, position as i64) {
             Ok(prepared_one) => prepared.push(prepared_one),
@@ -198,9 +197,7 @@ pub async fn tx_queue_post_route(
             return shit_1170_error_fun(
                 StatusCode::BAD_REQUEST,
                 "account_not_named_by_agent",
-                &format!(
-                    "the agent holds no api key for {refused}, so it may not name it"
-                ),
+                &format!("the agent holds no api key for {refused}, so it may not name it"),
             )
             .into_response();
         }
@@ -478,8 +475,14 @@ pub async fn tx_queue_get_route(
     for row in &rows {
         let empty_transactions: Vec<TX_QUEUE_TRANSACTION_ROW> = Vec::new();
         let empty_accounts: Vec<TX_QUEUE_ACCOUNT_ROW> = Vec::new();
-        let transactions = children.transactions.get(&row.queue_id).unwrap_or(&empty_transactions);
-        let accounts = children.accounts.get(&row.queue_id).unwrap_or(&empty_accounts);
+        let transactions = children
+            .transactions
+            .get(&row.queue_id)
+            .unwrap_or(&empty_transactions);
+        let accounts = children
+            .accounts
+            .get(&row.queue_id)
+            .unwrap_or(&empty_accounts);
         match tx_queue_row_to_json_fun(row, transactions, accounts) {
             Ok(item) => items.push(item),
             Err(err) => {
@@ -621,10 +624,7 @@ fn hide_sent_flag_fun(raw: Option<&str>) -> Option<bool> {
 // --- WHY --- it is read back and not built from what was just written:
 // the answer is then the SAME shape whether it comes from the queue
 // route, the one-batch route or the list route.
-async fn queue_item_fun(
-    pool: &SqlitePool,
-    queue_id: &str,
-) -> Result<TX_QUEUE_ITEM, Box<Response>> {
+async fn queue_item_fun(pool: &SqlitePool, queue_id: &str) -> Result<TX_QUEUE_ITEM, Box<Response>> {
     let queue = match tx_queue_get_fun(pool, queue_id).await {
         Ok(Some(queue)) => queue,
         Ok(None) => {

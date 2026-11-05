@@ -98,17 +98,21 @@ pub async fn tx_queue_facets_route(
         Json(TX_QUEUE_FACETS_RESPONSE {
             contracts: contracts
                 .into_iter()
-                .map(|one| crate::backend::types::tx_queue_facets_request::TX_QUEUE_FACET_CONTRACT {
-                    contract_id: one.contract_id,
-                    count: one.count,
+                .map(|one| {
+                    crate::backend::types::tx_queue_facets_request::TX_QUEUE_FACET_CONTRACT {
+                        contract_id: one.contract_id,
+                        count: one.count,
+                    }
                 })
                 .collect(),
             accounts: accounts
                 .into_iter()
-                .map(|one| crate::backend::types::tx_queue_facets_request::TX_QUEUE_FACET_ACCOUNT {
-                    account_id: one.account_id,
-                    count: one.count,
-                })
+                .map(
+                    |one| crate::backend::types::tx_queue_facets_request::TX_QUEUE_FACET_ACCOUNT {
+                        account_id: one.account_id,
+                        count: one.count,
+                    },
+                )
                 .collect(),
         }),
     )

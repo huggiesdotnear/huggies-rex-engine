@@ -50,8 +50,8 @@ pub mod backend {
         pub mod swap_queue_query;
         pub mod swap_queue_request;
         pub mod trezu_treasuries_query;
-        pub mod tx_queue_query;
         pub mod tx_queue_facets_request;
+        pub mod tx_queue_query;
         pub mod tx_queue_request;
     }
 }

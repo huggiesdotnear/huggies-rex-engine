@@ -15,7 +15,10 @@ struct TEMP_DB {
 impl TEMP_DB {
     fn new_fun(name: &str) -> Self {
         let mut path = std::env::temp_dir();
-        path.push(format!("shit-1170-test-schema-{name}-{:?}.db", std::process::id()));
+        path.push(format!(
+            "shit-1170-test-schema-{name}-{:?}.db",
+            std::process::id()
+        ));
         // a leftover from a previous run would make the test read old rows.
         let _ = std::fs::remove_file(&path);
         TEMP_DB { path }
@@ -47,14 +50,10 @@ async fn columns_of_fun(pool: &sqlx::SqlitePool, table: &str) -> Vec<String> {
     let statement = match table {
         "api_keys" => "SELECT name FROM pragma_table_info('api_keys')",
         "tx_queue" => "SELECT name FROM pragma_table_info('tx_queue')",
-        "tx_queue_transactions" => {
-            "SELECT name FROM pragma_table_info('tx_queue_transactions')"
-        }
+        "tx_queue_transactions" => "SELECT name FROM pragma_table_info('tx_queue_transactions')",
         "tx_queue_accounts" => "SELECT name FROM pragma_table_info('tx_queue_accounts')",
         "swap_queue" => "SELECT name FROM pragma_table_info('swap_queue')",
-        "swap_queue_accounts" => {
-            "SELECT name FROM pragma_table_info('swap_queue_accounts')"
-        }
+        "swap_queue_accounts" => "SELECT name FROM pragma_table_info('swap_queue_accounts')",
         _ => panic!("no such table: {table}"),
     };
 
@@ -602,7 +601,8 @@ async fn deleting_a_transaction_takes_its_account_rows_with_it() {
 }
 
 #[tokio::test]
-async fn an_account_row_starts_out_pending() {    let db = TEMP_DB::new_fun("default-status");
+async fn an_account_row_starts_out_pending() {
+    let db = TEMP_DB::new_fun("default-status");
     let pool = db.pool_fun().await;
 
     sqlx::query("INSERT INTO tx_queue (queue_id, created_at, updated_at) VALUES (?1, 1, 1)")
@@ -635,14 +635,13 @@ async fn an_account_row_starts_out_pending() {    let db = TEMP_DB::new_fun("def
     .await
     .expect("the account row should save");
 
-    let status: (String,) = sqlx::query_as(
-        "SELECT status FROM tx_queue_accounts WHERE tx_id = ?1 AND account_id = ?2",
-    )
-    .bind("tx-1")
-    .bind("alice.near")
-    .fetch_one(&pool)
-    .await
-    .expect("the status should read");
+    let status: (String,) =
+        sqlx::query_as("SELECT status FROM tx_queue_accounts WHERE tx_id = ?1 AND account_id = ?2")
+            .bind("tx-1")
+            .bind("alice.near")
+            .fetch_one(&pool)
+            .await
+            .expect("the status should read");
     assert_eq!(status.0, "pending");
 }
 // ========================================
