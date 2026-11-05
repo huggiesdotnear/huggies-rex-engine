@@ -5,17 +5,40 @@ queued and waiting to be signed: one post per queued batch of
 transactions, one post per queued swap, a filter bar above them, and the
 reader's own status on each one.
 
-the filter bar has a TOP ROW - the hide-sent switch, the FILTERS button
-and the direction button - and a PANEL behind the FILTERS button, and the
-panel has FOUR groups: the sort, the type, the contracts and the
-accounts. the url holds all of them, so a filtered feed is a link
-somebody can paste. `hide_sent` drops what the reader has sent, `sort` is
-DATE ADDED or MOST POPULAR, `dir` is the way round the sort, `type` is
-ALL, FUNCTION CALL or SWAPS, and `contracts` and `accounts` are the
-picked contract and account filters. the contract and account filters are
-LISTS - they go out to the api as comma separated values, and the api
-reads them as an OR. the api pages the feed with an opaque cursor, so the
-next page is asked for when the reader nears the bottom.
+the filter bar has a TOP ROW - the ALL / MINE shortcut, the hide-sent
+switch, the FILTERS button and the direction button - and a PANEL behind
+the FILTERS button, and the panel has FOUR groups: the sort, the type,
+the contracts and the accounts. the url holds all of them, so a filtered
+feed is a link somebody can paste. `hide_sent` drops what the reader has
+sent, `sort` is DATE ADDED or MOST POPULAR, `dir` is the way round the
+sort, `type` is ALL, FUNCTION CALL or SWAPS, and `contracts` and
+`accounts` are the picked contract and account filters. the contract and
+account filters are LISTS - they go out to the api as comma separated
+values, and the api reads them as an OR. the api pages the feed with an
+opaque cursor, so the next page is asked for when the reader nears the
+bottom.
+
+the ALL / MINE shortcut at the front of the bar is a SHORTCUT OVER THE
+ACCOUNTS LIST, and the accounts list is the ONE source of truth. there
+is no `?view=` url param and no `view` field in the saved filter.
+**ALL** is lit when the accounts list is EMPTY, and clicking it clears
+the accounts list. **MINE** is lit when the accounts list is EXACTLY ONE
+entry and it is the signed-in reader's OWN account, and clicking it sets
+the accounts list to just that account. any other accounts list -
+somebody else's, or the reader's own plus others - leaves NEITHER button
+lit, because the reader has gone past the shortcut with the ACCOUNTS
+group. **MINE** is disabled when nobody is signed in. the ME button in
+the ACCOUNTS group - the reader's own account, first in the row - sets
+the accounts list to the reader's account ALONE, so ME and MINE always
+agree: clicking one lights the other. the url carries the MINE view as
+`?accounts=<your.id>`, so a shared link opens exactly the MINE view.
+there is no `?view=` param.
+
+the CONTRACTS group applies to the SWAPS as well as to the batches. a
+queued swap names `tokenIn` - the token it sells - and `tokenOut` - the
+token it buys - and both are contract ids, so a swap shows when EITHER
+of its two tokens is a picked contract. picking usdt shows the swaps
+that SELL usdt AND the swaps that BUY usdt.
 
 a param at its default is LEFT OFF the url, so a link to the plain feed
 opens the plain feed.
@@ -24,15 +47,17 @@ the ACCOUNTS group offers the reader's OWN account first, as a ME button
 with the account id in its tooltip, so a reader can pick their own queues
 without recognising their id in a long row of ids. it is there even when
 the reader has no queued work of their own, because an account with no
-queued work is not in the facets.
+queued work is not in the facets. ME sets the accounts list to the
+reader's account ALONE, which is what makes ME and MINE agree.
 
 the filters can also be SAVED, and they are restored from the browser's
 own storage when the feed opens. the saved filter holds the switch, the
 sort, the direction, the type and the two lists - a reader who saved
 "just my account" saved that in the accounts list, and the accounts list
-IS saved. the url wins over the saved filters, so a link somebody pasted
-is the link's view and not the reader's saved one, and the saved filters
-only fill in what the url does not say.
+IS saved. the MINE shortcut is saved the same way, because it IS the
+accounts list. the url wins over the saved filters, so a link somebody
+pasted is the link's view and not the reader's saved one, and the saved
+filters only fill in what the url does not say.
 
 the feed's LIST requests need NO api key - the queue list and the swap
 list are OPEN, and a reader who is not signed in reads them like

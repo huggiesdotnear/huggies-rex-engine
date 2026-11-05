@@ -85,14 +85,49 @@ with.
 
 it is **OPEN** - it asks for NO api key.
 
+```
+GET /api/shit-1170/swap-queue?account_id=alice.near,bob.near&contract_id=usdt.tether-token.near&hide_sent=1&limit=50
+```
+
 the filters are `account_id`, `hide_sent`, `token_in`, `token_out`,
-`limit` and `cursor`. the same names and the same rules as the tx
-queue's list.
+`contract_id`, `limit` and `cursor`. the same names and the same rules as
+the tx queue's list.
+
+- `account_id` - only the swaps these accounts are on. it is a **COMMA
+  SEPARATED LIST**, so one value still works and many work too. it needs
+  **NO API KEY**
+- `contract_id` - only the swaps that TOUCH one of these contracts. it is
+  a **COMMA SEPARATED LIST** too, and a swap matches when EITHER of its
+  two tokens is one of them. it needs **NO API KEY**
+- `token_in` - only the swaps that SELL this token. one value
+- `token_out` - only the swaps that BUY this token. one value
+- `hide_sent` - `1` drops the ones the reader has sent. it is about ONE
+  account - the signed-in reader's OWN account, or the first account named
+  in the query when the reader is not signed in
+- `limit` - default 50, and clamped to 500
+- `cursor` - the opaque token of the page before. the FIRST page has none
 
 `account_id` is a **COMMA SEPARATED LIST** - one param carries many
 accounts, like `alice.near` and `bob.near` in one value - and the
 semantics are an OR: "alice's swaps OR bob's swaps". one value still
 works. it needs **NO API KEY**.
+
+`contract_id` is a **COMMA SEPARATED LIST** too - one param carries many
+contracts, like `usdt.tether-token.near` and `near` in one value - and
+the semantics are an OR: "the swaps that touch usdt OR the swaps that
+touch near". it needs **NO API KEY**.
+
+**a swap matches the `contract_id` list when EITHER of its two tokens is
+in the list.** a queued swap names `tokenIn` - the token it SELLS - and
+`tokenOut` - the token it BUYS - and both are contract ids. so picking
+`usdt.tether-token.near` shows the swaps that SELL usdt AND the swaps
+that BUY usdt.
+
+`token_in` and `token_out` ask about ONE side of the trade - "only the
+swaps that sell this" and "only the swaps that buy this" - and they
+still work and they are unchanged. `contract_id` asks a wider question:
+"the swaps that touch any of these". **all three can be used at once**,
+and a swap has to pass all of them to show.
 
 `hide_sent` is about ONE account - the signed-in reader's OWN account,
 or the first account named in the query when the reader is not signed
@@ -106,6 +141,8 @@ no cursor.
 
 **the `total` is the count of the WHOLE match, BEFORE the `limit` and
 the `cursor` took their cut.** it does not change as the reader pages.
+the `contract_id` filter is one of the filters the match is made of, so
+the `total` honours it like every other filter.
 
 **the `nextCursor` is the cursor of the NEXT page, or `null` when this
 page is the last one.** it is `null` when the page came back short,
@@ -154,6 +191,22 @@ and hiding it would defeat the point.
 > > > their own, so they must name one - and the first one they named is
 > > > the account the filter is about.
 
+> --- WHY --- a swap matches the CONTRACT LIST ON EITHER SIDE. a swap is
+> a TRADE and it has two tokens - the one it sells and the one it buys -
+> and both of them are contract ids. a reader who picks usdt wants every
+> swap that has usdt in it, and a swap that BUYS usdt has usdt in it
+> just as much as a swap that sells it. matching on one side only would
+> hide half of what the reader asked for.
+>
+> > --- WHY --- `token_in` AND `token_out` ARE STILL THERE AND STILL
+> >
+> > > MEAN ONE SIDE. "only the swaps that sell this" is a narrower
+> > > question than "the swaps that touch this", and a reader who asks
+> > > the narrow one wants the narrow one. so the two side filters stay
+> > > as they were, and the contract list sits beside them - a caller
+> > > that wants one of them can still use the other, and all three
+> > > together narrow the list further.
+
 > --- WHY --- the api key is read on the list route ONLY so the reader's
 > OWN account is known - the `hide_sent` filter is about the reader's
 > own history. a missing or unknown key is NOT an error here: the
@@ -184,6 +237,10 @@ the LIST route answers:
 
 **the LIST has no `401`.** it asks for no key at all - a reader with no
 api key still gets the list.
+
+**the LIST has no error for a bad `contract_id`.** a contract that no
+swap touches is not a failure - it is an empty match, and the `total`
+says `0`. the same is true of a bad `token_in` or `token_out`.
 
 > --- WHY --- a swap of a token for ITSELF is refused. a swap of a token
 > for itself is not a trade, and the router has no route for it.
