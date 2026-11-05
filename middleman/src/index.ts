@@ -50,6 +50,26 @@ export { build_headers } from "./stuff/request_options";
 export type { REQUEST_OPTIONS } from "./stuff/request_options";
 export { parse_feed_ws_event } from "./stuff/parse_feed_ws_event";
 
+// ---------- the tool primitives ---------
+// the argument parsing and the JSON printing every bin uses. they live
+// here because the middleman is what makes stdout noisy — it logs its
+// request and response with console.log — so a tool that promises pure
+// JSON on stdout needs the quieting and the printing from the same
+// place as the logging.
+export {
+  parse_args_fun,
+  args_string_fun,
+  args_require_string_fun,
+  args_bool_fun,
+  args_number_fun,
+} from "./stuff/args";
+export type { ARGS, ARGS_OPTIONS } from "./stuff/args";
+export {
+  quiet_fun,
+  print_json_fun,
+  print_error_fun,
+} from "./stuff/json_io";
+
 export type { SHIT_1170_ERROR_RESPONSE } from "./types/common";
 export type { SHIT_1170_FEED_WS_EVENT } from "./types/shit_1170_feed_ws";
 export type { SHIT_1170_PING } from "./types/shit_1170_ping";

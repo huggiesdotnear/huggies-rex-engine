@@ -69,6 +69,45 @@ it:
 - `@sleet-js/middleman-intear-dex-api` - `https://dex-backend.intear.tech`
 - `@sleet-js/middleman-rhea-api` - `https://api.rhea.finance`
 
+## THE TOOL PRIMITIVES
+
+the middleman logs every request and response with `console.log`, which
+lands on STDOUT. a tool that promises pure JSON on stdout has to move
+that banner, so the parsing and the printing live here too — next to
+the logging that makes them necessary.
+
+```ts
+import {
+  parse_args_fun,
+  args_string_fun,
+  args_require_string_fun,
+  args_bool_fun,
+  args_number_fun,
+  quiet_fun,
+  print_json_fun,
+  print_error_fun,
+} from "@huggies/shit-1170-rex-engine-middleman";
+
+const args = parse_args_fun(process.argv.slice(2), {
+  boolean_flags: ["hide-sent"],
+});
+
+const queue = args_require_string_fun(args, "queue");
+const limit = args_number_fun(args, "limit", 20);
+const hide_sent = args_bool_fun(args, "hide-sent");
+
+const answer = await quiet_fun(() => api_shit_1170_tx_queue_get(base_url, { limit }));
+print_json_fun({ ok: true, answer });
+```
+
+a flag that takes a value and does not get one is an ERROR, not an
+empty string — `--limit` with nothing after it is a typo, and a bin
+that read it as "no limit" would quietly do the wrong thing. a boolean
+flag is declared per bin, so it never swallows the next positional.
+
+`quiet_fun` moves the banner to stderr for the length of the call and
+puts `console.log` back afterwards, even when the call throws.
+
 =====================
 <br/>
 copyright 2026 by sleet.near
