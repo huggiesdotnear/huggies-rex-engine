@@ -4,6 +4,7 @@ clean ts library for interacting with the shit-1170-rex-engine backend routes.
 
 ```sh
 bun i
+# bun run build
 bun run build
 # publish
 bun publish --dry-run
