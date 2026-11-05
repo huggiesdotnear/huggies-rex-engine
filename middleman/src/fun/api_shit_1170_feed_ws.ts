@@ -11,6 +11,16 @@
 // the server sends NOTHING ELSE. the ping it sends every thirty seconds
 // is a CONTROL frame, and a client's message handler never sees it.
 //
+// --- WHY --- THERE IS AN on_connect CALLBACK: a caller that cannot see
+// the connection cannot tell a quiet feed from a dead one. the callback
+// says the socket came up, and it carries the url, the attempt number,
+// and the wait before it — so a caller can show "connected" and "third
+// try after a failure" without guessing.
+//
+// --- WHY --- on_connect FIRES ON EVERY CONNECT and not only the first:
+// a reconnect is exactly the moment a caller wants to know about, and
+// a socket that came back up is news to whoever was watching it.
+//
 // --- WHY --- THIS DOES NOT GO THROUGH api_call: api_call does one
 // request and one response, and a socket is neither. the socket opens
 // once and then the events arrive for as long as the connection lives,
@@ -75,16 +85,39 @@ export interface SHIT_1170_FEED_WS_HANDLE {
   close: () => void;
 }
 
+// what the caller is told when the connection comes up.
+//
+// --- WHY --- THE URL AND THE ATTEMPT ARE ON IT: a caller that cannot
+// see the connection cannot tell a quiet feed from a dead one. the url
+// says where the socket went, and the attempt says which connect it
+// was — the first one, or the third after two failures.
+export interface SHIT_1170_FEED_WS_CONNECT {
+  // the socket url the connection was made to.
+  url: string;
+  // which connect this is. the first is 1.
+  attempt: number;
+  // how long the wait before this connect was. the first connect is 0.
+  waited_ms: number;
+}
+
 // open the live feed.
 //
 // --- WHY --- THE CALLBACKS ARE PLAIN FUNCTIONS and not an object of
 // handlers: the caller wants to hand over two things — what to do with
 // an event, and what to do with a failure — and the rest of the socket
 // is the middleman's business.
+//
+// --- WHY --- on_connect IS A CALLBACK AND NOT A FIELD ON THE HANDLE:
+// the handle is what the caller uses to STOP the feed. a caller that
+// wants to know when the feed came up wants to be TOLD, and a
+// callback is how it is told. a field on the handle would have to be
+// polled, and a caller that polls a socket asks the wrong question —
+// "is the socket open" instead of "did it connect".
 export function api_shit_1170_feed_ws(
   base_url: string,
   on_event: (event: SHIT_1170_FEED_WS_EVENT) => void,
   on_error?: (message: string) => void,
+  on_connect?: (info: SHIT_1170_FEED_WS_CONNECT) => void,
 ): SHIT_1170_FEED_WS_HANDLE {
   const url = feed_ws_url_fun(base_url);
 
@@ -98,6 +131,11 @@ export function api_shit_1170_feed_ws(
   let retry_timer: ReturnType<typeof setTimeout> | null = null;
   // how long the next wait is.
   let backoff_ms = FEED_WS_BACKOFF_START_MS;
+  // how many times the socket has been opened. the first is 1.
+  let attempt = 0;
+  // how long the caller waited before the connect that is happening.
+  // the first connect waits 0.
+  let waited_ms = 0;
 
   // say what went wrong, to whoever asked to hear it.
   function report_fun(message: string): void {
@@ -122,6 +160,8 @@ export function api_shit_1170_feed_ws(
   function open_fun(): void {
     if (!wanted) return;
 
+    attempt += 1;
+
     let ws: WebSocket;
     try {
       ws = new WebSocket(url);
@@ -139,6 +179,19 @@ export function api_shit_1170_feed_ws(
       // is a healthy connection, and the next failure starts small
       // again.
       backoff_ms = FEED_WS_BACKOFF_START_MS;
+      // --- WHY --- THE CALLER IS TOLD THE CONNECTION CAME UP: a caller
+      // that cannot see the connection cannot tell a quiet feed from a
+      // dead one. the report is inside a try for the same reason the
+      // event handler is: the caller's own code must not take the
+      // socket down.
+      if (!on_connect) return;
+      try {
+        on_connect({ url, attempt, waited_ms });
+      } catch (err) {
+        report_fun(
+          `api_shit_1170_feed_ws failed: the connect callback threw: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
     };
 
     ws.onmessage = (message: MessageEvent) => {
@@ -195,6 +248,10 @@ export function api_shit_1170_feed_ws(
     // --- WHY --- THE WAIT DOUBLES ON THE WAY OUT: every failure costs
     // more than the one before it, up to the cap.
     backoff_ms = Math.min(wait * 2, FEED_WS_BACKOFF_MAX_MS);
+    // --- WHY --- THE WAIT IS REMEMBERED: the connect report says how
+    // long the caller waited before this attempt, so a caller can see
+    // that it is on its third try and not its first.
+    waited_ms = wait;
 
     retry_timer = setTimeout(() => {
       retry_timer = null;

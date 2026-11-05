@@ -54,13 +54,28 @@ let handle: SHIT_1170_FEED_WS_HANDLE | null = null;
 // --- WHY --- THE CALLBACK IS THE ONLY THING THE CALLER GIVES: the
 // socket's whole job is to say "this happened". what to DO about it is
 // the store's business.
+//
+// --- WHY --- THE CONNECT IS LOGGED: a feed that is quiet and a feed
+// that is not connected look the same from the page — nothing arrives
+// in both cases. the log says which one it is, and it says how many
+// tries the socket has made, so a flapping connection is visible.
 export function shit_1170_feed_ws_open_fun(
   on_event: (event: SHIT_1170_FEED_WS_EVENT) => void,
 ): void {
   if (handle !== null) return;
-  handle = api_shit_1170_feed_ws(SHIT_1170_BASE_URL, on_event, (message) => {
-    console.warn("[app_page_feed_ws] the live feed reported", message);
-  });
+  handle = api_shit_1170_feed_ws(
+    SHIT_1170_BASE_URL,
+    on_event,
+    (message) => {
+      console.warn("[app_page_feed_ws] the live feed reported", message);
+    },
+    (info) => {
+      console.info(
+        `[app_page_feed_ws] the live feed connected: ${info.url} ` +
+          `(attempt ${info.attempt}, waited ${info.waited_ms}ms)`,
+      );
+    },
+  );
 }
 // ========================================
 // ========================================
