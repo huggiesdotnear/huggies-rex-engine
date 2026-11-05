@@ -28,6 +28,8 @@ pub mod tx_queue_accounts_store;
 pub mod tx_queue_args_fun;
 pub mod tx_queue_auth_fun;
 pub mod tx_queue_caller_fun;
+pub mod tx_queue_cursor_fun;
+pub mod tx_queue_facets_store;
 pub mod tx_queue_named_accounts_fun;
 pub mod tx_queue_row_to_json_fun;
 pub mod tx_queue_stats_store;

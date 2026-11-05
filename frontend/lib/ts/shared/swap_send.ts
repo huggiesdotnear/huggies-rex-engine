@@ -195,7 +195,10 @@ export async function shit_1170_swap_send_fun(props: {
   const amount_out_human =
     result.amount_out === null || props.output_decimals === null
       ? null
-      : shit_1170_swap_amount_human_fun(result.amount_out, props.output_decimals);
+      : shit_1170_swap_amount_human_fun(
+          result.amount_out,
+          props.output_decimals,
+        );
   show_result_fun(result, amount_out_human);
 
   return result;

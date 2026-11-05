@@ -22,6 +22,7 @@
 import {
   api_shit_1170_swap_queue_get,
   type SHIT_1170_SWAP_QUEUE,
+  type SHIT_1170_SWAP_QUEUE_QUERY,
 } from "@huggies/shit-1170-rex-engine-middleman";
 import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
@@ -50,14 +51,51 @@ export interface SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED {
   // the SWAP NOW button is off when the balance does not cover the
   // amount, so the reader is never offered a trade they cannot make.
   balances: Map<string, string>;
+  // how many swaps the WHOLE match holds, before the cursor took its
+  // cut.
+  total: number;
+  // the cursor of the NEXT page, or null when this page is the last
+  // one.
+  next_cursor: string | null;
 }
 // ========================================
 // --- CONFIG -----------------------------
 // how many swaps the feed asks for.
 //
-// --- WHY --- it is the same number the queues use: a feed of fifty is a
-// screen or two, and both kinds of post share that screen.
-const SHIT_1170_FEED_SWAP_LIMIT = 50;
+// --- WHY --- it is a hundred and not fifty: the feed pages by cursor
+// and asks for the next page when the reader nears the bottom, so a
+// hundred is two screens of work for one request.
+const SHIT_1170_FEED_SWAP_LIMIT = 100;
+// ========================================
+// ========================================
+// --- QUERY -----------------------------
+// the query the feed's filter makes for the swaps.
+//
+// --- WHY THE SWAPS CARRY NO CONTRACT FILTER: a queued swap is a TRADE
+// and not a call, so it names a token and not a contract. the contract
+// filter is about the queued batches and about nothing else.
+//
+// --- WHY `account_id` GOES OUT ONLY IN THE MINE VIEW: the ALL view is
+// every swap, and asking for one account's swaps would be a different
+// view.
+//
+// --- WHY THE CURSOR GOES OUT UNTOUCHED: it is the backend's own opaque
+// page point, and only the backend can read it back.
+export function shit_1170_feed_swaps_query_fun(
+  account_id: string | null,
+  hide_sent: boolean,
+  cursor: string | null,
+): SHIT_1170_SWAP_QUEUE_QUERY {
+  const query: SHIT_1170_SWAP_QUEUE_QUERY = {
+    limit: SHIT_1170_FEED_SWAP_LIMIT,
+  };
+  if (cursor !== null) query.cursor = cursor;
+  if (account_id === null) return query;
+  query.account_id = account_id;
+  if (hide_sent) query.hide_sent = true;
+  return query;
+}
+// ========================================
 // ========================================
 // --- LOAD ------------------------------
 // load the queued swaps, their tokens and their live routes.
@@ -67,12 +105,14 @@ const SHIT_1170_FEED_SWAP_LIMIT = 50;
 // numbers, because the backend's stored quote is the fallback.
 export async function shit_1170_feed_swaps_load_fun(
   account_id: string | null,
+  hide_sent: boolean,
+  cursor: string | null,
   on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
 ): Promise<SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED> {
   const options = await api_key_options_fun(false, account_id ?? undefined);
   const result = await api_shit_1170_swap_queue_get(
     SHIT_1170_BASE_URL,
-    { limit: SHIT_1170_FEED_SWAP_LIMIT },
+    shit_1170_feed_swaps_query_fun(account_id, hide_sent, cursor),
     options,
   );
   const swaps = result.items;
@@ -85,6 +125,8 @@ export async function shit_1170_feed_swaps_load_fun(
     quotes: live.map((one) => one.quote),
     routes: live.map((one) => one.routes),
     balances,
+    total: result.total,
+    next_cursor: result.nextCursor,
   };
 }
 // ========================================
@@ -138,10 +180,7 @@ async function load_swap_balances_fun(
     const balances = await SHIT_1170_SWAP_BALANCES.load(account_id, ids);
     return new Map(balances);
   } catch (err) {
-    console.warn(
-      "[app_page_feed_swaps] the balances could not be read",
-      err,
-    );
+    console.warn("[app_page_feed_swaps] the balances could not be read", err);
     return new Map();
   }
 }
@@ -191,6 +230,7 @@ async function load_swap_routes_fun(
 // --- PUBLIC ---------------------------
 export const SHIT_1170_APP_PAGE_FEED_SWAPS = {
   load: shit_1170_feed_swaps_load_fun,
+  query: shit_1170_feed_swaps_query_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near

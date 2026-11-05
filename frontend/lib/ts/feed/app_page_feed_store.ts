@@ -12,13 +12,18 @@
 // looking at a feed that does not match the bar above it.
 import { SHIT_1170_APP_PAGE_FEED_LOAD } from "./app_page_feed_load";
 import { SHIT_1170_APP_PAGE_FEED_FILTER } from "./app_page_feed_filter";
+import { SHIT_1170_APP_PAGE_FEED_FACETS } from "./app_page_feed_facets";
+import { SHIT_1170_APP_PAGE_FEED_SAVED } from "./app_page_feed_saved";
 import { SHIT_1170_APP_PAGE_FEED_SWAPS } from "./app_page_feed_swaps";
 import { SHIT_1170_APP_PAGE_FEED_URL } from "./app_page_feed_url";
 import { shit_1170_feed_posts_fun } from "./app_page_feed_posts";
 import { SHIT_1170_AUTH } from "../shared/auth_status";
+import { SHIT_1170_TOAST_STORE } from "../shared/toast_store";
 import type {
   SHIT_1170_APP_PAGE_FEED_STATE,
+  SHIT_1170_FEED_DIRECTION,
   SHIT_1170_FEED_SORT,
+  SHIT_1170_FEED_TYPE,
   SHIT_1170_FEED_VIEW,
 } from "./app_page_feed_types";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
@@ -27,6 +32,7 @@ import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
 import type {
   SHIT_1170_SWAP_QUEUE,
   SHIT_1170_TX_QUEUE,
+  SHIT_1170_TX_QUEUE_FACETS,
 } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_FEED_POST } from "./app_page_feed_posts";
 // ========================================
@@ -34,7 +40,7 @@ import type { SHIT_1170_FEED_POST } from "./app_page_feed_posts";
 // --- TYPES ------------------------------
 // the state the store holds, plus the tokens the batches name.
 export interface SHIT_1170_APP_PAGE_FEED_STORE_STATE extends SHIT_1170_APP_PAGE_FEED_STATE {
-  // the token metadata for the transfers the batches make.
+  // the token metadata for the transfers the batches name.
   tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
   // the token metadata for the two tokens each swap names.
   swap_tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
@@ -60,7 +66,11 @@ let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
   view: "all",
   account_id: null,
   hide_sent: false,
-  sort: "newest",
+  sort: "date_added",
+  direction: "desc",
+  type: "all",
+  contracts: [],
+  accounts: [],
   queues: [],
   swaps: [],
   swap_quotes: [],
@@ -68,6 +78,11 @@ let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
   swap_balances: new Map(),
   tokens: new Map(),
   swap_tokens: new Map(),
+  total: 0,
+  next_cursor: null,
+  swaps_cursor: null,
+  loading_more: false,
+  facets: null,
   loading: false,
   error: null,
 };
@@ -78,6 +93,31 @@ const listeners: Array<() => void> = [];
 let loaded_for: string | null = null;
 // true while a load is running.
 let loading = false;
+// the cursors the NEXT pages start at, one for each kind of post.
+//
+// --- WHY --- THERE ARE TWO AND NOT ONE: the queued batches and the
+// queued swaps are TWO lists with TWO tables and TWO cursor shapes. the
+// api hands each list its own opaque token and only the api can read it
+// back, so one list's cursor cannot be sent to the other.
+//
+// --- WHY --- THE CURSORS ARE HELD BESIDE THE STATE AND NOT INSIDE IT:
+// the state is what the components read, and the cursors are what the
+// STORE asks the api with. the two are the same page though, so the
+// state carries them too and the components can see whether there is
+// another page.
+let queues_cursor: string | null = null;
+let swaps_cursor: string | null = null;
+// true while the next page is on its way.
+let loading_more = false;
+// the facets, once they have been read. they are asked for ONCE when
+// the page opens.
+//
+// --- WHY --- THEY ARE CACHED HERE AND NOT IN THE STATE: the state is
+// what the components read, and the facets are also what the STORE
+// asks the api with. one copy, held here, and the state carries it.
+let facets: SHIT_1170_TX_QUEUE_FACETS | null = null;
+// true while the facets are on their way.
+let facets_loading = false;
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
@@ -110,8 +150,6 @@ function set_state_fun(next: SHIT_1170_APP_PAGE_FEED_STORE_STATE): void {
 }
 // ========================================
 // ========================================
-// ========================================
-// ========================================
 // --- POSTS ------------------------------
 // the batches and the swaps in ONE ordered list.
 //
@@ -125,6 +163,7 @@ function build_posts_fun(): SHIT_1170_FEED_POST[] {
     state.swap_quotes,
     state.swap_routes,
     state.sort,
+    state.direction,
   );
 }
 // ========================================
@@ -138,16 +177,53 @@ function build_posts_fun(): SHIT_1170_FEED_POST[] {
 // disagree about which view was on screen.
 async function load_fun(): Promise<void> {
   const filter = SHIT_1170_APP_PAGE_FEED_FILTER.read();
-  const account_id = filter.view === "mine" ? filter.account_id : null;
+  // --- WHY --- THE SAVED FILTER IS USED ONLY FOR THE FIRST READ: the
+  // reader's own picks go on the url as soon as they make them, and
+  // from then on the url is the truth. the saved filter fills in the
+  // blanks while the page is opening and never again.
+  SHIT_1170_APP_PAGE_FEED_FILTER.saved_done();
+  // --- WHY --- THE ACCOUNT THE API IS ASKED FOR: the picked accounts
+  // are the reader's own narrower choice and they REPLACE the view's
+  // account, because the api reads the list as an OR and asking for
+  // both would widen the MINE view to everybody's.
+  const account_id =
+    filter.accounts.length > 0
+      ? filter.accounts.join(",")
+      : filter.view === "mine"
+        ? filter.account_id
+        : null;
   // the url is written so a link the reader copies says the same thing
   // the screen does. the VIEW goes on the url too, so a link to the ALL
   // view opens the ALL view and not the reader's own queues — and the
   // ACCOUNT stays on it, so the reader can flip back to MINE.
-  write_url_fun(filter.view, filter.account_id, filter.hide_sent, filter.sort);
-  const key = `${account_id ?? ""}|${filter.hide_sent ? "1" : "0"}`;
+  write_url_fun(
+    filter.view,
+    filter.account_id,
+    filter.hide_sent,
+    filter.sort,
+    filter.type,
+    filter.contracts,
+    filter.accounts,
+    filter.direction,
+  );
+  const key = filter_key_fun(
+    account_id,
+    filter.hide_sent,
+    filter.type,
+    filter.contracts,
+    filter.accounts,
+    filter.sort,
+    filter.direction,
+  );
   if (loading && loaded_for === key) return;
   loaded_for = key;
   loading = true;
+  // --- WHY --- THE PAGINATION RESETS HERE: the cursor is where the
+  // NEXT page starts, and a new filter is a new list. the cursors go
+  // back to null and the list starts again from the first page.
+  queues_cursor = null;
+  swaps_cursor = null;
+  loading_more = false;
   // --- WHY --- THE OLD SUBSCRIPTIONS ARE CLOSED BEFORE THE NEW LOAD:
   // the feed holds a live subscription per card, and a reload changes
   // which cards are on screen. the cards that left must let go of their
@@ -160,33 +236,37 @@ async function load_fun(): Promise<void> {
     account_id: filter.account_id,
     hide_sent: filter.hide_sent,
     sort: filter.sort,
+    direction: filter.direction,
+    type: filter.type,
+    contracts: filter.contracts,
+    accounts: filter.accounts,
     loading: true,
     error: null,
   });
   try {
-    const loaded = await SHIT_1170_APP_PAGE_FEED_LOAD.load(
-      account_id,
-      filter.hide_sent,
-    );
-    // --- WHY --- THE SWAPS ARE LOADED SEPARATELY AND NOT INSIDE THE
-    // QUEUE LOAD: a queued swap is a different resource with a
-    // different shape, and the queue loader fetches queues. the two
-    // loads run together so the reader sees one batch of work.
-    //
-    // --- WHY --- A FAILED SWAP LOAD DOES NOT FAIL THE FEED: the queues
-    // are the feed's heart, and the swaps are an addition to it. a
-    // router that is down must not take the queued batches off the
-    // screen with it.
-    const swaps_loaded = await load_swaps_fun(account_id);
+    // --- WHY --- THE TWO KINDS OF POST ARE ASKED FOR TOGETHER AND THE
+    // FACETS ALONGSIDE THEM: the reader sees one batch of work, and
+    // the facets are a summary of the same queue.
+    const [loaded, swaps_loaded, facets] = await Promise.all([
+      load_queues_fun(account_id, filter),
+      load_swaps_fun(account_id, filter),
+      load_facets_fun(),
+    ]);
     // a load for an older filter must not overwrite a newer one.
     if (loaded_for !== key) return;
     loading = false;
+    queues_cursor = loaded.next_cursor;
+    swaps_cursor = swaps_loaded.next_cursor;
     set_state_fun({
       ...state,
       view: filter.view,
       account_id: filter.account_id,
       hide_sent: filter.hide_sent,
       sort: filter.sort,
+      direction: filter.direction,
+      type: filter.type,
+      contracts: filter.contracts,
+      accounts: filter.accounts,
       queues: loaded.queues,
       tokens: loaded.tokens,
       swaps: swaps_loaded.swaps,
@@ -194,12 +274,19 @@ async function load_fun(): Promise<void> {
       swap_routes: swaps_loaded.routes,
       swap_balances: swaps_loaded.balances,
       swap_tokens: swaps_loaded.tokens,
+      total: total_of_fun(loaded.total, swaps_loaded.total, filter.type),
+      next_cursor: queues_cursor,
+      swaps_cursor: swaps_cursor,
+      loading_more: false,
       loading: false,
+      facets: facets ?? state.facets,
       error: null,
     });
   } catch (err) {
     if (loaded_for !== key) return;
     loading = false;
+    queues_cursor = null;
+    swaps_cursor = null;
     set_state_fun({
       ...state,
       queues: [],
@@ -209,11 +296,54 @@ async function load_fun(): Promise<void> {
       swap_balances: new Map(),
       tokens: new Map(),
       swap_tokens: new Map(),
+      total: 0,
+      next_cursor: null,
+      swaps_cursor: null,
+      loading_more: false,
       loading: false,
       error: err instanceof Error ? err.message : String(err),
     });
   }
 } // ========================================
+// ========================================
+// --- QUEUES ----------------------------
+// the queued batches, and their tokens.
+//
+// --- WHY THE QUEUES ARE NOT ASKED FOR IN THE SWAPS' VIEW: the feed's
+// TYPE filter says which kind of post the reader wants, and asking for
+// the other kind as well is half the requests for nothing.
+async function load_queues_fun(
+  account_id: string | null,
+  filter: {
+    hide_sent: boolean;
+    type: SHIT_1170_FEED_TYPE;
+    contracts: ReadonlyArray<string>;
+  },
+): Promise<{
+  queues: ReadonlyArray<SHIT_1170_TX_QUEUE>;
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+  total: number;
+  next_cursor: string | null;
+}> {
+  if (filter.type === "swaps") {
+    return { queues: [], tokens: new Map(), total: 0, next_cursor: null };
+  }
+  const contracts =
+    filter.contracts.length === 0 ? null : filter.contracts.join(",");
+  const loaded = await SHIT_1170_APP_PAGE_FEED_LOAD.load(
+    account_id,
+    filter.hide_sent,
+    contracts,
+    null,
+  );
+  return {
+    queues: loaded.queues,
+    tokens: loaded.tokens,
+    total: loaded.total,
+    next_cursor: loaded.next_cursor,
+  };
+}
+// ========================================
 // ========================================
 // --- SWAPS ------------------------------
 // the queued swaps, and their live routes.
@@ -222,16 +352,34 @@ async function load_fun(): Promise<void> {
 // an addition to the feed, and a swap queue that is down must not take
 // the queued batches off the screen with it. the reader gets the batches
 // and no swaps, and the swaps come back on the next load.
-async function load_swaps_fun(account_id: string | null): Promise<{
+async function load_swaps_fun(
+  account_id: string | null,
+  filter: { hide_sent: boolean; type: SHIT_1170_FEED_TYPE },
+): Promise<{
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
   quotes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_quotes"];
   routes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_routes"];
   balances: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_balances"];
   tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+  total: number;
+  next_cursor: string | null;
 }> {
+  if (filter.type === "calls") {
+    return {
+      swaps: [],
+      quotes: [],
+      routes: [],
+      balances: new Map(),
+      tokens: new Map(),
+      total: 0,
+      next_cursor: null,
+    };
+  }
   try {
     const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(
       account_id,
+      filter.hide_sent,
+      null,
       set_swap_routes_fun,
     );
     return {
@@ -240,6 +388,8 @@ async function load_swaps_fun(account_id: string | null): Promise<{
       routes: loaded.routes,
       balances: loaded.balances,
       tokens: loaded.tokens,
+      total: loaded.total,
+      next_cursor: loaded.next_cursor,
     };
   } catch (err) {
     console.warn("[app_page_feed_store] the swaps could not be loaded", err);
@@ -249,9 +399,38 @@ async function load_swaps_fun(account_id: string | null): Promise<{
       routes: [],
       balances: new Map(),
       tokens: new Map(),
+      total: 0,
+      next_cursor: null,
     };
   }
 }
+// ========================================
+// ========================================
+// --- FACETS ----------------------------
+// the contracts and the accounts that have queued work.
+//
+// --- WHY IT IS ASKED FOR ONCE AND NEVER AGAIN: the facets are a
+// summary of the WHOLE queue and they do not change when a filter
+// changes. one request when the page opens is enough.
+//
+// --- WHY A FAILED FACETS LOAD IS SWALLOWED: the facets only build the
+// filter bar's buttons. a reader with no contract buttons still has the
+// whole feed, and a failed facets call must not take the feed with it.
+async function load_facets_fun(): Promise<SHIT_1170_TX_QUEUE_FACETS | null> {
+  if (facets !== null) return facets;
+  if (facets_loading) return null;
+  facets_loading = true;
+  try {
+    facets = await SHIT_1170_APP_PAGE_FEED_FACETS.load();
+    return facets;
+  } catch (err) {
+    console.warn("[app_page_feed_store] the facets could not be read", err);
+    return null;
+  } finally {
+    facets_loading = false;
+  }
+}
+// ========================================
 // ========================================
 // --- LIVE ROUTES ------------------------
 // one swap's routes changed under the live subscription.
@@ -293,6 +472,239 @@ function set_swap_routes_fun(
   set_state_fun({ ...state, swap_routes, swap_quotes });
 }
 // ========================================
+// ========================================
+// --- PAGINATION -------------------------
+// load the NEXT page and APPEND it to what is on screen.
+//
+// --- WHY THE PAGES ARE APPENDED AND NOT REPLACED: the reader keeps
+// what they scrolled to. a page that replaced the list would throw
+// away the posts the reader was reading.
+//
+// --- WHY THE CURSOR IS THE API'S OWN: the queue list pages by cursor,
+// and the cursor it hands back is the only thing that knows where the
+// next page starts. it is stored and sent back untouched.
+//
+// --- WHY EACH LIST IS ASKED WITH ITS OWN CURSOR: the batches and the
+// swaps are two tables with two cursor shapes, and one list's cursor
+// cannot be sent to the other.
+//
+// --- WHY A PAGE THAT FAILS LEAVES THE LIST ALONE: the reader has
+// posts on screen and a failed page costs them the next page and not
+// the posts.
+async function load_more_fun(): Promise<void> {
+  if (loading || loading_more) return;
+  // --- WHY --- THERE IS NOTHING TO ASK FOR WHEN NEITHER LIST HAS A
+  // CURSOR: the whole match is on screen already.
+  if (queues_cursor === null && swaps_cursor === null) return;
+  const queues_page_cursor = queues_cursor;
+  const swaps_page_cursor = swaps_cursor;
+  loading_more = true;
+  set_state_fun({ ...state, loading_more: true });
+  // --- WHY --- THE FILTER COMES FROM THE STATE AND NOT FROM THE URL:
+  // the next page belongs to the view that is on screen, and the state
+  // IS that view. reading the url here could ask for a page of a
+  // filter the reader has already left.
+  const filter = {
+    hide_sent: state.hide_sent,
+    type: state.type,
+    contracts: state.contracts,
+  };
+  // --- WHY --- THE ACCOUNT IS WORKED OUT THE SAME WAY AS IN THE FIRST
+  // LOAD: the next page belongs to the same view, and it must be asked
+  // for the same way.
+  const account_id =
+    state.accounts.length > 0
+      ? state.accounts.join(",")
+      : SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state);
+  try {
+    const [loaded, swaps_loaded] = await Promise.all([
+      load_queues_more_fun(account_id, filter, queues_page_cursor),
+      load_swaps_more_fun(account_id, filter, swaps_page_cursor),
+    ]);
+    // --- WHY --- THE CURSOR MOVES ON ONLY WHEN SOMETHING CAME BACK: a
+    // failed page must be asked for again, and a cursor that moved past
+    // a failed page would skip the posts in it.
+    if (loaded.next_cursor !== null) queues_cursor = loaded.next_cursor;
+    if (swaps_loaded.next_cursor !== null) {
+      swaps_cursor = swaps_loaded.next_cursor;
+    }
+    set_state_fun({
+      ...state,
+      queues: [...state.queues, ...loaded.queues],
+      tokens: new Map([...state.tokens, ...loaded.tokens]),
+      swaps: [...state.swaps, ...swaps_loaded.swaps],
+      swap_quotes: [...state.swap_quotes, ...swaps_loaded.quotes],
+      swap_routes: [...state.swap_routes, ...swaps_loaded.routes],
+      swap_balances: new Map([
+        ...state.swap_balances,
+        ...swaps_loaded.balances,
+      ]),
+      swap_tokens: new Map([...state.swap_tokens, ...swaps_loaded.tokens]),
+      next_cursor: queues_cursor,
+      swaps_cursor: swaps_cursor,
+      loading_more: false,
+    });
+  } catch (err) {
+    console.warn("[app_page_feed_store] the next page could not be read", err);
+    set_state_fun({
+      ...state,
+      loading_more: false,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+
+// ========================================
+// --- PAGE HELPERS ----------------------
+// the next page of batches.
+//
+// --- WHY --- THE QUEUES ARE NOT ASKED FOR IN THE SWAPS' VIEW: the feed's
+// TYPE filter says which kind of post the reader wants, and asking for
+// the other kind as well is half the requests for nothing.
+async function load_queues_more_fun(
+  account_id: string | null,
+  filter: {
+    hide_sent: boolean;
+    type: SHIT_1170_FEED_TYPE;
+    contracts: ReadonlyArray<string>;
+  },
+  cursor: string | null,
+): Promise<{
+  queues: ReadonlyArray<SHIT_1170_TX_QUEUE>;
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+  next_cursor: string | null;
+}> {
+  if (filter.type === "swaps") {
+    return { queues: [], tokens: new Map(), next_cursor: null };
+  }
+  // --- WHY --- A LIST WITH NO CURSOR IS NOT ASKED FOR AGAIN: the whole
+  // match of that list is on screen already, and asking again would
+  // fetch the first page a second time.
+  if (cursor === null) {
+    return { queues: [], tokens: new Map(), next_cursor: null };
+  }
+  const contracts =
+    filter.contracts.length === 0 ? null : filter.contracts.join(",");
+  const loaded = await SHIT_1170_APP_PAGE_FEED_LOAD.load(
+    account_id,
+    filter.hide_sent,
+    contracts,
+    cursor,
+  );
+  return {
+    queues: loaded.queues,
+    tokens: loaded.tokens,
+    next_cursor: loaded.next_cursor,
+  };
+}
+
+// the next page of swaps.
+async function load_swaps_more_fun(
+  account_id: string | null,
+  filter: { hide_sent: boolean; type: SHIT_1170_FEED_TYPE },
+  cursor: string | null,
+): Promise<{
+  swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
+  quotes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_quotes"];
+  routes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_routes"];
+  balances: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_balances"];
+  tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+  next_cursor: string | null;
+}> {
+  if (filter.type === "calls") {
+    return {
+      swaps: [],
+      quotes: [],
+      routes: [],
+      balances: new Map(),
+      tokens: new Map(),
+      next_cursor: null,
+    };
+  }
+  // --- WHY --- A LIST WITH NO CURSOR IS NOT ASKED FOR AGAIN: the whole
+  // match of that list is on screen already, and asking again would
+  // fetch the first page a second time.
+  if (cursor === null) {
+    return {
+      swaps: [],
+      quotes: [],
+      routes: [],
+      balances: new Map(),
+      tokens: new Map(),
+      next_cursor: null,
+    };
+  }
+  try {
+    const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(
+      account_id,
+      filter.hide_sent,
+      cursor,
+      set_swap_routes_fun,
+    );
+    return {
+      swaps: loaded.swaps,
+      quotes: loaded.quotes,
+      routes: loaded.routes,
+      balances: loaded.balances,
+      tokens: loaded.tokens,
+      next_cursor: loaded.next_cursor,
+    };
+  } catch (err) {
+    console.warn("[app_page_feed_store] the next swaps page failed", err);
+    return {
+      swaps: [],
+      quotes: [],
+      routes: [],
+      balances: new Map(),
+      tokens: new Map(),
+      next_cursor: null,
+    };
+  }
+}
+
+// the total the reader is shown: how many queued transactions the whole
+// match holds.
+//
+// --- WHY --- THE TWO TOTALS ARE ADDED IN THE ALL VIEW: the reader sees
+// one feed, and the feed holds both kinds of post, so the total is both
+// counts together.
+function total_of_fun(
+  queues_total: number,
+  swaps_total: number,
+  type: SHIT_1170_FEED_TYPE,
+): number {
+  if (type === "calls") return queues_total;
+  if (type === "swaps") return swaps_total;
+  return queues_total + swaps_total;
+}
+
+// the key the current load was for, so a load for an older filter does
+// not overwrite a newer one.
+//
+// --- WHY --- THE SORT AND THE DIRECTION ARE IN THE KEY: they are part
+// of the view, and a load that finished after the reader changed them
+// must not overwrite the new view with the old one.
+function filter_key_fun(
+  account_id: string | null,
+  hide_sent: boolean,
+  type: SHIT_1170_FEED_TYPE,
+  contracts: ReadonlyArray<string>,
+  accounts: ReadonlyArray<string>,
+  sort: SHIT_1170_FEED_SORT,
+  direction: SHIT_1170_FEED_DIRECTION,
+): string {
+  return [
+    account_id ?? "",
+    hide_sent ? "1" : "0",
+    type,
+    contracts.join(","),
+    accounts.join(","),
+    sort,
+    direction,
+  ].join("|");
+}
+// ========================================
+// ========================================
 // --- SET -------------------------------
 // put the filter on the url.
 //
@@ -301,7 +713,8 @@ function set_swap_routes_fun(
 // it.
 //
 // --- WHY THE DEFAULTS ARE LEFT OFF THE URL: see the url module. the
-// sort's default is NEWEST and it is not written.
+// sort's default is DATE ADDED and it is not written, and neither is
+// the type's ALL or the direction's DESC.
 //
 // --- WHY THE ACCOUNT IS WRITTEN IN THE MINE VIEW AND NOT OMITTED: the
 // account IS the record of the reader choosing MINE over ALL. a shared
@@ -312,18 +725,38 @@ function write_url_fun(
   account_id: string | null,
   hide_sent: boolean,
   sort: SHIT_1170_FEED_SORT,
+  type: SHIT_1170_FEED_TYPE,
+  contracts: ReadonlyArray<string>,
+  accounts: ReadonlyArray<string>,
+  direction: SHIT_1170_FEED_DIRECTION,
 ): void {
   const sort_value =
-    sort === "newest"
+    sort === "date_added"
       ? null
       : SHIT_1170_APP_PAGE_FEED_FILTER.sort_is_known(sort)
         ? sort
+        : null;
+  const type_value =
+    type === "all"
+      ? null
+      : SHIT_1170_APP_PAGE_FEED_FILTER.type_is_known(type)
+        ? type
+        : null;
+  const dir_value =
+    direction === "desc"
+      ? null
+      : SHIT_1170_APP_PAGE_FEED_FILTER.direction_is_known(direction)
+        ? direction
         : null;
   SHIT_1170_APP_PAGE_FEED_URL.write_filter(
     view,
     account_id,
     hide_sent,
     sort_value,
+    type_value,
+    contracts,
+    accounts,
+    dir_value,
   );
 }
 
@@ -345,7 +778,16 @@ async function set_view_fun(view: SHIT_1170_FEED_VIEW): Promise<void> {
     const account_id = SHIT_1170_AUTH.get_account_id();
     if (account_id === null) return;
     set_state_fun({ ...state, view, account_id });
-    write_url_fun(view, account_id, state.hide_sent, state.sort);
+    write_url_fun(
+      view,
+      account_id,
+      state.hide_sent,
+      state.sort,
+      state.type,
+      state.contracts,
+      state.accounts,
+      state.direction,
+    );
   } else {
     // --- WHY --- THE ACCOUNT IS KEPT AND NOT CLEARED: the account is the
     // reader's own, and it is what the MINE view filters by. clearing it
@@ -357,7 +799,16 @@ async function set_view_fun(view: SHIT_1170_FEED_VIEW): Promise<void> {
     // NO account in the ALL view — that is the request — but the url
     // keeps the account so the reader can flip back.
     set_state_fun({ ...state, view, hide_sent: false });
-    write_url_fun(view, state.account_id, false, state.sort);
+    write_url_fun(
+      view,
+      state.account_id,
+      false,
+      state.sort,
+      state.type,
+      state.contracts,
+      state.accounts,
+      state.direction,
+    );
   }
   await load_fun();
 }
@@ -380,6 +831,10 @@ async function set_hide_sent_fun(hide_sent: boolean): Promise<void> {
     SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     hide_sent,
     state.sort,
+    state.type,
+    state.contracts,
+    state.accounts,
+    state.direction,
   );
   await load_fun();
 }
@@ -387,10 +842,15 @@ async function set_hide_sent_fun(hide_sent: boolean): Promise<void> {
 // --- SORT ------------------------------
 // the reader picked another sort.
 //
-// --- WHY THE SORT DOES NOT RE-READ THE FEED: the api has no sort
-// parameter, so the list is the same one and only its order changes.
-// asking the api again would cost a request for nothing.
-function set_sort_fun(sort: SHIT_1170_FEED_SORT): void {
+// --- WHY THE SORT IS DONE ON THE CLIENT: the api has no sort
+// parameter, so the order is worked out here over the posts that are
+// loaded. the api is still asked for the same list.
+//
+// --- WHY THE PAGINATION RESETS: the sort is ONE filter, and every
+// filter change starts the list again from the first page. a list that
+// was paged under one order and then re-sorted is a list whose pages
+// do not belong to each other any more.
+async function set_sort_fun(sort: SHIT_1170_FEED_SORT): Promise<void> {
   if (sort === state.sort) return;
   set_state_fun({
     ...state,
@@ -401,9 +861,165 @@ function set_sort_fun(sort: SHIT_1170_FEED_SORT): void {
     SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     sort,
+    state.type,
+    state.contracts,
+    state.accounts,
+    state.direction,
   );
+  await load_fun();
 }
 // ========================================
+// --- DIRECTION -------------------------
+// the reader flipped the direction.
+//
+// --- WHY THE PAGINATION RESETS: the same reason the sort's does. the
+// direction is part of the same one filter.
+async function set_direction_fun(
+  direction: SHIT_1170_FEED_DIRECTION,
+): Promise<void> {
+  if (direction === state.direction) return;
+  set_state_fun({
+    ...state,
+    direction,
+  });
+  write_url_fun(
+    state.view,
+    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
+    state.hide_sent,
+    state.sort,
+    state.type,
+    state.contracts,
+    state.accounts,
+    direction,
+  );
+  await load_fun();
+}
+// ========================================
+// --- TYPE ------------------------------
+// the reader picked another kind of post.
+//
+// --- WHY THE TYPE RE-READS THE FEED: it says WHICH KIND of post is
+// fetched, so the other kind is not asked for at all. that is half the
+// requests for the same screen.
+async function set_type_fun(type: SHIT_1170_FEED_TYPE): Promise<void> {
+  if (type === state.type) return;
+  set_state_fun({ ...state, type });
+  write_url_fun(
+    state.view,
+    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
+    state.hide_sent,
+    state.sort,
+    type,
+    state.contracts,
+    state.accounts,
+    state.direction,
+  );
+  await load_fun();
+}
+// ========================================
+// --- CONTRACTS -------------------------
+// the reader picked or unpicked a contract.
+//
+// --- WHY THE CONTRACTS RE-READ THE FEED: the api filters the batches by
+// contract, so the list on screen is not the list the reader asked for
+// until the api is asked again.
+//
+// --- WHY AN EMPTY LIST IS EVERY CONTRACT: there is nothing to filter
+// by, and the api reads a missing contract filter as every contract.
+async function set_contracts_fun(
+  contracts: ReadonlyArray<string>,
+): Promise<void> {
+  if (same_list_fun(contracts, state.contracts)) return;
+  set_state_fun({ ...state, contracts: [...contracts] });
+  write_url_fun(
+    state.view,
+    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
+    state.hide_sent,
+    state.sort,
+    state.type,
+    contracts,
+    state.accounts,
+    state.direction,
+  );
+  await load_fun();
+}
+
+// ========================================
+// --- ACCOUNTS --------------------------
+// the reader picked or unpicked an account.
+//
+// --- WHY THE ACCOUNTS RE-READ THE FEED: the api filters the batches by
+// account, so the list on screen is not the list the reader asked for
+// until the api is asked again.
+//
+// --- WHY THE ACCOUNT LIST IS ONE FIELD: the api reads `account_id` as
+// ONE comma separated string and reads the values as an OR, so the
+// picked accounts and the view's own account are asked for in one go.
+async function set_accounts_fun(
+  accounts: ReadonlyArray<string>,
+): Promise<void> {
+  if (same_list_fun(accounts, state.accounts)) return;
+  set_state_fun({ ...state, accounts: [...accounts] });
+  write_url_fun(
+    state.view,
+    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
+    state.hide_sent,
+    state.sort,
+    state.type,
+    state.contracts,
+    accounts,
+    state.direction,
+  );
+  await load_fun();
+}
+
+// ========================================
+// --- CLEAR -----------------------------
+// every filter goes back to its default.
+//
+// --- WHY THE CLEAR ALSO FORGETS THE SAVED FILTER: the saved filter is
+// the reader's own choice, and CLEAR ALL says "no filters". leaving the
+// saved one behind would bring it back on the next open.
+async function clear_all_fun(): Promise<void> {
+  set_state_fun({
+    ...state,
+    sort: "date_added",
+    direction: "desc",
+    type: "all",
+    contracts: [],
+    accounts: [],
+  });
+  SHIT_1170_APP_PAGE_FEED_SAVED.write(null);
+  write_url_fun(
+    state.view,
+    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
+    state.hide_sent,
+    "date_added",
+    "all",
+    [],
+    [],
+    "desc",
+  );
+  await load_fun();
+}
+
+// ========================================
+// --- SAVE ------------------------------
+// remember the filters, so the feed opens the way the reader left it.
+//
+// --- WHY THE TOAST SAYS SO: saving is quiet work and the reader pressed
+// a button that does something they cannot see. a toast tells them it
+// happened.
+function save_filters_fun(): void {
+  SHIT_1170_APP_PAGE_FEED_SAVED.write({
+    sort: state.sort,
+    direction: state.direction,
+    type: state.type,
+    contracts: state.contracts,
+    accounts: state.accounts,
+  });
+  SHIT_1170_TOAST_STORE.show("success", "FILTERS SAVED", null, null);
+}
 // ========================================
 // --- REFRESH ---------------------------
 // read the feed again, with the filter the page holds.
@@ -413,7 +1029,6 @@ function set_sort_fun(sort: SHIT_1170_FEED_SORT): void {
 async function refresh_fun(): Promise<void> {
   await load_fun();
 }
-// ========================================
 // ========================================
 // --- READ ------------------------------
 function get_fun(): SHIT_1170_APP_PAGE_FEED_STORE_STATE {
@@ -430,6 +1045,24 @@ function swap_token_of_fun(token_id: string): SHIT_1170_TRANSFER_TOKEN | null {
   return state.swap_tokens.get(token_id) ?? null;
 }
 // ========================================
+// --- HELPERS ----------------------------
+// are two lists the same list?
+//
+// --- WHY --- THE ORDER COUNTS: the reader picks contracts one at a
+// time and the list grows, so the order is the order they picked them
+// in. two lists with the same entries in another order are not the same
+// pick.
+function same_list_fun(
+  a: ReadonlyArray<string>,
+  b: ReadonlyArray<string>,
+): boolean {
+  if (a.length !== b.length) return false;
+  for (let index = 0; index < a.length; index++) {
+    if (a[index] !== b[index]) return false;
+  }
+  return true;
+}
+// ========================================
 // --- WATCH -----------------------------
 // follow the auth state, so a sign-in or a sign-out moves the feed.
 //
@@ -443,14 +1076,20 @@ function watch_fun(): () => void {
   });
 }
 // ========================================
-// ========================================
 // --- PUBLIC ---------------------------
 export const SHIT_1170_APP_PAGE_FEED_STORE = {
   load: load_fun,
+  load_more: load_more_fun,
   refresh: refresh_fun,
   set_view: set_view_fun,
   set_hide_sent: set_hide_sent_fun,
   set_sort: set_sort_fun,
+  set_direction: set_direction_fun,
+  set_type: set_type_fun,
+  set_contracts: set_contracts_fun,
+  set_accounts: set_accounts_fun,
+  clear_all: clear_all_fun,
+  save_filters: save_filters_fun,
   subscribe: subscribe_fun,
   get: get_fun,
   get_token: token_of_fun,

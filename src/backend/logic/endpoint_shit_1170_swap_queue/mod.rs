@@ -27,6 +27,7 @@
 // other fails.
 // ========================================
 pub mod swap_queue_accounts_store;
+pub mod swap_queue_cursor_fun;
 pub mod swap_queue_row_to_json_fun;
 pub mod swap_queue_status_fun;
 pub mod swap_queue_store;

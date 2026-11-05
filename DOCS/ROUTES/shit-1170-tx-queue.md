@@ -245,21 +245,29 @@ the one-batch route or the list route.
 
 ## THE GET
 
+`GET /api/shit-1170/tx-queue` - the queue list, filterable. it is
+**OPEN** - it asks for NO api key.
+
 ### the query
 
 ```
-GET /api/shit-1170/tx-queue?account_id=alice.near&hide_sent=1&limit=50&offset=0
+GET /api/shit-1170/tx-queue?account_id=alice.near,bob.near&contract_id=ref.finance.near&hide_sent=1&limit=50
 ```
 
 the filters are:
 
-- `account_id` - only the queues this account is on
-- `hide_sent` - `1` drops the ones this account has sent. it needs
-  `account_id`
-- `contract_id` - only the queues holding a tx for this contract
+- `account_id` - only the queues these accounts are on. it is a **COMMA
+  SEPARATED LIST**, so one value still works and many work too. it needs
+  **NO API KEY**
+- `hide_sent` - `1` drops the ones the reader has sent. it is about ONE
+  account - the signed-in reader's OWN account, or the first account named
+  in the query when the reader is not signed in
+- `contract_id` - only the queues holding a tx for one of these
+  contracts. it is a **COMMA SEPARATED LIST** too
 - `method` - only the queues holding a tx for this method
 - `limit` - default 50, and clamped to 500
-- `offset` - default 0
+- `cursor` - the opaque token of the page before. the FIRST page has
+  none
 
 **there is no `status` filter.** the status is per account and per
 transaction, and a queue has no global status to filter on.
@@ -272,13 +280,37 @@ the query names are snake_case and are matched literally, so
 and a filter that is switched on by accident hides the rows the reader
 came for.
 
-**`hide_sent` without `account_id` is a `400`.**
+**`hide_sent` without an account is a `400`.** a signed-in reader always
+has their own account, so they are never refused - `?hide_sent=1` with a
+valid api key works and filters by the reader's OWN account. a reader
+with NO api key must name one in the query -
+`?account_id=alice.near&hide_sent=1`.
+
+> --- WHY --- the account and contract filters are COMMA SEPARATED and
+> not repeated params. the query extractor reads ONE value per param,
+> and the filter bar builds its query string out of a map - a map
+> cannot hold the same param twice. one comma separated string carries
+> many values, and it reads the same in a hand-written url.
+>
+> > --- WHY --- the many accounts are an OR. "alice's batches OR bob's
+> > batches" is a question one id cannot answer, and the filter bar's
+> > whole point is a reader who picked two accounts. a reader who picked
+> > two wants the union, and the union is what an OR gives.
 
 > --- WHY --- `hide_sent` needs an account. "has this account sent it" is
 > a question about ONE account. a queue can be sent by alice and not by
 > bob, so there is no single answer to "has this queue been sent". the
 > filter therefore names the account it is about, and saying so is
 > better than quietly ignoring it and returning the whole list.
+>
+> > --- WHY --- the account it is about is the READER'S OWN when they
+> >
+> > > are signed in, and the FIRST ACCOUNT NAMED in the query when they
+> > > are not. a signed-in reader always has an account to be about, so
+> > > they are never refused, and `?hide_sent=1` with a valid api key
+> > > filters by their own account. a reader with NO key has no account
+> > > of their own, so they must name one - and the first one they named
+> > > is the account the filter is about.
 
 > --- WHY --- the api does the filtering and not the frontend. the
 > frontend would have to fetch every queue, read every account row, and
@@ -286,10 +318,19 @@ came for.
 > away. the api can do it in the query, so the reader gets the twenty
 > they asked for and not two hundred they did not.
 
-> --- WHY --- the list is OPEN. anyone with an api key can list the
-> queues. a queue is an open offer, and hiding it would defeat the
-> point. the key is still required - the list is open to people who
-> HAVE one, not to everybody.
+> --- WHY --- the list is OPEN. anybody can read it - a queue is an
+> open offer, and hiding it would defeat the point. a reader who is not
+> signed in can already read every batch and see every account on it -
+> the WHO is right there on the card. so filtering that PUBLIC list by a
+> name is not a leak, it is the filter the reader asked for, and the
+> reader does not have to be signed in to use it.
+>
+> > --- WHY --- the api key is read here ONLY so the reader's OWN
+> >
+> > > account is known - the `hide_sent` filter is about the reader's
+> > > own history. a missing or unknown key is NOT an error on this
+> > > route: the reader gets the list, and the other routes are the
+> > > ones that ask for the key.
 
 ### the answer
 
@@ -298,21 +339,80 @@ came for.
 ```json
 {
   "items": [ ...one batch each... ],
-  "total": 1
+  "total": 1,
+  "nextCursor": null
 }
 ```
 
 each item is the same shape as the `201` answer above.
 
-**the `total` is the count BEFORE `limit` and `offset`.** it is how many
-queues matched, so a client knows how many pages there are.
+**the `total` is the count of the WHOLE match, BEFORE the `limit` and
+the `cursor` took their cut.** it is how many queues matched, and it
+does NOT change as the reader pages - every page of the same filter
+answers with the same `total`.
+
+**the `nextCursor` is the cursor of the NEXT page, or `null` when this
+page is the last one.** the caller hands it straight back as the
+`cursor` of the next request. it is `null` when the page came back
+short, because a short page IS the last page and a cursor for it would
+send the reader off to look for rows that are not there.
+
+### the cursor
+
+the cursor is an **opaque token**. the caller does not read it, does
+not build it and does not change it - the api hands it out and the api
+takes it back. it says "the rows after THIS ONE" and it carries the
+`created_at` and the `queue_id` of the last row of the page before.
+
+**a cursor the api cannot read is a `400` with the code `bad_cursor`.**
+
+> --- WHY --- a cursor and NOT an offset. an offset says "skip the first
+> N rows", and the rows are ordered by `created_at DESC` - new batches
+> land at the top of that order all the time. so the first N rows of
+> page two are NOT the rows the reader already saw: the reader would
+> see a batch twice, or skip one. a cursor says "the rows after this
+> one", and that stays true whatever lands above it. a reader scrolling
+> a feed of queued work must not see the same batch twice, and must not
+> skip one either.
+>
+> > --- WHY --- the cursor carries the id and not just the time. many
+> > batches can be queued in the same millisecond, and `created_at`
+> > alone would leave the cursor ambiguous - the same millisecond read
+> > twice or skipped. the `queue_id` breaks the tie, and the pair is
+> > unique.
+>
+> > --- WHY --- a bad cursor is a 400 and NOT the first page. the caller
+> > sent something the api does not understand, and answering with the
+> > first page would show the reader the same rows twice and hide the
+> > fact that their paging was broken.
 
 ### the errors
 
-- `401` - `no_api_key` or `unknown_api_key`
 - `400` - `hide_sent_without_account` when `hide_sent` came without an
-  `account_id`
-- `500` - `db_unavailable`
+  account, or `bad_cursor` when the cursor could not be read
+- `500` - `db_unavailable`, or `args_broken` when the arguments could
+  not be read back
+
+**there is no `401` on this route.** a reader with no api key at all
+gets the list.
+
+### the reads
+
+the page's batches are read in ONE query, and their transactions and
+their accounts are read in TWO more - for the WHOLE page at once.
+
+> --- WHY --- the children are read for the WHOLE PAGE and not per
+> batch. reading them per batch is two queries per batch, and a page
+> of a hundred is two hundred queries - the single biggest cost in
+> serving the feed, and it grows with the page. two queries for the
+> whole page is the same cost whatever the page holds.
+
+## THE FACETS
+
+`GET /api/shit-1170/tx-queue/facets` - the contracts and the accounts
+that have queued work.
+
+see [`shit-1170-tx-queue-facets.md`](./shit-1170-tx-queue-facets.md)
 
 ## ONE BATCH
 
@@ -338,6 +438,7 @@ the typed client lives in `middleman/src/`, published as
 - `api_shit_1170_tx_queue_post(base_url, body, options)`
 - `api_shit_1170_tx_queue_get(base_url, query, options)`
 - `api_shit_1170_tx_queue_one_get(base_url, queue_id, options)`
+- `api_shit_1170_tx_queue_facets_get(base_url, query, options)`
 
 the middleman checks the empty batch and the fifty cap before the round
 trip, so a caller that goes over gets a clear message instead of a 400

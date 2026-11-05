@@ -229,7 +229,14 @@ pub async fn swap_queue_accounts_set_sent_fun(
 // ========================================
 // --- HELPERS ----------------------------
 // turn a db row into an account row.
-fn row_to_swap_queue_account_fun(row: &sqlx::sqlite::SqliteRow) -> SWAP_QUEUE_ACCOUNT_ROW {
+//
+// --- WHY --- IT IS PUBLIC: the store reads the account rows of a WHOLE
+// PAGE in one query — that is the batched read that keeps the feed's
+// answer at one query instead of one per swap — and that read lives in
+// `swap_queue_store`. so the row reader has to be reachable from there.
+pub fn row_to_swap_queue_account_fun(
+    row: &sqlx::sqlite::SqliteRow,
+) -> SWAP_QUEUE_ACCOUNT_ROW {
     SWAP_QUEUE_ACCOUNT_ROW {
         swap_id: row.get("swap_id"),
         account_id: row.get("account_id"),

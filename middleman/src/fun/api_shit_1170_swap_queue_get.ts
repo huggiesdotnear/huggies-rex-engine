@@ -5,14 +5,19 @@
 // the list is OPEN: anyone with an api key can list the swaps. a queued
 // swap is an open offer, and hiding it would defeat the point.
 //
-// the answer is `{ "items": [ ...one swap each... ], "total": N }`,
-// where `total` is the count BEFORE the limit and the offset took their
-// cut. it is how many pages there are.
+// the answer is `{ "items": [ ...one swap each... ], "total": N,
+// "nextCursor": "..." }`, where `total` is the count BEFORE the limit
+// and the cursor took their cut. it is how many pages there are.
 //
 // --- WHY --- the query names are snake_case and are NOT renamed:
 // `serde_urlencoded` matches the query key literally, so `tokenIn` would
 // never see the `token_in` the route reads and the filter would be
 // silently ignored.
+//
+// --- WHY --- `account_id` goes out as ONE COMMA SEPARATED STRING: the
+// route reads one value per param, so a list would need the param to be
+// repeated. one string carries many values, and a single value still
+// works.
 //
 // --- WHY --- `hide_sent` needs an account and the check is made HERE as
 // well as on the server: "has this account sent it" is a question about
@@ -23,6 +28,10 @@
 //
 // --- WHY --- `hide_sent` goes out as the word `true` and not as `1`:
 // the backend reads both, and the word is the readable one.
+//
+// --- WHY --- `cursor` is handed back EXACTLY as the backend gave it:
+// the cursor is opaque, and a middleman that reshaped it would break
+// the page the moment the backend changed the order.
 // ========================================
 
 import { api_call } from "../stuff/api_call";
@@ -51,7 +60,7 @@ export async function api_shit_1170_swap_queue_get(
       token_in: query.token_in?.trim(),
       token_out: query.token_out?.trim(),
       limit: query.limit,
-      offset: query.offset,
+      cursor: query.cursor?.trim(),
     },
     method: "GET",
     options,
@@ -64,10 +73,11 @@ export async function api_shit_1170_swap_queue_get(
     json === null ||
     Array.isArray(json) ||
     !Array.isArray(json.items) ||
-    typeof json.total !== "number"
+    typeof json.total !== "number" ||
+    (json.nextCursor !== null && typeof json.nextCursor !== "string")
   ) {
     throw new Error(
-      "api_shit_1170_swap_queue_get failed: invalid_response: expected a json object with an items array and a total",
+      "api_shit_1170_swap_queue_get failed: invalid_response: expected a json object with an items array, a total and a nextCursor",
     );
   }
 

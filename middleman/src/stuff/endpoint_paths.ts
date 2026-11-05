@@ -15,6 +15,7 @@ export const ENDPOINT_PATHS = {
   // by the wrapper and handed to api_call as a full path. see
   // api_shit_1170_tx_queue_one_get.ts.
   api_shit_1170_tx_queue: "/api/shit-1170/tx-queue",
+  api_shit_1170_tx_queue_facets: "/api/shit-1170/tx-queue/facets",
   api_shit_1170_tx_queue_stats_contracts:
     "/api/shit-1170/tx-queue/stats/contracts",
   api_shit_1170_tx_queue_stats_methods: "/api/shit-1170/tx-queue/stats/methods",

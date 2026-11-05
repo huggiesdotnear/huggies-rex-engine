@@ -168,9 +168,17 @@ pub struct SWAP_QUEUE_ITEM {
 pub struct SWAP_QUEUE_LIST_RESPONSE {
     // the swaps on this page.
     pub items: Vec<SWAP_QUEUE_ITEM>,
-    // how many swaps matched, BEFORE the limit and the offset took
+    // how many swaps matched, BEFORE the limit and the cursor took
     // their cut. it is how many pages there are.
     pub total: i64,
+    // the cursor of the NEXT page, or null when this page is the last
+    // one.
+    //
+    // --- WHY --- IT IS A TOKEN AND NOT A NUMBER: the caller hands it
+    // straight back, and it says "the rows after this one" — not "the
+    // rows after this many". a new swap landing at the top of the list
+    // does not move the reader's place in it.
+    pub next_cursor: Option<String>,
 }
 // ========================================
 // copyright 2026 by sleet.near

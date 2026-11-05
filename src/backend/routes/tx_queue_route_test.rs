@@ -147,10 +147,12 @@ async fn delete_account_fun(
 }
 
 // a GET of the queue list, with the given query string.
-async fn get_list_fun(base_url: &str, api_key: &str, query: &str) -> THE_REPLY {
-    let request = reqwest::Client::new()
-        .get(format!("{base_url}/api/shit-1170/tx-queue?{query}"))
-        .header("x-api-key", api_key);
+async fn get_list_fun(base_url: &str, api_key: Option<&str>, query: &str) -> THE_REPLY {
+    let mut request = reqwest::Client::new()
+        .get(format!("{base_url}/api/shit-1170/tx-queue?{query}"));
+    if let Some(api_key) = api_key {
+        request = request.header("x-api-key", api_key);
+    }
     answer_fun(request.send().await.expect("the route should answer")).await
 }
 
@@ -190,6 +192,17 @@ fn one_tx_body_fun() -> Value {
             }
         ]
     })
+}
+
+// a body that names the account the batch is for.
+//
+// --- WHY --- THE NAMED ACCOUNT IS THE WHO: a queued batch is a list of
+// calls FOR somebody, and the `accounts` list says who. a batch with
+// nobody on it is a batch nobody is waiting for.
+fn one_tx_body_for_fun(account_id: &str) -> Value {
+    let mut body = one_tx_body_fun();
+    body["accounts"] = json!([account_id]);
+    body
 }
 
 // a body with two transactions in it.
@@ -727,30 +740,31 @@ async fn the_delete_route_for_an_account_that_is_not_on_the_queue_is_a_404() {
 }
 
 #[tokio::test]
-async fn the_list_with_hide_sent_and_no_account_id_is_refused() {
-    let db = TEMP_DB::new_fun("hide-sent-no-account");
+async fn the_list_with_hide_sent_and_no_account_id_is_refused_for_a_reader_with_no_account() {
+    let db = TEMP_DB::new_fun("list-hide-sent");
     let pool = db.pool_fun().await;
-    let alice_key = put_api_key_fun(&pool, "alice.near").await;
     let base_url = serve_fun(pool).await;
 
-    let answer = get_list_fun(&base_url, &alice_key, "hide_sent=true").await;
-
+    // --- WHY --- A READER WITH NO ACCOUNT IS REFUSED: the filter says
+    // "hide what THIS account sent", and a reader who has no account
+    // and named none has nothing for it to be about.
+    //
+    // --- WHY --- A SIGNED-IN READER IS NOT REFUSED: they have an
+    // account — their own — and the filter is about that one.
+    let answer = get_list_fun(&base_url, None, "hide_sent=true").await;
     assert_eq!(answer.status, 400, "body was: {}", answer.body);
     assert_eq!(answer.body["error"]["code"], "hide_sent_without_account");
 }
 
 #[tokio::test]
-async fn the_list_with_hide_sent_as_the_number_one_and_no_account_id_is_refused() {
-    // --- WHY --- the plan spells the filter `hide_sent=1`, so the DIGIT
-    // has to work too. a bool in serde only reads the words `true` and
-    // `false`, and `1` would have failed the extraction with a 422.
-    let db = TEMP_DB::new_fun("hide-sent-one-no-account");
+async fn the_list_with_hide_sent_as_the_number_one_and_no_account_id_is_refused_for_a_reader_with_no_account() {
+    let db = TEMP_DB::new_fun("list-hide-sent-one");
     let pool = db.pool_fun().await;
-    let alice_key = put_api_key_fun(&pool, "alice.near").await;
     let base_url = serve_fun(pool).await;
 
-    let answer = get_list_fun(&base_url, &alice_key, "hide_sent=1").await;
-
+    // the plan spells the filter `hide_sent=1`, so the DIGIT is read
+    // the same way the word is.
+    let answer = get_list_fun(&base_url, None, "hide_sent=1").await;
     assert_eq!(answer.status, 400, "body was: {}", answer.body);
     assert_eq!(answer.body["error"]["code"], "hide_sent_without_account");
 }
@@ -775,9 +789,7 @@ async fn the_list_with_hide_sent_as_the_number_one_and_an_account_drops_the_sent
     let sent_answer = post_sent_fun(&base_url, &alice_key, &queue_id, &sent).await;
     assert_eq!(sent_answer.status, 200, "body was: {}", sent_answer.body);
 
-    let answer = get_list_fun(
-        &base_url,
-        &alice_key,
+    let answer = get_list_fun(&base_url, Some(&alice_key),
         "account_id=alice.near&hide_sent=1",
     )
     .await;
@@ -814,12 +826,12 @@ async fn the_list_with_an_account_and_hide_sent_drops_the_sent_ones() {
     assert_eq!(sent_answer.status, 200, "body was: {}", sent_answer.body);
 
     // the whole list holds both.
-    let all = get_list_fun(&base_url, &alice_key, "").await;
+    let all = get_list_fun(&base_url, Some(&alice_key), "").await;
     assert_eq!(all.status, 200, "body was: {}", all.body);
     assert_eq!(all.body["total"], 2);
 
     // and alice's hide-sent view holds only the one she has NOT sent.
-    let mine = get_list_fun(&base_url, &alice_key, "account_id=alice.near&hide_sent=true").await;
+    let mine = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near&hide_sent=true").await;
     assert_eq!(mine.status, 200, "body was: {}", mine.body);
     assert_eq!(mine.body["total"], 1);
     let items = mine.body["items"].as_array().expect("items");
@@ -827,7 +839,7 @@ async fn the_list_with_an_account_and_hide_sent_drops_the_sent_ones() {
 
     // --- WHY --- bob's view is NOT alice's view: the filter is about
     // ONE account, and bob never sent anything.
-    let bob_view = get_list_fun(&base_url, &bob_key, "account_id=bob.near&hide_sent=true").await;
+    let bob_view = get_list_fun(&base_url, Some(&bob_key), "account_id=bob.near&hide_sent=true").await;
     assert_eq!(bob_view.status, 200, "body was: {}", bob_view.body);
     assert_eq!(bob_view.body["total"], 0);
 }
@@ -844,21 +856,21 @@ async fn the_list_filters_by_account_and_by_contract() {
     let queued = post_queue_fun(&base_url, Some(&alice_key), &body).await;
     let queue_id = queued.body["queueId"].as_str().expect("a queue id").to_string();
 
-    let by_account = get_list_fun(&base_url, &alice_key, "account_id=alice.near").await;
+    let by_account = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near").await;
     assert_eq!(by_account.status, 200, "body was: {}", by_account.body);
     assert_eq!(by_account.body["total"], 1);
     assert_eq!(by_account.body["items"][0]["queueId"], queue_id);
 
     let by_contract =
-        get_list_fun(&base_url, &alice_key, "contract_id=ref.finance.near").await;
+        get_list_fun(&base_url, Some(&alice_key), "contract_id=ref.finance.near").await;
     assert_eq!(by_contract.status, 200, "body was: {}", by_contract.body);
     assert_eq!(by_contract.body["total"], 1);
 
-    let by_method = get_list_fun(&base_url, &alice_key, "method=ft_swap").await;
+    let by_method = get_list_fun(&base_url, Some(&alice_key), "method=ft_swap").await;
     assert_eq!(by_method.status, 200, "body was: {}", by_method.body);
     assert_eq!(by_method.body["total"], 1);
 
-    let by_nothing = get_list_fun(&base_url, &alice_key, "contract_id=nothing.near").await;
+    let by_nothing = get_list_fun(&base_url, Some(&alice_key), "contract_id=nothing.near").await;
     assert_eq!(by_nothing.status, 200, "body was: {}", by_nothing.body);
     assert_eq!(by_nothing.body["total"], 0);
 }
@@ -910,46 +922,291 @@ async fn the_list_of_one_queue_is_open_and_needs_no_api_key() {
 }
 
 #[tokio::test]
-async fn the_list_filtered_by_an_account_needs_an_api_key() {
-    let db = TEMP_DB::new_fun("list-account-no-key");
+async fn the_list_filtered_by_an_account_needs_no_api_key() {
+    let db = TEMP_DB::new_fun("list-account-key");
     let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
     let base_url = serve_fun(pool).await;
 
-    // --- WHY --- THE ACCOUNT FILTER IS NOT OPEN: "the queues THIS
-    // account is on" is a question about one account, and a stranger
-    // with no key has no account to answer it about.
-    let request = reqwest::Client::new()
-        .get(format!("{base_url}/api/shit-1170/tx-queue?account_id=alice.near"))
-        .send()
-        .await
-        .expect("the route should answer");
-    let status = request.status().as_u16();
-    let text = request.text().await.unwrap_or_default();
-    assert_eq!(status, 401, "body was: {text}");
-    assert!(
-        text.contains("no_api_key"),
-        "the answer must name the reason, body was: {text}"
-    );
+    post_queue_fun(
+        &base_url,
+        Some(&alice_key),
+        &one_tx_body_for_fun("alice.near"),
+    )
+    .await;
+
+    // --- WHY --- NO KEY IS NEEDED: the queue list is an OPEN offer. a
+    // reader who is not signed in can already read every batch and see
+    // every account on it, so filtering that public list by a name is
+    // not a leak — it is the filter the reader asked for.
+    let answer = get_list_fun(&base_url, None, "account_id=alice.near").await;
+    assert_eq!(answer.status, 200, "body was: {}", answer.body);
+    assert_eq!(answer.body["total"], 1);
 }
 
 #[tokio::test]
-async fn the_list_filtered_by_an_account_ignores_the_account_that_was_named() {
-    let db = TEMP_DB::new_fun("list-account-ignored");
+async fn the_list_filtered_by_an_account_filters_by_the_account_that_was_named() {
+    let db = TEMP_DB::new_fun("list-account-named");
     let pool = db.pool_fun().await;
     let alice_key = put_api_key_fun(&pool, "alice.near").await;
     let bob_key = put_api_key_fun(&pool, "bob.near").await;
     let base_url = serve_fun(pool).await;
 
     // bob queues a batch for himself.
-    post_queue_fun(&base_url, Some(&bob_key), &one_tx_body_fun()).await;
+    post_queue_fun(
+        &base_url,
+        Some(&bob_key),
+        &one_tx_body_for_fun("bob.near"),
+    )
+    .await;
 
-    // alice asks for bob's queues by name. she gets her OWN queues — and
-    // she has none.
-    let answer = get_list_fun(&base_url, &alice_key, "account_id=bob.near").await;
+    // alice asks for bob's queues by name.
+    //
+    // --- WHY --- SHE GETS THEM AND NOT HER OWN: the account filter is
+    // a filter BY account, and the reader picks the account. the
+    // queue is an OPEN offer — alice can already read bob's batch and
+    // see bob on it — so filtering the public list by a name is not a
+    // leak, it is the filter the reader asked for.
+    let answer = get_list_fun(&base_url, Some(&alice_key), "account_id=bob.near").await;
     assert_eq!(answer.status, 200, "body was: {}", answer.body);
     assert_eq!(
-        answer.body["total"], 0,
-        "a reader must not see another account's queues"
+        answer.body["total"], 1,
+        "the filter is by the account that was named"
+    );
+
+    // and alice's OWN queues — she has none — is still empty.
+    let own = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near").await;
+    assert_eq!(own.body["total"], 0);
+}
+
+#[tokio::test]
+async fn a_signed_in_readers_own_account_is_the_account_the_hide_sent_filter_is_about() {
+    let db = TEMP_DB::new_fun("list-hide-sent-own");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // alice has two queues and has sent one of them.
+    let sent = post_queue_fun(
+        &base_url,
+        Some(&alice_key),
+        &one_tx_body_for_fun("alice.near"),
+    )
+    .await;
+    let sent_id = sent.body["queueId"].as_str().expect("a queue id").to_string();
+    let sent_tx_id = sent.body["transactions"][0]["txId"]
+        .as_str()
+        .expect("a tx id")
+        .to_string();
+    post_queue_fun(
+        &base_url,
+        Some(&alice_key),
+        &one_tx_body_for_fun("alice.near"),
+    )
+    .await;
+
+    // alice says she sent it.
+    post_sent_fun(
+        &base_url,
+        &alice_key,
+        &sent_id,
+        &json!({ "txHashes": [ { "txId": sent_tx_id, "txHash": "a-hash" } ] }),
+    )
+    .await;
+
+    // the reader is signed in, so the filter has an account to be
+    // about — HER account — and it drops the one she sent.
+    let answer = get_list_fun(&base_url, Some(&alice_key), "hide_sent=1").await;
+    assert_eq!(answer.status, 200, "body was: {}", answer.body);
+    assert_eq!(answer.body["total"], 1, "the one she sent is hidden");
+}
+
+#[tokio::test]
+async fn the_list_pages_with_a_cursor_and_the_cursor_is_handed_back() {
+    let db = TEMP_DB::new_fun("list-cursor");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // five batches for alice.
+    for _ in 0..5 {
+        post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
+    }
+
+    // the first page holds two, and it says there is another one.
+    let first = get_list_fun(&base_url, Some(&alice_key), "limit=2").await;
+    assert_eq!(first.status, 200, "body was: {}", first.body);
+    assert_eq!(first.body["total"], 5, "the total is the WHOLE match");
+    assert_eq!(first.body["items"].as_array().map(|a| a.len()), Some(2));
+    let cursor = first.body["nextCursor"]
+        .as_str()
+        .expect("a cursor")
+        .to_string();
+
+    // the second page holds two more, and it does NOT repeat the first.
+    let second = get_list_fun(&base_url, Some(&alice_key),
+        &format!("limit=2&cursor={cursor}"),
+    )
+    .await;
+    assert_eq!(second.status, 200, "body was: {}", second.body);
+    assert_eq!(second.body["total"], 5, "the total does not change");
+    assert_eq!(second.body["items"].as_array().map(|a| a.len()), Some(2));
+
+    let first_ids: Vec<&str> = first.body["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .map(|item| item["queueId"].as_str().unwrap_or(""))
+        .collect();
+    let second_ids: Vec<&str> = second.body["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .map(|item| item["queueId"].as_str().unwrap_or(""))
+        .collect();
+    for id in &second_ids {
+        assert!(
+            !first_ids.contains(id),
+            "the cursor must not repeat a queue the reader already saw"
+        );
+    }
+
+    // the last page holds what is left, and it has NO cursor.
+    let last_cursor = second.body["nextCursor"]
+        .as_str()
+        .expect("a cursor")
+        .to_string();
+    let third = get_list_fun(&base_url, Some(&alice_key),
+        &format!("limit=2&cursor={last_cursor}"),
+    )
+    .await;
+    assert_eq!(third.body["items"].as_array().map(|a| a.len()), Some(1));
+    assert!(
+        third.body["nextCursor"].is_null(),
+        "the last page has no cursor — there is nothing after it"
+    );
+}
+
+#[tokio::test]
+async fn a_cursor_that_the_api_did_not_make_is_refused() {
+    let db = TEMP_DB::new_fun("list-bad-cursor");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let answer = get_list_fun(&base_url, Some(&alice_key), "cursor=not-a-cursor").await;
+    assert_eq!(answer.status, 400, "body was: {}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "bad_cursor");
+}
+
+#[tokio::test]
+async fn the_list_filters_by_several_accounts_at_once() {
+    let db = TEMP_DB::new_fun("list-many-accounts");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let bob_key = put_api_key_fun(&pool, "bob.near").await;
+    let carol_key = put_api_key_fun(&pool, "carol.near").await;
+    let base_url = serve_fun(pool).await;
+
+    post_queue_fun(
+        &base_url,
+        Some(&alice_key),
+        &one_tx_body_for_fun("alice.near"),
+    )
+    .await;
+    post_queue_fun(
+        &base_url,
+        Some(&bob_key),
+        &one_tx_body_for_fun("bob.near"),
+    )
+    .await;
+    post_queue_fun(
+        &base_url,
+        Some(&carol_key),
+        &one_tx_body_for_fun("carol.near"),
+    )
+    .await;
+
+    // alice OR bob is two queues, and carol's is not one of them.
+    let answer = get_list_fun(&base_url, Some(&alice_key),
+        "account_id=alice.near,bob.near",
+    )
+    .await;
+    assert_eq!(answer.status, 200, "body was: {}", answer.body);
+    assert_eq!(answer.body["total"], 2);
+
+    // and all three is three.
+    let all = get_list_fun(&base_url, Some(&alice_key),
+        "account_id=alice.near,bob.near,carol.near",
+    )
+    .await;
+    assert_eq!(all.body["total"], 3);
+}
+
+#[tokio::test]
+async fn the_list_filters_by_several_contracts_at_once() {
+    let db = TEMP_DB::new_fun("list-many-contracts");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_fun()).await;
+
+    // the queue's contract is in the body. let us read it.
+    let one = one_tx_body_fun();
+    let contract_id = one["transactions"][0]["contractId"]
+        .as_str()
+        .expect("a contract")
+        .to_string();
+
+    // that contract is in the list, and a made-up one is not.
+    let hit = get_list_fun(&base_url, Some(&alice_key),
+        &format!("contract_id={contract_id}"),
+    )
+    .await;
+    assert_eq!(hit.body["total"], 1);
+
+    let miss = get_list_fun(&base_url, Some(&alice_key),
+        "contract_id=nothing.near,other.near",
+    )
+    .await;
+    assert_eq!(miss.body["total"], 0);
+}
+
+#[tokio::test]
+async fn the_facets_route_lists_the_contracts_and_the_accounts() {
+    let db = TEMP_DB::new_fun("facets");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let one = one_tx_body_fun();
+    let contract_id = one["transactions"][0]["contractId"]
+        .as_str()
+        .expect("a contract")
+        .to_string();
+    post_queue_fun(&base_url, Some(&alice_key), &one_tx_body_for_fun("alice.near")).await;
+
+    // the route is OPEN — it needs no api key.
+    let request = reqwest::Client::new()
+        .get(format!("{base_url}/api/shit-1170/tx-queue/facets"));
+    let answer = answer_fun(request.send().await.expect("the route should answer")).await;
+    assert_eq!(answer.status, 200, "body was: {}", answer.body);
+
+    // alice is on the queue, and the contract is called.
+    let accounts = answer.body["accounts"].as_array().expect("accounts");
+    assert!(
+        accounts
+            .iter()
+            .any(|one| one["accountId"] == "alice.near" && one["count"] == 1),
+        "alice should be listed with one queue"
+    );
+    let contracts = answer.body["contracts"].as_array().expect("contracts");
+    assert!(
+        contracts
+            .iter()
+            .any(|one| one["contractId"] == contract_id && one["count"] == 1),
+        "the contract should be listed with one call"
     );
 }
 
@@ -986,11 +1243,11 @@ async fn the_list_clamps_a_wild_limit_and_a_negative_offset() {
     body["accounts"] = json!([ "alice.near" ]);
     post_queue_fun(&base_url, Some(&alice_key), &body).await;
 
-    let negative = get_list_fun(&base_url, &alice_key, "limit=-1&offset=-5").await;
+    let negative = get_list_fun(&base_url, Some(&alice_key), "limit=-1&offset=-5").await;
     assert_eq!(negative.status, 200, "body was: {}", negative.body);
     assert_eq!(negative.body["total"], 1, "the clamp holds");
 
-    let wild = get_list_fun(&base_url, &alice_key, "limit=100000").await;
+    let wild = get_list_fun(&base_url, Some(&alice_key), "limit=100000").await;
     assert_eq!(wild.status, 200, "body was: {}", wild.body);
     assert_eq!(wild.body["total"], 1);
 }

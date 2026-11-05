@@ -1,5 +1,6 @@
 // ========================================
-// the feed's filter bar: ALL / MINE, HIDE SENT and the sort.
+// the feed's filter bar: ALL / MINE, HIDE SENT, and the FILTERS panel
+// with the sort, the type, the contracts and the accounts.
 //
 // it reads the filter from the store and writes it back through the
 // store's setters.
@@ -8,63 +9,319 @@
 // display. the filter bar changes a filter, the store re-reads the feed,
 // and the bar never talks to the api.
 //
-// --- WHY THE SORT IS A BUTTON AND NOT A DROPDOWN: a dropdown is a
-// different shape from the buttons beside it, and a row that mixes a
-// dropdown with buttons does not line up — the dropdown is taller and
-// the "SORT" label in front of it pushes it out of the row. the sort is
-// a button that says what it will do, like the other three.
+// --- WHY THE PANEL IS BEHIND A BUTTON: the bar has four groups now,
+// and four groups of buttons on every screen is a wall of controls above
+// a feed. the reader opens the panel when they want to filter, and the
+// bar stays a bar the rest of the time.
 //
-// --- WHY THE BUTTON CYCLES THROUGH THE SORTS: there are two of them,
-// and a button that cycles is one control instead of two.
+// --- WHY THE BUTTON SAYS FILTERS AND NOT ONLY THE ICON: an icon alone
+// is a picture the reader has to guess at, and this bar is read by
+// people on a phone. the word says what it opens.
 //
-// mounts into <div id="SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS">.
+// --- WHY THE GROUP LABELS ARE UPPERCASE, SMALL AND DIM: they are
+// headings, not controls, and they must not look like buttons.
+//
+// --- WHY EVERY GROUP'S BUTTONS SHARE THE ROW EVENLY: a group is one
+// row of choices, and a row of buttons of different widths does not
+// read as one row. the flex makes them grow to fill the column evenly.
+//
+// --- WHY THE CONTRACT AND ACCOUNT ROWS SCROLL: the feed's queue can
+// hold hundreds of contracts and the panel cannot be taller than the
+// screen. the row scrolls, so every button is still reachable.
+//
+// --- WHY THE TYPE IS ALL / FUNCTION CALL / SWAPS: the feed holds two
+// kinds of post, and the reader often wants one of them. the api reads
+// each kind from its own route, so picking one halves the requests.
 import { render } from "preact";
+import { useState as use_state } from "preact/hooks";
+import { ArrowDown, ArrowUp, SlidersHorizontal } from "lucide-preact";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_FEED_STORE } from "../../ts/feed/app_page_feed_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
-import type { SHIT_1170_FEED_SORT } from "../../ts/feed/app_page_feed_types";
+import type {
+  SHIT_1170_FEED_DIRECTION,
+  SHIT_1170_FEED_SORT,
+  SHIT_1170_FEED_TYPE,
+} from "../../ts/feed/app_page_feed_types";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// the sorts the button cycles through.
+// the sorts the reader picks between.
 //
 // --- WHY THE LABELS ARE UPPERCASE: the app's controls are uppercase
 // everywhere, and a mixed-case label next to an uppercase button reads
 // as a different thing.
 //
-// --- WHY EACH ONE SAYS WHAT IT WILL DO: the button shows the sort that
-// is NOT on — the one clicking it will switch to — so the reader
-// knows what they get before they click.
+// --- WHY EACH ONE SAYS WHAT IT WILL DO: the button is the one the
+// reader clicks, and it says what clicking it will do.
 const SHIT_1170_FEED_SORT_OPTIONS: ReadonlyArray<{
   key: SHIT_1170_FEED_SORT;
   label: string;
 }> = [
-  { key: "newest", label: "NEWEST" },
-  { key: "most_accounts", label: "MOST ACCOUNTS" },
+  { key: "date_added", label: "DATE ADDED" },
+  { key: "most_popular", label: "MOST POPULAR" },
+];
+
+// the kinds of post the reader picks between.
+const SHIT_1170_FEED_TYPE_OPTIONS: ReadonlyArray<{
+  key: SHIT_1170_FEED_TYPE;
+  label: string;
+}> = [
+  { key: "all", label: "ALL" },
+  { key: "calls", label: "FUNCTION CALL" },
+  { key: "swaps", label: "SWAPS" },
 ];
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the sort the reader gets when they click the sort button.
+// the short form of a contract or an account id.
 //
-// --- WHY --- IT CYCLES IN THE ORDER THE OPTIONS ARE LISTED: the list is
-// the order the sorts are offered in, so the cycle follows it.
-function next_sort_fun(current: SHIT_1170_FEED_SORT): {
-  key: SHIT_1170_FEED_SORT;
-  label: string;
-} {
-  const index = SHIT_1170_FEED_SORT_OPTIONS.findIndex(
-    (option) => option.key === current,
-  );
-  const next_index = (index + 1) % SHIT_1170_FEED_SORT_OPTIONS.length;
-  return SHIT_1170_FEED_SORT_OPTIONS[next_index]!;
+// --- WHY --- THE FULL ID IS IN THE TITLE AND NOT IN THE BUTTON: the
+// app's column is 500px wide and an account id is longer than that. the
+// button shows enough to recognise the id and the title carries the
+// whole of it, so a reader who is not sure can hover.
+function short_id_fun(id: string): string {
+  if (id.length <= 18) return id;
+  return `${id.slice(0, 9)}…${id.slice(-6)}`;
 }
+
+// is this id in the picked list?
+function has_id_fun(list: ReadonlyArray<string>, id: string): boolean {
+  return list.includes(id);
+}
+
+// the picked list with one id added or taken out.
+function toggle_id_fun(list: ReadonlyArray<string>, id: string): string[] {
+  if (has_id_fun(list, id)) return list.filter((one) => one !== id);
+  return [...list, id];
+}
+// ========================================
+// ========================================
+// --- GROUP ------------------------------
+// one labelled group of buttons.
+//
+// --- WHY IT IS A COMPONENT AND NOT A CALL: it draws its own markup,
+// and the panel has four of them. a plain call would need the same
+// props four times over.
+function FilterGroup(props: {
+  label: string;
+  // true when the group holds a list that can be long — the contracts
+  // and the accounts.
+  scrolls?: boolean;
+  children: preact.ComponentChildren;
+}) {
+  return (
+    <div class="feed-filter-group">
+      <span class="feed-filter-label">{props.label}</span>
+      <div
+        class={
+          props.scrolls === true
+            ? "feed-filter-row is-scrolling"
+            : "feed-filter-row"
+        }
+      >
+        {props.children}
+      </div>
+    </div>
+  );
+}
+// ========================================
+// ========================================
+// --- PANEL -----------------------------
+// the filter panel: the sort, the type, the contracts, the accounts and
+// the counts.
+//
+// --- WHY THE COUNTS ARE AT THE BOTTOM: the reader wants to know how
+// much is on screen and how much there is, and that is a fact about the
+// feed rather than a control. the controls sit above it and the fact
+// sits under them.
+function FilterPanel() {
+  const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
+  const facets = state.facets;
+
+  // --- WHY --- THE CONTRACT AND ACCOUNT LISTS COME FROM THE FACETS: the
+  // bar can only offer a button for a contract that really has queued
+  // work on it, and the facets are the api's own list of those.
+  const contracts = facets?.contracts ?? [];
+  const accounts = facets?.accounts ?? [];
+
+  return (
+    <div class="feed-filter-panel">
+      <FilterGroup label="SORT">
+        {SHIT_1170_FEED_SORT_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            class={
+              option.key === state.sort
+                ? "feed-filter-button is-active"
+                : "feed-filter-button"
+            }
+            aria-pressed={option.key === state.sort}
+            onClick={() => {
+              void SHIT_1170_APP_PAGE_FEED_STORE.set_sort(option.key);
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
+        {/* --- WHY --- THE DIRECTION IS ITS OWN SMALL BUTTON: it is not a
+            third sort — it is the way round the sort that is on. so it
+            is an arrow and not a label, and it sits at the end of the
+            row beside the two sorts. */}
+        <button
+          type="button"
+          class="feed-filter-button feed-filter-direction"
+          aria-label={
+            state.direction === "desc" ? "sort ascending" : "sort descending"
+          }
+          title={state.direction === "desc" ? "DESCENDING" : "ASCENDING"}
+          onClick={() => {
+            const next: SHIT_1170_FEED_DIRECTION =
+              state.direction === "desc" ? "asc" : "desc";
+            void SHIT_1170_APP_PAGE_FEED_STORE.set_direction(next);
+          }}
+        >
+          {state.direction === "desc" ? (
+            <ArrowDown size={14} />
+          ) : (
+            <ArrowUp size={14} />
+          )}
+        </button>
+      </FilterGroup>
+      <FilterGroup label="TYPE">
+        {SHIT_1170_FEED_TYPE_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            class={
+              option.key === state.type
+                ? "feed-filter-button is-active"
+                : "feed-filter-button"
+            }
+            aria-pressed={option.key === state.type}
+            onClick={() => {
+              void SHIT_1170_APP_PAGE_FEED_STORE.set_type(option.key);
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
+      </FilterGroup>
+      <FilterGroup label="CONTRACTS" scrolls>
+        <button
+          type="button"
+          class={
+            state.contracts.length === 0
+              ? "feed-filter-button is-active"
+              : "feed-filter-button"
+          }
+          aria-pressed={state.contracts.length === 0}
+          onClick={() => {
+            void SHIT_1170_APP_PAGE_FEED_STORE.set_contracts([]);
+          }}
+        >
+          ALL
+        </button>
+        {contracts.map((contract) => (
+          <button
+            key={contract.contractId}
+            type="button"
+            class={
+              has_id_fun(state.contracts, contract.contractId)
+                ? "feed-filter-button is-active"
+                : "feed-filter-button"
+            }
+            aria-pressed={has_id_fun(state.contracts, contract.contractId)}
+            title={contract.contractId}
+            onClick={() => {
+              void SHIT_1170_APP_PAGE_FEED_STORE.set_contracts(
+                toggle_id_fun(state.contracts, contract.contractId),
+              );
+            }}
+          >
+            {short_id_fun(contract.contractId)}
+          </button>
+        ))}
+      </FilterGroup>
+      <FilterGroup label="ACCOUNTS" scrolls>
+        <button
+          type="button"
+          class={
+            state.accounts.length === 0
+              ? "feed-filter-button is-active"
+              : "feed-filter-button"
+          }
+          aria-pressed={state.accounts.length === 0}
+          onClick={() => {
+            void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts([]);
+          }}
+        >
+          ALL
+        </button>
+        {accounts.map((account) => (
+          <button
+            key={account.accountId}
+            type="button"
+            class={
+              has_id_fun(state.accounts, account.accountId)
+                ? "feed-filter-button is-active"
+                : "feed-filter-button"
+            }
+            aria-pressed={has_id_fun(state.accounts, account.accountId)}
+            title={account.accountId}
+            onClick={() => {
+              void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts(
+                toggle_id_fun(state.accounts, account.accountId),
+              );
+            }}
+          >
+            {short_id_fun(account.accountId)}
+          </button>
+        ))}
+      </FilterGroup>
+      {/* --- WHY --- THE COUNT IS THE POSTS ON SCREEN AND NOT THE API'S
+          TOTAL: the total is the count of the WHOLE match and it does
+          not change as the reader pages, so it says how much there is.
+          the number on screen is how much the reader can see. */}
+      <p class="feed-filter-count">
+        SHOWING {state.queues.length + state.swaps.length} OF {state.total}
+      </p>
+      <div class="feed-filter-actions">
+        <button
+          type="button"
+          class="feed-filter-button"
+          onClick={() => {
+            void SHIT_1170_APP_PAGE_FEED_STORE.clear_all();
+          }}
+        >
+          CLEAR ALL
+        </button>
+        <button
+          type="button"
+          class="feed-filter-button"
+          onClick={() => {
+            SHIT_1170_APP_PAGE_FEED_STORE.save_filters();
+          }}
+        >
+          SAVE
+        </button>
+      </div>
+    </div>
+  );
+}
+// ========================================
 // ========================================
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
   const signed_in = SHIT_1170_AUTH.is_signed_in();
+  // --- WHY --- THE PANEL IS ITS OWN STATE AND NOT IN THE STORE: whether
+  // the panel is open is a thing about THIS component on THIS screen,
+  // and it is not part of the feed's filter. a reader who opens the
+  // panel, filters and closes it wants the same filter the next time.
+  const [panel_open, set_panel_open] = use_state(false);
   // --- WHY --- THE MINE BUTTON IS DISABLED WHEN NOBODY IS SIGNED IN:
   // the MINE view is the reader's own queues, and a reader with no
   // account has none. a button that cannot work is noise.
@@ -74,11 +331,6 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
   // has none. the control is greyed out and the url's hide_sent is
   // ignored.
   const hide_sent_disabled = state.view !== "mine";
-  // --- WHY --- THE BUTTON SHOWS THE NEXT SORT AND NOT THE CURRENT ONE:
-  // the button is the one the reader clicks, and it says what clicking
-  // it will do. a button that reads "NEWEST" while the feed is already
-  // newest is a label, not a control.
-  const next_sort = next_sort_fun(state.sort);
 
   return (
     <div class="feed-filters">
@@ -135,18 +387,17 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
       </button>
       <button
         type="button"
-        class="feed-filter-button feed-filter-sort"
-        title={
-          next_sort.label === "NEWEST"
-            ? "sort by newest"
-            : "sort by most accounts"
-        }
+        class="feed-filter-button feed-filter-toggle"
+        aria-expanded={panel_open}
         onClick={() => {
-          SHIT_1170_APP_PAGE_FEED_STORE.set_sort(next_sort.key);
+          set_panel_open(!panel_open);
         }}
+        title="the sort, the type, the contracts and the accounts"
       >
-        {next_sort.label}
+        <SlidersHorizontal size={14} />
+        FILTERS
       </button>
+      {panel_open && <FilterPanel />}
     </div>
   );
 }

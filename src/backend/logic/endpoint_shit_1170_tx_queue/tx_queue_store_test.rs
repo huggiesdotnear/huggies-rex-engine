@@ -20,8 +20,8 @@ use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_args_fun::{
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_named_accounts_fun::tx_queue_named_accounts_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_status_fun::SHIT_1170_TX_QUEUE_STATUS_PENDING;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_store::{
-    TX_QUEUE_LIST_QUERY, tx_queue_delete_fun, tx_queue_get_fun, tx_queue_insert_fun,
-    tx_queue_list_fun,
+    TX_QUEUE_CURSOR_POINT, TX_QUEUE_LIST_QUERY, tx_queue_delete_fun, tx_queue_get_fun,
+    tx_queue_insert_fun, tx_queue_list_fun,
 };
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_transactions_store::{
     tx_queue_transactions_insert_fun, tx_queue_transactions_list_by_queue_fun,
@@ -112,12 +112,13 @@ async fn put_api_key_fun(pool: &sqlx::SqlitePool, account_id: &str) {
 // the list with no filters.
 fn all_queues_query_fun() -> TX_QUEUE_LIST_QUERY {
     TX_QUEUE_LIST_QUERY {
-        account_id: None,
+        account_ids: Vec::new(),
         hide_sent: None,
-        contract_id: None,
+        hide_sent_account: None,
+        contract_ids: Vec::new(),
         method: None,
+        cursor: None,
         limit: 50,
-        offset: 0,
     }
 }
 // ========================================
@@ -531,7 +532,7 @@ async fn the_list_with_an_account_returns_only_that_accounts_queues() {
     .expect("the account row should save");
 
     let query = TX_QUEUE_LIST_QUERY {
-        account_id: Some("alice.near".to_string()),
+        account_ids: vec!["alice.near".to_string()],
         ..all_queues_query_fun()
     };
 
@@ -575,8 +576,9 @@ async fn the_list_with_hide_sent_drops_the_queues_that_account_has_sent() {
     .expect("the row should save");
 
     let query = TX_QUEUE_LIST_QUERY {
-        account_id: Some("alice.near".to_string()),
+        account_ids: vec!["alice.near".to_string()],
         hide_sent: Some(true),
+        hide_sent_account: Some("alice.near".to_string()),
         ..all_queues_query_fun()
     };
 
@@ -613,8 +615,9 @@ async fn hide_sent_asks_about_the_account_not_about_everybody() {
 
     // alice's view drops it.
     let alice_query = TX_QUEUE_LIST_QUERY {
-        account_id: Some("alice.near".to_string()),
+        account_ids: vec!["alice.near".to_string()],
         hide_sent: Some(true),
+        hide_sent_account: Some("alice.near".to_string()),
         ..all_queues_query_fun()
     };
     let (alice_items, alice_total) = tx_queue_list_fun(&pool, &alice_query)
@@ -625,8 +628,9 @@ async fn hide_sent_asks_about_the_account_not_about_everybody() {
 
     // bob's view does NOT — bob never sent it.
     let bob_query = TX_QUEUE_LIST_QUERY {
-        account_id: Some("bob.near".to_string()),
+        account_ids: vec!["bob.near".to_string()],
         hide_sent: Some(true),
+        hide_sent_account: Some("bob.near".to_string()),
         ..all_queues_query_fun()
     };
     let (bob_items, bob_total) = tx_queue_list_fun(&pool, &bob_query)
@@ -666,8 +670,8 @@ async fn hide_sent_without_an_account_is_not_rejected_by_the_store() {
     // storage layer, and the storage layer is not asked what the caller
     // wanted.
     let query = TX_QUEUE_LIST_QUERY {
-        account_id: None,
         hide_sent: Some(true),
+        hide_sent_account: None,
         ..all_queues_query_fun()
     };
 
@@ -688,7 +692,7 @@ async fn the_list_filters_by_contract_and_by_method() {
     let other_queue = make_queue_fun(&pool, "a nft mint", "nft.near", "nft_mint").await;
 
     let by_contract = TX_QUEUE_LIST_QUERY {
-        contract_id: Some("ref.finance.near".to_string()),
+        contract_ids: vec!["ref.finance.near".to_string()],
         ..all_queues_query_fun()
     };
     let (items, total) = tx_queue_list_fun(&pool, &by_contract)
@@ -745,7 +749,7 @@ async fn a_contract_filter_matches_a_queue_holding_any_transaction_for_it() {
     }
 
     let query = TX_QUEUE_LIST_QUERY {
-        contract_id: Some("ref.finance.near".to_string()),
+        contract_ids: vec!["ref.finance.near".to_string()],
         ..all_queues_query_fun()
     };
     let (items, total) = tx_queue_list_fun(&pool, &query)
@@ -756,7 +760,7 @@ async fn a_contract_filter_matches_a_queue_holding_any_transaction_for_it() {
 }
 
 #[tokio::test]
-async fn the_total_is_the_count_before_the_limit_and_the_offset() {
+async fn the_total_is_the_count_before_the_limit() {
     let db = TEMP_DB::new_fun("total");
     let pool = db.pool_fun().await;
 
@@ -766,7 +770,6 @@ async fn the_total_is_the_count_before_the_limit_and_the_offset() {
 
     let query = TX_QUEUE_LIST_QUERY {
         limit: 2,
-        offset: 1,
         ..all_queues_query_fun()
     };
 
@@ -774,7 +777,147 @@ async fn the_total_is_the_count_before_the_limit_and_the_offset() {
         .await
         .expect("the list should read");
     assert_eq!(items.len(), 2, "the limit takes the cut");
-    assert_eq!(total, 5, "the total is the count BEFORE the limit and offset");
+    assert_eq!(total, 5, "the total is the count BEFORE the limit");
+}
+
+#[tokio::test]
+async fn the_cursor_walks_the_list_without_repeating_or_skipping() {
+    let db = TEMP_DB::new_fun("cursor");
+    let pool = db.pool_fun().await;
+
+    // five batches, and their ids in the order the list gives them.
+    for _ in 0..5 {
+        make_queue_fun(&pool, "a batch", "ref.finance.near", "ft_swap").await;
+    }
+
+    let (first, total) = tx_queue_list_fun(
+        &pool,
+        &TX_QUEUE_LIST_QUERY {
+            limit: 2,
+            ..all_queues_query_fun()
+        },
+    )
+    .await
+    .expect("the list should read");
+    assert_eq!(first.len(), 2);
+    assert_eq!(total, 5);
+
+    // the cursor of the last row of the page.
+    let last = first.last().expect("the page should have a last row");
+    let cursor = TX_QUEUE_CURSOR_POINT {
+        created_at: last.created_at,
+        queue_id: last.queue_id.clone(),
+    };
+
+    let (second, total) = tx_queue_list_fun(
+        &pool,
+        &TX_QUEUE_LIST_QUERY {
+            limit: 2,
+            cursor: Some(cursor.clone()),
+            ..all_queues_query_fun()
+        },
+    )
+    .await
+    .expect("the list should read");
+    assert_eq!(second.len(), 2);
+    assert_eq!(total, 5, "the total does not change as the reader pages");
+
+    // the second page does NOT repeat the first page.
+    for row in &second {
+        assert!(
+            !first.iter().any(|one| one.queue_id == row.queue_id),
+            "the cursor must not repeat a row the reader already saw"
+        );
+    }
+
+    // and the last page holds the rest.
+    let last_of_second = second.last().expect("the page should have a last row");
+    let (third, _total) = tx_queue_list_fun(
+        &pool,
+        &TX_QUEUE_LIST_QUERY {
+            limit: 2,
+            cursor: Some(TX_QUEUE_CURSOR_POINT {
+                created_at: last_of_second.created_at,
+                queue_id: last_of_second.queue_id.clone(),
+            }),
+            ..all_queues_query_fun()
+        },
+    )
+    .await
+    .expect("the list should read");
+    assert_eq!(third.len(), 1, "the last page holds what is left");
+
+    // and every row was seen exactly once.
+    let mut seen: Vec<String> = Vec::new();
+    for row in first.iter().chain(second.iter()).chain(third.iter()) {
+        seen.push(row.queue_id.clone());
+    }
+    let mut unique = seen.clone();
+    unique.sort();
+    unique.dedup();
+    assert_eq!(seen.len(), 5);
+    assert_eq!(unique.len(), 5, "every row is seen exactly once");
+}
+
+#[tokio::test]
+async fn the_account_filter_takes_several_accounts_at_once() {
+    let db = TEMP_DB::new_fun("list-accounts");
+    let pool = db.pool_fun().await;
+
+    let alice_queue = make_queue_fun(&pool, "for alice", "ref.finance.near", "ft_swap").await;
+    let bob_queue = make_queue_fun(&pool, "for bob", "ref.finance.near", "ft_swap").await;
+    let carol_queue = make_queue_fun(&pool, "for carol", "ref.finance.near", "ft_swap").await;
+
+    for (made, account_id) in [
+        (&alice_queue, "alice.near"),
+        (&bob_queue, "bob.near"),
+        (&carol_queue, "carol.near"),
+    ] {
+        tx_queue_accounts_insert_fun(
+            &pool,
+            &made.queue_id,
+            &made.tx_id,
+            account_id,
+            SHIT_1170_TX_QUEUE_STATUS_PENDING,
+        )
+        .await
+        .expect("the account row should save");
+    }
+
+    let query = TX_QUEUE_LIST_QUERY {
+        account_ids: vec!["alice.near".to_string(), "bob.near".to_string()],
+        ..all_queues_query_fun()
+    };
+
+    let (items, total) = tx_queue_list_fun(&pool, &query)
+        .await
+        .expect("the list should read");
+    assert_eq!(total, 2, "alice OR bob is two batches");
+    assert_eq!(items.len(), 2);
+}
+
+#[tokio::test]
+async fn the_contract_filter_takes_several_contracts_at_once() {
+    let db = TEMP_DB::new_fun("list-contracts");
+    let pool = db.pool_fun().await;
+
+    let ref_queue = make_queue_fun(&pool, "a ref swap", "ref.finance.near", "ft_swap").await;
+    let nft_queue = make_queue_fun(&pool, "a nft mint", "nft.near", "nft_mint").await;
+    let other_queue = make_queue_fun(&pool, "a token mint", "token.near", "mint").await;
+
+    let query = TX_QUEUE_LIST_QUERY {
+        contract_ids: vec!["ref.finance.near".to_string(), "nft.near".to_string()],
+        ..all_queues_query_fun()
+    };
+
+    let (items, total) = tx_queue_list_fun(&pool, &query)
+        .await
+        .expect("the list should read");
+    assert_eq!(total, 2, "ref OR nft is two batches");
+    assert_eq!(items.len(), 2);
+    assert!(items.iter().any(|one| one.queue_id == ref_queue.queue_id));
+    assert!(items.iter().any(|one| one.queue_id == nft_queue.queue_id));
+    assert!(!items.iter().any(|one| one.queue_id == other_queue.queue_id));
 }
 
 #[tokio::test]

@@ -80,25 +80,93 @@ with.
 
 ## THE LIST
 
-`GET /api/shit-1170/swap-queue` answers with `{ "items": [...], "total": N }`.
+`GET /api/shit-1170/swap-queue` answers with
+`{ "items": [...], "total": N, "nextCursor": "..." }`.
+
+it is **OPEN** - it asks for NO api key.
 
 the filters are `account_id`, `hide_sent`, `token_in`, `token_out`,
-`limit` and `offset`. the same names and the same rules as the tx
+`limit` and `cursor`. the same names and the same rules as the tx
 queue's list.
+
+`account_id` is a **COMMA SEPARATED LIST** - one param carries many
+accounts, like `alice.near` and `bob.near` in one value - and the
+semantics are an OR: "alice's swaps OR bob's swaps". one value still
+works. it needs **NO API KEY**.
+
+`hide_sent` is about ONE account - the signed-in reader's OWN account,
+or the first account named in the query when the reader is not signed
+in. a signed-in reader is never refused, so `?hide_sent=1` with a valid
+api key filters by their own account. a reader with NO api key must
+name one - `?account_id=alice.near&hide_sent=1`.
+
+`cursor` is the opaque token of the page before. the caller hands the
+`nextCursor` from the previous answer straight back. the FIRST page has
+no cursor.
+
+**the `total` is the count of the WHOLE match, BEFORE the `limit` and
+the `cursor` took their cut.** it does not change as the reader pages.
+
+**the `nextCursor` is the cursor of the NEXT page, or `null` when this
+page is the last one.** it is `null` when the page came back short,
+because a short page IS the last page.
+
+**a cursor the api cannot read is a `400` with the code `bad_cursor`.**
 
 the list is OPEN. anybody can read it - a queued swap is an open offer,
 and hiding it would defeat the point.
 
-> --- WHY --- the account filter is always the CALLER's own account. the
-> filter says "the swaps THIS account is on", and a reader who is not
-> signed in has no account. asking for somebody else's swaps by name is
-> not a thing a stranger can do.
+> --- WHY --- a cursor and NOT an offset. an offset says "skip the first
+> N rows", and the rows are ordered by `created_at DESC` - new swaps
+> land at the top of that order all the time. so the first N rows of
+> page two are NOT the rows the reader already saw: the reader would
+> see a swap twice, or skip one. a cursor says "the rows after this
+> one", and that stays true whatever lands above it.
+>
+> > --- WHY --- a bad cursor is a 400 and NOT the first page. the caller
+> > sent something the api does not understand, and answering with the
+> > first page would show the reader the same rows twice and hide the
+> > fact that their paging was broken.
+
+> --- WHY --- the account filter is the ACCOUNT THE READER NAMED. the
+> filter says "the swaps THIS account is on", and the reader picks the
+> accounts. the reader's OWN account is not added to the list - the
+> reader's own view is the front end's job, and it asks for the account
+> it wants.
+>
+> > --- WHY --- NO KEY IS NEEDED FOR THE ACCOUNT FILTER. the swap list is
+> >
+> > > an OPEN offer. a reader who is not signed in can already read
+> > > every swap and see every account on it - the WHO is right there on
+> > > the card. so filtering that PUBLIC list by a name is not a leak,
+> > > it is the filter the reader asked for, and the reader does not
+> > > have to be signed in to use it.
 
 > --- WHY --- `hide_sent` needs an account. "has this account sent it" is
 > a question about ONE account. a swap can be sent by alice and not by
 > bob, so there is no single answer about all the accounts at once.
+>
+> > --- WHY --- the account it is about is the READER'S OWN when they
+> >
+> > > are signed in, and the FIRST ACCOUNT NAMED in the query when they
+> > > are not. a signed-in reader always has an account to be about, so
+> > > they are never refused. a reader with NO key has no account of
+> > > their own, so they must name one - and the first one they named is
+> > > the account the filter is about.
+
+> --- WHY --- the api key is read on the list route ONLY so the reader's
+> OWN account is known - the `hide_sent` filter is about the reader's
+> own history. a missing or unknown key is NOT an error here: the
+> reader gets the list, and the routes that act on a swap are the ones
+> that ask for the key.
+
+> --- WHY --- the account rows of the whole page are read in ONE query
+> and not one per swap. a page of a hundred swaps is a hundred queries
+> that way, and that is the single biggest cost in serving the feed.
 
 ## THE ERRORS
+
+the POST route answers:
 
 - `400` - `no_token_in`, `no_token_out`, `same_token`, `no_amount_in` or
   `bad_amount_in` when the swap did not name itself properly, or
@@ -107,6 +175,15 @@ and hiding it would defeat the point.
 - `401` - `no_api_key` when the header is missing, or
   `unknown_api_key` when the key is not one of ours
 - `500` - `db_unavailable`
+
+the LIST route answers:
+
+- `400` - `hide_sent_without_account` when `hide_sent` came without an
+  account, or `bad_cursor` when the cursor could not be read
+- `500` - `db_unavailable`
+
+**the LIST has no `401`.** it asks for no key at all - a reader with no
+api key still gets the list.
 
 > --- WHY --- a swap of a token for ITSELF is refused. a swap of a token
 > for itself is not a trade, and the router has no route for it.

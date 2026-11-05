@@ -29,10 +29,11 @@
 // agrees to the number on the card and gets that number's route — the
 // live subscription keeps both in step as the pools move.
 //
-// --- WHY THERE ARE TWO ACTIONS AND NOT ONE: SWAP NOW is the trade, and
-// DETAILS is the record. one is a button that signs, the other is a
-// link the reader can open, bookmark or send somebody without meaning
-// to trade anything.
+// --- WHY THERE ARE THREE ACTIONS AND NOT ONE: SWAP NOW is the trade,
+// DECLINE is the way out of the queue and DETAILS is the record. one
+// is a button that signs, one is a button that takes the reader off
+// the queue, and the other is a link the reader can open, bookmark or
+// send somebody without meaning to trade anything.
 //
 // --- WHY THE ARROW IS AN ICON AND NOT A CHARACTER: the app's icons
 // come from lucide, and an arrow drawn as a character sits on the
@@ -227,9 +228,8 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
     }
   };
 
-  // --- WHY --- THE ADD / REMOVE BUTTON IS ONE BUTTON: it says the
-  // opposite of what it will do. the same rule the queued batch's card
-  // follows.
+  // --- WHY THE JOIN BUTTON IS ONE BUTTON: it says what it will do. the
+  // same rule the queued batch's card follows.
   const on_queue = status !== "not_on_queue";
   const sent =
     status === "sent" || status === "succeeded" || status === "failed";
@@ -331,6 +331,41 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
         >
           {busy ? "WORKING…" : "SWAP NOW"}
         </button>
+        {/* --- WHY --- THE ORDER IS SWAP NOW, THEN DECLINE, THEN DETAILS:
+            the reader's eye goes to the first button and the first
+            button is the one that does the work. the same order is on
+            the queued batch's card, so the two kinds of card are read
+            the same way.
+
+            --- WHY --- DECLINE IS ONE WORD AND IT ALWAYS MEANS THE SAME
+            THING: it is always "take me off this queue". the old button
+            said the opposite of what it would do — REMOVE when you were
+            on the queue and ADD when you were not — and a button that
+            changes its word is a button the reader has to read twice.
+
+            --- WHY --- A READER WHO IS NOT ON THE QUEUE GETS ADD: there
+            is nothing to decline when you are not on it, so the button
+            says what it does — it puts you on the queue. */}
+        {account_id !== null && !sent && (
+          <button
+            type="button"
+            class="feed-post-queue"
+            disabled={busy}
+            onClick={() => {
+              void (on_queue ? remove_fun() : add_fun());
+            }}
+            title={
+              on_queue
+                ? "take your account off this swap"
+                : "put your account on this swap"
+            }
+          >
+            {on_queue ? "DECLINE" : "ADD"}
+          </button>
+        )}
+        {/* --- WHY --- DETAILS IS A LINK: it is the record, and the
+            record is somewhere the reader can go — open it, bookmark
+            it, send it somebody — without meaning to trade anything. */}
         <a
           class="feed-post-detail is-swap is-quiet"
           href={swap_quote_href_fun(
@@ -343,25 +378,15 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
         >
           DETAILS
         </a>
-        {account_id !== null && !sent && (
-          <button
-            type="button"
-            class="feed-post-queue"
-            disabled={busy}
-            onClick={() => {
-              void (on_queue ? remove_fun() : add_fun());
-            }}
-          >
-            {on_queue ? "REMOVE" : "ADD"}
-          </button>
-        )}
         {/* --- WHY --- THE SHORT BALANCE IS SAID OUT LOUD: an off button
             with no reason is a button the reader cannot read. the
             balance is the one thing that stops them, and saying it
             means they know the trade is not theirs to make — and they
             can still ADD themselves to it and wait for the price. */}
         {account_id !== null && !sent && !has_balance && (
-          <span class="feed-post-hint">NOT ENOUGH {token_in?.symbol ?? swap.tokenIn}</span>
+          <span class="feed-post-hint">
+            NOT ENOUGH {token_in?.symbol ?? swap.tokenIn}
+          </span>
         )}
       </div>
     </article>

@@ -16,12 +16,25 @@
 // snake_case: it matches the query key literally. so `accountId` would
 // never see the `account_id` the api uses, and the filter would be
 // silently ignored.
+//
+// --- WHY --- `account_id` and `contract_id` are COMMA SEPARATED: the
+// feed's filter bar lets a reader pick several accounts and several
+// contracts, and "the batches of alice OR bob" is a question one id
+// cannot answer. one param carries many values, because the query
+// extractor reads one value per param and a browser cannot build a
+// repeated param out of a map.
 use serde::Deserialize;
 // ========================================
 // --- LIST QUERY ------------------------
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct TX_QUEUE_QUERY {
-    // only the queues this account is on.
+    // only the queues these accounts are on.
+    //
+    // --- WHY --- IT IS A COMMA SEPARATED STRING AND NOT A LIST: the
+    // query extractor reads ONE value per param, and a list field would
+    // need the param to be repeated — which a browser cannot build out
+    // of a map. one comma separated string carries many values, and it
+    // reads the same in a hand-written url.
     #[serde(default)]
     pub account_id: Option<String>,
     // with the account, drop the queues this account has already sent.
@@ -36,7 +49,10 @@ pub struct TX_QUEUE_QUERY {
     // wants.
     #[serde(default)]
     pub hide_sent: Option<String>,
-    // only the queues holding a transaction for this contract.
+    // only the queues holding a transaction for one of these contracts.
+    //
+    // --- WHY --- IT IS A COMMA SEPARATED STRING AND NOT A LIST: the
+    // same reason the account filter is.
     #[serde(default)]
     pub contract_id: Option<String>,
     // only the queues holding a transaction for this method.
@@ -46,9 +62,15 @@ pub struct TX_QUEUE_QUERY {
     // a default of 0 would answer with nothing.
     #[serde(default)]
     pub limit: Option<i64>,
-    // where to start.
+    // where the page starts.
+    //
+    // --- WHY --- IT IS A CURSOR AND NOT AN OFFSET: new batches land at
+    // the top of the list all the time, so "skip the first N rows"
+    // would show the reader the same batch twice or skip one. the
+    // cursor says "the rows after THIS one", and that stays true
+    // whatever lands above it.
     #[serde(default)]
-    pub offset: Option<i64>,
+    pub cursor: Option<String>,
 }
 
 // ========================================

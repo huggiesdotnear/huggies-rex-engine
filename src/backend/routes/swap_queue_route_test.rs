@@ -489,9 +489,18 @@ async fn the_list_filters_by_account_and_by_token() {
     let alice_view = get_list_fun(&base_url, Some(&alice_key), "account_id=alice.near").await;
     assert_eq!(alice_view.body.get("total").and_then(|t| t.as_i64()), Some(1));
 
-    // the agent is not on the swap, so the agent's own view is empty.
+    // --- WHY --- THE AGENT SEES IT TOO: the account filter is the
+    // account the READER NAMED, and the reader is signed in. the agent
+    // is not on the swap, but the agent asked for alice's swaps and
+    // alice's swaps is the answer. a filter by account is a filter BY
+    // account, and the caller's own account is not quietly added to it.
     let agent_view = get_list_fun(&base_url, Some(&agent_key), "account_id=alice.near").await;
-    assert_eq!(agent_view.body.get("total").and_then(|t| t.as_i64()), Some(0));
+    assert_eq!(agent_view.body.get("total").and_then(|t| t.as_i64()), Some(1));
+
+    // and the agent's OWN swaps — nobody put the agent on one — is
+    // still empty.
+    let agent_own = get_list_fun(&base_url, Some(&agent_key), "account_id=agent.near").await;
+    assert_eq!(agent_own.body.get("total").and_then(|t| t.as_i64()), Some(0));
 
     // the token filters find it, in the alice view.
     let by_token = get_list_fun(&base_url, Some(&alice_key), "token_in=near").await;
@@ -510,24 +519,41 @@ async fn the_list_filters_by_account_and_by_token() {
 }
 
 #[tokio::test]
-async fn the_list_filtered_by_an_account_needs_an_api_key() {
+async fn the_list_filtered_by_an_account_needs_no_api_key() {
     let db = TEMP_DB::new_fun("list-account-key");
     let pool = db.pool_fun().await;
+    let agent_key = put_api_key_fun(&pool, "agent.near").await;
+    // the NAMING RULE: an agent may only name accounts it holds a key
+    // for, so the agent needs one for alice.
+    put_api_key_fun(&pool, "alice.near").await;
     let base_url = serve_fun(pool).await;
 
-    let reply = get_list_fun(&base_url, None, "account_id=alice.near").await;
-    assert_eq!(reply.status, 401);
-    assert_eq!(error_code_fun(&reply), "no_api_key");
+    let mut body = one_swap_body_fun();
+    body["accounts"] = json!(["alice.near"]);
+    post_swap_fun(&base_url, Some(&agent_key), &body).await;
+
+    // --- WHY --- NO KEY IS NEEDED: the swap list is an OPEN offer. a
+    // reader who is not signed in can already read every swap and see
+    // every account on it, so filtering that public list by a name is
+    // not a leak — it is the filter the reader asked for.
+    let answer = get_list_fun(&base_url, None, "account_id=alice.near").await;
+    assert_eq!(answer.status, 200, "body was: {}", answer.body);
+    assert_eq!(answer.body["total"], 1);
 }
 
 #[tokio::test]
-async fn the_list_with_hide_sent_and_no_account_id_is_refused() {
+async fn the_list_with_hide_sent_and_no_account_id_is_refused_for_a_reader_with_no_account() {
     let db = TEMP_DB::new_fun("list-hide-sent");
     let pool = db.pool_fun().await;
-    let api_key = put_api_key_fun(&pool, "agent.near").await;
     let base_url = serve_fun(pool).await;
 
-    let reply = get_list_fun(&base_url, Some(&api_key), "hide_sent=1").await;
+    // --- WHY --- A READER WITH NO ACCOUNT IS REFUSED: the filter says
+    // "hide what THIS account sent", and a reader who has no account
+    // and named none has nothing for it to be about.
+    //
+    // --- WHY --- A SIGNED-IN READER IS NOT REFUSED: they have an
+    // account — their own — and the filter is about that one.
+    let reply = get_list_fun(&base_url, None, "hide_sent=1").await;
     assert_eq!(reply.status, 400);
     assert_eq!(error_code_fun(&reply), "hide_sent_without_account");
 }

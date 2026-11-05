@@ -96,9 +96,16 @@ export interface SHIT_1170_TX_QUEUE {
 export interface SHIT_1170_TX_QUEUE_LIST {
   // the batches on this page.
   items: SHIT_1170_TX_QUEUE[];
-  // how many batches matched, BEFORE the limit and the offset took
+  // how many batches matched, BEFORE the limit and the cursor took
   // their cut. it is how many pages there are.
   total: number;
+  // the cursor of the NEXT page, or null when this page is the last
+  // one. it is handed back as `cursor` to get the page after this.
+  //
+  // --- WHY --- it is a STRING and not null only: the backend encodes
+  // the page point and only the backend can read it back, so the
+  // middleman never shapes it.
+  nextCursor: string | null;
 }
 
 // --- REQUEST ----------------------------

@@ -10,12 +10,12 @@
 //     --hide-sent
 //
 // the filters:
-//   --account-id    only the queues this account is on
+//   --account-id    only the queues these accounts are on, comma separated
 //   --hide-sent     with the account, drop the ones it has already sent
-//   --contract-id   only the queues holding a tx for this contract
+//   --contract-id   only the queues holding a tx for these contracts, comma separated
 //   --method        only the queues holding a tx for this method
 //   --limit         how many, default 50
-//   --offset        where to start, default 0
+//   --cursor        where the page starts, default the first page
 //
 // --- WHY --- --hide-sent stands alone and takes no value: it is a
 // switch, and "hide sent = maybe" is not a thing.
@@ -24,6 +24,11 @@
 // snake_case: the flag is what a person types, the query is what the
 // route reads. `serde_urlencoded` matches the query key literally, so
 // the snake_case spelling is the one that goes on the wire.
+//
+// --- WHY --- --cursor and not --offset: the page is walked by a cursor
+// the backend hands out, and the cursor is opaque. there is no offset
+// to ask for, and the bin prints the next cursor so the next page can
+// be fetched with it.
 // ========================================
 
 import { api_shit_1170_tx_queue_get } from "@huggies/shit-1170-rex-engine-middleman";
@@ -64,7 +69,7 @@ function number_flag_fun(name: string): number | undefined {
 }
 
 const limit = number_flag_fun("--limit");
-const offset = number_flag_fun("--offset");
+const cursor = flags.get("--cursor");
 
 const list = await api_shit_1170_tx_queue_get(
   base_url,
@@ -74,7 +79,7 @@ const list = await api_shit_1170_tx_queue_get(
     contract_id: flags.get("--contract-id"),
     method: flags.get("--method"),
     limit,
-    offset,
+    cursor,
   },
   { api_key: flags.get("--api-key") },
 );
@@ -89,5 +94,6 @@ for (const queue of list.items) {
     console.log(`    ${account.accountId}  ${account.status}`);
   }
 }
+console.log(`NEXT CURSOR: ${list.nextCursor ?? "(last page)"}`);
 // ========================================
 // copyright 2026 by sleet.near

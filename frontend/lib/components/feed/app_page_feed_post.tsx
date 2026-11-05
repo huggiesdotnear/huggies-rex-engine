@@ -21,14 +21,20 @@
 // and tells the reader nothing about whether they are one of them. a
 // chip with their own id on it tells them at a glance.
 //
-// --- WHY THE ADD / REMOVE BUTTON IS ONE BUTTON: it says the opposite
-// of what it will do. if your account is on the queue and has not sent
-// it, the button says REMOVE. if it is not on the queue, it says ADD.
-// if you have already sent it, there is nothing to add or remove, so
-// the button is gone and the status takes its place.
+// --- WHY THE JOIN BUTTON IS ONE BUTTON: it says what it will do. if
+// your account is on the queue and has not sent it, the button says
+// DECLINE. if it is not on the queue, it says ADD. if you have already
+// sent it, there is nothing to join and nothing to decline, so the
+// button is gone and the status takes its place.
 //
 // --- WHY ADD IS HIDDEN WHEN THE READER IS SIGNED OUT: a button that
 // cannot work is noise.
+//
+// --- WHY THE BUTTONS ARE APPROVE, DECLINE AND DETAILS IN THAT ORDER:
+// the reader's eye goes to the first button, and the first button is
+// the one that does the work. the DECLINE is the way out and the
+// DETAILS is the record, and the same order is on the swap card, so
+// the two kinds of card are read the same way.
 import { render } from "preact";
 import { useState as use_state } from "preact/hooks";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
@@ -46,6 +52,7 @@ import {
 } from "../../ts/feed/app_page_feed_actions";
 import { SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN } from "./app_page_feed_transactions";
 import { SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN } from "./app_page_feed_swap_post";
+import { use_feed_scroll_load_fun } from "../../ts/feed/app_page_feed_scroll_load";
 import { tx_detail_href_fun } from "../../ts/shared/tx_link";
 import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_QUEUE_READER_STATUS } from "../../ts/feed/app_page_feed_actions";
@@ -196,9 +203,9 @@ function Post(props: { queue: SHIT_1170_TX_QUEUE }) {
     }
   };
 
-  // --- WHY --- THE BUTTON SAYS WHAT IT WILL DO: it is one button and
-  // not two. two buttons side by side, one of which is always wrong, is
-  // worse than one button that says what it will do.
+  // --- WHY --- THE JOIN BUTTON SAYS WHAT IT WILL DO: it is one button
+  // and not two. two buttons side by side, one of which is always
+  // wrong, is worse than one button that says what it will do.
   const on_queue = status !== "not_on_queue";
   const sent =
     status === "sent" || status === "succeeded" || status === "failed";
@@ -232,6 +239,14 @@ function Post(props: { queue: SHIT_1170_TX_QUEUE }) {
         <PostStatus queue={queue} account_id={account_id} status={status} />
       </div>
       <div class="feed-post-actions">
+        {/* --- WHY --- APPROVE IS THE SEND: it is the action that does the
+            work — the reader signs the batch and it goes out. the old
+            word was SEND, and APPROVE says what the reader is doing to
+            the batch rather than what the app does with it.
+
+            --- WHY --- THE ORDER IS APPROVE, THEN DECLINE, THEN DETAILS:
+            the reader's eye goes to the first button and the first
+            button is the one that does the work. */}
         <button
           type="button"
           class="feed-post-send"
@@ -241,12 +256,21 @@ function Post(props: { queue: SHIT_1170_TX_QUEUE }) {
           }}
           title={
             has_api_key
-              ? "send these transactions from your account"
+              ? "sign and send these transactions from your account"
               : "you need an api key to report a send"
           }
         >
-          {busy ? "WORKING…" : "SEND"}
+          {busy ? "WORKING…" : "APPROVE"}
         </button>
+        {/* --- WHY --- DECLINE IS ONE WORD AND IT ALWAYS MEANS THE SAME
+            THING: it is always "take me off this queue". the old button
+            said the opposite of what it would do — REMOVE when you were
+            on the queue and ADD when you were not — and a button that
+            changes its word is a button the reader has to read twice.
+
+            --- WHY --- A READER WHO IS NOT ON THE QUEUE GETS ADD: there
+            is nothing to decline when you are not on it, so the button
+            says what it does — it puts you on the queue. */}
         {account_id !== null && !sent && (
           <button
             type="button"
@@ -255,15 +279,20 @@ function Post(props: { queue: SHIT_1170_TX_QUEUE }) {
             onClick={() => {
               void (on_queue ? remove_fun() : add_fun());
             }}
+            title={
+              on_queue
+                ? "take your account off this queue"
+                : "put your account on this queue"
+            }
           >
-            {on_queue ? "REMOVE" : "ADD"}
+            {on_queue ? "DECLINE" : "ADD"}
           </button>
         )}
         <a
           class="feed-post-detail"
           href={queue_detail_href_fun(queue.queueId, depth)}
         >
-          DETAIL
+          DETAILS
         </a>
       </div>
     </article>
@@ -289,8 +318,25 @@ function PostStatus(props: {
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_POST_FUN() {
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
-  if (state.error !== null) return null;
   const posts = SHIT_1170_APP_PAGE_FEED_STORE.get_posts();
+  // --- WHY --- THE NEXT PAGE IS ASKED FOR WHEN THE READER NEARS THE
+  // BOTTOM OF THE PAGE: the feed page is not a scroll box — it is the
+  // page body that scrolls — so the feed has its own window-scroll
+  // hook. the store holds the cursor, so the component only says WHEN.
+  use_feed_scroll_load_fun(
+    state.next_cursor !== null || state.swaps_cursor !== null,
+    state.loading || state.loading_more,
+    () => {
+      void SHIT_1170_APP_PAGE_FEED_STORE.load_more();
+    },
+    posts.length,
+  );
+
+  // --- WHY --- THE CHECK IS HERE AND NOT AT THE TOP: a hook cannot be
+  // skipped — the number of hooks a component runs has to be the same
+  // every time it renders, or preact cannot keep the two renders in
+  // step. so the early return comes after the hook.
+  if (state.error !== null) return null;
   if (posts.length === 0) {
     if (state.loading) return <p class="feed-empty">LOADING THE FEED…</p>;
     return <p class="feed-empty">NO QUEUED BATCHES</p>;
@@ -313,6 +359,10 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_POST_FUN() {
           />
         ),
       )}
+      {/* --- WHY --- THE LOADING LINE IS UNDER THE POSTS: the next page
+          is on its way and the reader is told so, under the posts it is
+          about to add to the list. */}
+      {state.loading_more && <p class="feed-loading-more">LOADING MORE…</p>}
     </div>
   );
 }

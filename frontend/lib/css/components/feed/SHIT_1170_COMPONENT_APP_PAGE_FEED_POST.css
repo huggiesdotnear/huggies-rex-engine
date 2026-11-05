@@ -218,6 +218,19 @@
   letter-spacing: 0.06em;
 }
 /*==================================*/
+/* the line that says the next page is on its way.
+
+   --- WHY --- IT IS UNDER THE POSTS AND NOT OVER THEM: the reader is
+   scrolling towards the bottom of the list, and that is where the
+   notice belongs. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-loading-more {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  text-align: center;
+}
+/*==================================*/
 /*==================================*/
 /* A QUEUED SWAP's card.
    the swap card is the same shape as the batch card — headline, the

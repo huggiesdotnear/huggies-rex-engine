@@ -26,6 +26,7 @@ export * from "./fun/api_shit_1170_swap_queue_post";
 export * from "./fun/api_shit_1170_swap_queue_sent_post";
 export * from "./fun/api_shit_1170_tx_queue_accounts_delete";
 export * from "./fun/api_shit_1170_tx_queue_accounts_post";
+export * from "./fun/api_shit_1170_tx_queue_facets_get";
 export * from "./fun/api_shit_1170_tx_queue_get";
 export * from "./fun/api_shit_1170_tx_queue_one_get";
 export * from "./fun/api_shit_1170_tx_queue_post";
@@ -82,6 +83,12 @@ export type {
   SHIT_1170_TX_QUEUE_TRANSACTION_REQUEST,
 } from "./types/shit_1170_tx_queue";
 export type {
+  SHIT_1170_TX_QUEUE_FACET_ACCOUNT,
+  SHIT_1170_TX_QUEUE_FACET_CONTRACT,
+  SHIT_1170_TX_QUEUE_FACETS,
+} from "./types/shit_1170_tx_queue_facets";
+export type {
+  SHIT_1170_TX_QUEUE_FACETS_QUERY,
   SHIT_1170_TX_QUEUE_QUERY,
   SHIT_1170_TX_QUEUE_STATS_QUERY,
 } from "./types/shit_1170_tx_queue_query";

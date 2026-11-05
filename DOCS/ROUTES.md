@@ -40,10 +40,18 @@ user info, api key managmnets and the tx queue
   see [`ROUTES/shit-1170-api-key-rotate.md`](./ROUTES/shit-1170-api-key-rotate.md)
 
 - `/api/shit-1170/tx-queue` - the tx queue. `POST` queues a BATCH of
-  transactions, `GET` is the filterable list of them. a queue is never
-  done — the status lives on the account row.
+  transactions, `GET` is the filterable list of them. the list pages
+  with an opaque cursor and filters by many accounts and many contracts
+  at once. a queue is never done — the status lives on the account row.
+  the `GET` list is OPEN and asks for NO api key.
 
   see [`ROUTES/shit-1170-tx-queue.md`](./ROUTES/shit-1170-tx-queue.md)
+
+- `/api/shit-1170/tx-queue/facets` - the contracts and the accounts
+  that have queued work. `GET`. it is what the feed's filter bar builds
+  its buttons from, and it is OPEN.
+
+  see [`ROUTES/shit-1170-tx-queue-facets.md`](./ROUTES/shit-1170-tx-queue-facets.md)
 
 - `/api/shit-1170/tx-queue/{queue_id}` - one queued batch, with its
   transactions and its accounts. `GET`.
@@ -77,8 +85,10 @@ user info, api key managmnets and the tx queue
 
 - `/api/shit-1170/swap-queue` - the swap queue. `POST` queues a SWAP -
   the token in, the amount in and the token out, and NOT the route -
-  and `GET` is the filterable list of them. a swap is never done, so the
-  status lives on the account row.
+  and `GET` is the filterable list of them. the list pages with an
+  opaque cursor and filters by many accounts at once. a swap is never
+  done, so the status lives on the account row. the `GET` list is OPEN
+  and asks for NO api key.
 
   see [`ROUTES/shit-1170-swap-queue.md`](./ROUTES/shit-1170-swap-queue.md)
 

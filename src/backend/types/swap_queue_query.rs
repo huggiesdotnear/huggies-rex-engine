@@ -15,7 +15,14 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct SWAP_QUEUE_QUERY {
-    // only the swaps this account is on.
+    // only the swaps these accounts are on.
+    //
+    // --- WHY --- IT IS A COMMA SEPARATED STRING AND NOT A LIST: the
+    // query extractor reads ONE value per param, and a list field would
+    // need the param to be repeated — which a browser cannot build out
+    // of a map. one comma separated string carries many values, and it
+    // reads the same in a hand-written url.
+    #[serde(default)]
     pub account_id: Option<String>,
     // with the account, drop the swaps this account has already sent.
     //
@@ -30,8 +37,14 @@ pub struct SWAP_QUEUE_QUERY {
     pub token_out: Option<String>,
     // how many to return.
     pub limit: Option<i64>,
-    // where to start.
-    pub offset: Option<i64>,
+    // where the page starts.
+    //
+    // --- WHY --- IT IS A CURSOR AND NOT AN OFFSET: new swaps land at
+    // the top of the list all the time, so "skip the first N rows"
+    // would show the reader the same swap twice or skip one. the cursor
+    // says "the rows after THIS one", and that stays true whatever
+    // lands above it.
+    pub cursor: Option<String>,
 }
 // ========================================
 // copyright 2026 by sleet.near

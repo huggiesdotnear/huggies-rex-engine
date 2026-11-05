@@ -15,6 +15,8 @@ listed there, and a route that needs its own detail gets a file here.
   an account a new api key
 - [`shit-1170-tx-queue.md`](./shit-1170-tx-queue.md) — queue a batch of
   transactions, and the filterable list of them
+- [`shit-1170-tx-queue-facets.md`](./shit-1170-tx-queue-facets.md) — the
+  contracts and the accounts that have queued work
 - [`shit-1170-tx-queue-accounts.md`](./shit-1170-tx-queue-accounts.md) —
   add or remove YOUR OWN account on a queued batch
 - [`shit-1170-tx-queue-sent.md`](./shit-1170-tx-queue-sent.md) — record

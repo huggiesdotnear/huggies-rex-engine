@@ -13,15 +13,24 @@
 // agent names the swap and the route is worked out when it is executed
 // and quoted live on the feed.
 //
-// the GET is the feed: it is OPEN. anyone with an api key can list the
-// swaps, because a queued swap is an open offer and hiding it would
-// defeat the point.
+// the GET is the feed: it is OPEN. anyone can list the swaps, because a
+// queued swap is an open offer and hiding it would defeat the point.
 //
 // 400 = the body was empty, or named no token, or held an amount that
 // is not a number, or the `accounts` list named an account the agent
-// holds NO api key for — the NAMING RULE.
+// holds NO api key for — the NAMING RULE. on the GET, 400 is also a
+// cursor the api did not make, and a `hide_sent` with no account to be
+// about.
 // 401 = the x-api-key header is missing, or the key is not one of ours.
 // 500 = the db could not be reached.
+//
+// --- WHY --- THE GET NEVER ANSWERS A 401: the list is open, and so are
+// the FILTERS over it. a reader who is not signed in can read every
+// swap and see every account on it, so filtering that public list by a
+// name is not a leak — it is the filter the reader asked for. the key
+// is read by the GET only so the reader's OWN account is known for the
+// `hide_sent` filter, and a reader who has no key names the account in
+// the query instead.
 //
 // --- WHY --- ONE file holds TWO handlers: the repo's rule is one
 // FUNCTION per file, and this file holds the two functions of ONE url —
@@ -36,17 +45,21 @@ use axum::{
 use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_accounts_store::{
-    swap_queue_accounts_insert_fun, swap_queue_accounts_list_by_swap_fun,
+    SWAP_QUEUE_ACCOUNT_ROW, swap_queue_accounts_insert_fun, swap_queue_accounts_list_by_swap_fun,
+};
+use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_cursor_fun::{
+    swap_queue_cursor_decode_fun, swap_queue_cursor_encode_fun,
 };
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_row_to_json_fun::swap_queue_row_to_json_fun;
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_status_fun::SHIT_1170_SWAP_QUEUE_STATUS_PENDING;
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_store::{
-    SWAP_QUEUE_LIST_QUERY, SWAP_QUEUE_ROW, swap_queue_get_fun, swap_queue_insert_fun,
-    swap_queue_list_fun,
+    SWAP_QUEUE_CURSOR_POINT, SWAP_QUEUE_LIST_QUERY, SWAP_QUEUE_ROW, swap_queue_get_fun,
+    swap_queue_insert_fun, swap_queue_list_fun, swap_queue_page_accounts_fun,
 };
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_uuid_fun::swap_queue_uuid_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_caller_fun::tx_queue_caller_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_named_accounts_fun::tx_queue_named_accounts_fun;
+use crate::backend::types::shit_1170_query_list_fun::shit_1170_query_list_fun;
 use crate::backend::types::swap_queue_query::SWAP_QUEUE_QUERY;
 use crate::backend::types::swap_queue_request::{
     SWAP_QUEUE_ITEM, SWAP_QUEUE_LIST_RESPONSE, SWAP_QUEUE_REQUEST,
@@ -64,9 +77,6 @@ const SHIT_1170_SWAP_QUEUE_LIST_LIMIT: i64 = 50;
 // sqlite, so it has to be clamped too, or `limit=-1` would answer with
 // every swap in the db.
 const SHIT_1170_SWAP_QUEUE_LIST_MAX_LIMIT: i64 = 500;
-
-// where the list starts when no offset is given.
-const SHIT_1170_SWAP_QUEUE_LIST_OFFSET: i64 = 0;
 // ========================================
 // --- POST -------------------------------
 // queue a swap.
@@ -214,15 +224,14 @@ pub async fn swap_queue_get_route(
     // act on it, and the acting is what the other routes ask the key
     // for.
     //
-    // so the key is read here ONLY when the reader asked for their OWN
-    // swaps — the `account_id` filter and the `hide_sent` filter are
-    // questions about one account, and that account has to be the
-    // caller's own.
+    // so the key is read here ONLY so the reader's OWN account is known
+    // — the `hide_sent` filter is about the reader's own history.
     let caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
         Ok(account_id) => Some(account_id),
         // --- WHY --- a missing or unknown key is NOT an error here: the
-        // list is open. the key is only needed for the account filters,
-        // and those are checked below.
+        // list is open. the key is only needed so the reader's own
+        // account can be used for the hide-sent filter, and that filter
+        // is optional.
         Err(failure) if failure.status == StatusCode::UNAUTHORIZED => None,
         Err(failure) => {
             return shit_1170_error_fun(failure.status, &failure.code, &failure.message)
@@ -230,13 +239,32 @@ pub async fn swap_queue_get_route(
         }
     };
 
+    // --- THE ACCOUNT LIST ----------------
+    // the accounts the filter bar picked.
+    //
+    // --- WHY --- THE PARAM IS COMMA SEPARATED AND NOT REPEATED: the
+    // query extractor reads one value per param, and the filter bar
+    // builds its query string out of a map. one comma separated string
+    // carries many accounts and reads the same in a hand-written url.
+    let picked_accounts = shit_1170_query_list_fun(query.account_id.as_deref());
+
     // --- WHY --- `hide_sent` needs an account: "has this account sent it"
     // is a question about ONE account. a swap can be sent by alice and
     // not by bob, so there is no single answer to "has this swap been
     // sent". without an account the filter has nothing to be about, and
     // saying so is better than quietly ignoring it.
+    //
+    // --- WHY --- EITHER THE NAMED ACCOUNT OR THE READER'S OWN COUNTS:
+    // the filter says "hide what THIS account sent", and the account is
+    // the one the reader named in the query — or, when the reader named
+    // nobody, the reader's own account. a signed-in reader always has
+    // an account to be about, so they are never refused.
     let hide_sent = hide_sent_flag_fun(query.hide_sent.as_deref());
-    if hide_sent == Some(true) && query.account_id.is_none() {
+    let hide_sent_account: Option<String> = match &caller_account_id {
+        Some(caller) => Some(caller.clone()),
+        None => picked_accounts.first().cloned(),
+    };
+    if hide_sent == Some(true) && hide_sent_account.is_none() {
         return shit_1170_error_fun(
             StatusCode::BAD_REQUEST,
             "hide_sent_without_account",
@@ -245,39 +273,67 @@ pub async fn swap_queue_get_route(
         .into_response();
     }
 
-    // --- WHY --- THE ACCOUNT FILTER IS THE CALLER'S OWN ACCOUNT: the
-    // filter says "the swaps THIS account is on", and a reader who is
-    // not signed in has no account. asking for somebody else's swaps by
-    // name is not a thing a stranger can do.
+    // --- WHY --- THE ACCOUNT FILTER IS THE ACCOUNT THE READER NAMED:
+    // the filter says "the swaps THIS account is on", and the reader
+    // picks the accounts. a reader who is signed in and picks alice
+    // sees alice's swaps — that is the whole point of a filter by
+    // account.
     //
-    // --- WHY --- THE ACCOUNT IN THE QUERY IS IGNORED AND NOT REFUSED: the
-    // reader who is signed in gets their OWN swaps whatever the query
-    // says. a link with another account's id in it shows the reader their
-    // own feed, not somebody else's.
-    let account_id = match (&caller_account_id, query.account_id.as_deref()) {
-        (Some(caller), _) => Some(caller.clone()),
-        (None, Some(_)) => {
-            return shit_1170_error_fun(
-                StatusCode::UNAUTHORIZED,
-                "no_api_key",
-                "filtering by an account needs an api key",
-            )
-            .into_response();
-        }
-        (None, None) => None,
+    // --- WHY --- THE CALLER'S ACCOUNT IS NOT PREPENDED TO THE LIST: the
+    // reader's own account going first would make the filter answer
+    // "my swaps OR the ones I picked", and the reader asked for the
+    // ones they picked. the reader's OWN view is the front end's job —
+    // it asks for the account it wants.
+    //
+    // --- WHY --- NO KEY IS NEEDED FOR THE ACCOUNT FILTER: the swap list
+    // is an OPEN offer. a reader who is not signed in can already read
+    // every swap and see every account on it — the WHO is right there
+    // on the card. so filtering that public list by a name is not a
+    // leak, it is the filter the reader asked for, and the reader does
+    // not have to be signed in to use it.
+    let account_ids: Vec<String> = picked_accounts.clone();
+
+    // --- THE CURSOR ----------------------
+    // where the page starts.
+    //
+    // --- WHY --- A BAD CURSOR IS A 400 AND NOT THE FIRST PAGE: the
+    // caller sent something the api does not understand, and answering
+    // with the first page would show the reader the same rows twice and
+    // hide the fact that their paging was broken.
+    let cursor = match query.cursor.as_deref() {
+        Some(raw) => match swap_queue_cursor_decode_fun(raw) {
+            Ok(cursor) => Some(SWAP_QUEUE_CURSOR_POINT {
+                created_at: cursor.created_at,
+                swap_id: cursor.swap_id,
+            }),
+            Err(message) => {
+                return shit_1170_error_fun(
+                    StatusCode::BAD_REQUEST,
+                    "bad_cursor",
+                    &format!("the cursor could not be read: {message}"),
+                )
+                .into_response();
+            }
+        },
+        None => None,
     };
 
+    // --- THE HIDE-SENT ACCOUNT ------------
+    // the account the `hide_sent` filter is about — worked out above,
+    // so the refusal and the filter always agree.
+
     let list_query = SWAP_QUEUE_LIST_QUERY {
-        account_id,
+        account_ids,
         hide_sent,
+        hide_sent_account,
         token_in: query.token_in.clone(),
         token_out: query.token_out.clone(),
+        cursor,
         limit: limit_fun(
             query.limit,
             SHIT_1170_SWAP_QUEUE_LIST_LIMIT,
             SHIT_1170_SWAP_QUEUE_LIST_MAX_LIMIT,
         ),
-        offset: offset_fun(query.offset),
     };
 
     let (rows, total) = match swap_queue_list_fun(&pool, &list_query).await {
@@ -293,17 +349,55 @@ pub async fn swap_queue_get_route(
         }
     };
 
+    // --- THE WHO -------------------------
+    // the account rows of every swap on the page, in ONE read.
+    //
+    // --- WHY --- THIS IS ONE READ AND NOT ONE READ PER SWAP: reading
+    // them per swap is one query per swap, and a page of a hundred is a
+    // hundred queries. reading them for the WHOLE page at once is one
+    // query, whatever the page holds.
+    let swap_ids: Vec<String> = rows.iter().map(|row| row.swap_id.clone()).collect();
+    let page_accounts = match swap_queue_page_accounts_fun(&pool, &swap_ids).await {
+        Ok(found) => found,
+        Err(err) => {
+            eprintln!("[swap-queue] could not read the page accounts: {err}");
+            return shit_1170_error_fun(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "db_unavailable",
+                "the swap list could not be read",
+            )
+            .into_response();
+        }
+    };
+
     let mut items: Vec<SWAP_QUEUE_ITEM> = Vec::with_capacity(rows.len());
     for row in &rows {
-        match swap_item_from_row_fun(&pool, row).await {
-            Ok(item) => items.push(item),
-            Err(failure) => return *failure,
-        }
+        let empty_accounts: Vec<SWAP_QUEUE_ACCOUNT_ROW> = Vec::new();
+        let accounts = page_accounts.get(&row.swap_id).unwrap_or(&empty_accounts);
+        items.push(swap_queue_row_to_json_fun(row, accounts));
     }
+
+    // --- THE NEXT CURSOR -----------------
+    // the cursor of the page after this one.
+    //
+    // --- WHY --- IT IS ONLY HANDED OUT WHEN THE PAGE IS FULL: a page
+    // that came back short is the LAST page, and handing out a cursor
+    // for it would send the reader off to look for rows that are not
+    // there.
+    let next_cursor = match rows.last() {
+        Some(last) if rows.len() as i64 >= list_query.limit => {
+            Some(swap_queue_cursor_encode_fun(last.created_at, &last.swap_id))
+        }
+        _ => None,
+    };
 
     (
         StatusCode::OK,
-        Json(SWAP_QUEUE_LIST_RESPONSE { items, total }),
+        Json(SWAP_QUEUE_LIST_RESPONSE {
+            items,
+            total,
+            next_cursor,
+        }),
     )
         .into_response()
 }
@@ -405,18 +499,6 @@ fn limit_fun(asked: Option<i64>, default: i64, max: i64) -> i64 {
         None => default,
         Some(limit) if limit < 1 => default,
         Some(limit) => limit.min(max),
-    }
-}
-
-// where the page starts.
-//
-// --- WHY --- a NEGATIVE offset is zero: sqlite treats a negative offset
-// as zero anyway, and saying it here means the same thing in every
-// reader.
-fn offset_fun(asked: Option<i64>) -> i64 {
-    match asked {
-        Some(offset) if offset > 0 => offset,
-        _ => SHIT_1170_SWAP_QUEUE_LIST_OFFSET,
     }
 }
 

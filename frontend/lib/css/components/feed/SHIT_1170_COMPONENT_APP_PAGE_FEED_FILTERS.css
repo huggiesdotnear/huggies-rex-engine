@@ -1,11 +1,12 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS
-   the feed's filter bar: ALL / MINE, HIDE SENT and the sort.
+   the feed's filter bar: ALL / MINE, HIDE SENT, and the FILTERS panel
+   with the sort, the type, the contracts and the accounts.
 
    the bar sits across the top of the feed, above the posts. it is ONE
-   row of four buttons, and they are the base app buttons \u2014 narrower
-   than the base's 500px, because four of them have to share the page's
-   500px column.
+   row of three buttons, and they are the base app buttons — narrower
+   than the base's 500px, because three of them have to share the
+   page's 500px column.
 
    the active button is the filled-in one, and a disabled one is greyed
    out by the base button rules. */
@@ -29,13 +30,13 @@
 /* the buttons are the base app buttons, only narrower here.
 
    --- WHY --- they SHARE the row and are all the SAME width: the bar is
-   one row of four controls, and a row of buttons of different widths
+   one row of three controls, and a row of buttons of different widths
    does not read as a row. the flex makes them grow to fill the column
-   evenly, so ALL / MINE / HIDE SENT / NEWEST are four equal columns.
+   evenly, so ALL / MINE / HIDE SENT / FILTERS are equal columns.
 
    --- WHY --- the base's 500px width is overridden: the base button is
    as wide as the page column, which is right for a button that stands
-   alone and wrong for four that share it. */
+   alone and wrong for three that share it. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-button {
   flex: 1 1 0;
   width: auto;
@@ -44,6 +45,11 @@
   font-size: 12px;
   letter-spacing: 0.04em;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-sizing: border-box;
 }
 /*==================================*/
 /* the active one is filled in, so the reader can see which view is
@@ -54,13 +60,114 @@
   border-color: #009aab;
 }
 /*==================================*/
-/* the sort button.
+/* the FILTERS button carries the sliders icon beside the word.
 
-   --- WHY --- it is NOT FILLED IN when it is not active: the sort is
-   not a view, it is a switch, and filling it in would make it look
-   like a second view toggle. the reader sees it as a plain button that
-   changes the order. */
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-sort {
+   --- WHY --- the icon is NOT THE ONLY THING ON THE BUTTON: an icon
+   alone is a picture the reader has to guess at, and this bar is read
+   on a phone. the word says what it opens. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-toggle {
   font-family: Arial, Helvetica, sans-serif;
+}
+/*==================================*/
+/* the direction button is the small arrow at the end of the SORT row.
+
+   --- WHY --- IT IS NOT HALF THE ROW: it is not a sort, it is the way
+   round the sort that is on. so it keeps its own small width and sits
+   at the end of the row beside the two sorts. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-direction {
+  flex: 0 0 40px;
+  width: 40px;
+  padding: 8px 4px;
+}
+/*==================================*/
+/* the PANEL: the four groups and the actions under them.
+
+   --- WHY --- IT IS ITS OWN BLOCK AND NOT MORE OF THE BAR: the bar is
+   one row of controls and the panel is a set of groups under it. the
+   panel is a flex column so the groups stack and each one is as wide
+   as the column. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+/*==================================*/
+/* one group: the label on its own line, then the row of buttons.
+
+   --- WHY --- THE LABEL IS ITS OWN LINE: the label says what the row
+   below it is, and a label beside the row would be squeezed by it. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+/*==================================*/
+/* the group's label.
+
+   --- WHY --- IT IS SMALL AND DIM: it is a heading and not a control,
+   and it must not read as a button. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.65;
+}
+/*==================================*/
+/* the row of buttons under a label.
+
+   --- WHY --- THE ROW WRAPS: a contract id and an account id are long
+   and there can be dozens of them, and a row that cannot wrap would
+   push them off the panel. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+}
+/*==================================*/
+/* the contract and account rows scroll when there are many of them.
+
+   --- WHY --- THE HEIGHT IS CAPPED: the panel cannot be taller than the
+   screen, and a queue can hold hundreds of contracts. the row scrolls
+   and every button is still reachable.
+
+   --- WHY --- IT IS A VARIANT AND NOT THE RULE FOR EVERY ROW: only the
+   two long rows need it. the sort row and the type row are two or
+   three short buttons and they never fill their box. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-row.is-scrolling {
+  max-height: 132px;
+  overflow-y: auto;
+}
+/*==================================*/
+/* the count line: how many queued transactions are on screen out of how
+   many there are.
+
+   --- WHY --- IT IS QUIET: it is a fact about the feed and not a
+   control. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-count {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+/*==================================*/
+/* the actions row: CLEAR ALL and SAVE.
+
+   --- WHY --- THEY SHARE THE ROW EVENLY: they are the two things the
+   reader can do to the whole filter, and they read as one row. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-actions {
+  display: flex;
+  gap: 6px;
+  width: 100%;
 }
 /*==================================*/

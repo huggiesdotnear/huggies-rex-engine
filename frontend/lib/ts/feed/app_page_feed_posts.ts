@@ -25,7 +25,10 @@ import type {
 } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_SWAP_QUOTE } from "../shared/swap_quote";
 import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
-import type { SHIT_1170_FEED_SORT } from "./app_page_feed_types";
+import type {
+  SHIT_1170_FEED_DIRECTION,
+  SHIT_1170_FEED_SORT,
+} from "./app_page_feed_types";
 // ========================================
 // --- TYPES ------------------------------
 // which kind of post this is.
@@ -51,6 +54,7 @@ export type SHIT_1170_FEED_POST =
       routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>;
     };
 // ========================================
+// ========================================
 // --- MERGE -----------------------------
 // the batches and the swaps in ONE list, ordered the way the reader
 // asked for.
@@ -64,10 +68,10 @@ export type SHIT_1170_FEED_POST =
 // parameter for either list, and the loaded lists are small enough that
 // sorting them costs nothing.
 //
-// --- WHY NEWEST IS BY CREATION TIME: that is when the thing was
+// --- WHY DATE ADDED IS BY CREATION TIME: that is when the thing was
 // queued, and a feed of queued work reads newest-first.
 //
-// --- WHY MOST ACCOUNTS IS BY THE NUMBER OF ACCOUNTS: a post with more
+// --- WHY MOST POPULAR IS BY THE NUMBER OF ACCOUNTS: a post with more
 // accounts on it has more people waiting for it, and that is what a
 // social feed measures.
 export function shit_1170_feed_posts_fun(
@@ -76,6 +80,7 @@ export function shit_1170_feed_posts_fun(
   quotes: ReadonlyArray<SHIT_1170_SWAP_QUOTE | null>,
   routes: ReadonlyArray<ReadonlyArray<SHIT_1170_SWAP_ROUTE>>,
   sort: SHIT_1170_FEED_SORT,
+  direction: SHIT_1170_FEED_DIRECTION,
 ): SHIT_1170_FEED_POST[] {
   const posts: SHIT_1170_FEED_POST[] = [];
 
@@ -94,12 +99,18 @@ export function shit_1170_feed_posts_fun(
     });
   }
 
-  if (sort === "most_accounts") {
-    posts.sort((a, b) => accounts_of_fun(b) - accounts_of_fun(a));
+  // --- WHY --- THE DESCENDING ORDER IS THE DEFAULT AND THE ASCENDING
+  // ONE IS THE FLIP: the feed reads newest-first, and the direction
+  // button turns it over. the sort key says WHICH number, and the
+  // direction says which way round.
+  const sign = direction === "asc" ? 1 : -1;
+
+  if (sort === "most_popular") {
+    posts.sort((a, b) => sign * (accounts_of_fun(b) - accounts_of_fun(a)));
     return posts;
   }
 
-  posts.sort((a, b) => created_at_of_fun(b) - created_at_of_fun(a));
+  posts.sort((a, b) => sign * (created_at_of_fun(b) - created_at_of_fun(a)));
   return posts;
 }
 // ========================================
@@ -117,3 +128,4 @@ function created_at_of_fun(post: SHIT_1170_FEED_POST): number {
 }
 // ========================================
 // copyright 2026 by sleet.near
+// ========================================

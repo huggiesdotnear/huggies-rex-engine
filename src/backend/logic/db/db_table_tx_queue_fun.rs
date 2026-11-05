@@ -36,10 +36,18 @@ use sqlx::{Connection, Executor, SqliteConnection};
 // --- WHY --- `CREATE TABLE IF NOT EXISTS`: it creates the table on a
 // fresh db and does nothing on one that already has it.
 //
-// --- WHY --- there is NO index on `created_at` here: the feed list reads
-// the queues newest first, and a queue's rows are few enough that the
-// sort is over a small table. the index that matters is the one on the
-// account rows, which is where the feed actually filters.
+// --- WHY --- there IS an index on `created_at` now: the feed list reads
+// the queues newest first, and it used to do that over a table with no
+// index on the column it sorts by — so every page of the feed sorted
+// the WHOLE table before it took its hundred rows. a queue table is
+// small while the app is young and is NOT small once a few thousand
+// batches are queued, and the feed is exactly the query that pays for
+// it.
+//
+// --- WHY --- the index is on `(created_at, queue_id)` AND NOT JUST
+// `created_at`: the feed's order is `(created_at DESC, queue_id DESC)`
+// and the cursor walks it, and an index that carries both columns lets
+// sqlite walk the pages in order without sorting anything.
 //
 // --- WHY --- the `when` and `why` columns are QUOTED: `when` is a
 // reserved word in sqlite, and an unquoted `when` in a column list is a
@@ -56,6 +64,8 @@ pub const SHIT_1170_DB_TABLE_TX_QUEUE: &str = r#"
     created_at         INTEGER NOT NULL,
     updated_at         INTEGER NOT NULL
   );
+  CREATE INDEX IF NOT EXISTS tx_queue_created_at_idx
+    ON tx_queue (created_at DESC, queue_id DESC);
 "#;
 // ========================================
 // --- CREATE ----------------------------

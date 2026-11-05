@@ -21,6 +21,12 @@
 // `when` in a column list is a syntax error. `why` and `when_at` are
 // ordinary words and are left alone.
 use sqlx::{Row, SqlitePool};
+use std::collections::HashMap;
+
+use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_accounts_store::{
+    SWAP_QUEUE_ACCOUNT_ROW, row_to_swap_queue_account_fun,
+};
+use crate::backend::types::shit_1170_sql_list_fun::{SqliteBind, SqliteListBuilder};
 // ========================================
 // --- TYPES ------------------------------
 // one queued swap, as it comes out of the db.
@@ -62,20 +68,45 @@ pub struct SWAP_QUEUE_ROW {
 // list query is one statement with optional binds, and the caller fills
 // in the ones it was given. a struct keeps the filters named, so the
 // route cannot swap two of them by accident.
+//
+// --- WHY --- the account filter is a LIST and not a single value: the
+// feed's filter bar lets a reader pick several accounts, and "the swaps
+// of alice OR bob" is a question one id cannot answer.
 #[derive(Debug, Clone, Default)]
 pub struct SWAP_QUEUE_LIST_QUERY {
-    // only the swaps this account is on.
-    pub account_id: Option<String>,
+    // only the swaps these accounts are on. an empty list means "any
+    // account".
+    pub account_ids: Vec<String>,
     // with the account, drop the swaps this account has already sent.
     pub hide_sent: Option<bool>,
+    // the account the `hide_sent` filter is about.
+    //
+    // --- WHY --- IT IS ITS OWN FIELD AND NOT THE FIRST OF THE ACCOUNT
+    // LIST: "hide what I have sent" is a question about the READER, and
+    // the account list is what the reader is filtering BY. they are two
+    // different questions and one field cannot answer both.
+    pub hide_sent_account: Option<String>,
     // only the swaps that sell this token.
     pub token_in: Option<String>,
     // only the swaps that buy this token.
     pub token_out: Option<String>,
+    // where the page starts. it is the row the page starts after.
+    pub cursor: Option<SWAP_QUEUE_CURSOR_POINT>,
     // how many to return.
     pub limit: i64,
-    // where to start.
-    pub offset: i64,
+}
+
+// the row a page starts after.
+//
+// --- WHY --- IT IS ITS OWN STRUCT AND NOT THE CURSOR TOKEN: the cursor
+// token is base64 and is meant for the wire. this is what it turns into
+// once it has been read, and the sql binds it as two numbers.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SWAP_QUEUE_CURSOR_POINT {
+    // the `created_at` of the row the page starts after.
+    pub created_at: i64,
+    // the id of that same row.
+    pub swap_id: String,
 }
 // ========================================
 // --- INSERT ----------------------------
@@ -181,62 +212,252 @@ pub async fn swap_queue_get_fun(
 //
 // --- WHY --- the order is `created_at DESC`: the list is a feed, and the
 // newest swap is the one the reader wants.
+//
+// --- WHY --- THE ORDER IS `(created_at DESC, swap_id DESC)` AND NOT
+// JUST `created_at DESC`: two swaps can be queued in the same
+// millisecond, and the cursor that walks this order needs a total one.
+// the id breaks the tie in the same direction as the time, so "the rows
+// after this one" is one comparison and not two.
 pub async fn swap_queue_list_fun(
     pool: &SqlitePool,
     query: &SWAP_QUEUE_LIST_QUERY,
 ) -> Result<(Vec<SWAP_QUEUE_ROW>, i64), sqlx::Error> {
-    let rows = sqlx::query(
+    // --- THE HIDE-SENT ACCOUNT ------------
+    // the account the `hide_sent` filter is about.
+    //
+    // --- WHY --- IT IS THE FIRST ONE OF THE LIST: the filter is "has
+    // THIS account sent it", and the list is a set of accounts the
+    // reader is looking at. when there is one account it is that one,
+    // and when there are several the first one is the reader's own —
+    // the route always puts the caller's account first.
+    let hide_sent_account: Option<String> = query.hide_sent_account.clone();
+
+    // --- THE PAGE -----------------------
+    let mut builder = SqliteListBuilder::new_fun(
         "SELECT swap_id, what, \"when\", why, when_at, token_in, amount_in,
                 token_out, amount_out, dex_id, created_at, updated_at
        FROM swap_queue
-      WHERE ( ?1 IS NULL
-           OR EXISTS (SELECT 1 FROM swap_queue_accounts a
+      WHERE ( ",
+    );
+
+    // --- THE CALLER'S OWN VIEW -----------
+    // "is the caller on this swap" — the reader's own view of the feed.
+    //
+    // --- WHY --- THE CLAUSE IS ONLY WRITTEN FOR A SINGLE ACCOUNT: the
+    // caller's own view is about the ONE account the caller is. when
+    // the reader has picked SEVERAL accounts in the filter bar, the
+    // question is "is any of THESE on this swap", and asking "is the
+    // CALLER on this swap" as well would narrow the list down to the
+    // caller's own swaps and hide the ones the reader asked for.
+    if query.account_ids.len() == 1 {
+        builder.push_text_fun(
+            "EXISTS (SELECT 1 FROM swap_queue_accounts a
                        WHERE a.swap_id = swap_queue.swap_id
-                         AND a.account_id = ?1) )
-        AND ( ?2 IS NULL OR ?2 = 0
+                         AND a.account_id = ",
+        );
+        builder.push_bind_fun(SqliteBind::Text(query.account_ids[0].clone()));
+        builder.push_text_fun(" ) ");
+    } else {
+        builder.push_text_fun("1 ");
+    }
+    builder.push_text_fun(") ");
+
+    // --- THE ACCOUNT FILTER -------------
+    // "is any of the picked accounts on this swap" — the filter bar's
+    // multi-select.
+    //
+    // --- WHY --- IT IS A SEPARATE CLAUSE AND NOT PART OF THE `EXISTS`:
+    // the `EXISTS` above asks "is the CALLER on this swap", and this
+    // one asks "is ANY of these accounts on this swap". they are two
+    // different questions, and one subquery cannot ask both.
+    if !query.account_ids.is_empty() {
+        builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM swap_queue_accounts f
+                           WHERE f.swap_id = swap_queue.swap_id
+                             AND f.account_id ",
+        );
+        builder.push_in_fun(&query.account_ids);
+        builder.push_text_fun(")");
+    }
+
+    // --- THE HIDE-SENT FILTER ------------
+    //
+    // --- WHY --- THE FLAG IS BOUND AND NOT WRITTEN AS A LITERAL: the
+    // clause is "the flag is zero OR the account has not sent it". the
+    // flag is ONE when the reader wants the sent ones hidden, and then
+    // the clause asks the real question. the flag is ZERO when the
+    // reader does not, and then the whole clause is true and nothing
+    // is hidden.
+    if hide_sent_account.is_some() {
+        builder.push_text_fun(" AND ( ");
+        builder.push_bind_fun(SqliteBind::Int(if query.hide_sent.unwrap_or(false) {
+            1
+        } else {
+            0
+        }));
+        builder.push_text_fun(
+            " = 0
            OR NOT EXISTS (SELECT 1 FROM swap_queue_accounts s
                            WHERE s.swap_id = swap_queue.swap_id
-                             AND s.account_id = ?1
-                             AND s.tx_hash IS NOT NULL) )
-        AND ( ?3 IS NULL OR token_in = ?3 )
-        AND ( ?4 IS NULL OR token_out = ?4 )
-      ORDER BY created_at DESC
-      LIMIT ?5 OFFSET ?6",
-    )
-    .bind(query.account_id.as_deref())
-    .bind(query.hide_sent)
-    .bind(query.token_in.as_deref())
-    .bind(query.token_out.as_deref())
-    .bind(query.limit)
-    .bind(query.offset)
-    .fetch_all(pool)
-    .await?;
+                             AND s.account_id = ",
+        );
+        builder.push_bind_fun(SqliteBind::Text(
+            hide_sent_account.clone().unwrap_or_default(),
+        ));
+        builder.push_text_fun(" AND s.tx_hash IS NOT NULL) )");
+    }
 
-    let items = rows.iter().map(row_to_swap_queue_fun).collect();
+    // --- THE TOKEN FILTERS ---------------
+    // --- WHY --- THEY ARE PLAIN COMPARISONS AND NOT `EXISTS` OVER
+    // ANOTHER TABLE: the token in and the token out are COLUMNS on the
+    // swap, not rows on a transaction table. a queued swap has no
+    // transactions until somebody signs it.
+    if let Some(token_in) = query.token_in.as_deref() {
+        builder.push_text_fun(" AND token_in = ");
+        builder.push_bind_fun(SqliteBind::Text(token_in.to_string()));
+    }
+    if let Some(token_out) = query.token_out.as_deref() {
+        builder.push_text_fun(" AND token_out = ");
+        builder.push_bind_fun(SqliteBind::Text(token_out.to_string()));
+    }
 
-    let total: (i64,) = sqlx::query_as(
-        "SELECT COUNT(1)
-       FROM swap_queue
-      WHERE ( ?1 IS NULL
-           OR EXISTS (SELECT 1 FROM swap_queue_accounts a
+    // --- THE CURSOR ---------------------
+    // the rows after the one the cursor names.
+    if let Some(cursor) = query.cursor.as_ref() {
+        builder.push_text_fun(" AND ( created_at < ");
+        builder.push_bind_fun(SqliteBind::Int(cursor.created_at));
+        builder.push_text_fun(" OR ( created_at = ");
+        builder.push_bind_fun(SqliteBind::Int(cursor.created_at));
+        builder.push_text_fun(" AND swap_id < ");
+        builder.push_bind_fun(SqliteBind::Text(cursor.swap_id.clone()));
+        builder.push_text_fun(" ) )");
+    }
+
+    builder.push_text_fun(" ORDER BY created_at DESC, swap_id DESC LIMIT ");
+    builder.push_bind_fun(SqliteBind::Int(query.limit));
+
+    let rows = builder.build_fun().bind_all_fun().fetch_all(pool).await?;
+    let items: Vec<SWAP_QUEUE_ROW> = rows.iter().map(row_to_swap_queue_fun).collect();
+
+    // --- THE TOTAL ----------------------
+    // how many matched before the limit and the cursor took their cut.
+    //
+    // --- WHY --- THE TOTAL COUNTS THE WHOLE MATCH AND NOT THE PAGE: the
+    // reader is told how many queued swaps there are in total, and that
+    // number has to be the whole match and not the rows that survived
+    // the limit. the cursor is NOT part of the count.
+    //
+    // --- WHY --- IT IS THE SAME CLAUSES BUILT AGAIN AND NOT A SECOND
+    // FORM OF THE LIST: the count and the list have to agree about what
+    // matched, and two hand-written forms of the same filter are two
+    // chances to disagree.
+    let mut total_builder = SqliteListBuilder::new_fun("SELECT COUNT(1) FROM swap_queue WHERE ( ");
+    if query.account_ids.len() == 1 {
+        total_builder.push_text_fun(
+            "EXISTS (SELECT 1 FROM swap_queue_accounts a
                        WHERE a.swap_id = swap_queue.swap_id
-                         AND a.account_id = ?1) )
-        AND ( ?2 IS NULL OR ?2 = 0
+                         AND a.account_id = ",
+        );
+        total_builder.push_bind_fun(SqliteBind::Text(query.account_ids[0].clone()));
+        total_builder.push_text_fun(" ) ");
+    } else {
+        total_builder.push_text_fun("1 ");
+    }
+    total_builder.push_text_fun(") ");
+    if !query.account_ids.is_empty() {
+        total_builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM swap_queue_accounts f
+                           WHERE f.swap_id = swap_queue.swap_id
+                             AND f.account_id ",
+        );
+        total_builder.push_in_fun(&query.account_ids);
+        total_builder.push_text_fun(")");
+    }
+    if hide_sent_account.is_some() {
+        total_builder.push_text_fun(" AND ( ");
+        total_builder.push_bind_fun(SqliteBind::Int(if query.hide_sent.unwrap_or(false) {
+            1
+        } else {
+            0
+        }));
+        total_builder.push_text_fun(
+            " = 0
            OR NOT EXISTS (SELECT 1 FROM swap_queue_accounts s
                            WHERE s.swap_id = swap_queue.swap_id
-                             AND s.account_id = ?1
-                             AND s.tx_hash IS NOT NULL) )
-        AND ( ?3 IS NULL OR token_in = ?3 )
-        AND ( ?4 IS NULL OR token_out = ?4 )",
-    )
-    .bind(query.account_id.as_deref())
-    .bind(query.hide_sent)
-    .bind(query.token_in.as_deref())
-    .bind(query.token_out.as_deref())
-    .fetch_one(pool)
-    .await?;
+                             AND s.account_id = ",
+        );
+        total_builder.push_bind_fun(SqliteBind::Text(
+            hide_sent_account.clone().unwrap_or_default(),
+        ));
+        total_builder.push_text_fun(" AND s.tx_hash IS NOT NULL) )");
+    }
+    if let Some(token_in) = query.token_in.as_deref() {
+        total_builder.push_text_fun(" AND token_in = ");
+        total_builder.push_bind_fun(SqliteBind::Text(token_in.to_string()));
+    }
+    if let Some(token_out) = query.token_out.as_deref() {
+        total_builder.push_text_fun(" AND token_out = ");
+        total_builder.push_bind_fun(SqliteBind::Text(token_out.to_string()));
+    }
 
-    Ok((items, total.0))
+    let total: i64 = total_builder
+        .build_fun()
+        .bind_all_fun()
+        .fetch_one(pool)
+        .await?
+        .get(0);
+
+    Ok((items, total))
+}
+
+// ========================================
+// --- PAGE CHILDREN ---------------------
+// the account rows of a whole page of swaps, in ONE read.
+//
+// --- WHY --- THIS EXISTS AND NOT A LOOP OVER THE PAGE: the answer to
+// the list route is one json object per swap, and each one holds its
+// WHO. reading them per swap is one query per swap — a page of fifty is
+// fifty queries, and a thousand queued swaps is a thousand. that is the
+// single biggest cost in serving the feed, and it grows with the page.
+// reading them for the WHOLE page at once is one query, whatever the
+// page holds.
+//
+// --- WHY --- THE ANSWER IS GROUPED BY ID AND NOT BY POSITION: the swaps
+// come back in one order and the children come back in another, and
+// matching them up by position would break the moment the db answered
+// in a different order. the id is the join.
+pub async fn swap_queue_page_accounts_fun(
+    pool: &SqlitePool,
+    swap_ids: &[String],
+) -> Result<HashMap<String, Vec<SWAP_QUEUE_ACCOUNT_ROW>>, sqlx::Error> {
+    let mut accounts: HashMap<String, Vec<SWAP_QUEUE_ACCOUNT_ROW>> = HashMap::new();
+
+    // --- WHY --- AN EMPTY PAGE IS AN EMPTY ANSWER AND NOT A QUERY: a page
+    // with no swaps has no children, and asking the db for the children
+    // of nothing is a query that cannot answer anything.
+    if swap_ids.is_empty() {
+        return Ok(accounts);
+    }
+
+    let mut builder = SqliteListBuilder::new_fun(
+        "SELECT swap_id, account_id, status, tx_hash, amount_out, created_at, updated_at
+       FROM swap_queue_accounts
+      WHERE swap_id ",
+    );
+    builder.push_in_fun(swap_ids);
+    builder.push_text_fun(" ORDER BY swap_id ASC, created_at ASC, account_id ASC");
+
+    let rows = builder.build_fun().bind_all_fun().fetch_all(pool).await?;
+
+    for row in &rows {
+        let account = row_to_swap_queue_account_fun(row);
+        accounts
+            .entry(account.swap_id.clone())
+            .or_default()
+            .push(account);
+    }
+
+    Ok(accounts)
 }
 
 // ========================================

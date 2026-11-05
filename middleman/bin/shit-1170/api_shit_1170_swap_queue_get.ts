@@ -8,9 +8,22 @@
 //     --api-key shit_1170_abc123... \
 //     --limit 50
 //
+// the filters:
+//   --account-id    only the swaps these accounts are on, comma separated
+//   --hide-sent     with the account, drop the ones it has already sent
+//   --token-in      only the swaps that sell this token
+//   --token-out     only the swaps that buy this token
+//   --limit         how many to return
+//   --cursor        where the page starts, default the first page
+//
 // --- WHY --- `--hide-sent` NEEDS `--account-id`: "has this account sent
 // it" is a question about ONE account, and the backend answers a 400
 // for the filter without one.
+//
+// --- WHY --- --cursor and not --offset: the page is walked by a cursor
+// the backend hands out, and the cursor is opaque. there is no offset
+// to ask for, and the bin prints the next cursor so the next page can
+// be fetched with it.
 // ========================================
 
 import { api_shit_1170_swap_queue_get } from "@huggies/shit-1170-rex-engine-middleman";
@@ -50,18 +63,7 @@ if (limit_raw !== undefined) {
   limit = parsed;
 }
 
-const offset_raw = flags.get("--offset");
-let offset: number | undefined;
-if (offset_raw !== undefined) {
-  const parsed = Number(offset_raw);
-  if (!Number.isFinite(parsed)) {
-    console.error(
-      `api_shit_1170_swap_queue_get: --offset must be a number: ${offset_raw}`,
-    );
-    process.exit(1);
-  }
-  offset = parsed;
-}
+const cursor = flags.get("--cursor");
 
 const list = await api_shit_1170_swap_queue_get(
   base_url,
@@ -71,7 +73,7 @@ const list = await api_shit_1170_swap_queue_get(
     token_in: flags.get("--token-in"),
     token_out: flags.get("--token-out"),
     limit,
-    offset,
+    cursor,
   },
   { api_key: flags.get("--api-key") },
 );
@@ -84,5 +86,6 @@ for (const swap of list.items) {
       `${swap.accounts.length} account(s)`,
   );
 }
+console.log(`NEXT CURSOR: ${list.nextCursor ?? "(last page)"}`);
 // ========================================
 // copyright 2026 by sleet.near

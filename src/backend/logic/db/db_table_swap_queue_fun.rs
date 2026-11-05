@@ -40,9 +40,17 @@ use sqlx::{Connection, Executor, SqliteConnection};
 // --- WHY --- `CREATE TABLE IF NOT EXISTS`: it creates the table on a
 // fresh db and does nothing on one that already has it.
 //
-// --- WHY --- there is NO index on `created_at` here: the feed list reads
-// the swaps newest first, and a swap's rows are few enough that the
-// sort is over a small table.
+// --- WHY --- there IS an index on `created_at` now: the feed list reads
+// the swaps newest first, and it used to do that over a table with no
+// index on the column it sorts by — so every page of the feed sorted
+// the WHOLE table before it took its hundred rows. a swap table is
+// small while the app is young and is NOT small once a few thousand
+// swaps are queued, and the feed is exactly the query that pays for it.
+//
+// --- WHY --- the index is on `(created_at, swap_id)` AND NOT JUST
+// `created_at`: the feed's order is `(created_at DESC, swap_id DESC)`
+// and the cursor walks it, and an index that carries both columns lets
+// sqlite walk the pages in order without sorting anything.
 //
 // --- WHY --- the `when` column is QUOTED: `when` is a reserved word in
 // sqlite, and an unquoted `when` in a column list is a syntax error.
@@ -63,6 +71,8 @@ pub const SHIT_1170_DB_TABLE_SWAP_QUEUE: &str = r#"
     created_at         INTEGER NOT NULL,
     updated_at         INTEGER NOT NULL
   );
+  CREATE INDEX IF NOT EXISTS swap_queue_created_at_idx
+    ON swap_queue (created_at DESC, swap_id DESC);
 "#;
 // ========================================
 // --- CREATE ----------------------------

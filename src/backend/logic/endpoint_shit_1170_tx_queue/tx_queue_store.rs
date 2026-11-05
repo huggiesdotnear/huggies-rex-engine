@@ -21,6 +21,15 @@
 // `when` in a column list is a syntax error. `why` and `when_at` are
 // ordinary words and are left alone.
 use sqlx::{Row, SqlitePool};
+use std::collections::HashMap;
+
+use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_accounts_store::{
+    TX_QUEUE_ACCOUNT_ROW, row_to_tx_queue_account_fun,
+};
+use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_transactions_store::{
+    TX_QUEUE_TRANSACTION_ROW, row_to_tx_queue_transaction_fun,
+};
+use crate::backend::types::shit_1170_sql_list_fun::{SqliteBind, SqliteListBuilder};
 // ========================================
 // --- TYPES ------------------------------
 // one queued batch, as it comes out of the db.
@@ -50,20 +59,47 @@ pub struct TX_QUEUE_ROW {
 // list query is one statement with optional binds, and the caller fills
 // in the ones it was given. a struct keeps the filters named, so the
 // route cannot swap two of them by accident.
+//
+// --- WHY --- the account and the contract filters are LISTS and not
+// single values: the feed's filter bar lets a reader pick several
+// accounts and several contracts, and "the queues of alice OR bob" is a
+// question a single id cannot answer.
 #[derive(Debug, Clone, Default)]
 pub struct TX_QUEUE_LIST_QUERY {
-    // only the queues this account is on.
-    pub account_id: Option<String>,
+    // only the queues these accounts are on. an empty list means "any
+    // account".
+    pub account_ids: Vec<String>,
     // with the account, drop the queues this account has already sent.
     pub hide_sent: Option<bool>,
-    // only the queues holding a transaction for this contract.
-    pub contract_id: Option<String>,
+    // the account the `hide_sent` filter is about.
+    //
+    // --- WHY --- IT IS ITS OWN FIELD AND NOT THE FIRST OF THE ACCOUNT
+    // LIST: "hide what I have sent" is a question about the READER, and
+    // the account list is what the reader is filtering BY. they are two
+    // different questions and one field cannot answer both.
+    pub hide_sent_account: Option<String>,
+    // only the queues holding a transaction for one of these contracts.
+    // an empty list means "any contract".
+    pub contract_ids: Vec<String>,
     // only the queues holding a transaction for this method.
     pub method: Option<String>,
+    // where the page starts. it is the row the page starts after.
+    pub cursor: Option<TX_QUEUE_CURSOR_POINT>,
     // how many to return.
     pub limit: i64,
-    // where to start.
-    pub offset: i64,
+}
+
+// the row a page starts after.
+//
+// --- WHY --- IT IS ITS OWN STRUCT AND NOT THE CURSOR TOKEN: the cursor
+// token is base64 and is meant for the wire. this is what it turns into
+// once it has been read, and the sql binds it as two numbers.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TX_QUEUE_CURSOR_POINT {
+    // the `created_at` of the row the page starts after.
+    pub created_at: i64,
+    // the id of that same row.
+    pub queue_id: String,
 }
 // ========================================
 // --- INSERT ----------------------------
@@ -127,13 +163,13 @@ pub async fn tx_queue_get_fun(
 
 // ========================================
 // --- LIST ------------------------------
-// the queue list, and how many queues matched before the limit and the
-// offset took their cut.
+// the queue list, and how many queues matched before the limit took its
+// cut.
 //
 // --- WHY --- the total is a SECOND statement and not a window function
 // over the page: the total is the count of the WHOLE match, so it has to
-// be counted before the limit and the offset cut it. a window function
-// would count only the rows that survived.
+// be counted before the limit cut it. a window function would count only
+// the rows that survived.
 //
 // --- WHY --- the filters are OPTIONAL binds and the same `?1` is written
 // THREE times: the account id is wanted in the `EXISTS` and again in the
@@ -163,73 +199,343 @@ pub async fn tx_queue_get_fun(
 //
 // --- WHY --- the order is `created_at DESC`: the list is a feed, and the
 // newest batch is the one the reader wants.
+//
+// --- WHY --- THE ORDER IS `(created_at DESC, queue_id DESC)` AND NOT
+// JUST `created_at DESC`: two batches can be queued in the same
+// millisecond, and the cursor that walks this order needs a total one.
+// the id breaks the tie in the same direction as the time, so "the rows
+// after this one" is one comparison and not two.
+//
+// --- WHY --- THE CURSOR IS `(created_at, queue_id) < (?, ?)` AND NOT A
+// ROWID: the rowid moves when the db is vacuumed, and the cursor has
+// to survive that. the pair is what the row is identified by.
 pub async fn tx_queue_list_fun(
     pool: &SqlitePool,
     query: &TX_QUEUE_LIST_QUERY,
 ) -> Result<(Vec<TX_QUEUE_ROW>, i64), sqlx::Error> {
-    let rows = sqlx::query(
+    // --- THE HIDE-SENT ACCOUNT ------------
+    // the account the `hide_sent` filter is about.
+    //
+    // --- WHY --- IT IS THE FIRST ONE OF THE LIST: the filter is "has
+    // THIS account sent it", and the list is a set of accounts the
+    // reader is looking at. when there is one account it is that one,
+    // and when there are several the first one is the reader's own —
+    // the route always puts the caller's account first.
+    let hide_sent_account: Option<String> = query.hide_sent_account.clone();
+
+    // --- THE PAGE -----------------------
+    let mut builder = SqliteListBuilder::new_fun(
         "SELECT queue_id, what, \"when\", why, when_at, created_at, updated_at
        FROM tx_queue
-      WHERE ( ?1 IS NULL
-           OR EXISTS (SELECT 1 FROM tx_queue_accounts a
+      WHERE ( ",
+    );
+
+    // --- THE CALLER'S OWN VIEW -----------
+    // "is the caller on this batch" — the reader's own view of the feed.
+    //
+    // --- WHY --- THE CLAUSE IS ONLY WRITTEN FOR A SINGLE ACCOUNT: the
+    // caller's own view is about the ONE account the caller is. when
+    // the reader has picked SEVERAL accounts in the filter bar, the
+    // question is "is any of THESE on this batch", and asking "is the
+    // CALLER on this batch" as well would narrow the list down to the
+    // caller's own batches and hide the ones the reader asked for.
+    //
+    // so the clause is written only when there is exactly one account,
+    // and then it is that account's own view.
+    if query.account_ids.len() == 1 {
+        builder.push_text_fun(
+            "EXISTS (SELECT 1 FROM tx_queue_accounts a
                        WHERE a.queue_id = tx_queue.queue_id
-                         AND a.account_id = ?1) )
-        AND ( ?2 IS NULL OR ?2 = 0
+                         AND a.account_id = ",
+        );
+        builder.push_bind_fun(SqliteBind::Text(query.account_ids[0].clone()));
+        builder.push_text_fun(" ) ");
+    } else {
+        // no single account to ask about, so the clause is always true.
+        builder.push_text_fun("1 ");
+    }
+    builder.push_text_fun(") ");
+
+    // --- THE ACCOUNT FILTER -------------
+    // "is any of the picked accounts on this batch" — the filter bar's
+    // multi-select.
+    //
+    // --- WHY --- IT IS A SEPARATE CLAUSE AND NOT PART OF THE `EXISTS`:
+    // the `EXISTS` above asks "is the CALLER on this batch", and this
+    // one asks "is ANY of these accounts on this batch". they are two
+    // different questions — the first is the reader's own view and the
+    // second is the filter bar — and one subquery cannot ask both.
+    //
+    // so the two are ANDed: the batch must be one the caller can see
+    // AND one that carries an account from the list.
+    if !query.account_ids.is_empty() {
+        builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM tx_queue_accounts f
+                           WHERE f.queue_id = tx_queue.queue_id
+                             AND f.account_id ",
+        );
+        builder.push_in_fun(&query.account_ids);
+        builder.push_text_fun(")");
+    }
+
+    // --- THE HIDE-SENT FILTER ------------
+    //
+    // --- WHY --- THE FLAG IS BOUND AND NOT WRITTEN AS A LITERAL: the
+    // clause is "the flag is zero OR the account has not sent it". the
+    // flag is ONE when the reader wants the sent ones hidden, and then
+    // the clause asks the real question. the flag is ZERO when the
+    // reader does not, and then the whole clause is true and nothing
+    // is hidden.
+    if hide_sent_account.is_some() {
+        builder.push_text_fun(" AND ( ");
+        builder.push_bind_fun(SqliteBind::Int(if query.hide_sent.unwrap_or(false) {
+            1
+        } else {
+            0
+        }));
+        builder.push_text_fun(
+            " = 0
            OR NOT EXISTS (SELECT 1 FROM tx_queue_accounts s
                            WHERE s.queue_id = tx_queue.queue_id
-                             AND s.account_id = ?1
-                             AND s.tx_hash IS NOT NULL) )
-        AND ( ?3 IS NULL
-           OR EXISTS (SELECT 1 FROM tx_queue_transactions t
-                       WHERE t.queue_id = tx_queue.queue_id
-                         AND t.contract_id = ?3) )
-        AND ( ?4 IS NULL
-           OR EXISTS (SELECT 1 FROM tx_queue_transactions t
-                       WHERE t.queue_id = tx_queue.queue_id
-                         AND t.method = ?4) )
-      ORDER BY created_at DESC
-      LIMIT ?5 OFFSET ?6",
-    )
-    .bind(query.account_id.as_deref())
-    .bind(query.hide_sent)
-    .bind(query.contract_id.as_deref())
-    .bind(query.method.as_deref())
-    .bind(query.limit)
-    .bind(query.offset)
-    .fetch_all(pool)
-    .await?;
+                             AND s.account_id = ",
+        );
+        builder.push_bind_fun(SqliteBind::Text(
+            hide_sent_account.clone().unwrap_or_default(),
+        ));
+        builder.push_text_fun(" AND s.tx_hash IS NOT NULL) )");
+    }
 
-    let items = rows.iter().map(row_to_tx_queue_fun).collect();
+    // --- THE CONTRACT FILTER -------------
+    // --- WHY --- IT IS AN `EXISTS` OVER THE TRANSACTIONS and not over
+    // the account rows: a queue holds a transaction for a contract even
+    // when nobody has sent it yet, and the queue is what the filter is
+    // about.
+    if !query.contract_ids.is_empty() {
+        builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM tx_queue_transactions t
+                           WHERE t.queue_id = tx_queue.queue_id
+                             AND t.contract_id ",
+        );
+        builder.push_in_fun(&query.contract_ids);
+        builder.push_text_fun(")");
+    }
 
-    let total: (i64,) = sqlx::query_as(
-        "SELECT COUNT(1)
-       FROM tx_queue
-      WHERE ( ?1 IS NULL
-           OR EXISTS (SELECT 1 FROM tx_queue_accounts a
+    // --- THE METHOD FILTER --------------
+    if let Some(method) = query.method.as_deref() {
+        builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM tx_queue_transactions t
+                           WHERE t.queue_id = tx_queue.queue_id
+                             AND t.method = ",
+        );
+        builder.push_bind_fun(SqliteBind::Text(method.to_string()));
+        builder.push_text_fun(")");
+    }
+
+    // --- THE CURSOR ---------------------
+    // the rows after the one the cursor names.
+    if let Some(cursor) = query.cursor.as_ref() {
+        builder.push_text_fun(" AND ( created_at < ");
+        builder.push_bind_fun(SqliteBind::Int(cursor.created_at));
+        builder.push_text_fun(" OR ( created_at = ");
+        builder.push_bind_fun(SqliteBind::Int(cursor.created_at));
+        builder.push_text_fun(" AND queue_id < ");
+        builder.push_bind_fun(SqliteBind::Text(cursor.queue_id.clone()));
+        builder.push_text_fun(" ) )");
+    }
+
+    builder.push_text_fun(" ORDER BY created_at DESC, queue_id DESC LIMIT ");
+    builder.push_bind_fun(SqliteBind::Int(query.limit));
+
+    let rows = builder.build_fun().bind_all_fun().fetch_all(pool).await?;
+    let items: Vec<TX_QUEUE_ROW> = rows.iter().map(row_to_tx_queue_fun).collect();
+
+    // --- THE TOTAL ----------------------
+    // how many matched before the limit and the cursor took their cut.
+    //
+    // --- WHY --- THE TOTAL COUNTS THE WHOLE MATCH AND NOT THE PAGE: the
+    // reader is told how many queued txs there are in total, and that
+    // number has to be the whole match and not the rows that survived
+    // the limit. the cursor is NOT part of the count — the total is how
+    // many match the FILTERS, and it does not change as the reader
+    // pages through them.
+    //
+    // --- WHY --- IT IS THE SAME CLAUSES BUILT AGAIN AND NOT A SECOND
+    // FORM OF THE LIST: the count and the list have to agree about what
+    // matched, and two hand-written forms of the same filter are two
+    // chances to disagree.
+    let mut total_builder = SqliteListBuilder::new_fun("SELECT COUNT(1) FROM tx_queue WHERE ( ");
+    if query.account_ids.len() == 1 {
+        total_builder.push_text_fun(
+            "EXISTS (SELECT 1 FROM tx_queue_accounts a
                        WHERE a.queue_id = tx_queue.queue_id
-                         AND a.account_id = ?1) )
-        AND ( ?2 IS NULL OR ?2 = 0
+                         AND a.account_id = ",
+        );
+        total_builder.push_bind_fun(SqliteBind::Text(query.account_ids[0].clone()));
+        total_builder.push_text_fun(" ) ");
+    } else {
+        total_builder.push_text_fun("1 ");
+    }
+    total_builder.push_text_fun(") ");
+    if !query.account_ids.is_empty() {
+        total_builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM tx_queue_accounts f
+                           WHERE f.queue_id = tx_queue.queue_id
+                             AND f.account_id ",
+        );
+        total_builder.push_in_fun(&query.account_ids);
+        total_builder.push_text_fun(")");
+    }
+    if hide_sent_account.is_some() {
+        total_builder.push_text_fun(" AND ( ");
+        total_builder.push_bind_fun(SqliteBind::Int(if query.hide_sent.unwrap_or(false) {
+            1
+        } else {
+            0
+        }));
+        total_builder.push_text_fun(
+            " = 0
            OR NOT EXISTS (SELECT 1 FROM tx_queue_accounts s
                            WHERE s.queue_id = tx_queue.queue_id
-                             AND s.account_id = ?1
-                             AND s.tx_hash IS NOT NULL) )
-        AND ( ?3 IS NULL
-           OR EXISTS (SELECT 1 FROM tx_queue_transactions t
-                       WHERE t.queue_id = tx_queue.queue_id
-                         AND t.contract_id = ?3) )
-        AND ( ?4 IS NULL
-           OR EXISTS (SELECT 1 FROM tx_queue_transactions t
-                       WHERE t.queue_id = tx_queue.queue_id
-                         AND t.method = ?4) )",
-    )
-    .bind(query.account_id.as_deref())
-    .bind(query.hide_sent)
-    .bind(query.contract_id.as_deref())
-    .bind(query.method.as_deref())
-    .fetch_one(pool)
-    .await?;
+                             AND s.account_id = ",
+        );
+        total_builder.push_bind_fun(SqliteBind::Text(
+            hide_sent_account.clone().unwrap_or_default(),
+        ));
+        total_builder.push_text_fun(" AND s.tx_hash IS NOT NULL) )");
+    }
+    if !query.contract_ids.is_empty() {
+        total_builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM tx_queue_transactions t
+                           WHERE t.queue_id = tx_queue.queue_id
+                             AND t.contract_id ",
+        );
+        total_builder.push_in_fun(&query.contract_ids);
+        total_builder.push_text_fun(")");
+    }
+    if let Some(method) = query.method.as_deref() {
+        total_builder.push_text_fun(
+            " AND EXISTS (SELECT 1 FROM tx_queue_transactions t
+                           WHERE t.queue_id = tx_queue.queue_id
+                             AND t.method = ",
+        );
+        total_builder.push_bind_fun(SqliteBind::Text(method.to_string()));
+        total_builder.push_text_fun(")");
+    }
 
-    Ok((items, total.0))
+    let total: i64 = total_builder
+        .build_fun()
+        .bind_all_fun()
+        .fetch_one(pool)
+        .await?
+        .get(0);
+
+    Ok((items, total))
+}
+
+// ========================================
+// --- CHILDREN --------------------------
+// the transactions and the account rows of a whole page of batches, in
+// TWO reads.
+//
+// --- WHY --- THIS EXISTS AND NOT A LOOP OVER THE PAGE: the answer to
+// the list route is one json object per batch, and each one holds its
+// transactions and its WHO. reading them per batch is TWO queries per
+// batch — a page of fifty is a hundred queries, and a thousand queued
+// batches is two thousand. that is the single biggest cost in serving
+// the feed, and it grows with the page. reading them for the WHOLE page
+// at once is two queries, whatever the page holds.
+//
+// --- WHY --- THE IDS GO IN AS A LIST AND NOT AS A JOIN: a join over the
+// transactions and the account rows would multiply the rows together —
+// three transactions times three accounts is nine rows for one batch —
+// and the reading would have to un-multiply them again. a list of ids
+// keeps every row exactly as it is.
+//
+// --- WHY --- THE ANSWER IS GROUPED BY ID AND NOT BY POSITION: the
+// batches come back in one order and the children come back in another,
+// and matching them up by position would break the moment the db
+// answered in a different order. the id is the join.
+pub struct TX_QUEUE_PAGE_CHILDREN {
+    // the transactions of every batch on the page, keyed by the batch's
+    // id.
+    pub transactions: HashMap<String, Vec<TX_QUEUE_TRANSACTION_ROW>>,
+    // the account rows of every batch on the page, keyed by the batch's
+    // id.
+    pub accounts: HashMap<String, Vec<TX_QUEUE_ACCOUNT_ROW>>,
+}
+
+// the transactions and the account rows of a whole page of batches.
+//
+// --- WHY --- AN EMPTY PAGE IS AN EMPTY ANSWER AND NOT A QUERY: a page
+// with no batches has no children, and asking the db for the children
+// of nothing is a query that cannot answer anything.
+pub async fn tx_queue_page_children_fun(
+    pool: &SqlitePool,
+    queue_ids: &[String],
+) -> Result<TX_QUEUE_PAGE_CHILDREN, sqlx::Error> {
+    let mut transactions: HashMap<String, Vec<TX_QUEUE_TRANSACTION_ROW>> = HashMap::new();
+    let mut accounts: HashMap<String, Vec<TX_QUEUE_ACCOUNT_ROW>> = HashMap::new();
+
+    if queue_ids.is_empty() {
+        return Ok(TX_QUEUE_PAGE_CHILDREN {
+            transactions,
+            accounts,
+        });
+    }
+
+    // --- WHY --- THE IDS ARE BOUND ONE BY ONE AND NOT AS A LIST: sqlx
+    // does not bind a `Vec` as an `IN` list. the ids are bound one
+    // after the other and the placeholders are the same count, so the
+    // two still line up.
+    let mut transaction_builder = sqlx::QueryBuilder::<sqlx::Sqlite>::new(
+        "SELECT tx_id, queue_id, position, contract_id, method, args, gas, deposit, created_at, updated_at
+       FROM tx_queue_transactions
+      WHERE queue_id IN (",
+    );
+    {
+        let mut separated = transaction_builder.separated(", ");
+        for id in queue_ids {
+            separated.push_bind(id.as_str());
+        }
+    }
+    transaction_builder.push(") ORDER BY queue_id ASC, position ASC");
+    let transaction_rows = transaction_builder.build().fetch_all(pool).await?;
+
+    for row in &transaction_rows {
+        let transaction = row_to_tx_queue_transaction_fun(row);
+        transactions
+            .entry(transaction.queue_id.clone())
+            .or_default()
+            .push(transaction);
+    }
+
+    let mut account_builder = sqlx::QueryBuilder::<sqlx::Sqlite>::new(
+        "SELECT queue_id, tx_id, account_id, status, tx_hash, created_at, updated_at
+       FROM tx_queue_accounts
+      WHERE queue_id IN (",
+    );
+    {
+        let mut separated = account_builder.separated(", ");
+        for id in queue_ids {
+            separated.push_bind(id.as_str());
+        }
+    }
+    account_builder
+        .push(") ORDER BY queue_id ASC, created_at ASC, tx_id ASC, account_id ASC");
+    let account_rows = account_builder.build().fetch_all(pool).await?;
+
+    for row in &account_rows {
+        let account = row_to_tx_queue_account_fun(row);
+        accounts
+            .entry(account.queue_id.clone())
+            .or_default()
+            .push(account);
+    }
+
+    Ok(TX_QUEUE_PAGE_CHILDREN {
+        transactions,
+        accounts,
+    })
 }
 
 // ========================================

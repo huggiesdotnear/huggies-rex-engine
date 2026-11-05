@@ -31,6 +31,7 @@ use super::tx_queue_route::{tx_queue_get_route, tx_queue_post_route};
 use super::tx_queue_sent_route::tx_queue_sent_route;
 use super::tx_queue_stats_contracts_route::tx_queue_stats_contracts_route;
 use super::tx_queue_stats_methods_route::tx_queue_stats_methods_route;
+use super::tx_queue_facets_route::tx_queue_facets_route;
 use super::swap_queue_accounts_delete_route::swap_queue_accounts_delete_route;
 use super::swap_queue_accounts_route::swap_queue_accounts_route;
 use super::swap_queue_one_route::swap_queue_one_route;
@@ -114,6 +115,14 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         .route(
             "/api/shit-1170/tx-queue/stats/methods",
             get(tx_queue_stats_methods_route),
+        )
+        // the facets route — the contracts and the accounts the feed's
+        // filter bar offers. it comes BEFORE the `{queue_id}` route for
+        // the same reason the stats routes do: `facets` would otherwise
+        // be read as a queue id.
+        .route(
+            "/api/shit-1170/tx-queue/facets",
+            get(tx_queue_facets_route),
         )
         .route(
             "/api/shit-1170/tx-queue",

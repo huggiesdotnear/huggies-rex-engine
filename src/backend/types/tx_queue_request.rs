@@ -210,9 +210,17 @@ pub struct TX_QUEUE_ITEM {
 pub struct TX_QUEUE_LIST_RESPONSE {
     // the batches on this page.
     pub items: Vec<TX_QUEUE_ITEM>,
-    // how many batches matched, BEFORE the limit and the offset took
+    // how many batches matched, BEFORE the limit and the cursor took
     // their cut. it is how many pages there are.
     pub total: i64,
+    // the cursor of the NEXT page, or null when this page is the last
+    // one.
+    //
+    // --- WHY --- IT IS A TOKEN AND NOT A NUMBER: the caller hands it
+    // straight back, and it says "the rows after this one" — not "the
+    // rows after this many". a new batch landing at the top of the list
+    // does not move the reader's place in it.
+    pub next_cursor: Option<String>,
 }
 
 // one contract in the contract stats.

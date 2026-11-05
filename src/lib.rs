@@ -30,6 +30,7 @@ pub mod backend {
         pub mod trezu_treasuries_route;
         pub mod tx_queue_accounts_delete_route;
         pub mod tx_queue_accounts_route;
+        pub mod tx_queue_facets_route;
         pub mod tx_queue_one_route;
         pub mod tx_queue_route;
         #[cfg(test)]
@@ -40,10 +41,13 @@ pub mod backend {
     }
     pub mod types {
         pub mod api_keys_request;
+        pub mod shit_1170_query_list_fun;
+        pub mod shit_1170_sql_list_fun;
         pub mod swap_queue_query;
         pub mod swap_queue_request;
         pub mod trezu_treasuries_query;
         pub mod tx_queue_query;
+        pub mod tx_queue_facets_request;
         pub mod tx_queue_request;
     }
 }

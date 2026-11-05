@@ -90,9 +90,16 @@ export interface SHIT_1170_SWAP_QUEUE {
 export interface SHIT_1170_SWAP_QUEUE_LIST {
   // the swaps on this page.
   items: SHIT_1170_SWAP_QUEUE[];
-  // how many swaps matched, BEFORE the limit and the offset took their
+  // how many swaps matched, BEFORE the limit and the cursor took their
   // cut. it is how many pages there are.
   total: number;
+  // the cursor of the NEXT page, or null when this page is the last
+  // one. it is handed back as `cursor` to get the page after this.
+  //
+  // --- WHY --- it is a STRING and not null only: the backend encodes
+  // the page point and only the backend can read it back, so the
+  // middleman never shapes it.
+  nextCursor: string | null;
 }
 
 // --- REQUEST ----------------------------
@@ -151,8 +158,15 @@ export interface SHIT_1170_SWAP_QUEUE_SENT_REQUEST {
 
 // --- QUERY ------------------------------
 // the filters of the swap list.
+//
+// --- WHY --- `account_id` is a COMMA SEPARATED STRING and not an
+// array: the query extractor reads ONE value per param, so a list would
+// need the param to be repeated, and a browser cannot build a repeated
+// param out of a map. one comma separated string carries many values,
+// and it reads the same in a hand-written url. a single value still
+// works — "alice.near" is a list of one.
 export interface SHIT_1170_SWAP_QUEUE_QUERY {
-  // only the swaps this account is on.
+  // only the swaps these accounts are on. comma separated.
   account_id?: string;
   // with the account, drop the swaps this account has already sent.
   hide_sent?: boolean;
@@ -162,8 +176,20 @@ export interface SHIT_1170_SWAP_QUEUE_QUERY {
   token_out?: string;
   // how many to return.
   limit?: number;
-  // where to start.
-  offset?: number;
+  // where the page starts. it is the `nextCursor` of the previous page,
+  // handed back exactly as it was given.
+  //
+  // --- WHY --- it is a CURSOR and not an OFFSET: new swaps land at the
+  // top of the list all the time, so "skip the first N rows" would
+  // show the reader the same swap twice or skip one. the cursor says
+  // "the rows after THIS one", and that stays true whatever lands
+  // above it.
+  //
+  // --- WHY --- it is an OPAQUE STRING and not something we build: the
+  // backend encodes the page point and only the backend can read it
+  // back. a cursor we shaped would break the day the backend changes
+  // the order.
+  cursor?: string;
 }
 // ========================================
 // copyright 2026 by sleet.near
