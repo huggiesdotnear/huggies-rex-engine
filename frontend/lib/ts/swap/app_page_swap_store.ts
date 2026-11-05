@@ -12,7 +12,7 @@
 // the card is showing. splitting them into separate stores would let
 // one show a route for a pair the others have already moved on from.
 import { SHIT_1170_APP_PAGE_SWAP_URL } from "./app_page_swap_url";
-import { SHIT_1170_APP_PAGE_SWAP_BALANCES } from "./app_page_swap_balances";
+import { SHIT_1170_SWAP_BALANCES } from "../shared/swap_balances";
 import { SHIT_1170_SWAP_ROUTES } from "../shared/swap_routes";
 import { SHIT_1170_APP_PAGE_SWAP_QUEUE } from "./app_page_swap_queue";
 import { SHIT_1170_TOKEN_INFO } from "../shared/token_info";
@@ -214,7 +214,7 @@ async function load_tokens_and_balances_fun(
     const balances =
       account_id === null
         ? new Map<string, string>()
-        : await SHIT_1170_APP_PAGE_SWAP_BALANCES.load(account_id, ids);
+        : await SHIT_1170_SWAP_BALANCES.load(account_id, ids);
     const token_in_info = info_map.get(token_in) ?? null;
     const token_out_info = info_map.get(token_out) ?? null;
     set_state_fun({

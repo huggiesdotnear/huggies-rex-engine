@@ -190,10 +190,20 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
   // without one. the card's route is the best one the router answered
   // with, and the live subscription keeps it current.
   const has_route = props.routes.length > 0;
+  // --- WHY --- THE BUTTON NEEDS THE BALANCE: the swap SELLS the token
+  // in, so the reader has to hold at least that much of it. a button
+  // that would fail in the wallet is worse than an off button — the
+  // reader is told the truth before they press it.
+  //
+  // --- WHY THE COMPARISON IS EXACT: both numbers are in the token's
+  // smallest unit, so BigInt compares them without rounding.
+  const balance = state.swap_balances.get(swap.tokenIn) ?? "0";
+  const has_balance = BigInt(balance) >= BigInt(swap.amountIn || "0");
   const can_swap_now =
     account_id !== null &&
     has_api_key &&
     has_route &&
+    has_balance &&
     !busy &&
     !state.loading;
 
@@ -314,7 +324,9 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
               ? "you need an api key to report a send"
               : !has_route
                 ? "no dex can serve this pair right now"
-                : "sign this swap from your account"
+                : !has_balance
+                  ? "you do not hold enough of this token"
+                  : "sign this swap from your account"
           }
         >
           {busy ? "WORKING…" : "SWAP NOW"}
@@ -342,6 +354,14 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
           >
             {on_queue ? "REMOVE" : "ADD"}
           </button>
+        )}
+        {/* --- WHY --- THE SHORT BALANCE IS SAID OUT LOUD: an off button
+            with no reason is a button the reader cannot read. the
+            balance is the one thing that stops them, and saying it
+            means they know the trade is not theirs to make — and they
+            can still ADD themselves to it and wait for the price. */}
+        {account_id !== null && !sent && !has_balance && (
+          <span class="feed-post-hint">NOT ENOUGH {token_in?.symbol ?? swap.tokenIn}</span>
         )}
       </div>
     </article>

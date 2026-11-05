@@ -27,6 +27,7 @@ import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
 import { fetch_transfer_tokens_by_ids_fun } from "../shared/transfer_tokens";
 import { SHIT_1170_SWAP_LIVE_ROUTES } from "../shared/swap_live_routes";
+import { SHIT_1170_SWAP_BALANCES } from "../shared/swap_balances";
 import type { SHIT_1170_SWAP_QUOTE } from "../shared/swap_quote";
 import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
@@ -45,6 +46,10 @@ export interface SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED {
   // SWAP NOW button signs the BEST route of the swap, and this is
   // where it finds it.
   routes: ReadonlyArray<ReadonlyArray<SHIT_1170_SWAP_ROUTE>>;
+  // the reader's balance of each token a swap SELLS, keyed by token id.
+  // the SWAP NOW button is off when the balance does not cover the
+  // amount, so the reader is never offered a trade they cannot make.
+  balances: Map<string, string>;
 }
 // ========================================
 // --- CONFIG -----------------------------
@@ -72,12 +77,14 @@ export async function shit_1170_feed_swaps_load_fun(
   );
   const swaps = result.items;
   const tokens = await load_swap_tokens_fun(swaps);
+  const balances = await load_swap_balances_fun(swaps, account_id);
   const live = await load_swap_routes_fun(swaps, account_id, on_routes);
   return {
     swaps,
     tokens,
     quotes: live.map((one) => one.quote),
     routes: live.map((one) => one.routes),
+    balances,
   };
 }
 // ========================================
@@ -101,6 +108,38 @@ async function load_swap_tokens_fun(
   } catch (err) {
     console.warn(
       "[app_page_feed_swaps] the token metadata could not be read",
+      err,
+    );
+    return new Map();
+  }
+}
+// ========================================
+// --- BALANCES --------------------------
+// the reader's balance of the tokens the swaps sell.
+//
+// --- WHY ONLY THE TOKEN IN: the token in is the one that LEAVES the
+// reader's wallet, so it is the one the balance has to cover. the token
+// out is what comes back.
+//
+// --- WHY THE SIGNED-OUT READER GETS NO BALANCES: there is no account,
+// so there is nothing to check.
+//
+// --- WHY A FAILURE HERE IS SWALLOWED: the swaps are still worth
+// showing. a balance the app could not read costs the reader the
+// balance check, and it must not cost them the feed.
+async function load_swap_balances_fun(
+  swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>,
+  account_id: string | null,
+): Promise<Map<string, string>> {
+  if (account_id === null) return new Map();
+  const ids = [...new Set(swaps.map((swap) => swap.tokenIn))];
+  if (ids.length === 0) return new Map();
+  try {
+    const balances = await SHIT_1170_SWAP_BALANCES.load(account_id, ids);
+    return new Map(balances);
+  } catch (err) {
+    console.warn(
+      "[app_page_feed_swaps] the balances could not be read",
       err,
     );
     return new Map();

@@ -298,3 +298,20 @@
   opacity: 1;
 }
 /*==================================*/
+/* the reason the SWAP NOW button is off.
+
+   --- WHY --- IT IS SAID OUT LOUD AND NOT LEFT TO THE TOOLTIP: an off
+   button with no reason is a button the reader cannot read. the
+   balance is the one thing that stops them, and saying it means they
+   know the trade is not theirs to make — and they can still ADD
+   themselves to it and wait for the price.
+
+   --- WHY --- IT IS QUIET: it is a note, not another action. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-hint {
+  align-self: center;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--color-backend);
+  white-space: nowrap;
+}
+/*==================================*/

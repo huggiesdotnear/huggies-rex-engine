@@ -44,6 +44,13 @@ export interface SHIT_1170_APP_PAGE_FEED_STORE_STATE extends SHIT_1170_APP_PAGE_
   // SWAP NOW button signs the route the card is showing. so the route
   // has to be here, and the quote is read off it.
   swap_routes: ReadonlyArray<ReadonlyArray<SHIT_1170_SWAP_ROUTE>>;
+  // the reader's balance of each token a swap sells, keyed by token id.
+  //
+  // --- WHY --- THE BALANCES ARE HELD: the SWAP NOW button is off when
+  // the reader does not hold enough of the token the swap sells. a
+  // button that cannot work is noise, and a trade the reader cannot
+  // afford is a trade they should not be offered.
+  swap_balances: Map<string, string>;
 }
 // ========================================
 // ========================================
@@ -58,6 +65,7 @@ let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
   swaps: [],
   swap_quotes: [],
   swap_routes: [],
+  swap_balances: new Map(),
   tokens: new Map(),
   swap_tokens: new Map(),
   loading: false,
@@ -184,6 +192,7 @@ async function load_fun(): Promise<void> {
       swaps: swaps_loaded.swaps,
       swap_quotes: swaps_loaded.quotes,
       swap_routes: swaps_loaded.routes,
+      swap_balances: swaps_loaded.balances,
       swap_tokens: swaps_loaded.tokens,
       loading: false,
       error: null,
@@ -197,6 +206,7 @@ async function load_fun(): Promise<void> {
       swaps: [],
       swap_quotes: [],
       swap_routes: [],
+      swap_balances: new Map(),
       tokens: new Map(),
       swap_tokens: new Map(),
       loading: false,
@@ -216,6 +226,7 @@ async function load_swaps_fun(account_id: string | null): Promise<{
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
   quotes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_quotes"];
   routes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_routes"];
+  balances: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_balances"];
   tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
 }> {
   try {
@@ -227,11 +238,18 @@ async function load_swaps_fun(account_id: string | null): Promise<{
       swaps: loaded.swaps,
       quotes: loaded.quotes,
       routes: loaded.routes,
+      balances: loaded.balances,
       tokens: loaded.tokens,
     };
   } catch (err) {
     console.warn("[app_page_feed_store] the swaps could not be loaded", err);
-    return { swaps: [], quotes: [], routes: [], tokens: new Map() };
+    return {
+      swaps: [],
+      quotes: [],
+      routes: [],
+      balances: new Map(),
+      tokens: new Map(),
+    };
   }
 }
 // ========================================
