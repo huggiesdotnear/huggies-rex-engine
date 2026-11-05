@@ -30,7 +30,7 @@ BUT do not rebuild/restart the container for a MINIMAL backend code change that 
 ### USING
 
 - see live site at 🌐 https://shit-1170.com/
-- see the code at 🐱 https://github.com/huggiesdotnear/huggies-rex-engine
+- see the code at 🐱 https://github.com/huggiesdotnear/shit-1170-rex-engine
 - see skills at 🐱 https://github.com/huggiesdotnear/shit-1170-rex-engine-skills
 
 ========================================
