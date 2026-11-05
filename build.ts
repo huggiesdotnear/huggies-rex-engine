@@ -49,4 +49,21 @@ const openGraphImageOutput = join(outputDirectory, openGraphImage);
 await mkdir(dirname(openGraphImageOutput), { recursive: true });
 await cp(join(frontendDirectory, openGraphImage), openGraphImageOutput);
 
+// ========================================
+// the llms.txt is copied by hand too, and it lives at the REPO ROOT.
+//
+// it is the canonical file — the one that gets committed, read by humans
+// and by crawlers off github. it is copied into the output folder by
+// hand for the same reason the og image is: the bundler only tracks an
+// asset when a LINK tag references it, and nothing in the app links to
+// llms.txt.
+//
+// the copy lands at the ROOT of the output folder, so the static server
+// answers it at /llms.txt.
+// ========================================
+const llmsTxt = "llms.txt";
+const llmsTxtOutput = join(outputDirectory, llmsTxt);
+
+await cp(join(repositoryRoot, llmsTxt), llmsTxtOutput);
+
 console.log(`Built ${result.outputs.length} files into ${outputDirectory}`);
