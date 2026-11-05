@@ -15,8 +15,7 @@ import { render } from "preact";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store";
 import { SHIT_1170_TOKEN_PICKER } from "../../ts/shared/token_picker";
-import { SHIT_1170_APP_PAGE_SWAP_EXECUTE } from "../../ts/swap/app_page_swap_execute";
-import { SHIT_1170_TOAST_STORE } from "../../ts/shared/toast_store";
+import { SHIT_1170_SWAP_SEND } from "../../ts/shared/swap_send";
 import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
 import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
@@ -29,7 +28,6 @@ import {
 } from "../../ts/swap/app_page_swap_amount";
 import { swap_box_amount_fun } from "../../ts/swap/app_page_swap_box_amount";
 import type { SHIT_1170_TOKEN_INFO } from "../../ts/shared/token_info";
-import type { SHIT_1170_SWAP_EXECUTION } from "../../ts/swap/app_page_swap_execute";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
@@ -124,36 +122,6 @@ function amount_note_fun(
   );
 }
 // ========================================
-// ========================================
-// --- REPORT ---------------------------
-// tell the backend that the queued swap went out.
-//
-// --- WHY --- THE OUTCOME IS DERIVED FROM THE RESULT: the result says
-// whether the swap succeeded, whether it failed, or whether it went out
-// and nobody knows. those are the three states the backend records.
-//
-// --- WHY --- A FAILED REPORT IS SWALLOWED: the swap DID go out. the
-// report is the backend's record of it, and a backend that cannot be
-// reached must not turn a working swap into a failure in the reader's
-// eyes.
-async function report_queued_swap_fun(
-  result: SHIT_1170_SWAP_EXECUTION,
-): Promise<void> {
-  const status = result.succeeded
-    ? "succeeded"
-    : result.unknown
-      ? "sent"
-      : "failed";
-  try {
-    await SHIT_1170_APP_PAGE_SWAP_STORE.report_queued_swap(
-      result.tx_hash,
-      status,
-      result.amount_out,
-    );
-  } catch (err) {
-    console.warn("[app_page_swap_form] the swap could not be reported", err);
-  }
-}
 // ========================================
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_SWAP_FORM_FUN() {
@@ -256,46 +224,19 @@ export function SHIT_1170_COMPONENT_SWAP_FORM_FUN() {
     if (!can_swap || route === null) return;
     const account_id = SHIT_1170_AUTH.get_account_id();
     if (account_id === null) return;
-    const result = await SHIT_1170_APP_PAGE_SWAP_EXECUTE.execute(
-      route.raw,
-      page.token_in,
-      page.token_out,
+    // --- WHY --- THE SHARED SEND DOES THE WHOLE THING: it signs the
+    // route, records it against the queued swap the url points at, and
+    // tells the reader. the feed's SWAP NOW button calls the same
+    // function, so the two cannot answer differently about what
+    // happened.
+    await SHIT_1170_SWAP_SEND.send({
+      route: route.raw,
+      token_in: page.token_in,
+      token_out: page.token_out,
       account_id,
-    );
-    // --- WHY --- THE QUEUED SWAP IS REPORTED BEFORE THE TOAST: the
-    // report is what puts the swap's hash and its outcome on the feed,
-    // and the reader is about to be told the swap went out. so the
-    // record is made first, and a failure of the report is swallowed —
-    // the swap DID go out, and a backend that cannot be reached must
-    // not turn a working swap into a failure in the reader's eyes.
-    await report_queued_swap_fun(result);
-    // --- WHY --- A DECLINE IS NOT A TOAST: the reader said no, and that
-    // is not a failure. the page just goes back to offering the swap.
-    if (result.declined) return;
-    if (result.succeeded) {
-      SHIT_1170_TOAST_STORE.show(
-        "success",
-        "SWAP DONE",
-        result.amount_out === null
-          ? null
-          : `${unit_to_human_fun(result.amount_out, out_card.decimals)} ${out_card.symbol}`,
-        result.tx_hash,
-      );
-    } else if (result.unknown) {
-      SHIT_1170_TOAST_STORE.show(
-        "info",
-        "SWAP SENT — CHECK IT",
-        result.error,
-        result.tx_hash,
-      );
-    } else {
-      SHIT_1170_TOAST_STORE.show(
-        "error",
-        "SWAP FAILED",
-        result.error,
-        result.tx_hash,
-      );
-    }
+      swap: page.queued_swap,
+      output_decimals: out_card.decimals,
+    });
   };
 
   return (

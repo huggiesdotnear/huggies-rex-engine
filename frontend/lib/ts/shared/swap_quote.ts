@@ -19,11 +19,18 @@
 // --- WHY A FAILURE IS NOT FATAL: the router can be down, and a feed of
 // swaps with no numbers in them is useless. so a failure is answered
 // with null, and the caller falls back to the stored quote.
+//
+// --- WHY THE QUOTE CARRIES THE ROUTE AND NOT JUST THE NUMBERS: the
+// route IS the quote — the numbers are read off it. a card that shows
+// an amount out and cannot be signed from is half a quote. so the route
+// rides along, and the card's SWAP NOW signs exactly the route the
+// reader can see.
 import { SHIT_1170_SWAP_AGGREGATOR } from "../swap/app_page_swap_aggregator";
 import { router_token_id_fun } from "../swap/app_page_swap_router_token";
 import {
   AMOUNT_IN,
   GET_ROUTES,
+  type ROUTE,
 } from "@sleet-js/intear-dex-aggregator-tool-box";
 // ========================================
 // --- TYPES ------------------------------
@@ -44,6 +51,14 @@ export interface SHIT_1170_SWAP_QUOTE {
   // the best route's worst-case amount out, in the output token's
   // smallest unit. it is null when there is no route.
   worst_case_out: string | null;
+  // the BEST route itself, or null when there is none.
+  //
+  // --- WHY --- IT RIDES ALONG: the card shows the best route's amount
+  // out, and the SWAP NOW button signs the best route. if the button
+  // had to ask the router again, the route it signed could be a
+  // different one from the one on screen — and the number the reader
+  // agreed to would not be the number they got.
+  route: ROUTE | null;
 }
 // ========================================
 // --- QUOTE ------------------------------
@@ -82,6 +97,7 @@ export async function shit_1170_swap_quote_fun(
         amount_out: null,
         dex_id: null,
         worst_case_out: null,
+        route: null,
       };
     }
     const estimated = best.estimated_amount.amount_out;
@@ -97,6 +113,7 @@ export async function shit_1170_swap_quote_fun(
       dex_id: best.dex_id,
       worst_case_out:
         typeof worst === "string" && worst.length > 0 ? worst : null,
+      route: best,
     };
   } catch (err) {
     // --- WHY --- THE FAILURE IS SWALLOWED AND NOT THROWN: the router is
@@ -106,41 +123,6 @@ export async function shit_1170_swap_quote_fun(
     console.warn("[swap_quote] the router could not answer", err);
     return null;
   }
-}
-// ========================================
-// --- ALL -------------------------------
-// the live quotes for a set of swaps, in the same order.
-//
-// --- WHY EVERY SWAP IS ASKED FOR ON ITS OWN: the router answers ONE
-// pair and ONE amount at a time, so there is no batch call to make.
-// the swaps are asked for together so the answers come back together.
-//
-// --- WHY A SWAP THAT FAILS IS LEFT OUT AND NOT NULL-ED: the caller
-// matches the answers to the swaps by index, so a hole in the array
-// would shift every answer after it. a swap whose quote could not be
-// taken is answered with null in its place.
-export async function shit_1170_swap_quotes_fun(
-  swaps: ReadonlyArray<{
-    token_in: string;
-    token_out: string;
-    amount_in: string;
-  }>,
-): Promise<Array<SHIT_1170_SWAP_QUOTE | null>> {
-  const quotes = await Promise.all(
-    swaps.map(async (swap) => {
-      try {
-        return await shit_1170_swap_quote_fun(
-          swap.token_in,
-          swap.token_out,
-          swap.amount_in,
-        );
-      } catch (err) {
-        console.warn("[swap_quote] a quote could not be taken", err);
-        return null;
-      }
-    }),
-  );
-  return quotes;
 }
 // ========================================
 // copyright 2026 by sleet.near

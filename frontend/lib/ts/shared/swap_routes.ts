@@ -1,7 +1,7 @@
 // ========================================
-// the swap page's ROUTES: the dex-aggregator's answers for one swap.
+// the ROUTES for one swap: the dex-aggregator's answers.
 //
-// there are two ways to get routes and the page uses BOTH:
+// there are two ways to get routes and BOTH are used:
 //
 //   GET_ROUTES     one answer, right now. used when the reader first
 //                  opens the page and when they change a token or the
@@ -21,6 +21,17 @@
 // socket is bound to ONE query — one token pair, one amount. when the
 // reader changes any of those, the old socket is answering a question
 // nobody is asking any more, so it is closed and a new one opened.
+//
+// --- WHY IT IS SHARED AND NOT IN THE SWAP PAGE'S FOLDER: the feed
+// shows queued swaps too, and each card needs the same thing — the
+// routes for its pair and amount, kept live. one implementation, one
+// rule for how a route is asked for and how it is kept fresh, so the
+// feed's route and the swap page's route cannot drift.
+//
+// --- WHY EACH SUBSCRIPTION IS KEPT BY ITS QUERY KEY: the feed holds
+// MANY swaps at once, and the swap page holds one. so the subscriptions
+// live in a map keyed by the query, and closing one query's
+// subscription leaves the others alone.
 import {
   AMOUNT_IN,
   AMOUNT_OUT,
@@ -32,13 +43,12 @@ import {
   type ROUTE_SUBSCRIPTION,
   type SUBSCRIPTION_SOCKET,
 } from "@sleet-js/intear-dex-aggregator-tool-box";
-import { SHIT_1170_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
-import { router_token_id_fun } from "./app_page_swap_router_token";
-import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
-// ========================================
+import { SHIT_1170_SWAP_AGGREGATOR } from "../swap/app_page_swap_aggregator";
+import { router_token_id_fun } from "../swap/app_page_swap_router_token";
+import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "../swap/app_page_swap_amount_side";
 // ========================================
 // --- TYPES ------------------------------
-// one route, as the page shows it.
+// one route, as a page shows it.
 export interface SHIT_1170_SWAP_ROUTE {
   // which dex serves this route: "Rhea", "RheaDcl", "Plach", "Wrap".
   dex_id: string;
@@ -60,7 +70,6 @@ export interface SHIT_1170_SWAP_ROUTE {
   // the raw route, for the execution step.
   raw: ROUTE;
 }
-// ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // the output amount of a route, whichever field the quote carries.
@@ -134,6 +143,14 @@ function map_routes_fun(routes: ReadonlyArray<ROUTE>): SHIT_1170_SWAP_ROUTE[] {
   }));
 }
 // ========================================
+// map ONE route into the page's shape.
+//
+// --- WHY --- IT IS ITS OWN HELPER: the feed's one-shot fetch answers
+// with the router's raw route, and it has to become the same shape the
+// live subscription answers with. one mapper, so the two cannot drift.
+function map_route_fun(route: ROUTE): SHIT_1170_SWAP_ROUTE {
+  return map_routes_fun([route])[0] as SHIT_1170_SWAP_ROUTE;
+}
 // ========================================
 // --- PARAMS ----------------------------
 // the quote parameters for one swap.
@@ -166,6 +183,26 @@ function build_quote_params_fun(
   };
 }
 // ========================================
+// --- KEY -------------------------------
+// the key that names ONE query: the pair, the amount and the side.
+//
+// --- WHY --- the key CARRIES THE SIDE: `amount_in=100` and
+// `amount_out=100` are two different questions about the same pair,
+// and they answer different things. a key without the side would say
+// they are the same.
+//
+// --- WHY --- THE TRADER ACCOUNT IS NOT IN THE KEY: the account is
+// needed for the ROUTE to be executable, but it does not change what
+// the query is asking. the same pair and amount is the same question
+// whoever asks it.
+function route_query_key_fun(
+  token_in: string,
+  token_out: string,
+  amount: string,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
+): string {
+  return `${token_in}|${token_out}|${amount}|${side}`;
+}
 // ========================================
 // --- GET -------------------------------
 // fetch the routes for one swap, once.
@@ -186,7 +223,6 @@ async function get_swap_routes_fun(
   const routes = await GET_ROUTES(SHIT_1170_SWAP_AGGREGATOR.client, params);
   return map_routes_fun(routes);
 }
-// ========================================
 // ========================================
 // --- SUBSCRIBE -------------------------
 // open a live subscription for one swap.
@@ -212,47 +248,21 @@ const SHIT_1170_CLOSE_POLL_MS = 50;
 // already compares against the same value for the OPEN state.
 const SOCKET_CONNECTING = 0;
 // ========================================
-// the subscription the page currently holds, so it can be closed.
-let current_subscription: ROUTE_SUBSCRIPTION | null = null;
-// the newest subscribe's number.
-//
-// --- WHY --- it exists: a subscribe is opened with an `await`, and the
-// socket is created before that await resolves. two subscribes can
-// therefore overlap, and the older one can land AFTER the newer one.
-// this counter says which one is the newest, so the older one closes
-// itself on arrival instead of taking over.
-let generation = 0;
-// ========================================
-// the socket the current subscription is using.
-//
-// --- WHY --- IT IS TRACKED HERE: the tool box's subscription does not
-// expose its socket, so the page cannot tell whether the socket has
-// finished connecting. it matters: closing a socket that is still
-// CONNECTING makes the browser log "WebSocket is closed before the
-// connection is established" and report it as an error.
-//
-// the tool box takes a socket factory, so the page supplies its own and
-// keeps the socket it hands over.
-let current_socket: SUBSCRIPTION_SOCKET | null = null;
-// ========================================
-// close the live subscription, if there is one.
-//
-// --- WHY --- closing is safe to call when there is no subscription: the
-// page opens and closes these as the reader changes the swap, and a
-// close on an already-closed page must not throw.
-//
-// --- WHY --- THE CLOSE WAITS FOR THE SOCKET TO OPEN: closing a socket
-// that is still connecting makes the browser log the warning above and
-// report it as an error — an error the reader caused by typing one more
-// digit, because every keystroke opens a new socket and closes the old
-// one, and the old one is usually still connecting.
-function close_swap_subscription_fun(): void {
-  if (current_subscription === null) return;
-  const subscription = current_subscription;
-  current_subscription = null;
-  current_socket = null;
-  close_when_open_fun(subscription, current_socket);
+// one live subscription, and the socket it is using.
+interface SHIT_1170_ROUTE_SUBSCRIPTION {
+  subscription: ROUTE_SUBSCRIPTION;
+  socket: SUBSCRIPTION_SOCKET | null;
+  // the newest subscribe's number for THIS query, so an older subscribe
+  // that lands late closes itself instead of taking over.
+  generation: number;
 }
+// ========================================
+// the live subscriptions, by query key.
+//
+// --- WHY --- A MAP AND NOT ONE GLOBAL: the feed holds many swaps and
+// the swap page holds one, and they are on different pages. one global
+// would mean the feed's card closing the swap page's socket.
+const subscriptions: Map<string, SHIT_1170_ROUTE_SUBSCRIPTION> = new Map();
 // ========================================
 // close a subscription, but only once its socket has finished
 // connecting.
@@ -273,7 +283,7 @@ function close_when_open_fun(
     try {
       subscription.close();
     } catch (err) {
-      console.warn("[swap] closing the route subscription failed", err);
+      console.warn("[swap_routes] closing the route subscription failed", err);
     }
   };
   if (socket === null) {
@@ -291,9 +301,9 @@ function close_when_open_fun(
   // overwritten and never called. the readyState is the only thing the
   // page can still read.
   //
-  // --- WHY --- THE POLL STOPS EARLY: the socket is closed as soon as
-  // it is no longer connecting, so the poll does not keep running for
-  // the life of the socket.
+  // --- WHY --- THE POLL STOPS EARLY: the socket is closed as soon as it
+  // is no longer connecting, so the poll does not keep running for the
+  // life of the socket.
   const started_at = Date.now();
   const timer = setInterval(() => {
     const still_connecting = socket.readyState === SOCKET_CONNECTING;
@@ -304,7 +314,38 @@ function close_when_open_fun(
   }, SHIT_1170_CLOSE_POLL_MS);
 }
 // ========================================
-// open a live subscription for one swap, replacing any open one.
+// close the live subscription for one query, if there is one.
+//
+// --- WHY --- closing is safe to call when there is no subscription: the
+// page opens and closes these as the reader changes the swap, and a
+// close on an already-closed page must not throw.
+function close_swap_subscription_fun(
+  token_in: string,
+  token_out: string,
+  amount: string,
+  side: SHIT_1170_SWAP_AMOUNT_SIDE,
+): void {
+  const key = route_query_key_fun(token_in, token_out, amount, side);
+  const held = subscriptions.get(key);
+  if (held === undefined) return;
+  subscriptions.delete(key);
+  close_when_open_fun(held.subscription, held.socket);
+}
+// ========================================
+// close EVERY live subscription.
+//
+// --- WHY --- THE FEED NEEDS IT: the feed holds a subscription per card,
+// and a feed that is reloaded or filtered has to let go of all of them
+// — the cards that left the screen must not keep a socket open.
+function close_all_subscriptions_fun(): void {
+  for (const held of [...subscriptions.values()]) {
+    close_when_open_fun(held.subscription, held.socket);
+  }
+  subscriptions.clear();
+}
+// ========================================
+// open a live subscription for one swap, replacing any open one for the
+// same query.
 //
 // --- WHY --- THE GENERATION COUNTER: a subscription is opened with an
 // `await`, and the socket is created BEFORE that await resolves. so a
@@ -334,16 +375,14 @@ async function subscribe_swap_routes_fun(
   on_routes: (routes: SHIT_1170_SWAP_ROUTE[]) => void,
   on_error: (message: string) => void,
 ): Promise<void> {
-  // this subscribe is the newest one from now on.
-  generation += 1;
-  const my_generation = generation;
+  const key = route_query_key_fun(token_in, token_out, amount, side);
+  // this subscribe is the newest one for this query from now on.
+  const previous = subscriptions.get(key);
+  const my_generation = (previous?.generation ?? 0) + 1;
   // the subscription we are about to open, and the socket it uses.
-  const previous_subscription = current_subscription;
-  const previous_socket = current_socket;
-  current_subscription = null;
-  current_socket = null;
-  if (previous_subscription !== null) {
-    close_when_open_fun(previous_subscription, previous_socket);
+  if (previous !== undefined) {
+    close_when_open_fun(previous.subscription, previous.socket);
+    subscriptions.delete(key);
   }
   const params = build_quote_params_fun(
     token_in,
@@ -396,21 +435,26 @@ async function subscribe_swap_routes_fun(
   // have started while this one was opening. if so, this subscription
   // is already stale, and it is closed on arrival rather than left to
   // answer a question nobody is asking.
-  if (my_generation !== generation) {
+  const held = subscriptions.get(key);
+  if (held !== undefined && held.generation > my_generation) {
     close_when_open_fun(subscription, socket);
     return;
   }
-  current_subscription = subscription;
-  current_socket = socket;
+  subscriptions.set(key, {
+    subscription,
+    socket,
+    generation: my_generation,
+  });
 }
 // ========================================
-// ========================================
 // --- PUBLIC ---------------------------
-export const SHIT_1170_APP_PAGE_SWAP_ROUTES = {
+export const SHIT_1170_SWAP_ROUTES = {
   get: get_swap_routes_fun,
+  map: map_route_fun,
   subscribe: subscribe_swap_routes_fun,
   close_subscription: close_swap_subscription_fun,
+  close_all_subscriptions: close_all_subscriptions_fun,
+  key: route_query_key_fun,
 };
 // ========================================
 // copyright 2026 by sleet.near
-// ========================================

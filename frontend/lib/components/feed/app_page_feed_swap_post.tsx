@@ -20,14 +20,14 @@
 // was queued, so there is always something to show.
 //
 // --- WHY SWAP NOW IS A BUTTON AND NOT A LINK: it is the TRADE. it does
-// what the swap page's SWAP button does — it works out the route, hands
-// it to the wallet and records what came of it against the queued
-// swap. DETAILS is the record, and that IS a link to the swap page.
+// what the swap page's SWAP button does — it hands the route to the
+// wallet and records what came of it against the queued swap. DETAILS
+// is the record, and that IS a link to the swap page.
 //
-// --- WHY THE ROUTE IS WORKED OUT AT SEND TIME AND NOT ON PAGE LOAD:
-// the pools move every block, and a route that is minutes old can be
-// stale. so the send asks the router again, with the reader's account,
-// and uses the route that answer gives.
+// --- WHY THE ROUTE IS THE CARD'S OWN: the card shows the best route's
+// amount out, and the button signs that same best route. the reader
+// agrees to the number on the card and gets that number's route — the
+// live subscription keeps both in step as the pools move.
 //
 // --- WHY THERE ARE TWO ACTIONS AND NOT ONE: SWAP NOW is the trade, and
 // DETAILS is the record. one is a button that signs, the other is a
@@ -75,6 +75,7 @@ import {
 import { SHIT_1170_API_KEY } from "../../ts/shared/api_key";
 import type { SHIT_1170_SWAP_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_SWAP_QUOTE } from "../../ts/shared/swap_quote";
+import type { SHIT_1170_SWAP_ROUTE } from "../../ts/shared/swap_routes";
 import type { SHIT_1170_QUEUE_READER_STATUS } from "../../ts/feed/app_page_feed_actions";
 // ========================================
 // ========================================
@@ -147,6 +148,7 @@ function amount_out_fun(
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
   swap: SHIT_1170_SWAP_QUEUE;
   quote: SHIT_1170_SWAP_QUOTE | null;
+  routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>;
 }) {
   const swap = props.swap;
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
@@ -184,14 +186,26 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
   // the key, the same rule the queued batch's SEND follows.
   const has_api_key =
     account_id !== null && SHIT_1170_API_KEY.get_api_key(account_id) !== null;
+  // --- WHY --- THE BUTTON NEEDS A ROUTE: there is nothing to sign
+  // without one. the card's route is the best one the router answered
+  // with, and the live subscription keeps it current.
+  const has_route = props.routes.length > 0;
   const can_swap_now =
-    account_id !== null && has_api_key && !busy && !state.loading;
+    account_id !== null &&
+    has_api_key &&
+    has_route &&
+    !busy &&
+    !state.loading;
 
   const swap_now_fun = async () => {
     if (!can_swap_now) return;
     set_busy(true);
     try {
-      await shit_1170_feed_send_swap_fun(swap);
+      await shit_1170_feed_send_swap_fun(
+        swap,
+        props.routes,
+        token_out?.decimals ?? null,
+      );
     } finally {
       // --- WHY --- THE FEED IS READ AGAIN EVEN WHEN THE SEND FAILED: the
       // send may have gone out even when the app could not read the
@@ -296,9 +310,11 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
             void swap_now_fun();
           }}
           title={
-            has_api_key
-              ? "sign this swap from your account"
-              : "you need an api key to report a send"
+            !has_api_key
+              ? "you need an api key to report a send"
+              : !has_route
+                ? "no dex can serve this pair right now"
+                : "sign this swap from your account"
           }
         >
           {busy ? "WORKING…" : "SWAP NOW"}

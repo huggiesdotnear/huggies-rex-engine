@@ -4,7 +4,7 @@
 // the feed holds two kinds of post: a queued BATCH of transactions, and
 // a queued SWAP. the swap has no calls yet — the agent named a token in,
 // an amount in and a token out — so the feed asks the swap queue for
-// those, and asks the router for the live amount out.
+// those, and asks the router for the live route.
 //
 // --- WHY THE SWAPS ARE A SEPARATE FILE AND NOT IN THE FEED'S LOADER:
 // the feed's loader fetches the QUEUES. the swaps are a different
@@ -14,6 +14,11 @@
 // --- WHY THE TOKENS ARE ASKED FOR IN ONE CALL: a feed of ten swaps can
 // name the same token twice, and one request for the set is one request
 // and not ten.
+//
+// --- WHY THE ROUTES ARE LOADED HERE AND NOT IN A COMPONENT: a component
+// that fetches is a component that can fetch at the wrong time, and the
+// feed's rule is that the components only display. so the routes come
+// with the load.
 import {
   api_shit_1170_swap_queue_get,
   type SHIT_1170_SWAP_QUEUE,
@@ -21,10 +26,9 @@ import {
 import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
 import { fetch_transfer_tokens_by_ids_fun } from "../shared/transfer_tokens";
-import {
-  shit_1170_swap_quotes_fun,
-  type SHIT_1170_SWAP_QUOTE,
-} from "../shared/swap_quote";
+import { SHIT_1170_SWAP_LIVE_ROUTES } from "../shared/swap_live_routes";
+import type { SHIT_1170_SWAP_QUOTE } from "../shared/swap_quote";
+import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
 // ========================================
 // --- TYPES ------------------------------
@@ -37,6 +41,10 @@ export interface SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED {
   // the live quote of each swap, in the SAME order as `swaps`. an entry
   // is null when the router could not answer.
   quotes: ReadonlyArray<SHIT_1170_SWAP_QUOTE | null>;
+  // the live routes of each swap, in the SAME order as `swaps`. the
+  // SWAP NOW button signs the BEST route of the swap, and this is
+  // where it finds it.
+  routes: ReadonlyArray<ReadonlyArray<SHIT_1170_SWAP_ROUTE>>;
 }
 // ========================================
 // --- CONFIG -----------------------------
@@ -47,18 +55,14 @@ export interface SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED {
 const SHIT_1170_FEED_SWAP_LIMIT = 50;
 // ========================================
 // --- LOAD ------------------------------
-// load the queued swaps, their tokens and their live quotes.
+// load the queued swaps, their tokens and their live routes.
 //
-// --- WHY THE QUOTES ARE TAKEN HERE AND NOT IN A COMPONENT: a component
-// that fetches is a component that can fetch at the wrong time, and the
-// feed's rule is that the components only display. so the quotes come
-// with the load.
-//
-// --- WHY A FAILED QUOTE DOES NOT FAIL THE LOAD: the router is a third
-// party. the swaps are still worth showing without their live numbers,
-// because the backend's stored quote is the fallback.
+// --- WHY A FAILED ROUTE LOAD DOES NOT FAIL THE LOAD: the router is a
+// third party. the swaps are still worth showing without their live
+// numbers, because the backend's stored quote is the fallback.
 export async function shit_1170_feed_swaps_load_fun(
   account_id: string | null,
+  on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
 ): Promise<SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED> {
   const options = await api_key_options_fun(false, account_id ?? undefined);
   const result = await api_shit_1170_swap_queue_get(
@@ -68,10 +72,14 @@ export async function shit_1170_feed_swaps_load_fun(
   );
   const swaps = result.items;
   const tokens = await load_swap_tokens_fun(swaps);
-  const quotes = await load_swap_quotes_fun(swaps);
-  return { swaps, tokens, quotes };
+  const live = await load_swap_routes_fun(swaps, account_id, on_routes);
+  return {
+    swaps,
+    tokens,
+    quotes: live.map((one) => one.quote),
+    routes: live.map((one) => one.routes),
+  };
 }
-
 // ========================================
 // --- TOKENS ----------------------------
 // the token metadata for the tokens the swaps name.
@@ -98,31 +106,46 @@ async function load_swap_tokens_fun(
     return new Map();
   }
 }
-
 // ========================================
-// --- QUOTES ----------------------------
-// the live quote of each swap.
+// --- ROUTES ----------------------------
+// the live routes of the swaps.
 //
-// --- WHY THE QUOTES ARE TAKEN FOR ALL THE SWAPS AT ONCE: they are one
-// batch of work, and the loading bar counts one batch.
-async function load_swap_quotes_fun(
+// --- WHY THE TRADER ACCOUNT IS PASSED: the router plans the
+// storage-deposit legs for the account that is going to trade, so the
+// route it answers can actually be executed. the reader may not be the
+// one who presses SWAP NOW, but the route is planned for whoever is
+// signed in.
+//
+// --- WHY THE ROUTES ARE ASKED FOR ALL AT ONCE: a feed of fifty swaps
+// is fifty questions to the router, and they are asked together so the
+// answers come back together.
+async function load_swap_routes_fun(
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>,
-): Promise<ReadonlyArray<SHIT_1170_SWAP_QUOTE | null>> {
+  account_id: string | null,
+  on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
+): Promise<
+  ReadonlyArray<{
+    quote: SHIT_1170_SWAP_QUOTE | null;
+    routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>;
+  }>
+> {
   if (swaps.length === 0) return [];
   try {
-    return await shit_1170_swap_quotes_fun(
+    return await SHIT_1170_SWAP_LIVE_ROUTES.load(
       swaps.map((swap) => ({
         token_in: swap.tokenIn,
         token_out: swap.tokenOut,
         amount_in: swap.amountIn,
       })),
+      account_id,
+      on_routes,
     );
   } catch (err) {
     console.warn(
-      "[app_page_feed_swaps] the live quotes could not be taken",
+      "[app_page_feed_swaps] the live routes could not be taken",
       err,
     );
-    return swaps.map(() => null);
+    return swaps.map(() => ({ quote: null, routes: [] }));
   }
 }
 // ========================================

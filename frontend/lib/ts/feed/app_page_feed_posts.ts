@@ -24,6 +24,7 @@ import type {
   SHIT_1170_TX_QUEUE,
 } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_SWAP_QUOTE } from "../shared/swap_quote";
+import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
 import type { SHIT_1170_FEED_SORT } from "./app_page_feed_types";
 // ========================================
 // --- TYPES ------------------------------
@@ -44,6 +45,10 @@ export type SHIT_1170_FEED_POST =
       // the live quote of the swap, or null when the router could not
       // answer. the swap then shows the quote the backend stored.
       quote: SHIT_1170_SWAP_QUOTE | null;
+      // the live routes of the swap, best first. the SWAP NOW button
+      // signs the BEST one — the route whose amount out is the one the
+      // card is showing.
+      routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>;
     };
 // ========================================
 // --- MERGE -----------------------------
@@ -69,6 +74,7 @@ export function shit_1170_feed_posts_fun(
   queues: ReadonlyArray<SHIT_1170_TX_QUEUE>,
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>,
   quotes: ReadonlyArray<SHIT_1170_SWAP_QUOTE | null>,
+  routes: ReadonlyArray<ReadonlyArray<SHIT_1170_SWAP_ROUTE>>,
   sort: SHIT_1170_FEED_SORT,
 ): SHIT_1170_FEED_POST[] {
   const posts: SHIT_1170_FEED_POST[] = [];
@@ -84,6 +90,7 @@ export function shit_1170_feed_posts_fun(
       kind: "swap",
       swap,
       quote: quotes[index] ?? null,
+      routes: routes[index] ?? [],
     });
   }
 

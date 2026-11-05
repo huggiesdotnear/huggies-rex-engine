@@ -13,14 +13,14 @@
 // one show a route for a pair the others have already moved on from.
 import { SHIT_1170_APP_PAGE_SWAP_URL } from "./app_page_swap_url";
 import { SHIT_1170_APP_PAGE_SWAP_BALANCES } from "./app_page_swap_balances";
-import { SHIT_1170_APP_PAGE_SWAP_ROUTES } from "./app_page_swap_routes";
+import { SHIT_1170_SWAP_ROUTES } from "../shared/swap_routes";
 import { SHIT_1170_APP_PAGE_SWAP_QUEUE } from "./app_page_swap_queue";
 import { SHIT_1170_TOKEN_INFO } from "../shared/token_info";
 import { SHIT_1170_AUTH } from "../shared/auth_status";
 import { SHIT_1170_NEAR_ID } from "../shared/token_near";
 import { human_to_unit_fun, unit_to_human_fun } from "./app_page_swap_amount";
 import type { SHIT_1170_TOKEN_INFO as TOKEN_INFO } from "../shared/token_info";
-import type { SHIT_1170_SWAP_ROUTE } from "./app_page_swap_routes";
+import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
 import type { SHIT_1170_SWAP_AMOUNT_SIDE } from "./app_page_swap_amount_side";
 import type { SHIT_1170_SWAP_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 // ========================================
@@ -311,7 +311,7 @@ async function load_routes_fun(
   set_state_fun({ ...state, loading_routes: true, error: null });
   const trader_account_id = SHIT_1170_AUTH.get_account_id();
   try {
-    const routes = await SHIT_1170_APP_PAGE_SWAP_ROUTES.get(
+    const routes = await SHIT_1170_SWAP_ROUTES.get(
       token_in,
       token_out,
       amount,
@@ -380,7 +380,22 @@ function clear_routes_fun(): void {
   quoted_token_in = null;
   quoted_token_out = null;
   quoted_amount_in = null;
-  SHIT_1170_APP_PAGE_SWAP_ROUTES.close_subscription();
+  // --- WHY --- THE CLOSE IS FOR THE QUOTE THAT WAS ON SCREEN AND NOT
+  // FOR ALL OF THEM: the subscriptions are held by their query, so the
+  // page closes the one it is leaving. the feed's cards hold their own,
+  // and closing theirs from here would take the feed's routes away.
+  if (
+    quoted_token_in !== null &&
+    quoted_token_out !== null &&
+    quoted_amount_in !== null
+  ) {
+    SHIT_1170_SWAP_ROUTES.close_subscription(
+      quoted_token_in,
+      quoted_token_out,
+      quoted_amount_in,
+      quoted_amount_side,
+    );
+  }
   set_state_fun({
     ...state,
     routes: [],
@@ -401,7 +416,7 @@ function open_subscription_fun(
   side: SHIT_1170_SWAP_AMOUNT_SIDE,
 ): void {
   const trader_account_id = SHIT_1170_AUTH.get_account_id();
-  void SHIT_1170_APP_PAGE_SWAP_ROUTES.subscribe(
+  void SHIT_1170_SWAP_ROUTES.subscribe(
     token_in,
     token_out,
     amount,
@@ -487,33 +502,6 @@ async function load_queued_swap_fun(): Promise<void> {
 }
 
 // ========================================
-// ========================================
-// --- REPORT ---------------------------
-// report that the queued swap went out, so the feed can show it.
-//
-// --- WHY --- THE REPORT IS A SEPARATE ACTION AND NOT PART OF THE
-// EXECUTE: the execution is the swap, and it goes through the wallet
-// and the aggregator. the report is a bookkeeping call to our own
-// backend, and it must not be able to fail the swap.
-//
-// --- WHY --- THE HASH IS NEEDED AND THE OUTCOME MAY NOT BE KNOWN: the
-// outcome is read off the chain, and a swap that went out but whose
-// outcome could not be read is `sent` — which is a real state.
-async function report_queued_swap_fun(
-  tx_hash: string | null,
-  status: "succeeded" | "failed" | "sent",
-  amount_out: string | null,
-): Promise<void> {
-  const queued = state.queued_swap;
-  if (queued === null) return;
-  if (tx_hash === null) return;
-  await SHIT_1170_APP_PAGE_SWAP_QUEUE.report(
-    queued.swapId,
-    tx_hash,
-    status,
-    amount_out,
-  );
-}
 // ========================================
 // quote the swap: the routes for the current pair and amount, and the
 // live subscription that keeps them fresh.
@@ -902,7 +890,6 @@ export const SHIT_1170_APP_PAGE_SWAP_STORE = {
   switch_direction: switch_direction_fun,
   select_route: select_route_fun,
   reset: reset_fun,
-  report_queued_swap: report_queued_swap_fun,
   subscribe: subscribe_fun,
   get: get_fun,
   get_selected_route: selected_route_fun,

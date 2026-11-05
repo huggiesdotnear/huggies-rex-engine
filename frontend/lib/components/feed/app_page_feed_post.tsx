@@ -309,6 +309,7 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_POST_FUN() {
             key={post.swap.swapId}
             swap={post.swap}
             quote={post.quote}
+            routes={post.routes}
           />
         ),
       )}

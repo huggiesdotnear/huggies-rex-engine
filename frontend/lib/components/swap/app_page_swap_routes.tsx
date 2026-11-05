@@ -17,7 +17,7 @@ import { SHIT_1170_APP_PAGE_SWAP_STORE } from "../../ts/swap/app_page_swap_store
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { SHIT_1170_AMOUNT_FORMAT } from "../../ts/shared/token_amount_format";
 import { human_to_unit_fun } from "../../ts/swap/app_page_swap_amount";
-import type { SHIT_1170_SWAP_ROUTE } from "../../ts/swap/app_page_swap_routes";
+import type { SHIT_1170_SWAP_ROUTE } from "../../ts/shared/swap_routes";
 // ========================================
 // ========================================
 // --- CARD ------------------------------

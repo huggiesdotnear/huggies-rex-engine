@@ -22,6 +22,8 @@ import type {
   SHIT_1170_FEED_VIEW,
 } from "./app_page_feed_types";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
+import { SHIT_1170_SWAP_ROUTES } from "../shared/swap_routes";
+import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
 import type {
   SHIT_1170_SWAP_QUEUE,
   SHIT_1170_TX_QUEUE,
@@ -36,6 +38,12 @@ export interface SHIT_1170_APP_PAGE_FEED_STORE_STATE extends SHIT_1170_APP_PAGE_
   tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
   // the token metadata for the two tokens each swap names.
   swap_tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
+  // the live routes of each swap, in the SAME order as `swaps`.
+  //
+  // --- WHY --- THE ROUTES ARE HELD AND NOT JUST THE QUOTE: the card's
+  // SWAP NOW button signs the route the card is showing. so the route
+  // has to be here, and the quote is read off it.
+  swap_routes: ReadonlyArray<ReadonlyArray<SHIT_1170_SWAP_ROUTE>>;
 }
 // ========================================
 // ========================================
@@ -49,6 +57,7 @@ let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
   queues: [],
   swaps: [],
   swap_quotes: [],
+  swap_routes: [],
   tokens: new Map(),
   swap_tokens: new Map(),
   loading: false,
@@ -106,6 +115,7 @@ function build_posts_fun(): SHIT_1170_FEED_POST[] {
     state.queues,
     state.swaps,
     state.swap_quotes,
+    state.swap_routes,
     state.sort,
   );
 }
@@ -130,6 +140,12 @@ async function load_fun(): Promise<void> {
   if (loading && loaded_for === key) return;
   loaded_for = key;
   loading = true;
+  // --- WHY --- THE OLD SUBSCRIPTIONS ARE CLOSED BEFORE THE NEW LOAD:
+  // the feed holds a live subscription per card, and a reload changes
+  // which cards are on screen. the cards that left must let go of their
+  // sockets — otherwise a filtered feed keeps paying for routes nobody
+  // is looking at.
+  SHIT_1170_SWAP_ROUTES.close_all_subscriptions();
   set_state_fun({
     ...state,
     view: filter.view,
@@ -167,6 +183,7 @@ async function load_fun(): Promise<void> {
       tokens: loaded.tokens,
       swaps: swaps_loaded.swaps,
       swap_quotes: swaps_loaded.quotes,
+      swap_routes: swaps_loaded.routes,
       swap_tokens: swaps_loaded.tokens,
       loading: false,
       error: null,
@@ -179,6 +196,7 @@ async function load_fun(): Promise<void> {
       queues: [],
       swaps: [],
       swap_quotes: [],
+      swap_routes: [],
       tokens: new Map(),
       swap_tokens: new Map(),
       loading: false,
@@ -188,7 +206,7 @@ async function load_fun(): Promise<void> {
 } // ========================================
 // ========================================
 // --- SWAPS ------------------------------
-// the queued swaps, and their live quotes.
+// the queued swaps, and their live routes.
 //
 // --- WHY --- THE FAILURE IS SWALLOWED AND NOT PROPAGATED: the swaps are
 // an addition to the feed, and a swap queue that is down must not take
@@ -197,19 +215,64 @@ async function load_fun(): Promise<void> {
 async function load_swaps_fun(account_id: string | null): Promise<{
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
   quotes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_quotes"];
+  routes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_routes"];
   tokens: Map<string, SHIT_1170_TRANSFER_TOKEN>;
 }> {
   try {
-    const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(account_id);
+    const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(
+      account_id,
+      set_swap_routes_fun,
+    );
     return {
       swaps: loaded.swaps,
       quotes: loaded.quotes,
+      routes: loaded.routes,
       tokens: loaded.tokens,
     };
   } catch (err) {
     console.warn("[app_page_feed_store] the swaps could not be loaded", err);
-    return { swaps: [], quotes: [], tokens: new Map() };
+    return { swaps: [], quotes: [], routes: [], tokens: new Map() };
   }
+}
+// ========================================
+// --- LIVE ROUTES ------------------------
+// one swap's routes changed under the live subscription.
+//
+// --- WHY --- THE QUOTE IS REBUILT FROM THE ROUTE: the quote IS the
+// route's numbers, so when the route changes the numbers change too.
+// reading them off the route means the amount on the card and the route
+// the button signs can never disagree.
+//
+// --- WHY --- THE INDEX IS CHECKED: a subscription for a swap that has
+// left the screen must not write into the next swap's slot.
+function set_swap_routes_fun(
+  index: number,
+  routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>,
+): void {
+  if (index < 0 || index >= state.swaps.length) return;
+  const swap_routes = [...state.swap_routes];
+  swap_routes[index] = routes;
+  const best = routes[0];
+  const swap_quotes = [...state.swap_quotes];
+  if (best === undefined) {
+    swap_quotes[index] = null;
+  } else {
+    // --- WHY --- THE NUMBERS ARE READ OFF THE MAPPED ROUTE: the mapped
+    // route carries the same amounts the raw one does, and reading them
+    // from it means the card and the button read the same route.
+    const existing = swap_quotes[index];
+    swap_quotes[index] = {
+      token_in: existing?.token_in ?? state.swaps[index]?.tokenIn ?? "",
+      token_out: existing?.token_out ?? state.swaps[index]?.tokenOut ?? "",
+      amount_in: existing?.amount_in ?? state.swaps[index]?.amountIn ?? "",
+      amount_out: best.amount_out.length > 0 ? best.amount_out : null,
+      dex_id: best.dex_id,
+      worst_case_out:
+        best.worst_case_out.length > 0 ? best.worst_case_out : null,
+      route: best.raw,
+    };
+  }
+  set_state_fun({ ...state, swap_routes, swap_quotes });
 }
 // ========================================
 // --- SET -------------------------------
