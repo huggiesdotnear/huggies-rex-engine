@@ -29,7 +29,6 @@ import { SHIT_1170_SWAP_AGGREGATOR } from "./app_page_swap_aggregator";
 import { router_token_id_fun } from "./app_page_swap_router_token";
 import { shit_1170_outcome_hash_fun } from "../shared/outcome_hash";
 // ========================================
-// ========================================
 // --- TYPES ------------------------------
 // what happened to the swap.
 export interface SHIT_1170_SWAP_EXECUTION {
@@ -45,8 +44,13 @@ export interface SHIT_1170_SWAP_EXECUTION {
   // true when the swap may well have gone through but we could not
   // tell — the outcome CHECK failed, not the swap.
   unknown: boolean;
+  // true when the reader DECLINED the wallet popup.
+  //
+  // --- WHY --- a decline is its own thing: the reader said no. that is
+  // not a failure, and a toast that said "it failed" would be telling
+  // the reader they did something wrong.
+  declined: boolean;
 }
-// ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // the hash of the first transaction that was actually sent.
@@ -62,6 +66,25 @@ function first_hash_fun(outcomes: ReadonlyArray<unknown>): string | null {
   return null;
 }
 // ========================================
+// --- DECLINED --------------------------
+// did the reader decline the wallet popup.
+//
+// --- WHY --- the wallet's decline message is matched loosely: every
+// wallet says it in its own words, and the app only needs to know that
+// the reader said no rather than that the send broke.
+function is_declined_fun(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const message = (err as { message?: unknown }).message;
+  if (typeof message !== "string") return false;
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("declined") ||
+    lower.includes("denied") ||
+    lower.includes("rejected") ||
+    lower.includes("cancelled") ||
+    lower.includes("canceled")
+  );
+}
 // ========================================
 // --- EXECUTE ---------------------------
 // send the route and report what happened.
@@ -96,8 +119,22 @@ async function execute_swap_fun(
         ? null
         : (result.outcome.error ?? "THE SWAP FAILED"),
       unknown: false,
+      declined: false,
     };
   } catch (err) {
+    // --- WHY --- A DECLINE IS NOT AN ERROR: the reader said no, and
+    // that is not a failure. it is reported as a decline and the reader
+    // is not toasted.
+    if (is_declined_fun(err)) {
+      return {
+        succeeded: false,
+        tx_hash: null,
+        amount_out: null,
+        error: null,
+        unknown: false,
+        declined: true,
+      };
+    }
     // --- WHY --- the two failure kinds are kept apart: a swap that
     // failed is one thing, and a CHECK that could not complete is
     // another — the swap may well have gone through. reporting the
@@ -110,6 +147,7 @@ async function execute_swap_fun(
           amount_out: null,
           error: err.error.message,
           unknown: false,
+          declined: false,
         };
       }
       if (err.error.kind === "outcome_unavailable") {
@@ -119,6 +157,7 @@ async function execute_swap_fun(
           amount_out: null,
           error: err.error.message,
           unknown: true,
+          declined: false,
         };
       }
       // --- WHY --- the formatter and not `err.error.message`: the
@@ -131,6 +170,7 @@ async function execute_swap_fun(
         amount_out: null,
         error: FORMAT_DEX_AGGREGATOR_ERROR(err.error),
         unknown: false,
+        declined: false,
       };
     }
     return {
@@ -139,10 +179,10 @@ async function execute_swap_fun(
       amount_out: null,
       error: err instanceof Error ? err.message : String(err),
       unknown: false,
+      declined: false,
     };
   }
 }
-// ========================================
 // ========================================
 // --- PUBLIC ---------------------------
 export const SHIT_1170_APP_PAGE_SWAP_EXECUTE = {
@@ -150,4 +190,3 @@ export const SHIT_1170_APP_PAGE_SWAP_EXECUTE = {
 };
 // ========================================
 // copyright 2026 by sleet.near
-// ========================================

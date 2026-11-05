@@ -265,19 +265,22 @@
   color: var(--color-middle);
 }
 /*==================================*/
-/* the SWAP NOW link is the card's main action, so it carries the same
-   rules the DETAIL link carries — a swap cannot be signed from the
-   feed, so the link IS the action. */
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail.is-swap {
+/* the SWAP NOW button is the card's main action, so it carries the
+   accent border the DETAIL link carried before it.
+
+   --- WHY --- IT IS NOT THE QUIET OUTLINE: the swap card's loud action
+   is the trade itself now — the reader presses SWAP NOW and the
+   wallet opens. the DETAILS link beside it is the quiet one, because
+   it is the record and not the trade. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-send.is-swap {
   border-color: var(--color-middle);
 }
 /*==================================*/
 /* the DETAILS link is the QUIET one beside it.
 
-   --- WHY --- IT IS QUIET AND NOT A SECOND LOUD BUTTON: the two links
-   go to the same page, so they are the same weight of thing. a card
-   with two loud buttons and a third quiet one reads as three different
-   actions, and two of them go to the same place. so the SWAP NOW is
+   --- WHY --- IT IS QUIET AND NOT A SECOND LOUD BUTTON: the two actions
+   are different things — one signs a trade, the other opens a record —
+   so they must not read as the same weight of thing. the SWAP NOW is
    the loud one — it carries the trade — and the DETAILS is the outline
    beside it. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-post-detail.is-swap.is-quiet {

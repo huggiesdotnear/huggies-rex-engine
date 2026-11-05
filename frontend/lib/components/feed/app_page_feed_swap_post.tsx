@@ -19,17 +19,20 @@
 // minute ago. the backend kept the quote that was taken when the swap
 // was queued, so there is always something to show.
 //
-// --- WHY THERE IS NO SEND BUTTON: a queued swap cannot be signed from
-// the feed. signing it means working out the route, and the route is
-// the swap page's job. so the card's actions are LINKS to the swap
-// page, and the swap page does the signing.
+// --- WHY SWAP NOW IS A BUTTON AND NOT A LINK: it is the TRADE. it does
+// what the swap page's SWAP button does — it works out the route, hands
+// it to the wallet and records what came of it against the queued
+// swap. DETAILS is the record, and that IS a link to the swap page.
 //
-// --- WHY THERE ARE TWO LINKS AND NOT ONE: SWAP NOW is the trade, and
-// DETAILS is the record. a queued swap has no detail page of its own —
-// the swap page IS its home — so both links go there, and the two
-// names say what the reader means by going. SWAP NOW is the loud one
-// because it carries the trade, and DETAILS is the quiet outline
-// beside it.
+// --- WHY THE ROUTE IS WORKED OUT AT SEND TIME AND NOT ON PAGE LOAD:
+// the pools move every block, and a route that is minutes old can be
+// stale. so the send asks the router again, with the reader's account,
+// and uses the route that answer gives.
+//
+// --- WHY THERE ARE TWO ACTIONS AND NOT ONE: SWAP NOW is the trade, and
+// DETAILS is the record. one is a button that signs, the other is a
+// link the reader can open, bookmark or send somebody without meaning
+// to trade anything.
 //
 // --- WHY THE ARROW IS AN ICON AND NOT A CHARACTER: the app's icons
 // come from lucide, and an arrow drawn as a character sits on the
@@ -65,6 +68,11 @@ import {
   shit_1170_feed_reader_swap_status_fun,
   shit_1170_feed_remove_swap_fun,
 } from "../../ts/feed/app_page_feed_swap_actions";
+import {
+  shit_1170_feed_send_swap_fun,
+  shit_1170_feed_swap_send_refresh_fun,
+} from "../../ts/feed/app_page_feed_swap_send";
+import { SHIT_1170_API_KEY } from "../../ts/shared/api_key";
 import type { SHIT_1170_SWAP_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_SWAP_QUOTE } from "../../ts/shared/swap_quote";
 import type { SHIT_1170_QUEUE_READER_STATUS } from "../../ts/feed/app_page_feed_actions";
@@ -169,6 +177,32 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
     }
   };
 
+  // --- WHY --- THE SWAP BUTTON NEEDS AN API KEY: the send is reported
+  // to the backend with the reader's key, and a reader with no key has
+  // nothing to report it with. the swap itself would still go out, but
+  // the feed would go on saying WAITING — so the button is off without
+  // the key, the same rule the queued batch's SEND follows.
+  const has_api_key =
+    account_id !== null && SHIT_1170_API_KEY.get_api_key(account_id) !== null;
+  const can_swap_now =
+    account_id !== null && has_api_key && !busy && !state.loading;
+
+  const swap_now_fun = async () => {
+    if (!can_swap_now) return;
+    set_busy(true);
+    try {
+      await shit_1170_feed_send_swap_fun(swap);
+    } finally {
+      // --- WHY --- THE FEED IS READ AGAIN EVEN WHEN THE SEND FAILED: the
+      // send may have gone out even when the app could not read the
+      // outcome, and the card's status is the backend's record. so the
+      // feed is asked again either way, and the card says what the
+      // backend says.
+      await shit_1170_feed_swap_send_refresh_fun();
+      set_busy(false);
+    }
+  };
+
   // --- WHY --- THE ADD / REMOVE BUTTON IS ONE BUTTON: it says the
   // opposite of what it will do. the same rule the queued batch's card
   // follows.
@@ -247,35 +281,28 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
         )}
       </div>
       <div class="feed-post-actions">
-        {/* --- WHY --- THERE ARE TWO BUTTONS AND NOT ONE: they are two
-            different things. SWAP NOW is the trade - it opens the swap
-            page on this exact queued swap, with the route worked out and
-            ready to sign. DETAILS is the record - the same page, but as
-            a link the reader can open, bookmark or send somebody
-            without meaning to trade anything.
+        {/* --- WHY --- SWAP NOW IS A BUTTON: it is the trade, and the
+            trade is a signing. it works out the route, hands it to the
+            wallet and records what came of it against the queued swap.
 
-            --- WHY --- BOTH GO TO THE SWAP PAGE: a queued swap has no
-            detail page of its own. the swap page IS its home - it shows
-            the trade, it works out the route, and it signs it. so the
-            two buttons are the same place with two different intents,
-            and the reader picks the one that says what they mean.
-
-            --- WHY --- SWAP NOW IS THE PROMISED ONE: the button that
-            carries the trade is the one the reader presses when they
-            mean it, and the DETAILS button is the quiet one beside
-            it. */}
-        <a
-          class="feed-post-detail is-swap"
-          href={swap_quote_href_fun(
-            swap.swapId,
-            swap.tokenIn,
-            swap.tokenOut,
-            swap.amountIn,
-            depth,
-          )}
+            --- WHY --- DETAILS IS A LINK: it is the record, and the
+            record is somewhere the reader can go — open it, bookmark
+            it, send it somebody — without meaning to trade anything. */}
+        <button
+          type="button"
+          class="feed-post-send is-swap"
+          disabled={!can_swap_now}
+          onClick={() => {
+            void swap_now_fun();
+          }}
+          title={
+            has_api_key
+              ? "sign this swap from your account"
+              : "you need an api key to report a send"
+          }
         >
-          SWAP NOW
-        </a>
+          {busy ? "WORKING…" : "SWAP NOW"}
+        </button>
         <a
           class="feed-post-detail is-swap is-quiet"
           href={swap_quote_href_fun(

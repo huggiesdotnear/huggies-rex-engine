@@ -269,6 +269,9 @@ export function SHIT_1170_COMPONENT_SWAP_FORM_FUN() {
     // the swap DID go out, and a backend that cannot be reached must
     // not turn a working swap into a failure in the reader's eyes.
     await report_queued_swap_fun(result);
+    // --- WHY --- A DECLINE IS NOT A TOAST: the reader said no, and that
+    // is not a failure. the page just goes back to offering the swap.
+    if (result.declined) return;
     if (result.succeeded) {
       SHIT_1170_TOAST_STORE.show(
         "success",
