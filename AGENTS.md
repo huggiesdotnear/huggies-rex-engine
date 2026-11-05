@@ -16,7 +16,7 @@
 
 WORKFLOW
 
-- always pull first.
+- always fetch/pull first.
 - commit and push after making changes.
 
 SHIT-1170 IS DEPLOYED live to https://shit-1170.com/
