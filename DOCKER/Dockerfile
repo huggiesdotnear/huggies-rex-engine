@@ -30,6 +30,12 @@ COPY tsconfig.json ./
 COPY middleman ./middleman
 COPY frontend ./frontend
 COPY build.ts ./build.ts
+# --- WHY: llm.md comes along ---
+# build.ts copies llm.md to static/llms.txt — the served name stays
+# llms.txt and the source stays markdown. the file lives at the repo
+# root, so it has to be copied in, or the frontend stage fails on a
+# missing /src/llm.md.
+COPY llm.md ./llm.md
 
 # install only what's needed for the frontend build. the middleman/
 # and frontend trees import `preact` indirectly (components that call
@@ -140,13 +146,19 @@ RUN apt-get update \
 # layer the dependency manifest first so source-only edits skip the
 # dependency build. /build/target lives on the layer filesystem (not a
 # cache mount) so the final binary is visible to the next stage's COPY.
+#
+# --- WHY: the bins are NOT built here ---
+# this stage exists to warm the dependency cache. it builds one empty
+# main and throws the result away. the real build below builds the
+# bins, and if this stage built them too the cleanup below would have to
+# know about every one of them.
 COPY Cargo.toml Cargo.lock ./
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
     mkdir -p src \
     && echo "fn main() {}" > src/main.rs \
     && cargo build --release \
-    && rm -rf src target/release/deps/shit_1170_rex_engine* target/release/shit-1170-rex-engine
+    && rm -rf src target/release
 
 # real build. NOTE: no `static/` copy here — `static/` is gitignored and
 # never exists in the build context, and the binary doesn't read it at
@@ -155,8 +167,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 COPY src ./src
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
-    touch src/main.rs \
-    && cargo build --release
+    touch src/main.rs src/bin/*.rs \
+    && cargo build --release --bins \
+    && mkdir -p target/release/vault \
+    && for bin in list prune backup export import; do \
+         cp "target/release/vault_$bin" "target/release/vault/vault-$bin"; \
+       done
 
 # ========================================
 # Stage 3: minimal runtime image.
@@ -198,11 +214,14 @@ COPY --from=rust-builder /build/target/release/shit-1170-rex-engine /usr/local/b
 #
 # `docker compose exec shit-1170-rex-engine-backend vault-prune --db ...`
 # is the command that does it.
-COPY --from=rust-builder /build/target/release/vault-list /usr/local/bin/vault-list
-COPY --from=rust-builder /build/target/release/vault-prune /usr/local/bin/vault-prune
-COPY --from=rust-builder /build/target/release/vault-backup /usr/local/bin/vault-backup
-COPY --from=rust-builder /build/target/release/vault-export /usr/local/bin/vault-export
-COPY --from=rust-builder /build/target/release/vault-import /usr/local/bin/vault-import
+#
+# --- WHY: they come in as ONE COPY of a folder ---
+# one COPY of a folder is one source path for the builder to resolve,
+# and a folder copy takes whatever the builder produced. five separate
+# COPY lines meant five separate lookups, and a lookup that missed one
+# file failed the whole build with a checksum error while the rest of
+# the layer sat cached.
+COPY --from=rust-builder /build/target/release/vault /usr/local/bin/
 COPY --from=frontend /src/static /app/static
 
 # --- WHY: ServeDir::new("static") is a RELATIVE path ---

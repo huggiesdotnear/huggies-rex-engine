@@ -30,3 +30,9 @@ dist
 DOCKER
 DOCS
 *.md
+# --- WHY: llm.md is NOT ignored ---
+# the markdown files are docs and do not belong in the image. but
+# llm.md is the SOURCE of the served llms.txt — build.ts copies it to
+# static/llms.txt — so the frontend stage needs it on disk, or the
+# build fails on a missing /src/llm.md.
+!llm.md
