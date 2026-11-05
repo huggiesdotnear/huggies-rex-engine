@@ -1,6 +1,6 @@
 // ========================================
-// the feed's filter bar: ALL / MINE, HIDE SENT, and the FILTERS panel
-// with the sort, the type, the contracts and the accounts.
+// the feed's filter bar: HIDE SENT, the FILTERS panel with the sort, the
+// type, the contracts and the accounts, and the direction toggle.
 //
 // it reads the filter from the store and writes it back through the
 // store's setters.
@@ -9,10 +9,10 @@
 // display. the filter bar changes a filter, the store re-reads the feed,
 // and the bar never talks to the api.
 //
-// --- WHY THE PANEL IS BEHIND A BUTTON: the bar has four groups now,
-// and four groups of buttons on every screen is a wall of controls above
-// a feed. the reader opens the panel when they want to filter, and the
-// bar stays a bar the rest of the time.
+// --- WHY THE PANEL IS BEHIND A BUTTON: the bar has a few controls now,
+// and a wall of them above every feed is noise. the reader opens the
+// panel when they want to filter, and the bar stays a bar the rest of
+// the time.
 //
 // --- WHY THE BUTTON SAYS FILTERS AND NOT ONLY THE ICON: an icon alone
 // is a picture the reader has to guess at, and this bar is read by
@@ -136,7 +136,11 @@ function FilterGroup(props: {
 // much is on screen and how much there is, and that is a fact about the
 // feed rather than a control. the controls sit above it and the fact
 // sits under them.
-function FilterPanel() {
+//
+// --- WHY THE PANEL TAKES A CALLBACK: SAVE closes the panel, and the
+// panel does not own the panel's open state — the bar does. so the bar
+// passes the closing in.
+function FilterPanel(props: { on_saved: () => void }) {
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
   const facets = state.facets;
 
@@ -145,6 +149,16 @@ function FilterPanel() {
   // work on it, and the facets are the api's own list of those.
   const contracts = facets?.contracts ?? [];
   const accounts = facets?.accounts ?? [];
+
+  // --- WHY --- THE READER'S OWN ACCOUNT GOES FIRST AND IS LABELLED ME:
+  // an account with no queued work of its own is not in the facets, so
+  // without this the reader's own account could not be picked at all.
+  // and the reader should not have to recognise their own id in a long
+  // row of ids — ME says it is them.
+  const own_account_id = SHIT_1170_AUTH.get_account_id();
+  const other_accounts = accounts.filter(
+    (account) => account.accountId !== own_account_id,
+  );
 
   return (
     <div class="feed-filter-panel">
@@ -166,29 +180,6 @@ function FilterPanel() {
             {option.label}
           </button>
         ))}
-        {/* --- WHY --- THE DIRECTION IS ITS OWN SMALL BUTTON: it is not a
-            third sort — it is the way round the sort that is on. so it
-            is an arrow and not a label, and it sits at the end of the
-            row beside the two sorts. */}
-        <button
-          type="button"
-          class="feed-filter-button feed-filter-direction"
-          aria-label={
-            state.direction === "desc" ? "sort ascending" : "sort descending"
-          }
-          title={state.direction === "desc" ? "DESCENDING" : "ASCENDING"}
-          onClick={() => {
-            const next: SHIT_1170_FEED_DIRECTION =
-              state.direction === "desc" ? "asc" : "desc";
-            void SHIT_1170_APP_PAGE_FEED_STORE.set_direction(next);
-          }}
-        >
-          {state.direction === "desc" ? (
-            <ArrowDown size={14} />
-          ) : (
-            <ArrowUp size={14} />
-          )}
-        </button>
       </FilterGroup>
       <FilterGroup label="TYPE">
         {SHIT_1170_FEED_TYPE_OPTIONS.map((option) => (
@@ -260,7 +251,26 @@ function FilterPanel() {
         >
           ALL
         </button>
-        {accounts.map((account) => (
+        {own_account_id !== null && (
+          <button
+            type="button"
+            class={
+              has_id_fun(state.accounts, own_account_id)
+                ? "feed-filter-button is-active"
+                : "feed-filter-button"
+            }
+            aria-pressed={has_id_fun(state.accounts, own_account_id)}
+            title={own_account_id}
+            onClick={() => {
+              void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts(
+                toggle_id_fun(state.accounts, own_account_id),
+              );
+            }}
+          >
+            ME
+          </button>
+        )}
+        {other_accounts.map((account) => (
           <button
             key={account.accountId}
             type="button"
@@ -303,6 +313,10 @@ function FilterPanel() {
           class="feed-filter-button"
           onClick={() => {
             SHIT_1170_APP_PAGE_FEED_STORE.save_filters();
+            // --- WHY --- THE PANEL CLOSES AFTER A SAVE: the reader has
+            // said "this is how I want the feed" and they want to see
+            // it. a panel that stayed open would be in the way.
+            props.on_saved();
           }}
         >
           SAVE
@@ -316,55 +330,19 @@ function FilterPanel() {
 // --- COMPONENT --------------------------
 export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_FEED_STORE);
-  const signed_in = SHIT_1170_AUTH.is_signed_in();
   // --- WHY --- THE PANEL IS ITS OWN STATE AND NOT IN THE STORE: whether
   // the panel is open is a thing about THIS component on THIS screen,
   // and it is not part of the feed's filter. a reader who opens the
   // panel, filters and closes it wants the same filter the next time.
   const [panel_open, set_panel_open] = use_state(false);
-  // --- WHY --- THE MINE BUTTON IS DISABLED WHEN NOBODY IS SIGNED IN:
-  // the MINE view is the reader's own queues, and a reader with no
-  // account has none. a button that cannot work is noise.
-  const mine_disabled = !signed_in;
-  // --- WHY --- HIDE SENT IS DISABLED IN THE ALL VIEW: "has this
-  // account sent it" is a question about ONE account, and the ALL view
-  // has none. the control is greyed out and the url's hide_sent is
-  // ignored.
-  const hide_sent_disabled = state.view !== "mine";
 
   return (
     <div class="feed-filters">
-      <div class="feed-filters-toggle" role="group" aria-label="whose queues">
-        <button
-          type="button"
-          class={
-            state.view === "all"
-              ? "feed-filter-button is-active"
-              : "feed-filter-button"
-          }
-          aria-pressed={state.view === "all"}
-          onClick={() => {
-            void SHIT_1170_APP_PAGE_FEED_STORE.set_view("all");
-          }}
-        >
-          ALL
-        </button>
-        <button
-          type="button"
-          class={
-            state.view === "mine"
-              ? "feed-filter-button is-active"
-              : "feed-filter-button"
-          }
-          aria-pressed={state.view === "mine"}
-          disabled={mine_disabled}
-          onClick={() => {
-            void SHIT_1170_APP_PAGE_FEED_STORE.set_view("mine");
-          }}
-        >
-          MINE
-        </button>
-      </div>
+      {/* --- WHY --- HIDE SENT IS ALWAYS AVAILABLE: "has this account
+          sent it" is a question about ONE account, and the account in
+          play is the reader's own — the backend takes the caller's own
+          account for the filter. so there is always an account to be
+          about, signed in or not. */}
       <button
         type="button"
         class={
@@ -373,15 +351,10 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
             : "feed-filter-button"
         }
         aria-pressed={state.hide_sent}
-        disabled={hide_sent_disabled}
         onClick={() => {
           void SHIT_1170_APP_PAGE_FEED_STORE.set_hide_sent(!state.hide_sent);
         }}
-        title={
-          hide_sent_disabled
-            ? "hiding what you sent needs your own view"
-            : "hide the queues you have already sent"
-        }
+        title="hide the queues you have already sent"
       >
         HIDE SENT
       </button>
@@ -397,7 +370,37 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
         <SlidersHorizontal size={14} />
         FILTERS
       </button>
-      {panel_open && <FilterPanel />}
+      {/* --- WHY --- THE DIRECTION IS IN THE BAR AND NOT IN THE PANEL: it
+          is not one of the filters — it is the way round the sort that
+          is on, and the reader wants it beside the bar at all times.
+          a reader who wants the oldest first should not have to open
+          the panel to say so. */}
+      <button
+        type="button"
+        class="feed-filter-button feed-filter-direction"
+        aria-label={
+          state.direction === "desc" ? "sort ascending" : "sort descending"
+        }
+        title={state.direction === "desc" ? "DESCENDING" : "ASCENDING"}
+        onClick={() => {
+          const next: SHIT_1170_FEED_DIRECTION =
+            state.direction === "desc" ? "asc" : "desc";
+          void SHIT_1170_APP_PAGE_FEED_STORE.set_direction(next);
+        }}
+      >
+        {state.direction === "desc" ? (
+          <ArrowDown size={14} />
+        ) : (
+          <ArrowUp size={14} />
+        )}
+      </button>
+      {panel_open && (
+        <FilterPanel
+          on_saved={() => {
+            set_panel_open(false);
+          }}
+        />
+      )}
     </div>
   );
 }

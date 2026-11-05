@@ -30,6 +30,8 @@ const SHIT_1170_FEED_SAVED_STORAGE_KEY = "SHIT_1170_APP_PAGE_FEED_FILTER";
 // --- TYPES ------------------------------
 // the filters the reader saved.
 export interface SHIT_1170_APP_PAGE_FEED_SAVED {
+  // true when the queues the reader has already sent were hidden.
+  hide_sent: boolean;
   // how the list is ordered.
   sort: SHIT_1170_FEED_SORT;
   // which way round the list is ordered.
@@ -93,10 +95,12 @@ function normalize_saved_fun(
   if (!is_known_sort_fun(saved.sort)) return null;
   if (!is_known_direction_fun(saved.direction)) return null;
   if (!is_known_type_fun(saved.type)) return null;
+  if (typeof saved.hide_sent !== "boolean") return null;
   const contracts = normalize_ids_fun(saved.contracts);
   const accounts = normalize_ids_fun(saved.accounts);
   if (contracts === null || accounts === null) return null;
   return {
+    hide_sent: saved.hide_sent,
     sort: saved.sort,
     direction: saved.direction,
     type: saved.type,
@@ -110,9 +114,10 @@ function normalize_saved_fun(
 // the saved filter, or null when there is none worth using.
 //
 // --- WHY THE WHOLE ENTRY IS DROPPED WHEN ONE FIELD IS BAD: a saved
-// filter is one choice the reader made — the sort AND the direction AND
-// the type AND the lists. half of it is not what they saved, so the
-// entry is not used at all and the feed opens on its defaults.
+// filter is one choice the reader made — the switch AND the sort AND
+// the direction AND the type AND the lists. half of it is not what they
+// saved, so the entry is not used at all and the feed opens on its
+// defaults.
 function read_saved_fun(): SHIT_1170_APP_PAGE_FEED_SAVED | null {
   if (typeof localStorage === "undefined") return null;
   const raw = localStorage.getItem(SHIT_1170_FEED_SAVED_STORAGE_KEY);
@@ -136,6 +141,7 @@ function write_saved_fun(saved: SHIT_1170_APP_PAGE_FEED_SAVED | null): void {
   localStorage.setItem(
     SHIT_1170_FEED_SAVED_STORAGE_KEY,
     JSON.stringify({
+      hide_sent: saved.hide_sent,
       sort: saved.sort,
       direction: saved.direction,
       type: saved.type,

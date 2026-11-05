@@ -1,15 +1,14 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS
-   the feed's filter bar: ALL / MINE, HIDE SENT, and the FILTERS panel
-   with the sort, the type, the contracts and the accounts.
-
+   the feed's filter bar: HIDE SENT, the FILTERS panel with the sort,
+   the type, the contracts and the accounts, and the direction toggle.
+ 
    the bar sits across the top of the feed, above the posts. it is ONE
-   row of three buttons, and they are the base app buttons — narrower
+   row of three controls, and they are the base app buttons — narrower
    than the base's 500px, because three of them have to share the
    page's 500px column.
-
-   the active button is the filled-in one, and a disabled one is greyed
-   out by the base button rules. */
+ 
+   the active button is the filled-in one. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters {
   display: flex;
   flex-wrap: wrap;
@@ -22,18 +21,13 @@
   text-align: left;
 }
 /*==================================*/
-#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-toggle {
-  display: flex;
-  gap: 6px;
-}
-/*==================================*/
 /* the buttons are the base app buttons, only narrower here.
-
+ 
    --- WHY --- they SHARE the row and are all the SAME width: the bar is
    one row of three controls, and a row of buttons of different widths
    does not read as a row. the flex makes them grow to fill the column
-   evenly, so ALL / MINE / HIDE SENT / FILTERS are equal columns.
-
+   evenly, so HIDE SENT / FILTERS are equal columns.
+ 
    --- WHY --- the base's 500px width is overridden: the base button is
    as wide as the page column, which is right for a button that stands
    alone and wrong for three that share it. */
@@ -52,7 +46,7 @@
   box-sizing: border-box;
 }
 /*==================================*/
-/* the active one is filled in, so the reader can see which view is
+/* the active one is filled in, so the reader can see which filter is
    showing without reading the labels. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-button.is-active {
   background-color: var(--color-middle);

@@ -13,6 +13,7 @@ import {
 } from "@huggies/shit-1170-rex-engine-middleman";
 import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
+import { SHIT_1170_AUTH } from "../shared/auth_status";
 import {
   shit_1170_queue_token_ids_fun,
   type SHIT_1170_QUEUE_TRANSFER,
@@ -49,13 +50,15 @@ const SHIT_1170_FEED_LIMIT = 100;
 // --- QUERY -----------------------------
 // the query the feed's filter makes.
 //
-// --- WHY `hide_sent` GOES OUT ONLY WITH AN ACCOUNT: "has this
-// account sent it" is a question about ONE account, and the backend
-// answers a 400 for the filter without one.
+// --- WHY `hide_sent` GOES OUT WITH AN ACCOUNT: "has this account sent
+// it" is a question about ONE account, and the backend answers a 400
+// for the filter without one. the account is the reader's own, and the
+// backend takes the caller's own account for the filter — so the picked
+// accounts list is not what the switch is about.
 //
-// --- WHY `account_id` GOES OUT ONLY IN THE MINE VIEW: the ALL view
-// is every queue, and asking for one account's queues would be a
-// different view.
+// --- WHY `account_id` IS THE PICKED ACCOUNTS LIST: the api reads ONE
+// comma separated value and reads the values as an OR, so the reader's
+// picked accounts go out as the one string.
 //
 // --- WHY `contract_id` IS A COMMA SEPARATED STRING: the route reads ONE
 // value per param, and one string carries many values. the api reads
@@ -87,15 +90,29 @@ export function shit_1170_feed_query_fun(
 // request and not three.
 //
 // --- WHY THE API KEY RIDES ALONG: the queue list is open, but a reader
-// who is signed in gets their own view of it, and the key is how the
+// who is signed in has their own history, and the key is how the
 // backend knows who is asking.
+//
+// --- WHY THE KEY IS THE READER'S OWN AND NOT THE PICKED LIST: the
+// picked accounts are a comma separated LIST and a key belongs to ONE
+// account. asking for the key of the list finds nothing, and the call
+// goes out with no key at all — and then the backend cannot tell that
+// the `hide_sent` filter is about the reader's own account.
+//
+// --- WHY THE ACCOUNT IS THE READER'S OWN: the backend takes the
+// caller's own account for the `hide_sent` filter and only falls back
+// to the first picked account when there is no key. so the key is what
+// decides whose history the switch is about.
 export async function shit_1170_feed_load_fun(
   account_id: string | null,
   hide_sent: boolean,
   contracts: string | null,
   cursor: string | null,
 ): Promise<SHIT_1170_APP_PAGE_FEED_LOADED> {
-  const options = await api_key_options_fun(false, account_id ?? undefined);
+  const options = await api_key_options_fun(
+    false,
+    SHIT_1170_AUTH.get_account_id() ?? undefined,
+  );
   const result = await api_shit_1170_tx_queue_get(
     SHIT_1170_BASE_URL,
     shit_1170_feed_query_fun(account_id, hide_sent, contracts, cursor),

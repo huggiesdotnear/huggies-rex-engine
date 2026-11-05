@@ -26,6 +26,7 @@ import {
 } from "@huggies/shit-1170-rex-engine-middleman";
 import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
+import { SHIT_1170_AUTH } from "../shared/auth_status";
 import { fetch_transfer_tokens_by_ids_fun } from "../shared/transfer_tokens";
 import { SHIT_1170_SWAP_LIVE_ROUTES } from "../shared/swap_live_routes";
 import { SHIT_1170_SWAP_BALANCES } from "../shared/swap_balances";
@@ -75,9 +76,9 @@ const SHIT_1170_FEED_SWAP_LIMIT = 100;
 // and not a call, so it names a token and not a contract. the contract
 // filter is about the queued batches and about nothing else.
 //
-// --- WHY `account_id` GOES OUT ONLY IN THE MINE VIEW: the ALL view is
-// every swap, and asking for one account's swaps would be a different
-// view.
+// --- WHY `account_id` IS THE PICKED ACCOUNTS LIST: the api reads ONE
+// comma separated value and reads the values as an OR, so the reader's
+// picked accounts go out as the one string.
 //
 // --- WHY THE CURSOR GOES OUT UNTOUCHED: it is the backend's own opaque
 // page point, and only the backend can read it back.
@@ -103,13 +104,21 @@ export function shit_1170_feed_swaps_query_fun(
 // --- WHY A FAILED ROUTE LOAD DOES NOT FAIL THE LOAD: the router is a
 // third party. the swaps are still worth showing without their live
 // numbers, because the backend's stored quote is the fallback.
+//
+// --- WHY THE API KEY AND THE TRADER ACCOUNT ARE THE READER'S OWN: the
+// picked accounts are a comma separated LIST and a key belongs to ONE
+// account, so asking for the key of the list finds nothing and the call
+// goes out with no key at all. the reader's own account is what the
+// backend takes for the `hide_sent` filter, and what the router plans
+// the trade for.
 export async function shit_1170_feed_swaps_load_fun(
   account_id: string | null,
   hide_sent: boolean,
   cursor: string | null,
   on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
 ): Promise<SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED> {
-  const options = await api_key_options_fun(false, account_id ?? undefined);
+  const own_account_id = SHIT_1170_AUTH.get_account_id();
+  const options = await api_key_options_fun(false, own_account_id ?? undefined);
   const result = await api_shit_1170_swap_queue_get(
     SHIT_1170_BASE_URL,
     shit_1170_feed_swaps_query_fun(account_id, hide_sent, cursor),
@@ -117,8 +126,8 @@ export async function shit_1170_feed_swaps_load_fun(
   );
   const swaps = result.items;
   const tokens = await load_swap_tokens_fun(swaps);
-  const balances = await load_swap_balances_fun(swaps, account_id);
-  const live = await load_swap_routes_fun(swaps, account_id, on_routes);
+  const balances = await load_swap_balances_fun(swaps, own_account_id);
+  const live = await load_swap_routes_fun(swaps, own_account_id, on_routes);
   return {
     swaps,
     tokens,
@@ -163,6 +172,10 @@ async function load_swap_tokens_fun(
 // reader's wallet, so it is the one the balance has to cover. the token
 // out is what comes back.
 //
+// --- WHY THE ACCOUNT IS THE READER'S OWN: a balance belongs to a
+// wallet, and the wallet in play is the reader's. the picked accounts
+// are the queues being looked at and not the wallets being spent from.
+//
 // --- WHY THE SIGNED-OUT READER GETS NO BALANCES: there is no account,
 // so there is nothing to check.
 //
@@ -192,7 +205,8 @@ async function load_swap_balances_fun(
 // storage-deposit legs for the account that is going to trade, so the
 // route it answers can actually be executed. the reader may not be the
 // one who presses SWAP NOW, but the route is planned for whoever is
-// signed in.
+// signed in — the reader's own account, and not the accounts they are
+// looking at.
 //
 // --- WHY THE ROUTES ARE ASKED FOR ALL AT ONCE: a feed of fifty swaps
 // is fifty questions to the router, and they are asked together so the

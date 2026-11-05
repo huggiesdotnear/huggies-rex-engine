@@ -1,6 +1,6 @@
 // ========================================
-// the feed page's url parameters: `?view=`, `?account=`, `?hide_sent=`
-// and `?sort=`, plus `?type=`, `?contracts=`, `?accounts=` and `?dir=`.
+// the feed page's url parameters: `?hide_sent=`, `?sort=`, `?type=`,
+// `?contracts=`, `?accounts=` and `?dir=`.
 //
 // the feed's filter LIVES IN THE URL, so a filtered feed is a link
 // somebody can paste. a feed that cannot be linked is a feed that
@@ -12,21 +12,19 @@
 // open the plain feed. the url only carries what the reader changed.
 //
 // --- WHY IT IMPORTS NOTHING: the rule is the whole of it.
-const URL_ACCOUNT_PARAM = "account";
 const URL_ACCOUNTS_PARAM = "accounts";
 const URL_CONTRACTS_PARAM = "contracts";
 const URL_DIR_PARAM = "dir";
 const URL_HIDE_SENT_PARAM = "hide_sent";
 const URL_SORT_PARAM = "sort";
 const URL_TYPE_PARAM = "type";
-const URL_VIEW_PARAM = "view";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // trim a raw url value, treating blank as absent.
 //
-// --- WHY --- blank is treated as absent: a trailing `?account=` link
-// points at nothing, and an empty account id is not an account.
+// --- WHY --- blank is treated as absent: a trailing `?contracts=` link
+// points at nothing, and an empty contract id is not a contract.
 function normalize_param_fun(raw: string | null): string | null {
   if (raw === null) return null;
   const trimmed = raw.trim();
@@ -56,49 +54,23 @@ function join_list_fun(values: ReadonlyArray<string>): string {
 // ========================================
 // ========================================
 // --- READ ------------------------------
-// the `?account=` off the current url, or null when there is none.
+// the `?hide_sent=` off the current url, or null when the url does not
+// name it.
 //
-// the `?view=` off the current url: "all" or "mine".
-//
-// --- WHY THE VIEW IS ITS OWN PARAM AND NOT THE ACCOUNT: the account
-// says WHOSE queues are shown, and the view says WHICH question is
-// being asked. they are different things and one url parameter cannot
-// carry both.
-//
-// --- WHY THEY HAVE TO BE SEPARATE: the reader signs in, the feed
-// defaults to their own queues, and the url names the account for it.
-// but a reader who picks ALL wants to see everybody's, and the account
-// is still on the url. if the account alone decided the view, picking
-// ALL would be undone the moment the url was read back — the account
-// is there, so the page would go back to MINE.
-function read_url_view_fun(): string | null {
-  if (typeof window === "undefined" || typeof window.location === "undefined") {
-    return null;
-  }
-  const params = new URLSearchParams(window.location.search);
-  return normalize_param_fun(params.get(URL_VIEW_PARAM));
-}
-
-// --- WHY --- AN ABSENT ACCOUNT IS THE ALL VIEW: there is no account to
-// filter by, so the feed shows everything.
-function read_url_account_fun(): string | null {
-  if (typeof window === "undefined" || typeof window.location === "undefined") {
-    return null;
-  }
-  const params = new URLSearchParams(window.location.search);
-  return normalize_param_fun(params.get(URL_ACCOUNT_PARAM));
-}
-
-// the `?hide_sent=` off the current url, or null when there is none.
+// --- WHY --- ABSENT AND PRESENT ARE DIFFERENT THINGS: an absent
+// `?hide_sent=` means "the url does not say", and the saved filter may
+// fill it in. a `?hide_sent=1` means "hide the sent ones" and nothing
+// may fill it in.
 //
 // --- WHY --- only the word "1" counts: the url says yes or no, and a
 // "0" is a no written the long way. the reader has one switch and it
 // is either on or off.
-function read_url_hide_sent_fun(): boolean {
+function read_url_hide_sent_fun(): boolean | null {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
-    return false;
+    return null;
   }
   const params = new URLSearchParams(window.location.search);
+  if (!params.has(URL_HIDE_SENT_PARAM)) return null;
   return params.get(URL_HIDE_SENT_PARAM) === "1";
 }
 
@@ -181,13 +153,26 @@ function read_url_accounts_fun(): string[] | null {
 // put the feed's parameters on the url, without a reload.
 //
 // --- WHY `replaceState` AND NOT `pushState`: picking a filter is a
-// refinement of the same view, not a new page the reader can go back
+// refinement of the same page, not a new page the reader can go back
 // through. a history entry per filter fills the back button with a
 // stack of half-finished feeds.
 //
 // --- WHY THE PARAMETERS THAT ARE AT THEIR DEFAULT ARE LEFT OFF: the
 // url carries only what the reader changed. a null value takes the
 // parameter off the url.
+//
+// --- WHY THE COMMAS ARE PUT BACK AS COMMAS: the query builder encodes
+// a comma as `%2C`, and a url that reads
+// `accounts=sleet.near%2Calice.near` is unreadable to the person
+// looking at it — the whole point of a url is that a reader can read it
+// and change it. a comma is a legal character in a query string and
+// needs no encoding, so it is put back after the builder has done its
+// work.
+//
+// --- WHY ONLY THE COMMAS ARE PUT BACK: everything else the builder
+// encodes is a character that really does need it — a space, a `&`, a
+// `?`. the comma is the only one that is a punctuation mark the reader
+// reads.
 function write_url_fun(values: Record<string, string | null>): void {
   if (typeof window === "undefined" || typeof window.location === "undefined") {
     return;
@@ -200,13 +185,20 @@ function write_url_fun(values: Record<string, string | null>): void {
       url.searchParams.set(key, value);
     }
   }
-  window.history.replaceState(null, "", url.toString());
+  window.history.replaceState(null, "", unescape_commas_fun(url.toString()));
+}
+
+// put the encoded commas back.
+//
+// --- WHY --- the builder encodes them because it encodes EVERYTHING
+// that is not plainly safe, and a comma is plainly safe — the api reads
+// the list by splitting on it.
+function unescape_commas_fun(url: string): string {
+  return url.replace(/%2C/gi, ",");
 }
 
 // the whole filter on the url.
 function write_url_filter_fun(
-  view: string,
-  account_id: string | null,
   hide_sent: boolean,
   sort: string | null,
   type: string | null,
@@ -215,13 +207,6 @@ function write_url_filter_fun(
   dir: string | null,
 ): void {
   write_url_fun({
-    // --- WHY --- THE VIEW IS ALWAYS WRITTEN AND NEVER LEFT OFF: the
-    // view is what the reader CHOSE, and leaving it off would let the
-    // account's presence decide it again. a url with no view and an
-    // account is a MINE view by default, so an ALL view that left the
-    // view off would come back as MINE on the next read.
-    [URL_VIEW_PARAM]: view,
-    [URL_ACCOUNT_PARAM]: normalize_param_fun(account_id),
     [URL_HIDE_SENT_PARAM]: hide_sent ? "1" : null,
     [URL_SORT_PARAM]: normalize_param_fun(sort),
     // --- WHY --- THE TYPE, THE LISTS AND THE DIRECTION GO OUT ONLY WHEN
@@ -239,8 +224,6 @@ function write_url_filter_fun(
 // ========================================
 // --- PUBLIC ---------------------------
 export const SHIT_1170_APP_PAGE_FEED_URL = {
-  read_view: read_url_view_fun,
-  read_account: read_url_account_fun,
   read_hide_sent: read_url_hide_sent_fun,
   read_sort: read_url_sort_fun,
   read_type: read_url_type_fun,

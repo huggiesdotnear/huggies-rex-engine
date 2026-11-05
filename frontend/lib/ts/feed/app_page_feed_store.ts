@@ -6,7 +6,7 @@
 // posts, the status line — and they all read this one store, so they
 // cannot drift apart. the store owns the load, the components display.
 //
-// --- WHY THE FILTER AND THE DATA ARE IN ONE STORE: they are ONE view.
+// --- WHY THE FILTER AND THE DATA ARE IN ONE STORE: they are ONE thing.
 // the posts on screen are the ones the filter asked for, and a filter
 // that changed without the data changing would leave the reader
 // looking at a feed that does not match the bar above it.
@@ -24,7 +24,6 @@ import type {
   SHIT_1170_FEED_DIRECTION,
   SHIT_1170_FEED_SORT,
   SHIT_1170_FEED_TYPE,
-  SHIT_1170_FEED_VIEW,
 } from "./app_page_feed_types";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
 import { SHIT_1170_SWAP_ROUTES } from "../shared/swap_routes";
@@ -63,8 +62,6 @@ export interface SHIT_1170_APP_PAGE_FEED_STORE_STATE extends SHIT_1170_APP_PAGE_
 // --- STATE ------------------------------
 // the state the page holds.
 let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
-  view: "all",
-  account_id: null,
   hide_sent: false,
   sort: "date_added",
   direction: "desc",
@@ -172,9 +169,9 @@ function build_posts_fun(): SHIT_1170_FEED_POST[] {
 // load the feed: the filter from the url, then the batches.
 //
 // --- WHY THE FILTER IS READ FROM THE URL HERE AND NOT BY THE
-// COMPONENTS: the filter and the data are one view, and the components
+// COMPONENTS: the filter and the data are one thing, and the components
 // read the store. if each component read the url itself they could
-// disagree about which view was on screen.
+// disagree about what was on screen.
 async function load_fun(): Promise<void> {
   const filter = SHIT_1170_APP_PAGE_FEED_FILTER.read();
   // --- WHY --- THE SAVED FILTER IS USED ONLY FOR THE FIRST READ: the
@@ -182,23 +179,16 @@ async function load_fun(): Promise<void> {
   // from then on the url is the truth. the saved filter fills in the
   // blanks while the page is opening and never again.
   SHIT_1170_APP_PAGE_FEED_FILTER.saved_done();
-  // --- WHY --- THE ACCOUNT THE API IS ASKED FOR: the picked accounts
-  // are the reader's own narrower choice and they REPLACE the view's
-  // account, because the api reads the list as an OR and asking for
-  // both would widen the MINE view to everybody's.
+  // --- WHY --- THE ACCOUNT THE API IS ASKED FOR: the picked accounts are
+  // the reader's own narrower choice and they go out as the comma
+  // separated list the api reads. the reader's OWN account is not added
+  // to it — the reader asked for the accounts they picked.
   const account_id =
-    filter.accounts.length > 0
-      ? filter.accounts.join(",")
-      : filter.view === "mine"
-        ? filter.account_id
-        : null;
+    filter.accounts.length > 0 ? filter.accounts.join(",") : null;
   // the url is written so a link the reader copies says the same thing
-  // the screen does. the VIEW goes on the url too, so a link to the ALL
-  // view opens the ALL view and not the reader's own queues — and the
-  // ACCOUNT stays on it, so the reader can flip back to MINE.
+  // the screen does. the picked ACCOUNTS go on it, so a link to the
+  // reader's own queues opens the reader's own queues.
   write_url_fun(
-    filter.view,
-    filter.account_id,
     filter.hide_sent,
     filter.sort,
     filter.type,
@@ -232,8 +222,6 @@ async function load_fun(): Promise<void> {
   SHIT_1170_SWAP_ROUTES.close_all_subscriptions();
   set_state_fun({
     ...state,
-    view: filter.view,
-    account_id: filter.account_id,
     hide_sent: filter.hide_sent,
     sort: filter.sort,
     direction: filter.direction,
@@ -259,8 +247,6 @@ async function load_fun(): Promise<void> {
     swaps_cursor = swaps_loaded.next_cursor;
     set_state_fun({
       ...state,
-      view: filter.view,
-      account_id: filter.account_id,
       hide_sent: filter.hide_sent,
       sort: filter.sort,
       direction: filter.direction,
@@ -501,21 +487,19 @@ async function load_more_fun(): Promise<void> {
   loading_more = true;
   set_state_fun({ ...state, loading_more: true });
   // --- WHY --- THE FILTER COMES FROM THE STATE AND NOT FROM THE URL:
-  // the next page belongs to the view that is on screen, and the state
-  // IS that view. reading the url here could ask for a page of a
+  // the next page belongs to the filter that is on screen, and the state
+  // IS that filter. reading the url here could ask for a page of a
   // filter the reader has already left.
   const filter = {
     hide_sent: state.hide_sent,
     type: state.type,
     contracts: state.contracts,
   };
-  // --- WHY --- THE ACCOUNT IS WORKED OUT THE SAME WAY AS IN THE FIRST
-  // LOAD: the next page belongs to the same view, and it must be asked
-  // for the same way.
+  // --- WHY --- THE ACCOUNT IS THE PICKED LIST AND NOTHING ELSE: the next
+  // page belongs to the same list as the first one, and the list is the
+  // accounts the reader picked.
   const account_id =
-    state.accounts.length > 0
-      ? state.accounts.join(",")
-      : SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state);
+    state.accounts.length > 0 ? state.accounts.join(",") : null;
   try {
     const [loaded, swaps_loaded] = await Promise.all([
       load_queues_more_fun(account_id, filter, queues_page_cursor),
@@ -682,8 +666,8 @@ function total_of_fun(
 // not overwrite a newer one.
 //
 // --- WHY --- THE SORT AND THE DIRECTION ARE IN THE KEY: they are part
-// of the view, and a load that finished after the reader changed them
-// must not overwrite the new view with the old one.
+// of the filter, and a load that finished after the reader changed them
+// must not overwrite the new filter with the old one.
 function filter_key_fun(
   account_id: string | null,
   hide_sent: boolean,
@@ -715,14 +699,7 @@ function filter_key_fun(
 // --- WHY THE DEFAULTS ARE LEFT OFF THE URL: see the url module. the
 // sort's default is DATE ADDED and it is not written, and neither is
 // the type's ALL or the direction's DESC.
-//
-// --- WHY THE ACCOUNT IS WRITTEN IN THE MINE VIEW AND NOT OMITTED: the
-// account IS the record of the reader choosing MINE over ALL. a shared
-// link with no account would open the ALL view for whoever opened it,
-// and the reader's own view is the one they meant to share.
 function write_url_fun(
-  view: SHIT_1170_FEED_VIEW,
-  account_id: string | null,
   hide_sent: boolean,
   sort: SHIT_1170_FEED_SORT,
   type: SHIT_1170_FEED_TYPE,
@@ -749,8 +726,6 @@ function write_url_fun(
         ? direction
         : null;
   SHIT_1170_APP_PAGE_FEED_URL.write_filter(
-    view,
-    account_id,
     hide_sent,
     sort_value,
     type_value,
@@ -761,74 +736,20 @@ function write_url_fun(
 }
 
 // ========================================
-// --- VIEW ------------------------------
-// the reader switched between ALL and MINE.
-//
-// --- WHY THE MINE VIEW NEEDS AN ACCOUNT: it is the reader's own
-// queues. without a signed-in account there is no reader to be "mine",
-// so the view does not move.
-//
-// --- WHY THE URL IS WRITTEN HERE AND NOT ONLY IN THE LOAD: the load
-// reads the filter off the url, so the url has to carry the NEW view
-// before the load reads it. writing it in the load alone would read
-// the OLD url and load the OLD view.
-async function set_view_fun(view: SHIT_1170_FEED_VIEW): Promise<void> {
-  if (view === state.view) return;
-  if (view === "mine") {
-    const account_id = SHIT_1170_AUTH.get_account_id();
-    if (account_id === null) return;
-    set_state_fun({ ...state, view, account_id });
-    write_url_fun(
-      view,
-      account_id,
-      state.hide_sent,
-      state.sort,
-      state.type,
-      state.contracts,
-      state.accounts,
-      state.direction,
-    );
-  } else {
-    // --- WHY --- THE ACCOUNT IS KEPT AND NOT CLEARED: the account is the
-    // reader's own, and it is what the MINE view filters by. clearing it
-    // would lose the reader's account when they flip back.
-    //
-    // --- WHY --- IT GOES ON THE URL IN THE ALL VIEW TOO: the url's
-    // account says whose queues the MINE view would show, and the view
-    // param says which question is being asked. the api is asked with
-    // NO account in the ALL view — that is the request — but the url
-    // keeps the account so the reader can flip back.
-    set_state_fun({ ...state, view, hide_sent: false });
-    write_url_fun(
-      view,
-      state.account_id,
-      false,
-      state.sort,
-      state.type,
-      state.contracts,
-      state.accounts,
-      state.direction,
-    );
-  }
-  await load_fun();
-}
-// ========================================
 // --- HIDE SENT -------------------------
 // the reader flipped the hide-sent switch.
 //
-// --- WHY IT IS OFF AGAIN IN THE ALL VIEW: "has this account sent it"
-// is a question about one account, and the ALL view has none.
+// --- WHY THE SWITCH IS ALWAYS AVAILABLE: "has this account sent it" is
+// a question about ONE account, and the account in play is always the
+// reader's own — the backend takes the caller's own account for it.
 //
 // --- WHY THE URL IS WRITTEN HERE AND NOT ONLY IN THE LOAD: the load
 // reads the filter off the url, so the url has to carry the NEW switch
 // before the load reads it.
 async function set_hide_sent_fun(hide_sent: boolean): Promise<void> {
-  if (hide_sent && state.view !== "mine") return;
   if (hide_sent === state.hide_sent) return;
   set_state_fun({ ...state, hide_sent });
   write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     hide_sent,
     state.sort,
     state.type,
@@ -857,8 +778,6 @@ async function set_sort_fun(sort: SHIT_1170_FEED_SORT): Promise<void> {
     sort,
   });
   write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     sort,
     state.type,
@@ -883,8 +802,6 @@ async function set_direction_fun(
     direction,
   });
   write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     state.sort,
     state.type,
@@ -905,8 +822,6 @@ async function set_type_fun(type: SHIT_1170_FEED_TYPE): Promise<void> {
   if (type === state.type) return;
   set_state_fun({ ...state, type });
   write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     state.sort,
     type,
@@ -932,8 +847,6 @@ async function set_contracts_fun(
   if (same_list_fun(contracts, state.contracts)) return;
   set_state_fun({ ...state, contracts: [...contracts] });
   write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     state.sort,
     state.type,
@@ -954,15 +867,13 @@ async function set_contracts_fun(
 //
 // --- WHY THE ACCOUNT LIST IS ONE FIELD: the api reads `account_id` as
 // ONE comma separated string and reads the values as an OR, so the
-// picked accounts and the view's own account are asked for in one go.
+// picked accounts are asked for in one go.
 async function set_accounts_fun(
   accounts: ReadonlyArray<string>,
 ): Promise<void> {
   if (same_list_fun(accounts, state.accounts)) return;
   set_state_fun({ ...state, accounts: [...accounts] });
   write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
     state.hide_sent,
     state.sort,
     state.type,
@@ -983,6 +894,7 @@ async function set_accounts_fun(
 async function clear_all_fun(): Promise<void> {
   set_state_fun({
     ...state,
+    hide_sent: false,
     sort: "date_added",
     direction: "desc",
     type: "all",
@@ -990,16 +902,7 @@ async function clear_all_fun(): Promise<void> {
     accounts: [],
   });
   SHIT_1170_APP_PAGE_FEED_SAVED.write(null);
-  write_url_fun(
-    state.view,
-    SHIT_1170_APP_PAGE_FEED_FILTER.account_of(state),
-    state.hide_sent,
-    "date_added",
-    "all",
-    [],
-    [],
-    "desc",
-  );
+  write_url_fun(false, "date_added", "all", [], [], "desc");
   await load_fun();
 }
 
@@ -1012,6 +915,7 @@ async function clear_all_fun(): Promise<void> {
 // happened.
 function save_filters_fun(): void {
   SHIT_1170_APP_PAGE_FEED_SAVED.write({
+    hide_sent: state.hide_sent,
     sort: state.sort,
     direction: state.direction,
     type: state.type,
@@ -1066,10 +970,10 @@ function same_list_fun(
 // --- WATCH -----------------------------
 // follow the auth state, so a sign-in or a sign-out moves the feed.
 //
-// --- WHY THE FEED WATCHES THE AUTH: the default view depends on
-// whether anybody is signed in. a reader who signs in while the feed
-// is open wants their own queue, and a reader who signs out wants all
-// of it.
+// --- WHY THE FEED WATCHES THE AUTH: the reader's own account is in
+// play for the hide-sent filter and for the ME button in the accounts
+// group. a reader who signs in while the feed is open wants their own
+// queue, and a reader who signs out wants all of it.
 function watch_fun(): () => void {
   return SHIT_1170_AUTH.subscribe(() => {
     void load_fun();
@@ -1081,7 +985,6 @@ export const SHIT_1170_APP_PAGE_FEED_STORE = {
   load: load_fun,
   load_more: load_more_fun,
   refresh: refresh_fun,
-  set_view: set_view_fun,
   set_hide_sent: set_hide_sent_fun,
   set_sort: set_sort_fun,
   set_direction: set_direction_fun,

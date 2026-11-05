@@ -15,9 +15,10 @@ shit_1170_loading_bar_start_fun();
 // ========================================
 // the page's first load: the filter from the url, then the batches.
 //
-// --- WHY THE AUTH IS WATCHED: the default view depends on whether
-// anybody is signed in, so a sign-in or a sign-out has to move the
-// feed. the store owns the subscription.
+// --- WHY THE AUTH IS WATCHED: the reader's own account is in play for
+// the hide-sent filter and for the ME button in the accounts group, so
+// a sign-in or a sign-out has to move the feed. the store owns the
+// subscription.
 SHIT_1170_APP_PAGE_FEED_STORE.watch();
 // ========================================
 // the page's first load.

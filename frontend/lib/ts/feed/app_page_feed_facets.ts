@@ -37,9 +37,8 @@ const SHIT_1170_FEED_FACETS_LIMIT = 40;
 // the contracts and the accounts that have queued work.
 //
 // --- WHY THE API KEY RIDES ALONG WHEN THERE IS ONE: the route is open
-// and does not need the key, but a reader who is signed in gets their
-// own view of the queue and the key is how the backend knows who is
-// asking.
+// and does not need the key, but a reader who is signed in has their
+// own history, and the key is how the backend knows who is asking.
 export async function shit_1170_feed_facets_load_fun(): Promise<SHIT_1170_TX_QUEUE_FACETS> {
   const options = await api_key_options_fun(false);
   return await api_shit_1170_tx_queue_facets_get(

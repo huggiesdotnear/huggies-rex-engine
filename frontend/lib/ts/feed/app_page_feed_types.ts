@@ -13,14 +13,6 @@ import type { SHIT_1170_SWAP_QUOTE } from "../shared/swap_quote";
 // ========================================
 // ========================================
 // --- TYPES ------------------------------
-// the view the reader is looking at.
-//
-// --- WHY --- it is a union and not a boolean: "mine" and "all" are two
-// views and not a state of one thing, and the filter bar draws two
-// buttons for them. a boolean would make every reader of the store
-// decide which way round it is.
-export type SHIT_1170_FEED_VIEW = "all" | "mine";
-
 // how the list is ordered.
 //
 // --- WHY --- it is a named set and not a direction: the feed offers
@@ -45,11 +37,6 @@ export type SHIT_1170_FEED_DIRECTION = "asc" | "desc";
 
 // the whole state of the feed page.
 export interface SHIT_1170_APP_PAGE_FEED_STATE {
-  // the view the reader is in: every queue, or only the ones they are
-  // on.
-  view: SHIT_1170_FEED_VIEW;
-  // the account the view is about, or null for the ALL view.
-  account_id: string | null;
   // true when the queues the reader has already sent are hidden.
   hide_sent: boolean;
   // how the list is ordered.
@@ -101,12 +88,11 @@ export interface SHIT_1170_APP_PAGE_FEED_STATE {
 }
 // ========================================
 // --- DEFAULTS --------------------------
-// the view the page opens on.
+// the switch the page opens on.
 //
-// --- WHY --- MINE IS THE DEFAULT WHEN THE READER IS SIGNED IN: a
-// reader who signs in wants their own queue. a reader who is signed
-// out gets all of it, because they have no queue of their own.
-const SHIT_1170_FEED_DEFAULT_VIEW: SHIT_1170_FEED_VIEW = "all";
+// --- WHY --- IT IS OFF: a reader who has not asked to hide the queues
+// they sent sees everything, and the switch is one click away.
+const SHIT_1170_FEED_DEFAULT_HIDE_SENT = false;
 // the sort the page opens on.
 const SHIT_1170_FEED_DEFAULT_SORT: SHIT_1170_FEED_SORT = "date_added";
 // the direction the page opens on.
@@ -120,7 +106,7 @@ const SHIT_1170_FEED_DEFAULT_TYPE: SHIT_1170_FEED_TYPE = "all";
 // ========================================
 // --- PUBLIC ---------------------------
 export const SHIT_1170_APP_PAGE_FEED_DEFAULTS = {
-  view: SHIT_1170_FEED_DEFAULT_VIEW,
+  hide_sent: SHIT_1170_FEED_DEFAULT_HIDE_SENT,
   sort: SHIT_1170_FEED_DEFAULT_SORT,
   direction: SHIT_1170_FEED_DEFAULT_DIRECTION,
   type: SHIT_1170_FEED_DEFAULT_TYPE,
