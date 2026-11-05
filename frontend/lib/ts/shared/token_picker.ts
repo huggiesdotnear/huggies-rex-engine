@@ -218,13 +218,23 @@ async function load_default_tokens_fun(): Promise<void> {
     // --- WHY --- THE MARKED TOKENS GO ON TOP: the order module is the
     // ONE place that puts them there, and it is the same module the
     // discover page uses. so the two pages lead with the same tokens.
+    //
+    // --- WHY --- THE SORT IS PASSED IN: the order module only pins the
+    // marked block for the `default` view. every other sort is strict, so
+    // the rows have to arrive in the order the api sent them. leaving the
+    // sort out made the module fall back to `default` and pin the marked
+    // block on top of a VOLUME list too — so the marked tokens sat at the
+    // top of a list the reader had just told us to sort by volume.
     const with_marked = marked.map((row) => ({
       ...row,
       icon: icons.get(row.id) ?? row.icon,
     }));
     set_state_fun({
       ...state,
-      tokens: order_discover_tokens_fun([...with_marked, ...with_near]),
+      tokens: order_discover_tokens_fun(
+        [...with_marked, ...with_near],
+        state.sort,
+      ),
       loading: false,
     });
   } catch (err) {
