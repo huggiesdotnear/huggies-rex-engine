@@ -1,7 +1,7 @@
 # DOCS
 
-- [`../llms.txt`](../llms.txt) — the agent-facing map of the engine, its
-  skills, its repos, and its tools. it is served live at
+- [`../llm.md`](../llm.md) — the agent-facing map of the engine, its
+  skills, its repos, and its tools. it is built and served as
   <https://shit-1170.com/llms.txt>
 - [`ROUTES.md`](./ROUTES.md) — endpoint list
 - [`ROUTES/README.md`](./ROUTES/README.md) — one file per route that

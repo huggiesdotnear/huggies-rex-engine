@@ -52,18 +52,21 @@ await cp(join(frontendDirectory, openGraphImage), openGraphImageOutput);
 // ========================================
 // the llms.txt is copied by hand too, and it lives at the REPO ROOT.
 //
-// it is the canonical file — the one that gets committed, read by humans
-// and by crawlers off github. it is copied into the output folder by
-// hand for the same reason the og image is: the bundler only tracks an
-// asset when a LINK tag references it, and nothing in the app links to
-// llms.txt.
+// the SOURCE is `llm.md` — markdown, so it reads and edits like the rest
+// of the docs. the SERVED file is `llms.txt` — that is the name the
+// convention asks for, and that is the path the static server answers.
+//
+// the copy is copied by hand for the same reason the og image is: the
+// bundler only tracks an asset when a LINK tag references it, and nothing
+// in the app links to llms.txt.
 //
 // the copy lands at the ROOT of the output folder, so the static server
 // answers it at /llms.txt.
 // ========================================
+const llmMd = "llm.md";
 const llmsTxt = "llms.txt";
 const llmsTxtOutput = join(outputDirectory, llmsTxt);
 
-await cp(join(repositoryRoot, llmsTxt), llmsTxtOutput);
+await cp(join(repositoryRoot, llmMd), llmsTxtOutput);
 
 console.log(`Built ${result.outputs.length} files into ${outputDirectory}`);
