@@ -64,7 +64,7 @@ secure context).
 
 - the frontend is baked into the image at `/app/static` — no host volume
   is needed for it.
-- the sqlite db lives in the named volume `shit-1170-rex-engine-vault`, mounted at
+- the sqlite db lives in the named volume `shit-1170-rex-engine-production-vault`, mounted at
   `/home/shit-1170/.shit-1170-rex-engine`. it survives `docker compose down`
   and a rebuild. **never delete it** — it holds the session keys.
   the location can be moved with `SHIT_1170_VAULT_DB_LOCATION`; see

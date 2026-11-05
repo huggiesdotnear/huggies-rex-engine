@@ -117,17 +117,14 @@ the tables are created in DEPENDENCY ORDER: `tx_queue` before
 
 ## IN DOCKER
 
-the db lives in the named volume `shit-1170-vault`, mounted at
-`/home/shit-1170/.shit-1170-rex-engine` — the app's default path inside the
-image, since `HOME` is `/home/shit-1170` there.
+the db lives in the named volume `shit-1170-rex-engine-production-vault`,
+mounted at `/home/shit-1170/.shit-1170-rex-engine` — the app's default path
+inside the image, since `HOME` is `/home/shit-1170` there.
 
 the volume is declared in `docker-compose.yml` with an explicit `name:`,
 so it resolves to ONE fixed name on the host no matter what the compose
-project is called. the host name it points at is
-`huggies-rex-engine-fullstack-backend_huggies-vault` — the volume the
-live deployment has been writing to since before the rename. the pin is
-what keeps every session key alive across a rename of the project, the
-service or the app.
+project is called. the pin is what keeps every api key alive across a
+rename of the project, the service or the app.
 
 `docker compose down` keeps the volume. `docker compose down -v`
 DELETES it, and with it every api key and every queued batch.

@@ -6,10 +6,10 @@
 #   docker compose -f DOCKER/docker-compose.yml down
 #
 # there IS persistent state: the sqlite db. it lives in the named volume
-# `shit-1170-rex-engine-vault`, mounted at the app's default vault path. the
-# `static/` frontend bundle is baked into the image, and the frontend
-# talks to the intear api directly from the browser (the backend is
-# never rate limited by it).
+# `shit-1170-rex-engine-production-vault`, mounted at the app's default
+# vault path. the `static/` frontend bundle is baked into the image, and
+# the frontend talks to the intear api directly from the browser (the
+# backend is never rate limited by it).
 #
 # ACCESS: nothing is published to the host on purpose. the app is
 # reachable only through the cloudflare tunnel over https, which is
@@ -22,20 +22,12 @@ volumes:
   # the sqlite db. named, so `docker compose down` keeps it and a
   # rebuild never touches it.
   #
-  # --- WHY the explicit `name:` ---
-  # a volume declared under a compose project is prefixed with that
-  # project's name, so the volume a service mounts is
-  # `<project>_<key>`. renaming the project renames the volume, and
-  # the app would come up against an EMPTY db — every session key
-  # lost, silently, with no error anywhere.
-  #
-  # `name:` pins the volume to one exact name on the host, so the
-  # project can be renamed without touching the data. the name below
-  # is the volume the live deployment already has: it holds every
-  # session key. NEVER delete it and never point this at a different
-  # name without migrating the data first.
+  # the explicit `name:` pins the volume to one exact name on the host,
+  # so the compose project can be renamed without touching the data.
+  # NEVER delete it and never point this at a different name without
+  # migrating the data first.
   shit-1170-rex-engine-vault:
-    name: huggies-rex-engine-fullstack-backend_huggies-vault
+    name: shit-1170-rex-engine-production-vault
 services:
   shit-1170-rex-engine-backend:
     build:
@@ -70,16 +62,14 @@ services:
     env_file:
       - ../.env
 
-    # --- WHY --- the vault is a named volume and not a bind mount: the
-    # db must survive `docker compose down`, and it must never be
-    # touched by a rebuild. the path inside the container matches the
-    # app's default (`${HOME}/.shit-1170-rex-engine/`), so no env is
-    # needed for it.
+    # the vault is a named volume so the db survives `docker compose
+    # down` and is never touched by a rebuild. the path inside the
+    # container matches the app's default (`${HOME}/.shit-1170-rex-engine/`),
+    # so no env is needed for it.
     #
-    # --- WHY --- the volume is mounted at the FOLDER and not at the
-    # db file: sqlite creates the db file itself, and it needs to
-    # create the WAL and SHM files beside it. mounting the file would
-    # give it a directory where it expects a file.
+    # the volume is mounted at the FOLDER and not at the db file:
+    # sqlite creates the db file itself, and it needs to create the WAL
+    # and SHM files beside it.
     volumes:
       - shit-1170-rex-engine-vault:/home/shit-1170/.shit-1170-rex-engine
 
