@@ -69,6 +69,12 @@ export {
   print_json_fun,
   print_error_fun,
 } from "./stuff/json_io";
+export {
+  queue_call_fun,
+  DEFAULT_GAS,
+  DEFAULT_DEPOSIT,
+} from "./stuff/queue_payload";
+export type { QUEUE_CALL, QUEUE_CALL_INPUT } from "./stuff/queue_payload";
 
 export type { SHIT_1170_ERROR_RESPONSE } from "./types/common";
 export type { SHIT_1170_FEED_WS_EVENT } from "./types/shit_1170_feed_ws";

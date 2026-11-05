@@ -86,6 +86,7 @@ import {
   quiet_fun,
   print_json_fun,
   print_error_fun,
+  queue_call_fun,
 } from "@huggies/shit-1170-rex-engine-middleman";
 
 const args = parse_args_fun(process.argv.slice(2), {
@@ -107,6 +108,31 @@ flag is declared per bin, so it never swallows the next positional.
 
 `quiet_fun` moves the banner to stderr for the length of the call and
 puts `console.log` back afterwards, even when the call throws.
+
+## THE QUEUE PAYLOAD
+
+`queue_call_fun` builds the shape the engine's tx-queue accepts. it
+builds DATA — the engine holds it for a human to sign, and nothing is
+sent.
+
+```ts
+const call = queue_call_fun({
+  contractId: "usdt.tether-token.near",
+  method: "ft_transfer",
+  args: { receiver_id: "bob.near", amount: "25000000" },
+  gas: "30000000000000",
+  deposit: "1",
+});
+```
+
+the gas and the deposit are raw digit strings — gas units and
+yoctoNEAR. the web app also accepts the human forms ("30 Tgas"), but
+raw digits are the unambiguous form.
+
+the builder refuses what it cannot trust: an empty contract id, an
+empty method, args that are not a plain object, and a gas or deposit
+that is not raw digits. the engine records whatever it is given, so
+the check belongs where the payload is built.
 
 =====================
 <br/>
