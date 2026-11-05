@@ -367,7 +367,7 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
             record is somewhere the reader can go — open it, bookmark
             it, send it somebody — without meaning to trade anything. */}
         <a
-          class="feed-post-detail is-swap is-quiet"
+          class="feed-post-detail"
           href={swap_quote_href_fun(
             swap.swapId,
             swap.tokenIn,
@@ -378,17 +378,26 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_SWAP_POST_FUN(props: {
         >
           DETAILS
         </a>
-        {/* --- WHY --- THE SHORT BALANCE IS SAID OUT LOUD: an off button
-            with no reason is a button the reader cannot read. the
-            balance is the one thing that stops them, and saying it
-            means they know the trade is not theirs to make — and they
-            can still ADD themselves to it and wait for the price. */}
-        {account_id !== null && !sent && !has_balance && (
-          <span class="feed-post-hint">
-            NOT ENOUGH {token_in?.symbol ?? swap.tokenIn}
-          </span>
-        )}
       </div>
+      {/* --- WHY --- THE SHORT BALANCE IS SAID OUT LOUD: an off button
+          with no reason is a button the reader cannot read. the
+          balance is the one thing that stops them, and saying it
+          means they know the trade is not theirs to make — and they
+          can still ADD themselves to it and wait for the price.
+
+          --- WHY --- IT IS UNDER THE BUTTONS AND NOT IN THEIR ROW: the
+          actions row is the THREE things a reader can do with the
+          card, and they share the row evenly so it reads as three
+          buttons of the same width. a note is not an action — when it
+          sat in that row it took a share of the width, and the
+          buttons beside it came out narrower than the buttons on a
+          queued batch's card, so the two kinds of card stopped looking
+          the same. the note gets its own line under them. */}
+      {account_id !== null && !sent && !has_balance && (
+        <span class="feed-post-hint">
+          NOT ENOUGH {token_in?.symbol ?? swap.tokenIn}
+        </span>
+      )}
     </article>
   );
 }
