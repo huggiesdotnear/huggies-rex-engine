@@ -10,7 +10,7 @@
 - see [DOCS/ROUTES.md](./DOCS/ROUTES.md) for routes
 - see [DOCS/RULES.md](./DOCS/RULES.md) for rules
 
-ℹ️ the biggest/best way to contribute if you are a user is to create issues on our github.
+ℹ️ the biggest/best way to contribute if you are a user is to create issues on our github. as well as help us flesh out our skill library to improve the user experience.
 
 ### SLEET AI AGENT
 
