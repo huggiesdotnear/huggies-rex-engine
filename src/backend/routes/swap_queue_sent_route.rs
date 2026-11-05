@@ -40,7 +40,6 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
-use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_accounts_store::{
     swap_queue_accounts_list_by_swap_fun, swap_queue_accounts_set_sent_fun,
@@ -52,14 +51,21 @@ use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_status_fun:
 };
 use crate::backend::logic::endpoint_shit_1170_swap_queue::swap_queue_store::swap_queue_get_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_caller_fun::tx_queue_caller_fun;
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
+use crate::backend::logic::feed_ws::feed_ws_event::FEED_WS_EVENT;
+use crate::backend::logic::feed_ws::feed_ws_publish_fun::feed_ws_publish_fun;
 use crate::backend::types::swap_queue_request::SWAP_QUEUE_SENT_REQUEST;
 // ========================================
 pub async fn swap_queue_sent_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     headers: HeaderMap,
     Path(swap_id): Path<String>,
     Json(body): Json<SWAP_QUEUE_SENT_REQUEST>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     // --- WHO IS CALLING ------------------
     let caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
         Ok(account_id) => account_id,
@@ -173,6 +179,20 @@ pub async fn swap_queue_sent_route(
     };
 
     let item = swap_queue_row_to_json_fun(&swap, &accounts);
+
+    // --- THE LIVE FEED --------------------
+    // the open feed pages are told that the swap was sent.
+    //
+    // --- WHY --- THE SAME ITEM THAT IS ANSWERED WITH: the client's live
+    // post has to be byte-for-byte what a refetch would give it, and
+    // reading the row again could read a different one.
+    feed_ws_publish_fun(
+        &state.feed_ws,
+        FEED_WS_EVENT::Swap {
+            swap: item.clone(),
+        },
+    );
+
     (StatusCode::OK, Json(item)).into_response()
 }
 // ========================================

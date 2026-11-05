@@ -29,13 +29,17 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
-use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_fun::api_key_hash_fun;
 use crate::backend::logic::endpoint_shit_1170_api_keys::api_key_of_header_fun::api_key_of_header_fun;
 use crate::backend::logic::endpoint_shit_1170_api_keys::api_keys_store::api_key_get_by_hash_fun;
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
 // ========================================
-pub async fn api_key_me_route(State(pool): State<SqlitePool>, headers: HeaderMap) -> Response {
+pub async fn api_key_me_route(State(state): State<APP_STATE>, headers: HeaderMap) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     // the key comes from the header, not from a query parameter: a url
     // ends up in logs and in the referer of the next page.
     let api_key = match api_key_of_header_fun(&headers) {

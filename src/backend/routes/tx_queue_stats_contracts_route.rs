@@ -25,10 +25,10 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
-use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_caller_fun::tx_queue_caller_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_stats_store::tx_queue_stats_contracts_fun;
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
 use crate::backend::types::tx_queue_query::TX_QUEUE_STATS_QUERY;
 use crate::backend::types::tx_queue_request::{
     TX_QUEUE_CONTRACT_STAT, TX_QUEUE_CONTRACT_STATS_RESPONSE,
@@ -46,10 +46,14 @@ const SHIT_1170_TX_QUEUE_STATS_LIMIT: i64 = 20;
 const SHIT_1170_TX_QUEUE_STATS_MAX_LIMIT: i64 = 500;
 // ========================================
 pub async fn tx_queue_stats_contracts_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     headers: HeaderMap,
     Query(query): Query<TX_QUEUE_STATS_QUERY>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     // the key is the gate, even for a read that says nothing private.
     // --- WHY --- THE KEY IS NOT ASKED FOR: the stats are READ-ONLY and
     // they are about the queue as a whole — how many batches name this

@@ -20,6 +20,12 @@ export const ENDPOINT_PATHS = {
     "/api/shit-1170/tx-queue/stats/contracts",
   api_shit_1170_tx_queue_stats_methods: "/api/shit-1170/tx-queue/stats/methods",
 
+  // --- the live feed ---
+  // --- WHY --- the feed socket's path IS FIXED, so it lives in this
+  // map like the rest. the wrapper turns the base url into a socket url
+  // and appends this. see api_shit_1170_feed_ws.ts.
+  api_shit_1170_feed_ws: "/api/shit-1170/feed/ws",
+
   // --- the swap queue ---
   // --- WHY --- the swap queue routes that carry a swap_id are NOT in
   // this map: their path has a piece in the middle of it, so they are

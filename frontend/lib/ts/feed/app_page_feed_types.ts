@@ -99,7 +99,11 @@ const SHIT_1170_FEED_DEFAULT_SORT: SHIT_1170_FEED_SORT = "date_added";
 //
 // --- WHY --- DESC IS THE DEFAULT: a feed of queued work reads
 // newest-first, and the oldest thing in the queue is the thing that has
-// waited longest.
+// waited longest. DESC is DESCENDING, so the newest post is at the TOP
+// of the list and the oldest is at the bottom — the same order the
+// backend's own list route answers in (`ORDER BY created_at DESC`).
+// ASC is the flip: the oldest post at the top and the newest at the
+// bottom.
 const SHIT_1170_FEED_DEFAULT_DIRECTION: SHIT_1170_FEED_DIRECTION = "desc";
 // the kind of post the page opens on.
 const SHIT_1170_FEED_DEFAULT_TYPE: SHIT_1170_FEED_TYPE = "all";

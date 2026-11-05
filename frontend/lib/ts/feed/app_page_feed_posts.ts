@@ -103,9 +103,27 @@ export function shit_1170_feed_posts_fun(
   // ONE IS THE FLIP: the feed reads newest-first, and the direction
   // button turns it over. the sort key says WHICH number, and the
   // direction says which way round.
-  const sign = direction === "asc" ? 1 : -1;
+  //
+  // --- WHY --- DESC MEANS NEWEST FIRST AND NOT OLDEST FIRST: "desc" is
+  // DESCENDING, and a descending list of times runs from the LARGEST
+  // time to the smallest — the newest post at the TOP. the backend's own
+  // list route answers `ORDER BY created_at DESC`, so the client has to
+  // agree with it or the feed would re-order the api's own answer.
+  //
+  // --- WHY --- THE COMPARATOR IS "b BEFORE a" AND THE SIGN FLIPS IT:
+  // `created_at_of_fun(b) - created_at_of_fun(a)` is positive when b is
+  // the NEWER one, and a positive comparator result means "a comes
+  // after b" — so with no sign the list runs NEWEST FIRST. `desc` keeps
+  // that and `asc` flips it with the minus, and the OLDEST post then
+  // sits at the top. the sign was the wrong way round before, so `desc`
+  // put the OLDEST post at the top and the feed read backwards.
+  const sign = direction === "asc" ? -1 : 1;
 
   if (sort === "most_popular") {
+    // --- WHY --- THE ACCOUNT COUNT IS SORTED THE SAME WAY ROUND: the
+    // direction is about which end of the list the biggest number sits
+    // at, and it must mean the same thing for both sorts. `desc` puts
+    // the most accounts at the top.
     posts.sort((a, b) => sign * (accounts_of_fun(b) - accounts_of_fun(a)));
     return posts;
   }

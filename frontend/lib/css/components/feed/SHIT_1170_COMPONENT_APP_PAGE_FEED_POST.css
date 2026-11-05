@@ -218,6 +218,43 @@
   letter-spacing: 0.06em;
 }
 /*==================================*/
+/* the line that says posts arrived while the reader was further down.
+
+   --- WHY --- IT IS OVER THE POSTS: a post that lands at the top of a
+   newest-first list is off screen when the reader has scrolled to page
+   two, and a post that appears silently is a post the reader never
+   sees. the line sits above the list, where the reader's eye already
+   is.
+
+   --- WHY --- IT IS QUIET AND NOT A CARD: it is a note about the list,
+   not a post. it is the app's pale accent and not the page red, and
+   it is small — the reader wants to know there is something new, not
+   to be interrupted by it. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-new-posts {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--color-middle);
+  border-radius: 10px;
+  color: #ffe8e6;
+  background: transparent;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  cursor: pointer;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_POST .feed-new-posts:hover {
+  background: var(--color-middle);
+  color: var(--color-fontend);
+}
+/*==================================*/
+/*==================================*/
 /* the line that says the next page is on its way.
 
    --- WHY --- IT IS UNDER THE POSTS AND NOT OVER THEM: the reader is

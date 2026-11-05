@@ -10,6 +10,7 @@ pub mod backend {
         pub mod endpoint_shit_1170_swap_queue;
         pub mod endpoint_shit_1170_tx_queue;
         pub mod endpoint_trezu;
+        pub mod feed_ws;
         pub mod server;
     }
     pub mod routes {
@@ -19,6 +20,9 @@ pub mod backend {
         pub mod api_key_rotate_route;
         pub mod api_keys_route;
         pub mod app_router_fun;
+        pub mod feed_ws_route;
+        #[cfg(test)]
+        pub mod feed_ws_route_test;
         pub mod ping_route;
         pub mod swap_queue_accounts_delete_route;
         pub mod swap_queue_accounts_route;

@@ -13,6 +13,8 @@ listed there, and a route that needs its own detail gets a file here.
   this api key belong to, and the header it travels in
 - [`shit-1170-api-key-rotate.md`](./shit-1170-api-key-rotate.md) — give
   an account a new api key
+- [`shit-1170-feed-ws.md`](./shit-1170-feed-ws.md) — the live feed, a
+  websocket that pushes every newly queued batch and swap
 - [`shit-1170-tx-queue.md`](./shit-1170-tx-queue.md) — queue a batch of
   transactions, and the filterable list of them
 - [`shit-1170-tx-queue-facets.md`](./shit-1170-tx-queue-facets.md) — the

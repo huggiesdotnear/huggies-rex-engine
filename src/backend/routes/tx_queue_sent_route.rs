@@ -37,7 +37,6 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
-use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_accounts_store::{
     tx_queue_accounts_list_by_queue_fun, tx_queue_accounts_set_sent_fun,
@@ -52,14 +51,21 @@ use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_store::tx_queue
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_transactions_store::{
     tx_queue_transactions_get_fun, tx_queue_transactions_list_by_queue_fun,
 };
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
+use crate::backend::logic::feed_ws::feed_ws_event::FEED_WS_EVENT;
+use crate::backend::logic::feed_ws::feed_ws_publish_fun::feed_ws_publish_fun;
 use crate::backend::types::tx_queue_request::TX_QUEUE_SENT_REQUEST;
 // ========================================
 pub async fn tx_queue_sent_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     headers: HeaderMap,
     Path(queue_id): Path<String>,
     Json(body): Json<TX_QUEUE_SENT_REQUEST>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     // --- WHO IS CALLING ------------------
     let caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
         Ok(account_id) => account_id,
@@ -218,7 +224,22 @@ pub async fn tx_queue_sent_route(
     };
 
     match tx_queue_row_to_json_fun(&queue, &transactions, &accounts) {
-        Ok(item) => (StatusCode::OK, Json(item)).into_response(),
+        Ok(item) => {
+            // --- THE LIVE FEED ----------------
+            // the open feed pages are told that the batch was sent.
+            //
+            // --- WHY --- THE SAME ITEM THAT IS ANSWERED WITH: the
+            // client's live post has to be byte-for-byte what a refetch
+            // would give it.
+            feed_ws_publish_fun(
+                &state.feed_ws,
+                FEED_WS_EVENT::Queue {
+                    queue: item.clone(),
+                },
+            );
+
+            (StatusCode::OK, Json(item)).into_response()
+        }
         Err(err) => {
             eprintln!("[tx-queue] could not read the args: {err}");
             shit_1170_error_fun(

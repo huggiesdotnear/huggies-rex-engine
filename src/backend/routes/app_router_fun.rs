@@ -19,9 +19,13 @@ use axum::{
 use sqlx::SqlitePool;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
+use crate::backend::logic::feed_ws::feed_ws_bus_fun::feed_ws_bus_new_fun;
+
 use super::api_key_me_route::api_key_me_route;
 use super::api_key_rotate_route::api_key_rotate_route;
 use super::api_keys_route::api_keys_route;
+use super::feed_ws_route::feed_ws_route;
 use super::ping_route::ping_route;
 use super::trezu_treasuries_route::trezu_treasuries_route;
 use super::tx_queue_accounts_delete_route::tx_queue_accounts_delete_route;
@@ -83,6 +87,14 @@ async fn fresh_static_middleware_fun(req: Request, next: Next) -> Response {
 }
 // ====================================
 pub fn app_router_fun(pool: SqlitePool) -> Router {
+    // --- WHY --- THE BUS IS BUILT HERE AND NOT AT THE CALL SITE: the
+    // router owns the state, and the state holds the bus. one bus per
+    // router, so every route that writes to the queue and every socket
+    // that listens are talking about the same one.
+    let state = APP_STATE {
+        pool,
+        feed_ws: feed_ws_bus_new_fun(),
+    };
     let cors = CorsLayer::new()
         .allow_origin(HeaderValue::from_static("*"))
         .allow_methods([
@@ -105,6 +117,9 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
         .route("/api/shit-1170/api-keys", post(api_keys_route))
         .route("/api/shit-1170/api-key/me", get(api_key_me_route))
         .route("/api/shit-1170/api-key/rotate", post(api_key_rotate_route))
+        // the live feed. a websocket upgrade on its own path, so it is
+        // never mistaken for a page or swallowed by the static folder.
+        .route("/api/shit-1170/feed/ws", get(feed_ws_route))
         // the tx queue. the stats routes come BEFORE the `{queue_id}`
         // route, because axum matches the more specific path first and
         // `stats` would otherwise be read as a queue id.
@@ -181,9 +196,11 @@ pub fn app_router_fun(pool: SqlitePool) -> Router {
     Router::new()
         .merge(api_router)
         .merge(static_router)
-        // the db pool is the router's state, so the routes that need the
-        // db can reach it without opening a pool per request.
-        .with_state(pool)
+        // the db pool and the feed bus are the router's state, so the
+        // routes that need the db can reach it without opening a pool
+        // per request, and the routes that write to the queue can tell
+        // the feed socket about it.
+        .with_state(state)
         // axum wraps layers in REVERSE declaration order, so the
         // request runs preflight -> cors -> route. the preflight
         // intercepts OPTIONS and short-circuits to 204 with CORS

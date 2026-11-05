@@ -120,7 +120,7 @@ export async function shit_1170_feed_swaps_load_fun(
   hide_sent: boolean,
   contracts: string | null,
   cursor: string | null,
-  on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
+  on_routes: (swap_id: string, routes: SHIT_1170_SWAP_ROUTE[]) => void,
 ): Promise<SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED> {
   const own_account_id = SHIT_1170_AUTH.get_account_id();
   const options = await api_key_options_fun(false, own_account_id ?? undefined);
@@ -216,10 +216,17 @@ async function load_swap_balances_fun(
 // --- WHY THE ROUTES ARE ASKED FOR ALL AT ONCE: a feed of fifty swaps
 // is fifty questions to the router, and they are asked together so the
 // answers come back together.
+//
+// --- WHY THE CALLBACK IS GIVEN THE SWAP'S ID AND NOT ITS POSITION: the
+// live routes module answers with the index of the swap WITHIN THIS
+// PAGE, and the page is not the whole feed. the feed grows while the
+// reader is on it — a live swap joins it, and the next page is appended
+// to it — so a position is not a thing the store can write with. the
+// swap's id is, and it is the same thing wherever the swap sits.
 async function load_swap_routes_fun(
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>,
   account_id: string | null,
-  on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
+  on_routes: (swap_id: string, routes: SHIT_1170_SWAP_ROUTE[]) => void,
 ): Promise<
   ReadonlyArray<{
     quote: SHIT_1170_SWAP_QUOTE | null;
@@ -235,7 +242,11 @@ async function load_swap_routes_fun(
         amount_in: swap.amountIn,
       })),
       account_id,
-      on_routes,
+      (index, routes) => {
+        const swap = swaps[index];
+        if (swap === undefined) return;
+        on_routes(swap.swapId, routes);
+      },
     );
   } catch (err) {
     console.warn(

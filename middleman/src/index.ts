@@ -17,6 +17,7 @@
 export * from "./fun/api_shit_1170_api_key_me_get";
 export * from "./fun/api_shit_1170_api_key_rotate_post";
 export * from "./fun/api_shit_1170_api_keys_post";
+export * from "./fun/api_shit_1170_feed_ws";
 export * from "./fun/api_shit_1170_ping_get";
 export * from "./fun/api_shit_1170_swap_queue_accounts_delete";
 export * from "./fun/api_shit_1170_swap_queue_accounts_post";
@@ -39,6 +40,7 @@ export { api_call } from "./stuff/api_call";
 export type { API_CALL_PARAMS } from "./stuff/api_call";
 export { ENDPOINT_PATHS } from "./stuff/endpoint_paths";
 export type { EndpointKey } from "./stuff/endpoint_paths";
+export { feed_ws_url_fun } from "./stuff/feed_ws_url";
 export { parse_error } from "./stuff/parse_error";
 export type {
   SHIT_1170_API_ERROR,
@@ -46,8 +48,10 @@ export type {
 } from "./stuff/parse_error";
 export { build_headers } from "./stuff/request_options";
 export type { REQUEST_OPTIONS } from "./stuff/request_options";
+export { parse_feed_ws_event } from "./stuff/parse_feed_ws_event";
 
 export type { SHIT_1170_ERROR_RESPONSE } from "./types/common";
+export type { SHIT_1170_FEED_WS_EVENT } from "./types/shit_1170_feed_ws";
 export type { SHIT_1170_PING } from "./types/shit_1170_ping";
 export type {
   SHIT_1170_API_KEY,

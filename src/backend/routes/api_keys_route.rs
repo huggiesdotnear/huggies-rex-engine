@@ -36,12 +36,17 @@ use crate::backend::logic::endpoint_shit_1170_api_keys::{
     api_keys_store::{api_key_get_fun, api_key_upsert_fun},
     nep413_verify_fun::{NEP413_SIGNED_MESSAGE, NEP413_VERIFY_ERROR, nep413_verify_fun},
 };
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
 use crate::backend::types::api_keys_request::{API_KEY_ENTRY, API_KEYS_REQUEST, API_KEYS_RESPONSE};
 // ========================================
 pub async fn api_keys_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     Json(body): Json<API_KEYS_REQUEST>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     if body.accounts.is_empty() {
         return shit_1170_error_fun(
             StatusCode::BAD_REQUEST,

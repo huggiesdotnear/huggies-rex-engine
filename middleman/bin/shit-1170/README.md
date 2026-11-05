@@ -58,6 +58,23 @@ file, the same way the sign-in bin takes it.
 bun middleman/bin/shit-1170/api_shit_1170_api_key_rotate_post.ts --accounts ./accounts.json
 ```
 
+## api_shit_1170_feed_ws
+
+GET /api/shit-1170/feed/ws — the LIVE feed, a websocket. the server
+pushes every newly queued batch and every newly queued swap, so the bin
+prints them as they land.
+
+the bin LISTENS until it is stopped with ctrl+c. it reconnects on its
+own when the socket drops, so a run that goes quiet for a while is a
+backend that is down, not a bin that gave up.
+
+the socket is OPEN: there is no `--api-key`.
+
+```sh
+bun middleman/bin/shit-1170/api_shit_1170_feed_ws.ts
+bun middleman/bin/shit-1170/api_shit_1170_feed_ws.ts --base-url http://my-host:54733
+```
+
 ## the tx queue
 
 a `queue_id` is a BATCH of transactions, not one transaction. the agent

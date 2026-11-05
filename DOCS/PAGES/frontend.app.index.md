@@ -18,6 +18,13 @@ values, and the api reads them as an OR. the api pages the feed with an
 opaque cursor, so the next page is asked for when the reader nears the
 bottom.
 
+`dir` is the way round the sort. `desc` is DESCENDING, so the NEWEST
+post is at the TOP of the list and the oldest is at the bottom - the
+same order the api's own list route answers in. `asc` is the flip: the
+oldest post at the top and the newest at the bottom. `desc` is the
+default, and the direction button's arrow shows the way the list runs -
+down for `desc` and up for `asc`.
+
 the ALL / MINE shortcut at the front of the bar is a SHORTCUT OVER THE
 ACCOUNTS LIST, and the accounts list is the ONE source of truth. there
 is no `?view=` url param and no `view` field in the saved filter.
@@ -62,6 +69,17 @@ filters only fill in what the url does not say.
 the feed's LIST requests need NO api key - the queue list and the swap
 list are OPEN, and a reader who is not signed in reads them like
 anybody else. the key is only needed for the things a reader ACTS on.
+
+the feed is LIVE. one WEBSOCKET carries the new work - a newly queued
+batch or a newly queued swap - and the new post appears on screen
+without the reader polling or reloading. the socket is OPEN and carries
+EVERY new post; the client decides what matches the reader's filter,
+so a filter change costs nothing on the wire. the socket is opened when
+the page's first load runs and is closed when the page goes away, and
+the client reconnects it by itself when it drops. the sort and the
+direction are the ORDER of the list, not a part of the filter, so a
+post that arrives live lands where the sort says it lands - at the TOP
+of a newest-first list and at the BOTTOM of an oldest-first one.
 
 the TYPE group says which kind of post is FETCHED: FUNCTION CALL asks
 for the queued batches only, SWAPS asks for the queued swaps only, and

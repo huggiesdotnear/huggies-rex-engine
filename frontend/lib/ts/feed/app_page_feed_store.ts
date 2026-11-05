@@ -16,6 +16,11 @@ import { SHIT_1170_APP_PAGE_FEED_FACETS } from "./app_page_feed_facets";
 import { SHIT_1170_APP_PAGE_FEED_SAVED } from "./app_page_feed_saved";
 import { SHIT_1170_APP_PAGE_FEED_SWAPS } from "./app_page_feed_swaps";
 import { SHIT_1170_APP_PAGE_FEED_URL } from "./app_page_feed_url";
+import { SHIT_1170_APP_PAGE_FEED_WS } from "./app_page_feed_ws";
+import {
+  shit_1170_feed_ws_queue_matches_fun,
+  shit_1170_feed_ws_swap_matches_fun,
+} from "./app_page_feed_ws_match";
 import { shit_1170_feed_posts_fun } from "./app_page_feed_posts";
 import { SHIT_1170_AUTH } from "../shared/auth_status";
 import { SHIT_1170_TOAST_STORE } from "../shared/toast_store";
@@ -28,11 +33,16 @@ import type {
 import type { SHIT_1170_TRANSFER_TOKEN } from "../shared/transfer_tokens";
 import { SHIT_1170_SWAP_ROUTES } from "../shared/swap_routes";
 import type { SHIT_1170_SWAP_ROUTE } from "../shared/swap_routes";
+import { SHIT_1170_SWAP_LIVE_ROUTES } from "../shared/swap_live_routes";
+import { SHIT_1170_SWAP_BALANCES } from "../shared/swap_balances";
+import { fetch_transfer_tokens_by_ids_fun } from "../shared/transfer_tokens";
+import { shit_1170_queue_token_ids_fun } from "../shared/queue_transfers";
 import type {
   SHIT_1170_SWAP_QUEUE,
   SHIT_1170_TX_QUEUE,
   SHIT_1170_TX_QUEUE_FACETS,
 } from "@huggies/shit-1170-rex-engine-middleman";
+import type { SHIT_1170_FEED_WS_EVENT } from "@huggies/shit-1170-rex-engine-middleman";
 import type { SHIT_1170_FEED_POST } from "./app_page_feed_posts";
 // ========================================
 // ========================================
@@ -56,6 +66,15 @@ export interface SHIT_1170_APP_PAGE_FEED_STORE_STATE extends SHIT_1170_APP_PAGE_
   // button that cannot work is noise, and a trade the reader cannot
   // afford is a trade they should not be offered.
   swap_balances: Map<string, string>;
+  // how many posts have arrived live since the reader last looked at
+  // the top of the feed.
+  //
+  // --- WHY --- THE COUNT IS HELD AND NOT JUST SHOWN: a post that lands
+  // at the top of a newest-first list is OFF SCREEN when the reader has
+  // scrolled down to page two, and a post that appears silently is a
+  // post the reader never sees. so the count is held, and the feed
+  // shows it until the reader goes back to the top.
+  new_posts: number;
 }
 // ========================================
 // ========================================
@@ -75,6 +94,7 @@ let state: SHIT_1170_APP_PAGE_FEED_STORE_STATE = {
   swap_balances: new Map(),
   tokens: new Map(),
   swap_tokens: new Map(),
+  new_posts: 0,
   total: 0,
   next_cursor: null,
   swaps_cursor: null,
@@ -106,6 +126,21 @@ let queues_cursor: string | null = null;
 let swaps_cursor: string | null = null;
 // true while the next page is on its way.
 let loading_more = false;
+// the posts that arrived LIVE and that no load has caught up with yet.
+//
+// --- WHY --- THEY ARE HELD BESIDE THE STATE AND NOT INSIDE IT: a load
+// REPLACES the list with what the api answered, and the api's answer
+// was made before the live post was queued. so a post that arrives
+// while a load is on its way would be thrown away by that load's answer,
+// and the reader would have to reload to see it. these are the posts
+// that a load has not caught up with, and every load merges them back
+// in.
+//
+// --- WHY --- THEY ARE TWO LISTS AND NOT ONE: the queued batches and the
+// queued swaps are two resources with two ids, and a post is one or the
+// other.
+let pending_queues: ReadonlyArray<SHIT_1170_TX_QUEUE> = [];
+let pending_swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE> = [];
 // the facets, once they have been read. they are asked for ONCE when
 // the page opens.
 //
@@ -208,6 +243,53 @@ async function load_fun(): Promise<void> {
   if (loading && loaded_for === key) return;
   loaded_for = key;
   loading = true;
+  // --- WHY --- THE LIVE SOCKET IS OPENED HERE AND NOT IN THE START
+  // SCRIPT: the socket is the feed's live half, and the feed's live
+  // half starts when the feed starts. the start script is the page's
+  // first load, and this IS the page's first load — but the load also
+  // runs again when the reader changes a filter, and opening the socket
+  // again then would push every event twice.
+  //
+  // --- WHY --- THE SOCKET IS NOT CLOSED AND REOPENED ON A FILTER
+  // CHANGE: the socket is FILTER-AGNOSTIC — it pushes every new post
+  // and the client decides what matches — so the match check reads the
+  // CURRENT filter off the state when the event arrives. a filter
+  // change therefore costs nothing on the wire.
+  //
+  // --- WHY --- OPENING IT TWICE IS A NO-OP: the open is guarded by the
+  // socket module, so the second load of the page finds the socket
+  // already open and leaves it alone.
+  SHIT_1170_APP_PAGE_FEED_WS.open(handle_feed_event_fun);
+  // --- WHY --- THE PENDING POSTS ARE MATCHED AGAIN AGAINST THE NEW
+  // FILTER: they were matched against the filter that was on screen when
+  // they arrived, and the reader may have changed it since. a post that
+  // the new filter does not want is dropped, and a post that it does
+  // want is kept — so a filter change never shows a post the reader did
+  // not ask for.
+  pending_queues = pending_queues.filter((queue) =>
+    shit_1170_feed_ws_queue_matches_fun(
+      queue,
+      {
+        hide_sent: filter.hide_sent,
+        type: filter.type,
+        contracts: filter.contracts,
+        accounts: filter.accounts,
+      },
+      SHIT_1170_AUTH.get_account_id(),
+    ),
+  );
+  pending_swaps = pending_swaps.filter((swap) =>
+    shit_1170_feed_ws_swap_matches_fun(
+      swap,
+      {
+        hide_sent: filter.hide_sent,
+        type: filter.type,
+        contracts: filter.contracts,
+        accounts: filter.accounts,
+      },
+      SHIT_1170_AUTH.get_account_id(),
+    ),
+  );
   // --- WHY --- THE PAGINATION RESETS HERE: the cursor is where the
   // NEXT page starts, and a new filter is a new list. the cursors go
   // back to null and the list starts again from the first page.
@@ -229,6 +311,10 @@ async function load_fun(): Promise<void> {
     contracts: filter.contracts,
     accounts: filter.accounts,
     loading: true,
+    // --- WHY --- THE NEW-POST COUNT GOES BACK TO ZERO ON A LOAD: the
+    // load brings the whole first page, so everything that arrived live
+    // is on screen now and there is nothing left to announce.
+    new_posts: 0,
     error: null,
   });
   try {
@@ -245,6 +331,22 @@ async function load_fun(): Promise<void> {
     loading = false;
     queues_cursor = loaded.next_cursor;
     swaps_cursor = swaps_loaded.next_cursor;
+    // --- WHY --- THE PENDING POSTS ARE MERGED IN: a post that arrived
+    // live while this load was on its way is NOT in what the api
+    // answered — the api's answer was made before the post was queued.
+    // so the load would throw it away, and the reader would have to
+    // reload to see it. the pending posts go back in.
+    const merged = merge_pending_fun(loaded.queues, swaps_loaded.swaps);
+    // --- WHY --- THE PENDING SWAPS BRING THEIR OWN SLOTS: the quote
+    // and the route arrays are PARALLEL to `swaps`, so a swap that
+    // joins the list has to bring a slot in BOTH of them. a pending
+    // swap has no route in the slot the load made for it — the load
+    // only knows about the swaps the api answered with — so it starts
+    // with a null quote and no routes, exactly like a swap that has
+    // just joined the list, and its own live routes are taken again
+    // below.
+    const pending_swap_slots = merged.pending_swaps.map(() => null);
+    const pending_route_slots = merged.pending_swaps.map(() => []);
     set_state_fun({
       ...state,
       hide_sent: filter.hide_sent,
@@ -253,13 +355,22 @@ async function load_fun(): Promise<void> {
       type: filter.type,
       contracts: filter.contracts,
       accounts: filter.accounts,
-      queues: loaded.queues,
-      tokens: loaded.tokens,
-      swaps: swaps_loaded.swaps,
-      swap_quotes: swaps_loaded.quotes,
-      swap_routes: swaps_loaded.routes,
-      swap_balances: swaps_loaded.balances,
-      swap_tokens: swaps_loaded.tokens,
+      queues: merged.queues,
+      // --- WHY --- THE LOADED TOKENS ARE MERGED WITH THE ONES ALREADY
+      // HELD: the live posts brought their own tokens, and the load's
+      // answer does not carry them.
+      tokens: new Map([...state.tokens, ...loaded.tokens]),
+      swaps: merged.swaps,
+      swap_quotes: [...swaps_loaded.quotes, ...pending_swap_slots],
+      swap_routes: [...swaps_loaded.routes, ...pending_route_slots],
+      // --- WHY --- THE BALANCES AND THE SWAP TOKENS ARE MERGED AND NOT
+      // REPLACED: the live swaps brought their own, and the load's
+      // answer does not carry them.
+      swap_balances: new Map([
+        ...state.swap_balances,
+        ...swaps_loaded.balances,
+      ]),
+      swap_tokens: new Map([...state.swap_tokens, ...swaps_loaded.tokens]),
       total: total_of_fun(loaded.total, swaps_loaded.total, filter.type),
       next_cursor: queues_cursor,
       swaps_cursor: swaps_cursor,
@@ -268,29 +379,110 @@ async function load_fun(): Promise<void> {
       facets: facets ?? state.facets,
       error: null,
     });
+    // --- WHY --- THE PENDING LIST IS CLEARED AFTER THE LOAD: the load
+    // has caught up with the posts that were queued before it asked, and
+    // the posts that arrived after it asked are still pending — so only
+    // the ones the api's answer carries are let go of.
+    pending_queues = merged.pending_queues;
+    pending_swaps = merged.pending_swaps;
+    // --- WHY --- THE PENDING SWAPS GET THEIR ROUTES AGAIN: the load
+    // gave the list new slots and the live routes are held by slot, so
+    // the live swap asks for its route once more and it lands in the
+    // slot the new list has for it. only the ROUTES are taken again —
+    // the tokens and the balance are already held and the load did not
+    // take them away.
+    for (const pending of merged.pending_swaps) {
+      void load_live_swap_routes_fun(pending, SHIT_1170_AUTH.get_account_id());
+    }
   } catch (err) {
     if (loaded_for !== key) return;
     loading = false;
     queues_cursor = null;
     swaps_cursor = null;
+    // --- WHY --- THE PENDING POSTS SURVIVE A FAILED LOAD: they arrived
+    // live and they are real — the load failed, not the posts. so the
+    // reader keeps the posts the socket brought them and loses only the
+    // pages the api could not answer.
     set_state_fun({
       ...state,
-      queues: [],
-      swaps: [],
-      swap_quotes: [],
-      swap_routes: [],
-      swap_balances: new Map(),
-      tokens: new Map(),
-      swap_tokens: new Map(),
-      total: 0,
+      queues: [...pending_queues],
+      swaps: [...pending_swaps],
+      swap_quotes: pending_swaps.map(() => null),
+      swap_routes: pending_swaps.map(() => []),
+      // --- WHY --- THE TOKENS AND THE BALANCES ARE KEPT: they were
+      // fetched for the pending posts and they are still true.
+      swap_balances: new Map(state.swap_balances),
+      tokens: new Map(state.tokens),
+      swap_tokens: new Map(state.swap_tokens),
+      new_posts: 0,
+      total: pending_queues.length + pending_swaps.length,
       next_cursor: null,
       swaps_cursor: null,
       loading_more: false,
       loading: false,
       error: err instanceof Error ? err.message : String(err),
     });
+    // --- WHY --- THE PENDING SWAPS GET THEIR ROUTES AGAIN: the error
+    // path gave the list new slots and the live routes are held by slot.
+    for (const pending of pending_swaps) {
+      void load_live_swap_routes_fun(pending, SHIT_1170_AUTH.get_account_id());
+    }
   }
 } // ========================================
+// ========================================
+// --- MERGE PENDING ---------------------
+// put the posts that arrived live back into what a load answered.
+//
+// --- WHY --- THE LOAD'S ANSWER IS A SNAPSHOT FROM BEFORE THE POST WAS
+// QUEUED: the api answered the question it was asked, and the post that
+// arrived live while the answer was on its way was queued after the
+// question was asked. so the answer does not carry it, and the load
+// would drop it.
+//
+// --- WHY --- A POST THE ANSWER ALREADY CARRIES IS NOT PUT IN TWICE: a
+// post that was queued before the load asked IS in the answer, and the
+// reader must see it once.
+//
+// --- WHY --- THE PENDING LIST IS ONLY SHRUNK AND NEVER GROWN HERE: a
+// post that arrived while the load was on its way is still pending, so
+// the next load merges it in again — and the answer will carry it by
+// then, and it is let go of.
+//
+// --- WHY --- THE PENDING POSTS ARE APPENDED AND NOT PUT FIRST: the
+// merge sorts the list, so the order of the list does not matter. the
+// pages are in the order the api sent them and the live posts come
+// after them, and the sort puts everything where the reader expects it.
+function merge_pending_fun(
+  loaded_queues: ReadonlyArray<SHIT_1170_TX_QUEUE>,
+  loaded_swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>,
+): {
+  queues: ReadonlyArray<SHIT_1170_TX_QUEUE>;
+  swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
+  pending_queues: ReadonlyArray<SHIT_1170_TX_QUEUE>;
+  pending_swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
+} {
+  const loaded_queue_ids = new Set(loaded_queues.map((queue) => queue.queueId));
+  const loaded_swap_ids = new Set(loaded_swaps.map((swap) => swap.swapId));
+  // --- WHY --- THE PENDING POSTS THE ANSWER DOES NOT CARRY STAY
+  // PENDING: they were queued after the api was asked, so the answer
+  // does not have them — and the next load will.
+  const keep_queues = pending_queues.filter(
+    (queue) => !loaded_queue_ids.has(queue.queueId),
+  );
+  const keep_swaps = pending_swaps.filter(
+    (swap) => !loaded_swap_ids.has(swap.swapId),
+  );
+  return {
+    // --- WHY --- THE PENDING POSTS GO AFTER THE ANSWER: the merge sorts
+    // the list, so the order of the list does not matter — and the
+    // pages are in the order the api sent them.
+    queues: [...loaded_queues, ...keep_queues],
+    swaps: [...loaded_swaps, ...keep_swaps],
+    pending_queues: keep_queues,
+    pending_swaps: keep_swaps,
+  };
+}
+// ========================================
 // ========================================
 // --- QUEUES ----------------------------
 // the queued batches, and their tokens.
@@ -431,17 +623,28 @@ async function load_facets_fun(): Promise<SHIT_1170_TX_QUEUE_FACETS | null> {
 // --- LIVE ROUTES ------------------------
 // one swap's routes changed under the live subscription.
 //
+// --- WHY THE SWAP IS FOUND BY ITS ID AND NOT BY ITS POSITION: the
+// quote and the routes are held in arrays PARALLEL to `swaps`, and the
+// position of a swap in them changes — a live swap joins the list, the
+// next page is appended to it, a reload replaces it. a subscription
+// that fires late would then write into the WRONG slot and the card
+// would show another swap's route. the id is the one thing about a
+// swap that does not move.
+//
+// --- WHY A SWAP THAT IS NOT THERE IS IGNORED: a subscription for a
+// swap that has left the screen must not write into the next swap's
+// slot. a swap that is not in the list has no slot at all, so there is
+// nothing to write into.
+//
 // --- WHY --- THE QUOTE IS REBUILT FROM THE ROUTE: the quote IS the
 // route's numbers, so when the route changes the numbers change too.
 // reading them off the route means the amount on the card and the route
 // the button signs can never disagree.
-//
-// --- WHY --- THE INDEX IS CHECKED: a subscription for a swap that has
-// left the screen must not write into the next swap's slot.
 function set_swap_routes_fun(
-  index: number,
+  swap_id: string,
   routes: ReadonlyArray<SHIT_1170_SWAP_ROUTE>,
 ): void {
+  const index = state.swaps.findIndex((swap) => swap.swapId === swap_id);
   if (index < 0 || index >= state.swaps.length) return;
   const swap_routes = [...state.swap_routes];
   swap_routes[index] = routes;
@@ -466,6 +669,289 @@ function set_swap_routes_fun(
     };
   }
   set_state_fun({ ...state, swap_routes, swap_quotes });
+}
+// ========================================
+// ========================================
+// --- LIVE FEED -------------------------
+// the socket is open, and a new post arrived.
+//
+// --- WHY THE EVENT IS HANDLED AND NOT THE POSTS: the event is either
+// a queued batch or a queued swap, and the two need different work — a
+// batch needs its tokens, a swap needs its quote, its routes, its live
+// subscription, its tokens and its balance. so the event is split and
+// each kind is given its own handling.
+//
+// --- WHY THE MATCH IS READ OFF THE STATE AND NOT OFF THE URL: the
+// state IS the filter that is on screen. the url carries what the
+// reader picked, and the state carries the same thing plus the
+// defaults — so reading the state cannot answer a question about a
+// filter the reader has already left.
+//
+// --- WHY THE MATCH READS THE READER'S OWN ACCOUNT AT THIS MOMENT: the
+// hide-sent filter is about the reader's OWN account, and the reader
+// may have signed in since the page opened. so the account is read now
+// and not captured when the socket opened.
+function handle_feed_event_fun(event: SHIT_1170_FEED_WS_EVENT): void {
+  const filter = {
+    hide_sent: state.hide_sent,
+    type: state.type,
+    contracts: state.contracts,
+    accounts: state.accounts,
+  };
+  const own_account_id = SHIT_1170_AUTH.get_account_id();
+  if (event.type === "queue") {
+    if (
+      !shit_1170_feed_ws_queue_matches_fun(event.queue, filter, own_account_id)
+    ) {
+      return;
+    }
+    add_live_queue_fun(event.queue);
+    return;
+  }
+  if (!shit_1170_feed_ws_swap_matches_fun(event.swap, filter, own_account_id)) {
+    return;
+  }
+  add_live_swap_fun(event.swap);
+}
+// ========================================
+// ========================================
+// --- LIVE QUEUE ------------------------
+// a new queued batch joins the feed.
+//
+// --- WHY THE BATCH IS APPENDED AND NOT PUT AT THE TOP: the LIST on
+// screen is not the order the reader sees. `build_posts_fun` merges
+// the batches and the swaps and sorts them by the time they were
+// queued, so the batch lands in the right place on its own — and the
+// direction decides whether that is the top or the bottom. the LIST
+// keeps the order the pages were loaded in, so the cursors and the
+// pages stay consistent.
+//
+// --- WHY A BATCH THE READER ALREADY HAS IS NOT ADDED TWICE: the socket
+// pushes a batch when it is QUEUED, and a reload may have already
+// brought it in. two copies of one batch would show the reader the
+// same post twice, and the count would be wrong too.
+//
+// --- WHY THE TOKENS ARE ASKED FOR AFTERWARDS: the card's call line
+// shows the token's icon and symbol, and those come from the token
+// indexer. the batch itself is already on screen by then — the tokens
+// arrive a moment later and the card fills in.
+function add_live_queue_fun(queue: SHIT_1170_TX_QUEUE): void {
+  if (state.queues.some((one) => one.queueId === queue.queueId)) return;
+  // --- WHY --- THE POST IS ALSO HELD AS PENDING: a load that is on its
+  // way replaces the list with what the api answered, and the api's
+  // answer was made before this post was queued. so the post is held
+  // here until a load has caught up with it.
+  pending_queues = [...pending_queues, queue];
+  set_state_fun({
+    ...state,
+    queues: [...state.queues, queue],
+    total: state.total + 1,
+    new_posts: state.new_posts + 1,
+  });
+  void load_live_queue_tokens_fun(queue);
+}
+// ========================================
+// ========================================
+// --- LIVE QUEUE TOKENS -----------------
+// the token metadata for a batch that arrived live.
+//
+// --- WHY A FAILURE HERE IS SWALLOWED: the batch is still worth
+// showing without its icons. a failure costs the reader the icon and
+// the symbol, and it must not cost them the feed.
+async function load_live_queue_tokens_fun(
+  queue: SHIT_1170_TX_QUEUE,
+): Promise<void> {
+  const ids = shit_1170_queue_token_ids_fun(queue);
+  if (ids.length === 0) return;
+  const tokens = await fetch_transfer_tokens_by_ids_fun(ids);
+  if (tokens.size === 0) return;
+  // --- WHY --- THE TOKENS ARE MERGED AND NOT REPLACED: the map holds
+  // the tokens of EVERY batch on screen, and the other batches' tokens
+  // are in it already.
+  set_state_fun({
+    ...state,
+    tokens: new Map([...state.tokens, ...tokens]),
+  });
+}
+// ========================================
+// ========================================
+// --- LIVE SWAP -------------------------
+// a new queued swap joins the feed.
+//
+// --- WHY THE SWAP IS APPENDED AND NOT PUT AT THE TOP: the same reason
+// the live batch is appended — the merge sorts the list, and the swap
+// lands in the right place on its own.
+//
+// --- WHY THE SWAP IS APPENDED WITH ITS OWN SLOT IN THE QUOTE AND THE
+// ROUTE ARRAYS: those two arrays are PARALLEL to `swaps` — the same
+// order and the same length — and the card reads its quote and its
+// route by index. so a swap that joins the list has to bring a slot
+// with it, and the slot has to be the same slot in BOTH arrays.
+//
+// --- WHY THE ROUTES ARE TAKEN AND NOT LEFT EMPTY: the card's SWAP NOW
+// button signs the route the card is showing, and a card with no route
+// has an off button. the live swap gets its route the same way a loaded
+// one does — the one-shot fetch fills the screen and the subscription
+// keeps it fresh.
+function add_live_swap_fun(swap: SHIT_1170_SWAP_QUEUE): void {
+  if (state.swaps.some((one) => one.swapId === swap.swapId)) return;
+  // --- WHY --- THE POST IS ALSO HELD AS PENDING: a load that is on its
+  // way replaces the list with what the api answered, and the api's
+  // answer was made before this post was queued. so the post is held
+  // here until a load has caught up with it.
+  pending_swaps = [...pending_swaps, swap];
+  set_state_fun({
+    ...state,
+    swaps: [...state.swaps, swap],
+    // --- WHY --- A NULL QUOTE AND AN EMPTY ROUTE LIST ARE THE SLOTS'
+    // PLACEHOLDERS: the quote is null when the router could not answer
+    // and the routes are empty when there is nothing to sign. the card
+    // falls back to the quote the backend stored.
+    swap_quotes: [...state.swap_quotes, null],
+    swap_routes: [...state.swap_routes, []],
+    total: state.total + 1,
+    new_posts: state.new_posts + 1,
+  });
+  void load_live_swap_parts_fun(swap);
+}
+// ========================================
+// ========================================
+// --- LIVE SWAP PARTS -------------------
+// the tokens, the balance, the quote and the live routes of a swap that
+// arrived live.
+//
+// --- WHY IT IS THE SAME WORK A LOADED SWAP GETS: a swap that arrives
+// live must look exactly like a swap that arrived with the page, or the
+// reader gets a card with no icon, no number and an off button for a
+// trade they can perfectly well make.
+async function load_live_swap_parts_fun(
+  swap: SHIT_1170_SWAP_QUEUE,
+): Promise<void> {
+  const own_account_id = SHIT_1170_AUTH.get_account_id();
+  await Promise.all([
+    load_live_swap_tokens_fun(swap),
+    load_live_swap_balance_fun(swap, own_account_id),
+    load_live_swap_routes_fun(swap, own_account_id),
+  ]);
+}
+// ========================================
+// ========================================
+// --- LIVE SWAP TOKENS -----------------
+// the token metadata for a swap that arrived live.
+//
+// --- WHY A FAILURE HERE IS SWALLOWED: the swap is still worth showing
+// without its icons.
+async function load_live_swap_tokens_fun(
+  swap: SHIT_1170_SWAP_QUEUE,
+): Promise<void> {
+  const ids = [...new Set([swap.tokenIn, swap.tokenOut])];
+  if (ids.length === 0) return;
+  const tokens = await fetch_transfer_tokens_by_ids_fun(ids);
+  if (tokens.size === 0) return;
+  // --- WHY --- THE TOKENS ARE MERGED AND NOT REPLACED: the map holds
+  // the tokens of EVERY swap on screen.
+  set_state_fun({
+    ...state,
+    swap_tokens: new Map([...state.swap_tokens, ...tokens]),
+  });
+}
+// ========================================
+// ========================================
+// --- LIVE SWAP BALANCE ----------------
+// the reader's balance of the token a live swap sells.
+//
+// --- WHY ONLY THE TOKEN IN: the token in is the one that LEAVES the
+// reader's wallet, so it is the one the balance has to cover.
+//
+// --- WHY THE ACCOUNT IS THE READER'S OWN: a balance belongs to a
+// wallet, and the wallet in play is the reader's.
+//
+// --- WHY A FAILURE HERE IS SWALLOWED: the swap is still worth showing.
+// it costs the reader the balance check and not the card.
+async function load_live_swap_balance_fun(
+  swap: SHIT_1170_SWAP_QUEUE,
+  account_id: string | null,
+): Promise<void> {
+  if (account_id === null) return;
+  try {
+    const balances = await SHIT_1170_SWAP_BALANCES.load(account_id, [
+      swap.tokenIn,
+    ]);
+    set_state_fun({
+      ...state,
+      swap_balances: new Map([...state.swap_balances, ...balances]),
+    });
+  } catch (err) {
+    console.warn(
+      "[app_page_feed_store] the live swap's balance could not be read",
+      err,
+    );
+  }
+}
+// ========================================
+// ========================================
+// --- LIVE SWAP ROUTES ------------------
+// the live quote and the live routes of a swap that arrived live.
+//
+// --- WHY THE ONE-SHOT FETCH COMES FIRST AND THE SUBSCRIPTION AFTER: the
+// socket takes a moment to open and to answer, so the card would show
+// nothing until it does. the fetch fills the screen immediately and the
+// socket takes over.
+//
+// --- WHY THE SWAP'S OWN SLOT IS FOUND BY ITS ID: the quote and the
+// routes are held in arrays PARALLEL to `swaps`, and the position of
+// the swap in them is not a fixed thing — the list grows while the
+// reader is on it. the id finds the swap wherever it sits, so the
+// numbers land in the slot the card reads from.
+//
+// --- WHY A FAILURE HERE IS SWALLOWED: the router is a third party. the
+// swap is still worth showing without its live numbers, and the
+// backend's stored quote is the fallback.
+async function load_live_swap_routes_fun(
+  swap: SHIT_1170_SWAP_QUEUE,
+  account_id: string | null,
+): Promise<void> {
+  try {
+    const live = await SHIT_1170_SWAP_LIVE_ROUTES.load(
+      [
+        {
+          token_in: swap.tokenIn,
+          token_out: swap.tokenOut,
+          amount_in: swap.amountIn,
+        },
+      ],
+      account_id,
+      (routes_index, routes) => {
+        // --- WHY --- THE BATCH'S OWN INDEX IS IGNORED AND THE SWAP'S OWN
+        // ID IS USED: the one-shot load was asked for ONE swap, so its
+        // index is always zero, and the id is the one thing that says
+        // WHICH swap the routes belong to.
+        void routes_index;
+        set_swap_routes_fun(swap.swapId, routes);
+      },
+    );
+    const one = live[0];
+    if (one === undefined) return;
+    // --- WHY --- THE SLOT IS FOUND AGAIN HERE: the routes may have
+    // arrived while the fetch was in flight, and the swap may have
+    // moved in the list while the fetch was in flight. so the slot is
+    // looked up again here rather than remembered.
+    const index = state.swaps.findIndex((one) => one.swapId === swap.swapId);
+    if (index < 0) return;
+    // --- WHY --- THE QUOTE AND THE ROUTES GO INTO THE SWAP'S OWN SLOT:
+    // the arrays are parallel to `swaps`, and the slot is where the
+    // card reads them from.
+    const swap_quotes = [...state.swap_quotes];
+    const swap_routes = [...state.swap_routes];
+    swap_quotes[index] = one.quote;
+    swap_routes[index] = one.routes;
+    set_state_fun({ ...state, swap_quotes, swap_routes });
+  } catch (err) {
+    console.warn(
+      "[app_page_feed_store] the live swap's routes could not be taken",
+      err,
+    );
+  }
 }
 // ========================================
 // ========================================
@@ -961,6 +1447,30 @@ async function refresh_fun(): Promise<void> {
   await load_fun();
 }
 // ========================================
+// --- NEW POSTS -------------------------
+// the reader went back to the top of the feed, so the new posts are on
+// screen and there is nothing left to announce.
+//
+// --- WHY --- THE COUNT GOES TO ZERO AND THE POSTS STAY: the posts are
+// already in the list, and the count is only ever a way of saying "there
+// are posts above where you are". the reader has been there, so the
+// count has said what it had to say.
+function clear_new_posts_fun(): void {
+  if (state.new_posts === 0) return;
+  set_state_fun({ ...state, new_posts: 0 });
+}
+// ========================================
+// --- CLOSE -----------------------------
+// the page is going away, so the live feed stops.
+//
+// --- WHY --- THE SOCKET IS CLOSED HERE: a socket that is left open
+// keeps pushing events into a page that is no longer there, and the
+// reconnects keep it alive. the feed holds one socket and the page
+// holds the store, so this is where the socket is let go of.
+function close_fun(): void {
+  SHIT_1170_APP_PAGE_FEED_WS.close();
+}
+// ========================================
 // --- READ ------------------------------
 function get_fun(): SHIT_1170_APP_PAGE_FEED_STORE_STATE {
   return state;
@@ -1020,6 +1530,8 @@ export const SHIT_1170_APP_PAGE_FEED_STORE = {
   set_accounts: set_accounts_fun,
   clear_all: clear_all_fun,
   save_filters: save_filters_fun,
+  clear_new_posts: clear_new_posts_fun,
+  close: close_fun,
   subscribe: subscribe_fun,
   get: get_fun,
   get_token: token_of_fun,

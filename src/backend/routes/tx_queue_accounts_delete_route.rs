@@ -25,7 +25,6 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
-use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_accounts_store::{
     tx_queue_accounts_delete_fun, tx_queue_accounts_has_for_account_fun,
@@ -35,12 +34,17 @@ use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_caller_fun::tx_
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_row_to_json_fun::tx_queue_row_to_json_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_store::tx_queue_get_fun;
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_transactions_store::tx_queue_transactions_list_by_queue_fun;
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
 // ========================================
 pub async fn tx_queue_accounts_delete_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     headers: HeaderMap,
     Path((queue_id, account_id)): Path<(String, String)>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     // --- WHO IS CALLING ------------------
     let caller_account_id = match tx_queue_caller_fun(&pool, &headers).await {
         Ok(account_id) => account_id,

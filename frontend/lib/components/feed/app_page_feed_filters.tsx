@@ -430,14 +430,32 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
           is not one of the filters — it is the way round the sort that
           is on, and the reader wants it beside the bar at all times.
           a reader who wants the oldest first should not have to open
-          the panel to say so. */}
+          the panel to say so.
+
+          --- WHY --- THE ARROW SHOWS THE WAY THE LIST RUNS: `desc` is
+          DESCENDING, so the newest post is at the TOP and the list
+          runs DOWN the page from the newest to the oldest — the arrow
+          points down. `asc` is the flip, the oldest post is at the top
+          and the list runs UP the page — the arrow points up.
+
+          --- WHY --- THE LABEL SAYS WHAT CLICKING WILL DO: the button
+          shows the order the list is in now, and the label says what
+          the reader gets if they press it. a button whose label
+          described the state it was in would be a button the reader
+          has to read twice. */}
       <button
         type="button"
         class="feed-filter-button feed-filter-direction"
         aria-label={
-          state.direction === "desc" ? "sort ascending" : "sort descending"
+          state.direction === "desc"
+            ? "sort oldest first — the list now runs newest first"
+            : "sort newest first — the list now runs oldest first"
         }
-        title={state.direction === "desc" ? "DESCENDING" : "ASCENDING"}
+        title={
+          state.direction === "desc"
+            ? "NEWEST FIRST — PRESS FOR OLDEST FIRST"
+            : "OLDEST FIRST — PRESS FOR NEWEST FIRST"
+        }
         onClick={() => {
           const next: SHIT_1170_FEED_DIRECTION =
             state.direction === "desc" ? "asc" : "desc";

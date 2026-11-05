@@ -79,6 +79,9 @@ use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_transactions_st
     tx_queue_transactions_list_by_queue_fun,
 };
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_uuid_fun::tx_queue_uuid_fun;
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
+use crate::backend::logic::feed_ws::feed_ws_event::FEED_WS_EVENT;
+use crate::backend::logic::feed_ws::feed_ws_publish_fun::feed_ws_publish_fun;
 use crate::backend::types::shit_1170_query_list_fun::shit_1170_query_list_fun;
 use crate::backend::types::tx_queue_query::TX_QUEUE_QUERY;
 use crate::backend::types::tx_queue_request::{
@@ -111,10 +114,14 @@ const SHIT_1170_TX_QUEUE_LIST_MAX_LIMIT: i64 = 500;
 // and in the referer of the next page, and a bearer token in a url is a
 // bearer token in everybody's browser history.
 pub async fn tx_queue_post_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     headers: HeaderMap,
     Json(body): Json<TX_QUEUE_REQUEST>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     let account_id = match tx_queue_caller_fun(&pool, &headers).await {
         Ok(account_id) => account_id,
         Err(failure) => {
@@ -278,6 +285,19 @@ pub async fn tx_queue_post_route(
         Err(failure) => return *failure,
     };
 
+    // --- THE LIVE FEED --------------------
+    // the open feed pages are told about the new batch.
+    //
+    // --- WHY --- THE SAME ITEM THAT IS ANSWERED WITH: the client's live
+    // post has to be byte-for-byte what a refetch would give it, and
+    // reading the row again could read a different one.
+    feed_ws_publish_fun(
+        &state.feed_ws,
+        FEED_WS_EVENT::Queue {
+            queue: item.clone(),
+        },
+    );
+
     (StatusCode::CREATED, Json(item)).into_response()
 }
 
@@ -289,10 +309,14 @@ pub async fn tx_queue_post_route(
 // queues. a queue is an open offer, and hiding it would defeat the
 // point.
 pub async fn tx_queue_get_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     headers: HeaderMap,
     Query(query): Query<TX_QUEUE_QUERY>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     // --- WHY --- THE LIST DOES NOT ASK FOR A KEY: the queue is an OPEN
     // offer. a reader who is not signed in can still read the feed — they
     // see every batch, and they can open one. what they cannot do is act

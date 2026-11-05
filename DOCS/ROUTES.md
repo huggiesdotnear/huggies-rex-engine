@@ -39,6 +39,15 @@ user info, api key managmnets and the tx queue
 
   see [`ROUTES/shit-1170-api-key-rotate.md`](./ROUTES/shit-1170-api-key-rotate.md)
 
+- `/api/shit-1170/feed/ws` - the LIVE feed. `GET`, a websocket upgrade.
+  the server pushes every newly queued batch and every newly queued swap
+  to every connected client, so the feed page does not have to poll.
+  the message is `{ "type": "queue", "queue": {…} }` or
+  `{ "type": "swap", "swap": {…} }`, and the payload is the SAME item
+  the list route answers with. it is OPEN and asks for NO api key.
+
+  see [`ROUTES/shit-1170-feed-ws.md`](./ROUTES/shit-1170-feed-ws.md)
+
 - `/api/shit-1170/tx-queue` - the tx queue. `POST` queues a BATCH of
   transactions, `GET` is the filterable list of them. the list pages
   with an opaque cursor and filters by many accounts and many contracts

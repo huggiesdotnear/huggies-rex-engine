@@ -115,6 +115,21 @@ function reader_hash_fun(
 }
 
 // ========================================
+// --- HELPERS ----------------------------
+// take the reader back to the top of the page.
+//
+// --- WHY --- IT SCROLLS AND DOES NOT RELOAD: the new posts are already
+// in the list — the feed's merge sorts them into place — so the reader
+// only needs to be shown where they are. a reload would throw the
+// loaded pages away and ask the api for them again.
+//
+// --- WHY --- IT IS SMOOTH: the reader pressed a link that says "go to
+// the top", and a jump that snaps is a jump that loses their place.
+function scroll_to_top_fun(): void {
+  if (typeof window === "undefined") return;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+// ========================================
 // --- POST STATUS ------------------------
 // the reader's status on one post.
 //
@@ -343,6 +358,38 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_POST_FUN() {
   }
   return (
     <div class="feed-posts">
+      {/* --- WHY --- THE NEW-POST LINE IS OVER THE POSTS AND NOT UNDER
+          THEM: a post that lands at the top of a newest-first list is
+          OFF SCREEN when the reader has scrolled down to page two, and
+          a post that appears silently is a post the reader never sees.
+          so the feed says how many arrived, above the list, where the
+          reader's eye already is.
+
+          --- WHY --- IT IS A LINE AND NOT A TOAST: a toast floats over
+          the page and goes away on its own, and the reader would have
+          to catch it in the moment. this line sits with the list, it
+          says the same thing every time, and it goes away when the
+          reader goes back to the top — which is exactly when it stops
+          being true.
+
+          --- WHY --- IT IS A BUTTON AND NOT JUST WORDS: the reader who
+          wants the new posts presses it and the page goes to the top,
+          where they are. a button says "press me" and a link to a
+          place that is not on the page says nothing useful. */}
+      {state.new_posts > 0 && (
+        <button
+          type="button"
+          class="feed-new-posts"
+          onClick={() => {
+            SHIT_1170_APP_PAGE_FEED_STORE.clear_new_posts();
+            scroll_to_top_fun();
+          }}
+        >
+          {state.new_posts === 1
+            ? "1 NEW POST — GO TO THE TOP"
+            : `${state.new_posts} NEW POSTS — GO TO THE TOP`}
+        </button>
+      )}
       {/* --- WHY --- THE TWO KINDS OF CARD ARE DRAWN FROM ONE LIST: the
           reader reads one feed, and the order of the cards is the
           feed's business. a swap is not a batch, so it gets its own

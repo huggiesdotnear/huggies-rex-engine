@@ -25,11 +25,11 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_facets_store::{
     tx_queue_facet_accounts_fun, tx_queue_facet_contracts_fun,
 };
+use crate::backend::logic::feed_ws::app_state::APP_STATE;
 use crate::backend::types::tx_queue_facets_request::{
     TX_QUEUE_FACETS_QUERY, TX_QUEUE_FACETS_RESPONSE,
 };
@@ -52,9 +52,13 @@ const SHIT_1170_TX_QUEUE_FACETS_MAX_LIMIT: i64 = 500;
 // --- GET --------------------------------
 // the contracts and the accounts the filter bar offers.
 pub async fn tx_queue_facets_route(
-    State(pool): State<SqlitePool>,
+    State(state): State<APP_STATE>,
     Query(query): Query<TX_QUEUE_FACETS_QUERY>,
 ) -> Response {
+    // --- WHY --- THE POOL IS TAKEN OUT OF THE STATE: the router's
+    // state holds the pool and the feed bus, and this route needs
+    // the pool. the bus is not needed here.
+    let pool = state.pool.clone();
     let limit = limit_fun(
         query.limit,
         SHIT_1170_TX_QUEUE_FACETS_LIMIT,
