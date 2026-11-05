@@ -340,7 +340,11 @@ async function load_queues_fun(
 // and no swaps, and the swaps come back on the next load.
 async function load_swaps_fun(
   account_id: string | null,
-  filter: { hide_sent: boolean; type: SHIT_1170_FEED_TYPE },
+  filter: {
+    hide_sent: boolean;
+    type: SHIT_1170_FEED_TYPE;
+    contracts: ReadonlyArray<string>;
+  },
 ): Promise<{
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
   quotes: SHIT_1170_APP_PAGE_FEED_STORE_STATE["swap_quotes"];
@@ -362,9 +366,15 @@ async function load_swaps_fun(
     };
   }
   try {
+    // --- WHY --- THE SWAPS GET THE SAME CONTRACTS AS THE BATCHES: both
+    // kinds of post answer the reader's contracts pick, and the swaps
+    // match when either of their two tokens is a picked contract.
+    const contracts =
+      filter.contracts.length === 0 ? null : filter.contracts.join(",");
     const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(
       account_id,
       filter.hide_sent,
+      contracts,
       null,
       set_swap_routes_fun,
     );
@@ -585,7 +595,11 @@ async function load_queues_more_fun(
 // the next page of swaps.
 async function load_swaps_more_fun(
   account_id: string | null,
-  filter: { hide_sent: boolean; type: SHIT_1170_FEED_TYPE },
+  filter: {
+    hide_sent: boolean;
+    type: SHIT_1170_FEED_TYPE;
+    contracts: ReadonlyArray<string>;
+  },
   cursor: string | null,
 ): Promise<{
   swaps: ReadonlyArray<SHIT_1170_SWAP_QUEUE>;
@@ -619,9 +633,16 @@ async function load_swaps_more_fun(
     };
   }
   try {
+    // --- WHY --- THE NEXT PAGE CARRIES THE SAME CONTRACT FILTER: the
+    // next page belongs to the same match as the first one, so a page
+    // asked for without the contracts would bring back swaps the
+    // reader did not pick.
+    const contracts =
+      filter.contracts.length === 0 ? null : filter.contracts.join(",");
     const loaded = await SHIT_1170_APP_PAGE_FEED_SWAPS.load(
       account_id,
       filter.hide_sent,
+      contracts,
       cursor,
       set_swap_routes_fun,
     );
@@ -649,9 +670,15 @@ async function load_swaps_more_fun(
 // the total the reader is shown: how many queued transactions the whole
 // match holds.
 //
-// --- WHY --- THE TWO TOTALS ARE ADDED IN THE ALL VIEW: the reader sees
-// one feed, and the feed holds both kinds of post, so the total is both
-// counts together.
+// --- WHY --- THE TWO TOTALS ARE ADDED WHEN BOTH KINDS ARE FETCHED: the
+// reader sees one feed, and the feed holds both kinds of post, so the
+// total is both counts together. the contract filter narrows both
+// lists, so each count is already the count of the whole match for the
+// reader's filter.
+//
+// --- WHY --- ONE KIND IS COUNTED ON ITS OWN: the other kind is not
+// fetched for that type filter, and its zero must not change the count
+// of the kind the reader asked for.
 function total_of_fun(
   queues_total: number,
   swaps_total: number,

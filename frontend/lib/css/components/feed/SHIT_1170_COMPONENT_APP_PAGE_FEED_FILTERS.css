@@ -1,12 +1,12 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS
-   the feed's filter bar: HIDE SENT, the FILTERS panel with the sort,
-   the type, the contracts and the accounts, and the direction toggle.
+   the feed's filter bar: the ALL / MINE shortcut, HIDE SENT, the FILTERS
+   panel with the sort, the type, the contracts and the accounts, and the
+   direction toggle.
  
    the bar sits across the top of the feed, above the posts. it is ONE
-   row of three controls, and they are the base app buttons — narrower
-   than the base's 500px, because three of them have to share the
-   page's 500px column.
+   row of controls, and they are the base app buttons — narrower than
+   the base's 500px, because they have to share the page's 500px column.
  
    the active button is the filled-in one. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters {
@@ -21,16 +21,32 @@
   text-align: left;
 }
 /*==================================*/
+/* the ALL / MINE shortcut at the front of the bar.
+ 
+   --- WHY --- IT IS ITS OWN GROUP: the two buttons answer one question
+   and the rest of the bar answers others. the group holds them together
+   so the reader sees one choice and not four loose buttons.
+ 
+   --- WHY --- THE GROUP TAKES ITS SHARE OF THE ROW: the bar is one row
+   of controls and the shortcut is one of them, so it grows with the
+   others and keeps the bar one row instead of a row and a half. */
+#SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filters-toggle {
+  display: flex;
+  flex: 1 1 0;
+  gap: 6px;
+  min-width: 0;
+}
+/*==================================*/
 /* the buttons are the base app buttons, only narrower here.
  
    --- WHY --- they SHARE the row and are all the SAME width: the bar is
-   one row of three controls, and a row of buttons of different widths
-   does not read as a row. the flex makes them grow to fill the column
+   one row of controls, and a row of buttons of different widths does
+   not read as a row. the flex makes them grow to fill the column
    evenly, so HIDE SENT / FILTERS are equal columns.
  
    --- WHY --- the base's 500px width is overridden: the base button is
    as wide as the page column, which is right for a button that stands
-   alone and wrong for three that share it. */
+   alone and wrong for the ones that share it. */
 #SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS .feed-filter-button {
   flex: 1 1 0;
   width: auto;

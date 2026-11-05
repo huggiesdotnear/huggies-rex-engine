@@ -1,6 +1,7 @@
 // ========================================
-// the feed's filter bar: HIDE SENT, the FILTERS panel with the sort, the
-// type, the contracts and the accounts, and the direction toggle.
+// the feed's filter bar: the ALL / MINE shortcut, HIDE SENT, the FILTERS
+// panel with the sort, the type, the contracts and the accounts, and the
+// direction toggle.
 //
 // it reads the filter from the store and writes it back through the
 // store's setters.
@@ -32,6 +33,11 @@
 // --- WHY THE TYPE IS ALL / FUNCTION CALL / SWAPS: the feed holds two
 // kinds of post, and the reader often wants one of them. the api reads
 // each kind from its own route, so picking one halves the requests.
+//
+// --- WHY THE BAR HAS AN ALL / MINE SHORTCUT: "just mine" is a common
+// ask and the ACCOUNTS group can answer it, but the group is behind the
+// FILTERS button. the shortcut is in the bar and it writes the same
+// accounts list the group writes, so there is one answer and not two.
 import { render } from "preact";
 import { useState as use_state } from "preact/hooks";
 import { ArrowDown, ArrowUp, SlidersHorizontal } from "lucide-preact";
@@ -262,9 +268,10 @@ function FilterPanel(props: { on_saved: () => void }) {
             aria-pressed={has_id_fun(state.accounts, own_account_id)}
             title={own_account_id}
             onClick={() => {
-              void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts(
-                toggle_id_fun(state.accounts, own_account_id),
-              );
+              // --- WHY --- ME PICKS THE READER'S ACCOUNT ALONE: ME and
+              // the MINE shortcut are the same choice in two places, so
+              // ME sets the one account that makes the shortcut lit.
+              void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts([own_account_id]);
             }}
           >
             ME
@@ -335,9 +342,58 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_FILTERS_FUN() {
   // and it is not part of the feed's filter. a reader who opens the
   // panel, filters and closes it wants the same filter the next time.
   const [panel_open, set_panel_open] = use_state(false);
+  // --- WHY --- THE READER'S OWN ACCOUNT IS READ HERE: the shortcut and
+  // the ME button in the accounts group are two ways to the same place,
+  // and both work off the account the reader is signed in as.
+  const own_account_id = SHIT_1170_AUTH.get_account_id();
+  // --- WHY --- MINE IS LIT FOR THE READER'S ACCOUNT ALONE: an accounts
+  // list holding their account and somebody else's is neither ALL nor
+  // MINE. the reader has gone past the shortcut with the ACCOUNTS group,
+  // and the shortcut says so by having neither button lit.
+  const mine_active =
+    own_account_id !== null &&
+    state.accounts.length === 1 &&
+    state.accounts[0] === own_account_id;
+  const all_active = state.accounts.length === 0;
 
   return (
     <div class="feed-filters">
+      {/* --- WHY --- THE SHORTCUT IS IN FRONT OF HIDE SENT: it is the
+          quickest way to say whose queues the reader wants, and it was
+          the first thing in the bar before the accounts group existed. */}
+      <div class="feed-filters-toggle" role="group" aria-label="whose queues">
+        <button
+          type="button"
+          class={
+            all_active ? "feed-filter-button is-active" : "feed-filter-button"
+          }
+          aria-pressed={all_active}
+          onClick={() => {
+            void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts([]);
+          }}
+        >
+          ALL
+        </button>
+        <button
+          type="button"
+          class={
+            mine_active ? "feed-filter-button is-active" : "feed-filter-button"
+          }
+          aria-pressed={mine_active}
+          disabled={own_account_id === null}
+          title={
+            own_account_id === null
+              ? "your own queues need you to be signed in"
+              : "only the queues on your own account"
+          }
+          onClick={() => {
+            if (own_account_id === null) return;
+            void SHIT_1170_APP_PAGE_FEED_STORE.set_accounts([own_account_id]);
+          }}
+        >
+          MINE
+        </button>
+      </div>
       {/* --- WHY --- HIDE SENT IS ALWAYS AVAILABLE: "has this account
           sent it" is a question about ONE account, and the account in
           play is the reader's own — the backend takes the caller's own

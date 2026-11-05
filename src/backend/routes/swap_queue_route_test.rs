@@ -519,6 +519,160 @@ async fn the_list_filters_by_account_and_by_token() {
 }
 
 #[tokio::test]
+async fn the_list_filters_by_contract_on_either_side_of_the_swap() {
+    let db = TEMP_DB::new_fun("list-contract");
+    let pool = db.pool_fun().await;
+    let agent_key = put_api_key_fun(&pool, "agent.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // a swap that SELLS usdt for wrap.
+    let mut sells = one_swap_body_fun();
+    sells["tokenIn"] = json!("usdt.tether-token.near");
+    sells["tokenOut"] = json!("wrap.near");
+    let sells = post_swap_fun(&base_url, Some(&agent_key), &sells).await;
+
+    // a swap that BUYS usdt.
+    let mut buys = one_swap_body_fun();
+    buys["tokenIn"] = json!("wrap.near");
+    buys["tokenOut"] = json!("usdt.tether-token.near");
+    let buys = post_swap_fun(&base_url, Some(&agent_key), &buys).await;
+
+    // a swap that touches NEITHER of them.
+    let mut other = one_swap_body_fun();
+    other["tokenIn"] = json!("wrap.near");
+    other["tokenOut"] = json!("ref.finance.near");
+    post_swap_fun(&base_url, Some(&agent_key), &other).await;
+
+    // --- WHY --- THE CONTRACT LIST MATCHES EITHER SIDE: the reader picked
+    // a CONTRACT and not a side of the trade, so picking usdt shows the
+    // swap that sells usdt AND the swap that buys usdt.
+    let by_usdt = get_list_fun(&base_url, None, "contract_id=usdt.tether-token.near").await;
+    assert_eq!(by_usdt.status, 200, "body was: {}", by_usdt.body);
+    assert_eq!(
+        by_usdt.body.get("total").and_then(|t| t.as_i64()),
+        Some(2),
+        "the swap that sells usdt and the swap that buys usdt"
+    );
+
+    let items = by_usdt
+        .body
+        .get("items")
+        .and_then(|i| i.as_array())
+        .expect("there should be items");
+    let ids: Vec<&str> = items
+        .iter()
+        .filter_map(|item| item.get("swapId").and_then(|id| id.as_str()))
+        .collect();
+    assert!(ids.contains(&sells.body["swapId"].as_str().unwrap()));
+    assert!(ids.contains(&buys.body["swapId"].as_str().unwrap()));
+
+    // a contract nobody picked matches nothing.
+    let by_nothing = get_list_fun(&base_url, None, "contract_id=nothing.near").await;
+    assert_eq!(by_nothing.status, 200, "body was: {}", by_nothing.body);
+    assert_eq!(by_nothing.body.get("total").and_then(|t| t.as_i64()), Some(0));
+
+    // and TWO contracts at once match the swaps touching EITHER of them.
+    let by_two = get_list_fun(
+        &base_url,
+        None,
+        "contract_id=usdt.tether-token.near,ref.finance.near",
+    )
+    .await;
+    assert_eq!(by_two.status, 200, "body was: {}", by_two.body);
+    assert_eq!(
+        by_two.body.get("total").and_then(|t| t.as_i64()),
+        Some(3),
+        "usdt OR ref is the two usdt swaps and the ref one"
+    );
+}
+
+#[tokio::test]
+async fn the_contract_filter_and_the_token_filters_both_narrow_the_list() {
+    let db = TEMP_DB::new_fun("list-contract-token");
+    let pool = db.pool_fun().await;
+    let agent_key = put_api_key_fun(&pool, "agent.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // sells usdt for wrap.
+    let mut sells = one_swap_body_fun();
+    sells["tokenIn"] = json!("usdt.tether-token.near");
+    sells["tokenOut"] = json!("wrap.near");
+    post_swap_fun(&base_url, Some(&agent_key), &sells).await;
+
+    // sells usdt for ref.
+    let mut sells_other = one_swap_body_fun();
+    sells_other["tokenIn"] = json!("usdt.tether-token.near");
+    sells_other["tokenOut"] = json!("ref.finance.near");
+    post_swap_fun(&base_url, Some(&agent_key), &sells_other).await;
+
+    // the contract narrows to the two usdt swaps...
+    let by_contract = get_list_fun(&base_url, None, "contract_id=usdt.tether-token.near").await;
+    assert_eq!(
+        by_contract.body.get("total").and_then(|t| t.as_i64()),
+        Some(2)
+    );
+
+    // ...and the token filter narrows further to the one that BUYS wrap.
+    let both = get_list_fun(
+        &base_url,
+        None,
+        "contract_id=usdt.tether-token.near&token_out=wrap.near",
+    )
+    .await;
+    assert_eq!(both.status, 200, "body was: {}", both.body);
+    assert_eq!(both.body.get("total").and_then(|t| t.as_i64()), Some(1));
+}
+
+#[tokio::test]
+async fn the_total_of_the_contract_filter_counts_the_swaps_the_list_shows() {
+    let db = TEMP_DB::new_fun("list-contract-total");
+    let pool = db.pool_fun().await;
+    let agent_key = put_api_key_fun(&pool, "agent.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // three swaps touch usdt and one does not.
+    //
+    // --- WHY --- NO SWAP OF USDT FOR USDT: the route refuses a swap of
+    // a token for itself, so the third one buys usdt for ref and the
+    // second one buys usdt for wrap.
+    let mut buys_wrap = one_swap_body_fun();
+    buys_wrap["tokenIn"] = json!("wrap.near");
+    buys_wrap["tokenOut"] = json!("usdt.tether-token.near");
+    post_swap_fun(&base_url, Some(&agent_key), &buys_wrap).await;
+
+    let mut buys_ref = one_swap_body_fun();
+    buys_ref["tokenIn"] = json!("ref.finance.near");
+    buys_ref["tokenOut"] = json!("usdt.tether-token.near");
+    post_swap_fun(&base_url, Some(&agent_key), &buys_ref).await;
+
+    let mut sells = one_swap_body_fun();
+    sells["tokenIn"] = json!("usdt.tether-token.near");
+    sells["tokenOut"] = json!("wrap.near");
+    post_swap_fun(&base_url, Some(&agent_key), &sells).await;
+
+    let mut other = one_swap_body_fun();
+    other["tokenIn"] = json!("wrap.near");
+    other["tokenOut"] = json!("ref.finance.near");
+    post_swap_fun(&base_url, Some(&agent_key), &other).await;
+
+    let reply = get_list_fun(&base_url, None, "contract_id=usdt.tether-token.near").await;
+    assert_eq!(reply.status, 200, "body was: {}", reply.body);
+
+    let total = reply.body.get("total").and_then(|t| t.as_i64()).unwrap_or(0);
+    let items = reply
+        .body
+        .get("items")
+        .and_then(|i| i.as_array())
+        .expect("there should be items");
+    assert_eq!(total, 3, "three swaps touch usdt");
+    assert_eq!(
+        items.len() as i64,
+        total,
+        "the total and the items must agree about what matched"
+    );
+}
+
+#[tokio::test]
 async fn the_list_filtered_by_an_account_needs_no_api_key() {
     let db = TEMP_DB::new_fun("list-account-key");
     let pool = db.pool_fun().await;

@@ -170,6 +170,20 @@ export interface SHIT_1170_SWAP_QUEUE_QUERY {
   account_id?: string;
   // with the account, drop the swaps this account has already sent.
   hide_sent?: boolean;
+  // only the swaps that touch one of these contracts. comma separated.
+  //
+  // --- WHY --- IT IS A LIST AND NOT THE SINGLE `token_in`/`token_out`
+  // PAIR: the feed's filter bar lets a reader pick several contracts,
+  // and a swap touches TWO of them — the one it sells and the one it
+  // buys. a swap matches when EITHER of its tokens is in this list, so
+  // picking `usdt.tether-token.near` shows the swaps that sell usdt AND
+  // the swaps that buy it.
+  //
+  // --- WHY --- IT IS NOT THE SAME THING AS `token_in`/`token_out`: those
+  // ask a question about ONE side of the trade — "only the swaps that
+  // sell this" and "only the swaps that buy this". this asks "the
+  // swaps that touch any of these". all three can be used at once.
+  contract_id?: string;
   // only the swaps that sell this token.
   token_in?: string;
   // only the swaps that buy this token.

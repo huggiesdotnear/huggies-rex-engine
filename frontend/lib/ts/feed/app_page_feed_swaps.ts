@@ -72,9 +72,11 @@ const SHIT_1170_FEED_SWAP_LIMIT = 100;
 // --- QUERY -----------------------------
 // the query the feed's filter makes for the swaps.
 //
-// --- WHY THE SWAPS CARRY NO CONTRACT FILTER: a queued swap is a TRADE
-// and not a call, so it names a token and not a contract. the contract
-// filter is about the queued batches and about nothing else.
+// --- WHY THE SWAPS CARRY THE CONTRACT FILTER: a queued swap's
+// `tokenIn` and `tokenOut` ARE contract ids, so the api can match a
+// swap when EITHER side of the trade is one of the picked contracts.
+// without it the contracts group would narrow the batches and leave
+// every swap on screen.
 //
 // --- WHY `account_id` IS THE PICKED ACCOUNTS LIST: the api reads ONE
 // comma separated value and reads the values as an OR, so the reader's
@@ -85,11 +87,13 @@ const SHIT_1170_FEED_SWAP_LIMIT = 100;
 export function shit_1170_feed_swaps_query_fun(
   account_id: string | null,
   hide_sent: boolean,
+  contracts: string | null,
   cursor: string | null,
 ): SHIT_1170_SWAP_QUEUE_QUERY {
   const query: SHIT_1170_SWAP_QUEUE_QUERY = {
     limit: SHIT_1170_FEED_SWAP_LIMIT,
   };
+  if (contracts !== null) query.contract_id = contracts;
   if (cursor !== null) query.cursor = cursor;
   if (account_id === null) return query;
   query.account_id = account_id;
@@ -114,6 +118,7 @@ export function shit_1170_feed_swaps_query_fun(
 export async function shit_1170_feed_swaps_load_fun(
   account_id: string | null,
   hide_sent: boolean,
+  contracts: string | null,
   cursor: string | null,
   on_routes: (index: number, routes: SHIT_1170_SWAP_ROUTE[]) => void,
 ): Promise<SHIT_1170_APP_PAGE_FEED_SWAPS_LOADED> {
@@ -121,7 +126,7 @@ export async function shit_1170_feed_swaps_load_fun(
   const options = await api_key_options_fun(false, own_account_id ?? undefined);
   const result = await api_shit_1170_swap_queue_get(
     SHIT_1170_BASE_URL,
-    shit_1170_feed_swaps_query_fun(account_id, hide_sent, cursor),
+    shit_1170_feed_swaps_query_fun(account_id, hide_sent, contracts, cursor),
     options,
   );
   const swaps = result.items;

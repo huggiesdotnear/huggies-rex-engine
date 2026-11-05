@@ -122,6 +122,37 @@ console.log("=== the comma separated filters are read ===");
   }
 }
 
+console.log("=== the swaps answer the contract filter ===");
+{
+  const all = await get("/swap-queue?limit=500");
+  const contracts = await get("/tx-queue/facets");
+  const contract = contracts.body.contracts?.[0]?.contractId;
+  if (contract === undefined) {
+    check("there is a contract to filter the swaps by", false, "no contracts");
+  } else {
+    const filtered = await get(`/swap-queue?contract_id=${contract}`);
+    check(
+      "a contract filter narrows the swaps",
+      filtered.body.total <= all.body.total,
+      `${filtered.body.total} of ${all.body.total}`,
+    );
+    const two = await get(
+      `/swap-queue?contract_id=${contract},definitely.not.a.contract`,
+    );
+    check(
+      "a made-up contract in the list does not change the answer",
+      two.body.total === filtered.body.total,
+      `${two.body.total} vs ${filtered.body.total}`,
+    );
+    const empty = await get("/swap-queue?contract_id=definitely.not.a.contract");
+    check(
+      "a contract nobody has queued work for shows nothing",
+      empty.body.total === 0,
+      `total ${empty.body.total}`,
+    );
+  }
+}
+
 console.log("=== the facets give the bar its buttons ===");
 {
   const facets = await get("/tx-queue/facets");

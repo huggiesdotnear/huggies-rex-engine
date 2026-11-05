@@ -72,6 +72,10 @@ pub struct SWAP_QUEUE_ROW {
 // --- WHY --- the account filter is a LIST and not a single value: the
 // feed's filter bar lets a reader pick several accounts, and "the swaps
 // of alice OR bob" is a question one id cannot answer.
+//
+// --- WHY --- the contract filter is a LIST too: the same bar lets a
+// reader pick several contracts, and "the swaps of usdt OR wrap" is a
+// question one id cannot answer either.
 #[derive(Debug, Clone, Default)]
 pub struct SWAP_QUEUE_LIST_QUERY {
     // only the swaps these accounts are on. an empty list means "any
@@ -90,6 +94,9 @@ pub struct SWAP_QUEUE_LIST_QUERY {
     pub token_in: Option<String>,
     // only the swaps that buy this token.
     pub token_out: Option<String>,
+    // only the swaps that touch one of these contracts — the token they
+    // sell OR the token they buy. an empty list means "any contract".
+    pub contract_ids: Vec<String>,
     // where the page starts. it is the row the page starts after.
     pub cursor: Option<SWAP_QUEUE_CURSOR_POINT>,
     // how many to return.
@@ -321,6 +328,30 @@ pub async fn swap_queue_list_fun(
         builder.push_bind_fun(SqliteBind::Text(token_out.to_string()));
     }
 
+    // --- THE CONTRACT FILTER -------------
+    // "is one of the picked contracts on this swap" — the filter bar's
+    // multi-select of contracts.
+    //
+    // --- WHY --- IT MATCHES THE TOKEN IN OR THE TOKEN OUT: a queued
+    // swap NAMES two contracts — the one it sells and the one it buys —
+    // and the reader picked a contract, not a side of the trade. so
+    // picking usdt shows the swaps that SELL usdt AND the swaps that BUY
+    // usdt. a filter that only looked at one side would hide half of
+    // what the reader asked for.
+    //
+    // --- WHY --- THE SAME LIST IS BOUND TWICE AND NOT WRITTEN TWICE:
+    // the builder numbers its placeholders by the order the values were
+    // bound, so the second `push_in_fun` writes `?N+1 ...` and binds the
+    // list again. one list, two bindings, and the two sides of the `OR`
+    // cannot drift apart — they are the same values in the same order.
+    if !query.contract_ids.is_empty() {
+        builder.push_text_fun(" AND ( token_in ");
+        builder.push_in_fun(&query.contract_ids);
+        builder.push_text_fun(" OR token_out ");
+        builder.push_in_fun(&query.contract_ids);
+        builder.push_text_fun(" )");
+    }
+
     // --- THE CURSOR ---------------------
     // the rows after the one the cursor names.
     if let Some(cursor) = query.cursor.as_ref() {
@@ -398,6 +429,18 @@ pub async fn swap_queue_list_fun(
     if let Some(token_out) = query.token_out.as_deref() {
         total_builder.push_text_fun(" AND token_out = ");
         total_builder.push_bind_fun(SqliteBind::Text(token_out.to_string()));
+    }
+    // --- WHY --- THE CONTRACT CLAUSE IS HERE TOO AND NOT ONLY IN THE
+    // LIST: the total counts the WHOLE match, and a total that did not
+    // carry the contract clause would count every swap on the feed and
+    // tell the reader there are more pages than there are. the count and
+    // the list have to agree about what matched.
+    if !query.contract_ids.is_empty() {
+        total_builder.push_text_fun(" AND ( token_in ");
+        total_builder.push_in_fun(&query.contract_ids);
+        total_builder.push_text_fun(" OR token_out ");
+        total_builder.push_in_fun(&query.contract_ids);
+        total_builder.push_text_fun(" )");
     }
 
     let total: i64 = total_builder

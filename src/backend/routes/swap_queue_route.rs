@@ -293,6 +293,19 @@ pub async fn swap_queue_get_route(
     // not have to be signed in to use it.
     let account_ids: Vec<String> = picked_accounts.clone();
 
+    // --- THE CONTRACT LIST ---------------
+    // the contracts the filter bar picked.
+    //
+    // --- WHY --- THE PARAM IS COMMA SEPARATED AND NOT REPEATED: the
+    // query extractor reads one value per param, and the filter bar
+    // builds its query string out of a map. one comma separated string
+    // carries many contracts and reads the same in a hand-written url.
+    //
+    // --- WHY --- THE NAME IS THE TX QUEUE'S NAME: the bar picks
+    // contracts for both lists, and one picked contract has to reach
+    // both under one name.
+    let contract_ids: Vec<String> = shit_1170_query_list_fun(query.contract_id.as_deref());
+
     // --- THE CURSOR ----------------------
     // where the page starts.
     //
@@ -328,6 +341,7 @@ pub async fn swap_queue_get_route(
         hide_sent_account,
         token_in: query.token_in.clone(),
         token_out: query.token_out.clone(),
+        contract_ids,
         cursor,
         limit: limit_fun(
             query.limit,

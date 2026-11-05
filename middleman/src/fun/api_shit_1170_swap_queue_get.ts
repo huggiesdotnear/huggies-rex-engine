@@ -19,6 +19,12 @@
 // repeated. one string carries many values, and a single value still
 // works.
 //
+// --- WHY --- `contract_id` goes out as ONE COMMA SEPARATED STRING TOO:
+// it is the same shape for the same reason — the reader picks several
+// contracts and the route reads one value per param. a swap matches
+// when EITHER of its two tokens is in the list, so picking one contract
+// shows the swaps that sell it AND the swaps that buy it.
+//
 // --- WHY --- `hide_sent` needs an account and the check is made HERE as
 // well as on the server: "has this account sent it" is a question about
 // ONE account. a swap can be sent by alice and not by bob, so there is
@@ -57,6 +63,7 @@ export async function api_shit_1170_swap_queue_get(
     query: {
       account_id,
       hide_sent: query.hide_sent,
+      contract_id: query.contract_id?.trim(),
       token_in: query.token_in?.trim(),
       token_out: query.token_out?.trim(),
       limit: query.limit,
