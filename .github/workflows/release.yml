@@ -93,7 +93,9 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Typecheck
-        run: bun run --cwd "$PACKAGE_DIR" typecheck
+        # Build the package first: the bins import the workspace package
+        # by name, and TypeScript resolves those imports through dist/.
+        run: bun run --cwd "$PACKAGE_DIR" clean && bun run --cwd "$PACKAGE_DIR" build && bun run --cwd "$PACKAGE_DIR" typecheck
 
       - name: Compute the release version
         id: version
