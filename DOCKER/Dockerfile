@@ -190,6 +190,19 @@ RUN mkdir -p /home/shit-1170/.shit-1170-rex-engine \
     && chown -R shit1170:shit1170 /home/shit-1170
 
 COPY --from=rust-builder /build/target/release/shit-1170-rex-engine /usr/local/bin/shit-1170-backend
+# --- WHY: the vault bins are in the image too ---
+# the bins are the way to do db work on a vault from outside the app,
+# and the production vault lives on a docker volume. so the bins have
+# to be reachable inside the container, or the only way to prune the
+# production vault would be to copy the db off the host first.
+#
+# `docker compose exec shit-1170-rex-engine-backend vault-prune --db ...`
+# is the command that does it.
+COPY --from=rust-builder /build/target/release/vault-list /usr/local/bin/vault-list
+COPY --from=rust-builder /build/target/release/vault-prune /usr/local/bin/vault-prune
+COPY --from=rust-builder /build/target/release/vault-backup /usr/local/bin/vault-backup
+COPY --from=rust-builder /build/target/release/vault-export /usr/local/bin/vault-export
+COPY --from=rust-builder /build/target/release/vault-import /usr/local/bin/vault-import
 COPY --from=frontend /src/static /app/static
 
 # --- WHY: ServeDir::new("static") is a RELATIVE path ---

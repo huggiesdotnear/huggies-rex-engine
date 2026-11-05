@@ -10,6 +10,7 @@
 // --- WHY --- one file per table: a table's shape is read in one place.
 // `db_schema_run_fun` holds the order and runs them, and it is the only
 // file that knows how many tables there are.
+pub mod bin;
 pub mod db_open_fun;
 pub mod db_schema_run_fun;
 pub mod db_table_api_keys_fun;

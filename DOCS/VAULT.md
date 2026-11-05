@@ -14,7 +14,7 @@ NEVER wipe or delete this db.
 
 ## WHAT IS IN IT
 
-the db holds FOUR tables of its own:
+the db holds SIX tables of its own:
 
 - `api_keys` — the api keys the users hold. one row per ACCOUNT, and an
   account has exactly one key, ever.
@@ -25,6 +25,11 @@ the db holds FOUR tables of its own:
   deposit, and the `position` that says the order.
 - `tx_queue_accounts` — one row per account, per transaction. this is
   the WHO of a batch, and it is the ONLY place a status lives.
+- `swap_queue` — one row per queued SWAP. it holds the token in, the
+  amount in, the token out and the quote that was taken when it was
+  queued.
+- `swap_queue_accounts` — one row per account, per queued swap. the
+  WHO of a swap, and the ONLY place a status lives there too.
 
 the tables were once ONE table called `sessions`, and the api keys were
 called session keys. the credential in them is not a browser session: the
@@ -106,11 +111,19 @@ the schema lives in `src/backend/logic/db/`, one file per table, and
 **there is no migration system.** a migration system exists so a db's
 schema can be CHANGED over time: each change is a numbered step, the db
 records which steps it has run, and a fresh db runs them all in order.
-this db has four tables and four settled shapes for them, so there is
+this db has six tables and six settled shapes for them, so there is
 nothing to step through and nothing to remember.
 
 a changed shape means changing the table file. the db is ours and it
 holds nothing that cannot be made again.
+
+**the bins are where the CHANGING happens.** the app never has to
+handle a migration, because a change to the db's contents is a job for
+a bin and not for the running app. the app opens the db, reads it and
+writes to it, and it knows the shape it expects. when the data needs
+moving — the rows are old, the queue is too big, a vault has to move
+from one machine to another — that is a bin's job, run by a person, on
+a db that is not being written to at the time.
 
 the tables are created in DEPENDENCY ORDER: `tx_queue` before
 `tx_queue_transactions` before `tx_queue_accounts`.
@@ -128,6 +141,123 @@ rename of the project, the service or the app.
 
 `docker compose down` keeps the volume. `docker compose down -v`
 DELETES it, and with it every api key and every queued batch.
+
+## TESTING AGAINST A LOCAL VAULT
+
+**never test a feature against the production vault.** the production
+vault holds real api keys and real queued batches for real people. a
+test that queues a swap, signs it, opens a websocket and watches the
+feed move will write rows into it, and a test that prunes will take
+them away.
+
+so every test — a queueing test, a websocket test, a feed test, a
+prune test, anything — runs against a LOCAL vault. a local vault is
+just a db file somewhere on the machine, and the app can be pointed at
+it with the env var the app already reads:
+
+```sh
+SHIT_1170_VAULT_DB_LOCATION=/tmp/shit-1170-test/vault.db cargo run
+```
+
+the app creates the file and the schema on first start. the local
+vault is throwaway: delete it, and the next start makes a new one.
+
+**a local vault can be a COPY of the production one.** a copy is the
+right thing to test against when the thing being tested depends on the
+SHAPE of the data — a queue with three transactions, an account that
+has already sent, a swap whose quote is stale. `vault-export` writes
+the production vault out as json and `vault-import` brings it into a
+local db. the api keys are deliberately left out of that round trip:
+the accounts come back and the user signs in again.
+
+**the bins take the db path as a flag, and that is the point.** the
+production db is on a docker volume and the local one is in a temp
+folder, and the bins do not care which because they are told:
+
+```sh
+# the local one
+./target/debug/vault_list --db /tmp/shit-1170-test/vault.db
+
+# the production one, inside the container
+docker compose -f DOCKER/docker-compose.yml exec \
+  shit-1170-rex-engine-backend \
+  vault-prune --db /home/shit-1170/.shit-1170-rex-engine/shit-1170-rex-engine.db --older-than 30
+```
+
+**always take a backup before a prune on the production vault.** the
+backup is safe to take while the app is running, because it is taken
+with sqlite's own backup and not with a file copy.
+
+## THE VAULT BINS
+
+the bins are the DEFAULT way to do db work on a vault. the app has no
+migration system and no admin routes that wipe the queue, so anything
+that changes the db from outside the app goes through a bin. that way
+the rules of the db live in one place, the app never has to know that
+the bins exist, and the app never has to handle migration logic.
+
+the bins live in `src/bin/` and their logic lives in
+`src/backend/logic/db/bin/`.
+
+| bin | what it does |
+| --- | --- |
+| `vault-list` | shows what is in a vault: the queues, the swaps and the row counts. it only reads. |
+| `vault-prune` | takes old queued batches and swaps off a vault, by age, by never-sent, or by id. |
+| `vault-backup` | takes a safe copy of a vault, with sqlite's own backup. |
+| `vault-export` | writes a vault out as json. |
+| `vault-import` | brings an export back into a vault. |
+
+every bin takes `--db <path>`. the flag wins over
+`SHIT_1170_VAULT_DB_LOCATION`, and that wins over the default path —
+the same order the app uses. so a bin with no flag on the same machine
+as the app reads the app's db, and a bin with `--db` reads exactly the
+file it was told to.
+
+### THE BINS ARE SAFE BY DEFAULT
+
+**`vault-prune` and `vault-import` are a DRY RUN until `--confirm` is
+given.** they print the plan — which rows, how many, which tables' rows
+go with them — and then stop. there is no undo, so the plan is the
+whole point.
+
+**a prune leaves the history alone.** a row that carries a `tx_hash` is
+HISTORY: it shows who did the transaction and it stays. so a queue that
+any account has sent does not match a prune at all. `--include-sent`
+says "take that history too", and it is the only way to do it.
+
+**the bins do not create a db.** a bin pointed at a path with no db
+there says so and stops. it does not make an empty db where the real
+one should have been, and it does not run the schema creates against a
+vault it was asked to look at.
+
+**the api keys do not travel.** `vault-export` leaves them out unless
+`--with-api-keys` is given, and `vault-import` never brings them back
+in — a key that has been in a file has been in the clear, so the
+accounts come back and the user signs in again.
+
+### THE PRUNE FILTERS
+
+```
+--older-than <days>   only the rows queued more than <days> ago
+--before <epoch-ms>   only the rows queued before that moment
+--after <epoch-ms>    only the rows queued after that moment
+--never-sent          only the rows no account ever sent
+--queue-ids <a,b,c>   only these queue ids
+--swap-ids <a,b,c>    only these swap ids
+--account <account>   only the rows this account is on
+--include-sent        also take the rows that were sent
+--swaps               also take the queued swaps
+--confirm             actually delete
+```
+
+the swaps are only part of the plan when `--swaps` or `--swap-ids` is
+given. a prune that names a queue id is about that queue, and taking
+the swaps too would mean the prune took something it was not asked
+for.
+
+deleting a queue takes its transactions and their account rows with it,
+in one statement — the schema's own `ON DELETE CASCADE` does that
+work. the same goes for a swap and its account rows.
 
 =====================
 <br/>
