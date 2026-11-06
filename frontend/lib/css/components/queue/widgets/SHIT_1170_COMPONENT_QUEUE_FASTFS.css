@@ -1,0 +1,140 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_QUEUE_FASTFS
+   the queue page's files widget: the FastFS uploads the batch asks for.
+
+   one row per upload: an icon, who will put it up, what the file is,
+   and the link it will be served at. the card that says what the bytes
+   mean is under the row.
+
+   --- WHY --- THE FILE NAME IS THE MOUNT ID AND NOT THE WIDGET'S: the
+   mount id belongs to the page's div, and the page's div did not
+   change. the widget is the files and the id is the page's.
+
+   --- WHY --- THE SECTION LOOKS LIKE THE TRANSFERS ONE: the transfers
+   are what the batch will move, summarised, in their own place. a file
+   is the same kind of thing — what the batch will do — and the reader
+   looks in the same place for both.
+
+   --- WHY --- THE ROW IS ONE LINE THAT WRAPS: the explorer's transfer
+   rows read as a sentence — "alice transferred 1.5 USDC to bob" — and
+   the details hang off it. a row of loose fields says nothing about
+   what happened; a sentence does.
+
+   --- WHY --- THE ACCOUNT IS A LINK: the uploader is the account that
+   will sign the upload, and the account the file is served under. a
+   reader who wants the account goes to the account.
+
+   --- WHY --- THE PREVIEW IS DARKER THAN THE PAGE: the file may be an
+   image or a video, and a light frame around a picture makes the
+   picture's own edges hard to see. the preview's own background is a
+   plain dark box, and the picture sits inside it.
+
+   --- WHY --- THE IMAGE IS BOUNDED: a FastFS upload can be 32 MiB, and
+   an unbounded picture would push the whole page down. the box holds
+   the picture and the picture fits in the box.
+
+   --- WHY --- THE SHARED CARD'S CSS RIDES IN HERE: the card is a
+   shared piece, and the shared pieces bring their own css in with the
+   @import below. the page's import file lists components and not
+   pieces. */
+@import url(../../shared/app_page_fastfs_card.css);
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs {
+  width: 500px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin: 12px auto;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/*==================================*/
+/* the upload row: the icon, the account, the verb, the file and the
+   facts. */
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+  min-width: 0;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+/* the icon says at a glance what kind of thing this is. the word is
+   still there beside it, for a reader who does not know the icons. */
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-icon {
+  align-self: center;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-icon.is-delete {
+  color: var(--color-backend);
+}
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-icon.is-image,
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-icon.is-video {
+  color: var(--color-middle);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-account {
+  font-family: monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/* the verb is the quiet part of the sentence — it says what will
+   happen, and it stays out of the way of the file's name. */
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-verb {
+  opacity: 0.6;
+}
+/* the file's name is the headline of the row. */
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-file {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-type,
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-size {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+/*==================================*/
+/* the link the file will be served at. */
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-links {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-url {
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  color: var(--color-middle);
+}
+/*==================================*/

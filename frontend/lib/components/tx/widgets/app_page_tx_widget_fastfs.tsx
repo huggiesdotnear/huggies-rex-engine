@@ -36,6 +36,13 @@
 // breaks the line. the row says what happened; the preview shows the
 // file.
 //
+// --- WHY --- THE CARD IS THE SHARED ONE AND NOT A COPY: the queue
+// page's files widget shows the same card, and the card's own rules —
+// what a preview needs, what the link means, what the indexer will
+// drop — are the same on both. one card, in the shared folder, and the
+// two pages hand it what they know. this page's upload IS on chain, so
+// the card is told so, and it renders the live preview.
+//
 // --- WHY --- THE ACCOUNT LINKS: the uploader is the account that
 // SIGNED — the receipt's predecessor — and it is the account the file
 // is served under. a reader who wants the account goes to the account.
@@ -48,8 +55,10 @@ import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_TX_STORE } from "../../../ts/tx/app_page_tx_store";
 import { use_page_store_fun } from "../../../ts/shared/use_page_store";
 import { current_app_depth_fun } from "../../../ts/shared/app_depth";
-import { shit_1170_code_block_fun } from "../code_block";
-import { size_text_fun } from "./app_page_tx_widget_fastfs_card";
+import {
+  fastfs_card_fun,
+  size_text_fun,
+} from "../../shared/app_page_fastfs_card";
 import { SHIT_1170_TX_WIDGETS } from "./tx_widgets";
 import type {
   FASTFS_FILE_INFO,
@@ -91,62 +100,13 @@ function upload_icon_fun(info: FASTFS_FILE_INFO): preact.JSX.Element {
 }
 // ========================================
 // ========================================
-// --- PREVIEW ----------------------------
-// the preview of the file, when its type allows one.
-//
-// --- WHY --- THE PREVIEW ONLY WORKS ON-CHAIN: the file is served by the
-// FastData indexer, and the indexer only knows about a file once its
-// transaction is on chain. this page shows a transaction that already
-// happened, so the url has something at it.
-//
-// --- WHY --- THE TEXT IS SHOWN AS A CODE BLOCK: a text file's content
-// is text, and the code block is how the app shows text that came off
-// the chain — it is selectable, and it is not mistaken for a sentence
-// the page wrote.
-function preview_fun(
-  info: FASTFS_FILE_INFO,
-  url: string,
-): preact.JSX.Element | null {
-  if (info.mime_type.startsWith("text/")) {
-    return (
-      <div class="tx-fastfs-preview is-text">
-        {shit_1170_code_block_fun({
-          code: new TextDecoder("utf-8", { fatal: false }).decode(
-            info.content.slice(0, 2000),
-          ),
-        })}
-      </div>
-    );
-  }
-
-  if (info.mime_type.startsWith("image/")) {
-    return (
-      <div class="tx-fastfs-preview is-image">
-        <img class="tx-fastfs-image" src={url} alt={info.relative_path} />
-      </div>
-    );
-  }
-
-  if (info.mime_type.startsWith("video/")) {
-    return (
-      <div class="tx-fastfs-preview is-video">
-        {/* --- WHY THE CONTROLS ARE ON: a video the reader cannot pause
-            or scrub is a thing that plays at them. */}
-        <video class="tx-fastfs-video" src={url} controls={true} />
-      </div>
-    );
-  }
-
-  return null;
-}
-// ========================================
-// ========================================
 // --- ROW --------------------------------
 // one upload: who put it up, what it is, where it is served, and the
-// preview of it.
+// card that says what the bytes mean.
 function upload_fun(
   action: PARSED_ACTION,
   signer_id: string,
+  receiver_id: string,
 ): preact.JSX.Element {
   const info = action.fastfs;
   // --- WHY --- THE NULL IS GUARDED: the action carries a FastFS upload
@@ -187,7 +147,14 @@ function upload_fun(
           </a>
         </div>
       )}
-      {preview_fun(info, url)}
+      {fastfs_card_fun({
+        info,
+        predecessor: signer_id,
+        receiver: receiver_id,
+        // --- WHY IT IS ON CHAIN: the transaction already happened. the
+        // indexer has the file, the link works, and the preview renders.
+        is_on_chain: true,
+      })}
     </div>
   );
 }
@@ -215,6 +182,9 @@ export function SHIT_1170_COMPONENT_TX_WIDGET_FASTFS_FUN() {
   // the account that signed — the receipt's predecessor. it is the
   // account the file is served under.
   const signer_id = data.parsed.signer_id;
+  // the contract the call was made to — the namespace the file is
+  // served under. the parser built the url from it too.
+  const receiver_id = data.parsed.receiver_id;
 
   return (
     <section class="tx-fastfs">
@@ -222,7 +192,7 @@ export function SHIT_1170_COMPONENT_TX_WIDGET_FASTFS_FUN() {
       <div class="tx-fastfs-list">
         {uploads.map((action, index) => (
           <div key={`fastfs-${index}`}>
-            {upload_fun(action, signer_id)}
+            {upload_fun(action, signer_id, receiver_id)}
           </div>
         ))}
       </div>

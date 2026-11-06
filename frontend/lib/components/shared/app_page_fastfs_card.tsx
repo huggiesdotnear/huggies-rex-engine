@@ -2,20 +2,36 @@
 // the FastFS card: what a FastFS upload is.
 //
 // a FastFS upload is a function call to `__fastdata_fastfs` whose
-// arguments are RAW BORSH BYTES. this card decodes those bytes and
-// shows the file they carry — its name, its type, its size — the link
-// it will be served at, and a preview of it when the type allows one.
+// arguments are RAW BORSH BYTES. the client decodes those bytes into a
+// file's facts, and this card shows them — the name, the type, the
+// size — the link the file will be served at, and a preview of it when
+// the type allows one.
+//
+// --- WHY THE CARD IS GIVEN THE DECODED FILE AND NOT THE BYTES: the
+// caller has to decode the bytes anyway — the transaction page's parser
+// has already decoded them, and the queue page's widget needs the
+// file's path and its mime type to build its row. so the decode happens
+// ONCE, in the caller's hands, and the card is given the result. the
+// card is about what a file IS, and how to show one, and not about
+// what the bytes are.
 //
 // --- WHY THE DECODER IS THE CLIENT'S AND NOT A COPY HERE: the queue
 // page shows a QUEUED upload, before it is signed, and the transaction
 // page shows an ON-CHAIN one. the two must read the same bytes the
 // same way, and two decoders drift. the fastnear client owns the borsh
-// rules, so this card asks it what the bytes mean.
+// rules, so both pages ask it what the bytes mean.
 //
-// --- WHY THE CARD IS ITS OWN COMPONENT AND NOT A BLOCK IN EACH PAGE:
+// --- WHY THE CARD LIVES IN THE SHARED FOLDER AND NOT IN EITHER PAGE'S:
 // the queue page and the transaction page both show one, and the rules
 // about what a queued upload can show — no preview, no working link —
-// are the same on both.
+// are the same on both. so the card is SHARED, and neither page reaches
+// across into the other's folder for it. the shared folder already
+// holds the shared transfer amount, and the two pages already share
+// that.
+//
+// --- WHY THE CARD IS ITS OWN COMPONENT AND NOT A BLOCK IN EACH PAGE:
+// the rules about what a queued upload can show are the same on both,
+// and one copy of the rules is one copy to keep true.
 //
 // --- WHY THE PREVIEW ONLY WORKS ON-CHAIN: the file is served by the
 // FastData indexer, and the indexer only knows about a file after the
@@ -35,15 +51,12 @@
 //
 // this component does NOT fetch. it renders what it is given.
 import {
-  decode_base64_bytes_raw,
   fastfs_can_display_fun,
-  fastfs_decode_fun,
   fastfs_file_uri_fun,
   fastfs_file_url_fun,
-  fastfs_is_call_fun,
   fastfs_validate_fun,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { shit_1170_code_block_fun } from "../code_block";
+import { shit_1170_code_block_fun } from "../tx/code_block";
 import type { FASTFS_FILE_INFO } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -186,7 +199,7 @@ function preview_fun(
 // ========================================
 // --- CARD -------------------------------
 // the FastFS card: the file, the link, the preview, the notes.
-export function FASTFS_CARD_FUN(props: {
+export function fastfs_card_fun(props: {
   info: FASTFS_FILE_INFO;
   predecessor: string;
   receiver: string;
@@ -298,60 +311,6 @@ export function FASTFS_CARD_FUN(props: {
         </div>
       )}
     </div>
-  );
-}
-// ========================================
-// ========================================
-// --- PUBLIC -----------------------------
-// the FastFS card, for a call that IS a FastFS upload.
-//
-// --- WHY THE BASE64 IS TAKEN AND NOT THE BYTES: the caller has the
-// arguments as the base64 string the chain and the queue carry, and the
-// card turns them into bytes with the client's own lossless base64
-// decoder. the borsh rules live in the client, so the decode happens
-// in ONE place, next to the rules about what a decoded upload means.
-//
-// --- WHY THE LOSSLESS DECODER AND NOT THE TEXT ONE: the arguments
-// decoder the pages already use decodes the base64 to utf-8 TEXT and
-// re-encodes it, and that round trip is lossy for anything that is
-// not valid utf-8 — a png is not utf-8, and its bytes come back
-// changed and longer. the file's bytes must survive the decode
-// untouched, so the raw decoder is the one that is used.
-//
-// --- WHY A NULL IS RETURNED AND NOT A THROWN ERROR: a payload that is
-// not FastFS borsh gives null, and the caller then renders the bytes as
-// hex, which is what it does today. a decoder that throws would take
-// down a transaction page.
-export function shit_1170_fastfs_card_fun(props: {
-  // the arguments of the call, as the base64 string the chain and the
-  // queue carry them in.
-  args_base64: string;
-  // the method the call was made by.
-  method_name: string;
-  // the account that SIGNED — the receipt's predecessor. for a queued
-  // upload it is the account the queue is for.
-  predecessor: string;
-  // the account the call was made to.
-  receiver: string;
-  // true when the upload is on chain — a transaction that already
-  // happened. false for a queued upload, which is not signed yet.
-  is_on_chain: boolean;
-}): preact.JSX.Element | null {
-  // --- WHY THE METHOD IS CHECKED FIRST: the bytes of any call could
-  // decode as FastFS borsh by accident, and a card about a file would
-  // be a lie. the method name is what says this IS a FastFS call.
-  if (!fastfs_is_call_fun(props.method_name)) return null;
-  const bytes = decode_base64_bytes_raw(props.args_base64);
-  if (bytes === null) return null;
-  const info = fastfs_decode_fun(bytes);
-  if (info === null) return null;
-  return (
-    <FASTFS_CARD_FUN
-      info={info}
-      predecessor={props.predecessor}
-      receiver={props.receiver}
-      is_on_chain={props.is_on_chain}
-    />
   );
 }
 // ========================================

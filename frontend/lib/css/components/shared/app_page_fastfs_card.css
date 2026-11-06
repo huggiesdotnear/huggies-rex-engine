@@ -1,17 +1,13 @@
 /*==================================*/
-/* app_page_tx_fastfs_card
+/* app_page_fastfs_card
    the FastFS card: the file, the link it is served at, the preview, and
    the notes.
 
-   --- WHY --- THE CARD LIVES WITH THE WIDGETS: the widget shows an
-   on-chain upload and the queue page shows a queued one, and they are
-   the same card with the same rules. the card belongs with the widget
-   that grew out of it.
-
-   --- WHY --- THE CARD IS USED BY BOTH PAGES: the queue page shows a
-   QUEUED upload and the transaction page shows an ON-CHAIN one, and
-   the two are the same card with the same rules — so the rules reach
-   both of them.
+   --- WHY --- THE CARD LIVES WITH THE SHARED COMPONENTS: the tx page
+   shows an on-chain upload and the queue page shows a queued one, and
+   they are the same card with the same rules. the card belongs where
+   both pages can reach it without reaching across, so it sits with the
+   shared transfer amount and the other shared pieces.
 
    --- WHY --- THE CARD IS DARKER THAN THE PAGE: the file may be an
    image or a video, and a light frame around a picture makes the

@@ -11,6 +11,14 @@
 // answers to SHIT_1170_COMPONENT_TX_TRANSFERS and the files widget to
 // SHIT_1170_COMPONENT_TX_FASTFS, and both live in
 // frontend/lib/components/tx/widgets/.
+//
+// --- WHY --- THE QUEUE WIDGETS' IDS ARE NOT RENAMED EITHER: the same
+// reason. the queue page's transfers widget answers to
+// SHIT_1170_COMPONENT_QUEUE_TRANSFERS and its files widget to
+// SHIT_1170_COMPONENT_QUEUE_FASTFS, and both live in
+// frontend/lib/components/queue/widgets/. the FILES id is NEW because
+// the queue page had no files section before — it had a FastFS card
+// nested inside each call, and a card is not a section.
 // ========================================
 export const SHIT_1170_MOUNT_ID = {
   SHIT_1170_COMPONENT_LOADING_BAR: "SHIT_1170_COMPONENT_LOADING_BAR",
@@ -119,6 +127,7 @@ export const SHIT_1170_MOUNT_ID = {
   SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS:
     "SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS",
   SHIT_1170_COMPONENT_QUEUE_TRANSFERS: "SHIT_1170_COMPONENT_QUEUE_TRANSFERS",
+  SHIT_1170_COMPONENT_QUEUE_FASTFS: "SHIT_1170_COMPONENT_QUEUE_FASTFS",
   SHIT_1170_COMPONENT_QUEUE_ACCOUNTS: "SHIT_1170_COMPONENT_QUEUE_ACCOUNTS",
   SHIT_1170_COMPONENT_QUEUE_ACTIONS: "SHIT_1170_COMPONENT_QUEUE_ACTIONS",
 } as const;
