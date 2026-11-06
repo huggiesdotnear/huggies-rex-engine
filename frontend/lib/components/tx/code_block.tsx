@@ -38,6 +38,12 @@
 // json comes from the chain and from a contract's logs, so it is
 // untrusted text.
 //
+// --- WHY --- THERE IS A PLAIN MODE AND NOT ONLY THE HIGHLIGHTED ONE: a
+// hex dump is NOT json. the json grammar reads a hex dump as a string
+// literal and escapes the characters in it — the byte `89` comes out
+// as `ef bf bd`, which is three bytes where there was one. a hex dump
+// must show the bytes exactly, so it is shown as plain text.
+//
 // this component does NOT fetch. it renders what it is given.
 // ========================================
 import { createHighlighterCore } from "@shikijs/core";
@@ -64,11 +70,24 @@ export function shit_1170_code_block_fun(props: {
   // the language to highlight it as. "json" is the only one the app
   // asks for today; the theme is fixed.
   lang?: "json";
+  // true when the code is NOT a language and must be shown as it is.
+  //
+  // --- WHY --- A HEX DUMP IS NOT A LANGUAGE: a hex dump has no syntax
+  // to colour, and the json grammar mangles it — it reads the dump as
+  // a string literal and escapes the characters in it, so the byte
+  // `89` comes out as `ef bf bd`. a hex dump must show the bytes
+  // exactly, so it is shown as plain text.
+  plain?: boolean;
 }): preact.JSX.Element {
   const lang = props.lang ?? "json";
   const [html, set_html] = use_state<string | null>(null);
+  const plain = props.plain ?? false;
 
   use_effect(() => {
+    // --- WHY --- THE PLAIN MODE NEVER TOUCHES THE HIGHLIGHTER: there
+    // is nothing to highlight, and asking for it would build a
+    // highlighter for code that will not use it.
+    if (plain) return;
     // the component can unmount before the highlighter is ready (the
     // reader leaves the page), so the result is dropped if it arrives
     // too late.
@@ -94,13 +113,13 @@ export function shit_1170_code_block_fun(props: {
     return () => {
       alive = false;
     };
-  }, [props.code, lang]);
+  }, [props.code, lang, plain]);
 
   // --- WHY --- THE PLAIN TEXT IS SHOWN FIRST: the highlighter takes a
   // moment to build, and a reader should not see an empty box while it
   // does. the plain text is the code, unhighlighted — it is right, and
   // it is there immediately.
-  if (html === null) {
+  if (plain || html === null) {
     return (
       <pre class="code-block is-plain">
         <code>{props.code}</code>

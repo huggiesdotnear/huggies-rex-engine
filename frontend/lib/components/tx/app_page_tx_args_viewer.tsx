@@ -22,8 +22,9 @@
 import { useState as use_state } from "preact/hooks";
 import {
   args_view_modes,
-  bytes_to_hex,
+  decode_base64_bytes_raw,
   default_args_view_mode,
+  fastfs_bytes_to_hex_fun,
 } from "@sleet-js/fastnear-explorer-api-client";
 import { shit_1170_code_block_fun } from "./code_block";
 import type { DECODED_ARGS } from "@sleet-js/fastnear-explorer-api-client";
@@ -61,6 +62,15 @@ function ARGS_VIEWER_FUN(props: {
     decoded.json !== null,
   ) as SHIT_1170_ARGS_VIEW_MODE[];
 
+  // --- WHY --- THE HEX VIEW USES THE RAW BYTES AND NOT THE DECODED
+  // ONES: the arguments decoder decodes the base64 to utf-8 TEXT and
+  // re-encodes it, and that round trip is LOSSY for anything that is
+  // not valid utf-8 — a png is not utf-8, and the byte `89` comes back
+  // as `ef bf bd`, three bytes where there was one. a hex dump has to
+  // show the bytes exactly, so it uses the client's lossless decoder.
+  const raw_bytes = decode_base64_bytes_raw(props.base64);
+  const hex_bytes = raw_bytes ?? decoded.bytes;
+
   if (decoded.bytes.length === 0) {
     return <div class="args-viewer is-empty">NO ARGUMENTS</div>;
   }
@@ -68,7 +78,7 @@ function ARGS_VIEWER_FUN(props: {
   return (
     <div class="args-viewer">
       <div class="args-toolbar">
-        <span class="args-size">{decoded.bytes.length} BYTES</span>
+        <span class="args-size">{hex_bytes.length} BYTES</span>
         <span class="args-modes">
           {modes.map((item) => (
             <button
@@ -98,8 +108,23 @@ function ARGS_VIEWER_FUN(props: {
           </div>
         )}
         {mode === "hex" && (
-          <div class="args-text">
-            {shit_1170_code_block_fun({ code: bytes_to_hex(decoded.bytes) })}
+          <div class="args-text is-hex">
+            {/* --- WHY --- THE HEX IS THE FASTFS HEX AND NOT THE PLAIN
+                ONE: the plain hex is one long line, and a long line of
+                hex is unreadable — the reader cannot count the offset
+                and cannot see where one field ends and the next
+                begins. the FastFS hex breaks every sixteen bytes, so
+                the bytes on a line line up with the offset, and it is
+                the same format the queue page's raw bytes use.
+
+                --- WHY --- IT IS SHOWN PLAIN AND NOT HIGHLIGHTED: a hex
+                dump is not json, and the json grammar escapes the
+                characters in it — the byte `89` comes out as `ef bf
+                bd`. a hex dump must show the bytes exactly. */}
+            {shit_1170_code_block_fun({
+              code: fastfs_bytes_to_hex_fun(hex_bytes),
+              plain: true,
+            })}
           </div>
         )}
         {mode === "base64" && (

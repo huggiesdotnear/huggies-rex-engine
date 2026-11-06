@@ -100,3 +100,27 @@
   min-width: 0;
 }
 /*==================================*/
+/* the hex mode: the lines are sixteen bytes each, and a line must stay
+   a line.
+
+   --- WHY --- THE CODE BLOCK'S OWN WRAPPING IS UNDONE HERE: the code
+   block wraps a long line, because a json value can be longer than the
+   screen. a hex line is NOT a long value — it is sixteen bytes and an
+   offset, and a css wrap lands mid-byte and pushes the rest of the
+   line onto the next one, so the bytes no longer line up with the
+   offset. so the hex keeps its own line breaks and the box scrolls
+   sideways.
+
+   --- WHY --- BOTH THE `pre` AND THE `code` ARE TARGETED: the plain
+   code block puts the bytes in a `<pre><code>`, and the wrapping is
+   on the `code` inside it. */
+#SHIT_1170_COMPONENT_TX_ACTIONS .args-viewer .args-text.is-hex pre,
+#SHIT_1170_COMPONENT_TX_RECEIPTS .args-viewer .args-text.is-hex pre,
+#SHIT_1170_COMPONENT_TX_ACTIONS .args-viewer .args-text.is-hex code,
+#SHIT_1170_COMPONENT_TX_RECEIPTS .args-viewer .args-text.is-hex code {
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+  overflow-x: auto;
+}
+/*==================================*/

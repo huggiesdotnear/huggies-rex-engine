@@ -99,6 +99,30 @@
   opacity: 0.75;
 }
 /*==================================*/
+/*==================================*/
+/* the hex of the raw bytes.
+   --- WHY --- NO `word-break: break-all` HERE: the line break is part
+   of the hex format — a break every sixteen bytes, so a reader can
+   count the offset. a css word-break lands at an arbitrary character,
+   which is mid-byte, and the bytes on the line would no longer line up
+   with the offset. the breaks are in the string, so the css only has
+   to keep them.
+
+   --- WHY --- THE `code` IS TARGETED TOO: the base rule for every
+   `code` on the site breaks words anywhere, and the hex sits in one.
+   a reader would see a line of bytes cut in half.
+
+   --- WHY --- THE LINES DO NOT WRAP: a hex line of sixteen bytes is
+   wider than the card on a phone, and a wrapped line would put the
+   second half of the bytes on a line of its own, under the first —
+   and the offset would be wrong again. the box scrolls sideways
+   instead, and every line stays one line. */
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-binary-hex,
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-binary-hex code {
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
 #SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-binary-hex {
   margin: 0;
   padding: 8px;
@@ -107,7 +131,6 @@
   font-family: monospace;
   font-size: 11px;
   line-height: 1.5;
-  overflow-wrap: anywhere;
-  word-break: break-all;
+  overflow-x: auto;
 }
 /*==================================*/

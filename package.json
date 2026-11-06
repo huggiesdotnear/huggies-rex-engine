@@ -22,7 +22,7 @@
     "@shikijs/engine-javascript": "4.5.0",
     "@shikijs/langs": "4.5.0",
     "@shikijs/themes": "4.5.0",
-    "@sleet-js/fastnear-explorer-api-client": "^0.1.5",
+    "@sleet-js/fastnear-explorer-api-client": "^0.1.6",
     "@sleet-js/intear-api-tool-box": "^0.1.1",
     "@sleet-js/intear-dex-aggregator-tool-box": "0.1.3",
     "@sleet-js/middleman-intear-api": "0.1.0",

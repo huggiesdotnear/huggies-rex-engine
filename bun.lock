@@ -14,7 +14,7 @@
         "@shikijs/engine-javascript": "4.5.0",
         "@shikijs/langs": "4.5.0",
         "@shikijs/themes": "4.5.0",
-        "@sleet-js/fastnear-explorer-api-client": "^0.1.5",
+        "@sleet-js/fastnear-explorer-api-client": "^0.1.6",
         "@sleet-js/intear-api-tool-box": "^0.1.1",
         "@sleet-js/intear-dex-aggregator-tool-box": "0.1.3",
         "@sleet-js/middleman-intear-api": "0.1.0",
@@ -32,7 +32,7 @@
     },
     "middleman": {
       "name": "@huggies/shit-1170-rex-engine-middleman",
-      "version": "0.0.1",
+      "version": "0.0.7",
       "devDependencies": {
         "@types/bun": "latest",
         "@types/node": "^26.6.6",
@@ -112,7 +112,7 @@
 
     "@shikijs/vscode-textmate": ["@shikijs/vscode-textmate@10.1.0", "", {}, "sha512-cVBuhDQjBZaNMTwBquYfPydrUP+E3hE6oYGasx8h6ZrODIM7/r+gxLDXdd66oszbrggZHEntdE6j+5gYIVyMWQ=="],
 
-    "@sleet-js/fastnear-explorer-api-client": ["@sleet-js/fastnear-explorer-api-client@0.1.5", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-hEFhdfRMSbxBQxAx3KmTxHdLg20JjkkzctetbQ0RtrvvC3RGDdZmMrl0ovbKaltrVGHlD8ir6WDPpIGueQW7Vw=="],
+    "@sleet-js/fastnear-explorer-api-client": ["@sleet-js/fastnear-explorer-api-client@0.1.6", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-lrIxVLnDDOuzOCzIQKAOj7RZ8NUUsOqedTQTjuL+jcwHv06MJyEWui05xtCZYSt/M25WirVSL+ZvIk0/zYWQRA=="],
 
     "@sleet-js/intear-api-tool-box": ["@sleet-js/intear-api-tool-box@0.1.1", "", { "peerDependencies": { "typescript": "^7" } }, "sha512-VjOhxQNc5s9W/Wa4HdfuTJ1KW93krt+rN8VIYI/TqHgprZZgvM8rU0LloJnHjU4EAD2pQwdIq25zkcgiWbk6Bg=="],
 

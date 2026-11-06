@@ -1,0 +1,206 @@
+/*==================================*/
+/* app_page_tx_fastfs
+   the FastFS card: the file, the link it is served at, the preview, and
+   the notes.
+
+   --- WHY --- THE CARD IS USED BY BOTH PAGES: the queue page shows a
+   QUEUED upload and the transaction page shows an ON-CHAIN one, and
+   the two are the same card with the same rules — so the rules reach
+   both of them.
+
+   --- WHY --- THE CARD IS DARKER THAN THE PAGE: the file may be an
+   image or a video, and a light frame around a picture makes the
+   picture's own edges hard to see. the card's own background is a
+   plain dark box, and the preview sits inside it.
+
+   --- WHY --- THE IMAGE IS BOUNDED: a FastFS upload can be 32 MiB, and
+   an unbounded picture would push the whole page down. the box holds
+   the picture and the picture fits in the box. */
+/*==================================*/
+.fastfs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  text-align: left;
+  min-width: 0;
+}
+/*==================================*/
+/* the head row: what this is, and what kind of upload it is. */
+.fastfs-card .fastfs-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+.fastfs-card .fastfs-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+/*==================================*/
+/* the kind: simple, partial or delete. it tells the reader whether the
+   sizes below are one number or two. */
+.fastfs-card .fastfs-kind {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  opacity: 0.85;
+}
+/*==================================*/
+/* the path: the name the file was uploaded with. */
+.fastfs-card .fastfs-path {
+  font-family: monospace;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* the facts: the type, the sizes, the offset and the nonce. */
+.fastfs-card .fastfs-facts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+.fastfs-card .fastfs-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/*==================================*/
+.fastfs-card .fastfs-fact-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+/*==================================*/
+.fastfs-card .fastfs-fact-value {
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the links: the serving url and the fastfs:// uri. */
+.fastfs-card .fastfs-links {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+/*==================================*/
+.fastfs-card .fastfs-url {
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  color: var(--color-middle);
+}
+/*==================================*/
+/* the uri is a reference form, not a link — a browser cannot open it. */
+.fastfs-card .fastfs-uri {
+  font-family: monospace;
+  font-size: 10px;
+  opacity: 0.6;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* the notes: why the link does not work yet, why the receipt fails, and
+   what the indexer will drop. */
+.fastfs-card .fastfs-note {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+/*==================================*/
+/* the receipt note is the one that stops a reader reading a failed
+   receipt as a broken upload, so it is a touch stronger. */
+.fastfs-card .fastfs-note.is-receipt {
+  opacity: 0.85;
+  border-left: 2px solid var(--color-middle);
+  padding-left: 6px;
+}
+/*==================================*/
+/* the preview: the text, the picture or the video. */
+.fastfs-card .fastfs-preview {
+  min-width: 0;
+}
+/*==================================*/
+/* the text preview: the content in a code block, and the note that it
+   was cut. */
+.fastfs-card .fastfs-preview.is-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/*==================================*/
+.fastfs-card .fastfs-preview-truncated {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+/*==================================*/
+/* the note that stands in for a preview that cannot exist yet. */
+.fastfs-card .fastfs-preview.is-unavailable {
+  padding: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+}
+/*==================================*/
+.fastfs-card .fastfs-preview-note {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+/*==================================*/
+/* the picture and the video: both fit inside the card, and neither
+   overflows it. */
+.fastfs-card .fastfs-image,
+.fastfs-card .fastfs-video {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+}
+/*==================================*/
+/* the problems the indexer will drop the upload for. */
+.fastfs-card .fastfs-problems {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #da291c;
+  border-radius: 8px;
+  background: rgba(218, 41, 28, 0.12);
+}
+/*==================================*/
+.fastfs-card .fastfs-problems-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: #da291c;
+}
+/*==================================*/
+.fastfs-card .fastfs-problems-list {
+  margin: 0;
+  padding-left: 16px;
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1.5;
+}
+/*==================================*/

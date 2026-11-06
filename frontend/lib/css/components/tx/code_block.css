@@ -21,7 +21,15 @@
   text-align: left;
 }
 /*==================================*/
-/* the plain text shown before the highlighter is ready. */
+/* the plain text shown before the highlighter is ready, and the plain
+   text shown for code that has no language — a hex dump.
+
+   --- WHY --- THE WRAPPING IS LOOSE HERE: a plain block may hold json
+   the reader wants to copy, or a long value, and it wraps inside
+   itself rather than making the reader scroll sideways.
+
+   the hex dump is the exception, and the args viewer's own rule undoes
+   the wrapping for it — see app_page_tx_args_viewer.css. */
 .code-block.is-plain {
   margin: 0;
   padding: 10px;
