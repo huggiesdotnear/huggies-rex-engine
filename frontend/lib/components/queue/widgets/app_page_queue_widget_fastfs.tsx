@@ -42,7 +42,6 @@ import { FileUp, Image as ImageIcon, Film, Trash } from "lucide-preact";
 import {
   decode_base64_bytes_raw,
   fastfs_decode_fun,
-  fastfs_file_url_fun,
   fastfs_is_call_fun,
 } from "@sleet-js/fastnear-explorer-api-client";
 import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
@@ -164,15 +163,6 @@ function upload_fun(
   signer_id: string,
 ): preact.JSX.Element {
   const info = upload.info;
-  // --- WHY --- THE URL IS BUILT HERE AND NOT IN THE CARD: the row
-  // says where the file WILL be served, and the card below it says
-  // that the link does not work until the batch is signed. the two
-  // facts are about different moments, and the row is the one that says
-  // where the file goes.
-  const url =
-    signer_id === ""
-      ? ""
-      : fastfs_file_url_fun(signer_id, upload.receiver, info.relative_path);
 
   return (
     <div class="queue-fastfs-upload">
@@ -200,13 +190,12 @@ function upload_fun(
             : size_text_fun(info.size)}
         </span>
       </div>
-      {url !== "" && (
-        <div class="queue-fastfs-links">
-          <a class="queue-fastfs-url" href={url}>
-            {url}
-          </a>
-        </div>
-      )}
+      {/* --- WHY --- THE URL IS NOT IN THE ROW: the card below shows the
+          serving link, and the row is the one-line summary. a url in
+          both places is the same link twice on one screen, and the
+          reader has to work out whether they are the same link or two.
+          the card also says the link does not work until the batch is
+          signed, and the row does not need to say it twice. */}
       {fastfs_card_fun({
         info,
         predecessor: signer_id,

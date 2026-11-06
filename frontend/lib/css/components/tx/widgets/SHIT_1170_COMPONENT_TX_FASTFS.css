@@ -121,19 +121,10 @@
   font-variant-numeric: tabular-nums;
 }
 /*==================================*/
-/* the link the file is served at. */
-#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-links {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-url {
-  font-family: monospace;
-  font-size: 11px;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  color: var(--color-middle);
-}
+/* --- WHY --- THERE IS NO LINK RULE HERE: the row is the one-line
+   summary and the SHARED FastFS card below it owns the serving link
+   and the `fastfs://` uri. a link in both places is the same link
+   twice on one screen. */
 /*==================================*/
 /* --- WHY --- THERE IS NO PREVIEW RULE HERE: the preview of the file is
    drawn by the SHARED FastFS card, under the row, and the card owns

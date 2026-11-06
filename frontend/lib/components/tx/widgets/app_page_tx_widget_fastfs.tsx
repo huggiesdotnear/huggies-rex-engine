@@ -114,7 +114,6 @@ function upload_fun(
   // the actions that have one. the guard is here so a future change
   // cannot render a row with nothing in it.
   if (info === undefined) return <></>;
-  const url = action.fastfs_url ?? "";
 
   return (
     <div class="tx-fastfs-upload">
@@ -140,13 +139,11 @@ function upload_fun(
             : size_text_fun(info.size)}
         </span>
       </div>
-      {url !== "" && (
-        <div class="tx-fastfs-links">
-          <a class="tx-fastfs-url" href={url}>
-            {url}
-          </a>
-        </div>
-      )}
+      {/* --- WHY --- THE URL IS NOT IN THE ROW: the card below shows
+          the serving link and the `fastfs://` uri, and the row is the
+          one-line summary. a url in both places is the same link twice
+          on one screen, and the reader has to work out whether they
+          are the same link or two. */}
       {fastfs_card_fun({
         info,
         predecessor: signer_id,

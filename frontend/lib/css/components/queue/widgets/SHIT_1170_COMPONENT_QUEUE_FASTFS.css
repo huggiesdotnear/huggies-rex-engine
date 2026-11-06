@@ -124,17 +124,8 @@
   font-variant-numeric: tabular-nums;
 }
 /*==================================*/
-/* the link the file will be served at. */
-#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-links {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-url {
-  font-family: monospace;
-  font-size: 11px;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-  color: var(--color-middle);
-}
+/* --- WHY --- THERE IS NO LINK RULE HERE: the row is the one-line
+   summary and the SHARED FastFS card below it owns the serving link
+   and says that it does not work until the batch is signed. a link in
+   both places is the same link twice on one screen. */
 /*==================================*/
