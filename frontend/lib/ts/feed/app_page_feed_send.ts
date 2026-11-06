@@ -38,6 +38,7 @@ import {
 } from "../shared/gas_deposit";
 import { shit_1170_outcome_hash_fun } from "../shared/outcome_hash";
 import { shit_1170_queue_args_bytes_fun } from "../shared/queue_args";
+import { shit_1170_queue_args_wallet_bytes_fun } from "../shared/queue_args_wallet_bytes";
 import { SHIT_1170_TOAST_STORE } from "../shared/toast_store";
 // ========================================
 // ========================================
@@ -126,6 +127,15 @@ function to_wallet_transaction_fun(
 // --- WHY --- A CALL WITH NO BINARY ARGS GETS ITS JSON OBJECT: the two
 // kinds of call are different, and the json object is what the toolbox
 // and the wallet both understand.
+//
+// --- WHY --- THE BYTES GET A `toJSON`: a wallet hands the transaction to
+// its signer over a json boundary, and `JSON.stringify` of a `Uint8Array`
+// is an OBJECT keyed by the byte indexes. a signer that reads that object
+// back as a map of bytes writes out the map's json instead of the file's
+// bytes, and the FastFS indexer drops the action silently. the `toJSON`
+// makes the args cross that boundary as an ARRAY OF NUMBERS, which is
+// what a signer reads as bytes. the reason is written down in
+// shared/queue_args_wallet_bytes.ts.
 function wallet_args_fun(
   transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
 ): unknown {
@@ -133,7 +143,9 @@ function wallet_args_fun(
   if (args_base64 === null || args_base64 === undefined) {
     return transaction.args ?? {};
   }
-  return shit_1170_queue_args_bytes_fun(args_base64);
+  return shit_1170_queue_args_wallet_bytes_fun(
+    shit_1170_queue_args_bytes_fun(args_base64),
+  );
 }
 // ========================================
 // --- DECLINED --------------------------
