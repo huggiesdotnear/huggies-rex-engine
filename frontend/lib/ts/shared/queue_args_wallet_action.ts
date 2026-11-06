@@ -41,25 +41,38 @@
 // its manifest, and the manifest carries the wallet's id. so the app can
 // ask, rather than guess, and it asks the wallet that is going to sign.
 //
-// --- WHY THE INTEAR SHAPE IS THE NEAR-API-JS ONE ---
-// the Intear Wallet's Rust reads its native action as
-// `{ "FunctionCall": { "method_name", "args", "gas", "deposit" } }`, and
-// its action enum is `#[serde(untagged)]`, so the native shape is tried
-// FIRST. the connector shape — `{ "type": "FunctionCall", "params": {…} }`
-// — does not match the native shape and falls through to the fallback,
-// and the fallback is the one that stringifies.
+// --- WHY THE INTEAR SHAPE IS ITS OWN ---
+// the Intear Wallet's Rust reads the transaction as
 //
-// so the Intear Wallet gets the near-api-js shape with the arguments as a
-// base64 string, and every other wallet gets the connector shape with
-// the arguments as a `Uint8Array`.
+//   Vec<WalletSelectorTransaction>  ->  actions: Vec<SendTransactionsAction>
 //
-// --- WHY A WALLET WE DO NOT KNOW GETS THE CONNECTOR SHAPE ---
-// the connector shape is the one near-connect documents as the portable
-// one, and it is what every wallet that borshs in the browser expects.
-// a wallet we do not know is more likely to be one of those than one of
-// the wallet-server kind. and when the bytes do not survive, the upload
-// is dropped SILENTLY, so the app says so in the answer rather than
-// leaving a reader with a file that never appears.
+// and `SendTransactionsAction` is `#[serde(untagged)]`, so serde tries the
+// NATIVE action first and falls back to the wallet-selector one. the
+// native action is an externally tagged enum, so it is read as
+//
+//   { "FunctionCall": { "method_name": ..., "args": ..., "gas": ..., "deposit": ... } }
+//
+// and the native `FunctionCallAction` holds the arguments as
+// `Vec<u8>` with `#[serde_as(as = "Base64")]`, which serde_with reads from
+// a SEQUENCE OF NUMBERS.
+//
+// so the shape that reaches the native path is: the capitalized
+// `FunctionCall` key, the snake_case `method_name`, the arguments as an
+// array of numbers, and the gas and the deposit as numbers.
+//
+// the FALLBACK path — the one the connector shape lands on — takes the
+// arguments as a json value and writes them out with
+// `serde_json::to_vec`, and that is the one that turns the bytes into
+// the json text of a byte map. THAT is what reaches the chain when a
+// FastFS upload goes through the Intear Wallet without this shape: 52
+// bytes of borsh arrive as 426 bytes of json, the indexer finds no
+// borsh, and the action is DROPPED SILENTLY.
+//
+// --- WHY THE OTHER WALLETS GET THE CONNECTOR SHAPE ---
+// the wallets that borsh-serialize the transaction in the browser take
+// the arguments as a `Uint8Array` and the bytes reach the chain
+// untouched. the connector shape is the one near-connect documents as
+// the portable one, and it is what those wallets expect.
 import type { SHIT_1170_TX_QUEUE_TRANSACTION } from "@huggies/shit-1170-rex-engine-middleman";
 import {
   shit_1170_deposit_fun,
@@ -121,16 +134,33 @@ const SHIT_1170_WALLET_SERVER_IDS = [
 // string decode it with the standard alphabet.
 function wallet_args_fun(
   transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
-  as_base64: boolean,
 ): unknown {
   const args_base64 = transaction.argsBase64;
   if (args_base64 === null || args_base64 === undefined) {
     return transaction.args ?? {};
   }
-  if (as_base64) {
-    return args_base64;
-  }
   return shit_1170_queue_args_bytes_fun(args_base64);
+}
+
+// the arguments of a queued call, as the SEQUENCE OF NUMBERS the native
+// action reads.
+//
+// --- WHY --- A SEQUENCE AND NOT A BASE64 STRING: the native action holds
+// the arguments as `Vec<u8>` with `#[serde_as(as = "Base64")]`, and
+// serde_with reads that format from a sequence of numbers. a base64
+// string does not parse there.
+//
+// --- WHY --- A CALL WITH NO BINARY ARGS GETS ITS JSON OBJECT: the two
+// kinds of call are different, and the json object is what the wallet
+// understands.
+function wallet_args_sequence_fun(
+  transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
+): unknown {
+  const args_base64 = transaction.argsBase64;
+  if (args_base64 === null || args_base64 === undefined) {
+    return transaction.args ?? {};
+  }
+  return Array.from(shit_1170_queue_args_bytes_fun(args_base64));
 }
 
 // the wallet's id, or an empty string when it is not known.
@@ -169,22 +199,33 @@ export function shit_1170_wallet_transaction_fun(
   const gas = shit_1170_gas_fun(transaction.gas);
   const deposit = shit_1170_deposit_fun(transaction.deposit);
 
-  // --- WHY --- THE SERVER WALLETS GET THE NEAR-API-JS SHAPE: their Rust
-  // reads the native action — `{ "FunctionCall": { "method_name", "args",
-  // "gas", "deposit" } }` — and their action enum is untagged, so the
-  // native shape is tried FIRST. the arguments are a base64 string there,
-  // because their native action type holds them as `Vec<u8>` with
-  // `#[serde_as(as = "Base64")]`.
+  // --- WHY --- THE SERVER WALLETS GET THE NATIVE ACTION: their Rust reads
+  // the transaction as `Vec<WalletSelectorTransaction>` and each action is
+  // `#[serde(untagged)]`, so the NATIVE action is tried first. the native
+  // action is an externally tagged enum, so its json is
+  // `{ "FunctionCall": { ... } }` with the capitalized key, and its fields
+  // are snake_case.
+  //
+  // --- WHY --- THE ARGUMENTS ARE AN ARRAY OF NUMBERS: the native action
+  // holds them as `Vec<u8>` with `#[serde_as(as = "Base64")]`, and
+  // serde_with reads that format from a SEQUENCE OF NUMBERS. a base64
+  // string does not parse there, and the wallet falls back to the
+  // wallet-selector action, which writes the arguments out with
+  // `serde_json::to_vec` — and that is the path that turns the bytes into
+  // the json text of a byte map.
+  //
+  // --- WHY --- THE GAS AND THE DEPOSIT ARE NUMBERS: the native action
+  // holds them as `Gas` and `NearToken`, and both serialize as numbers.
   if (wallet_reads_base64_fun(manifest)) {
     return {
       receiverId: transaction.contractId,
       actions: [
         {
-          functionCall: {
-            methodName: transaction.method,
-            args: wallet_args_fun(transaction, true),
-            gas,
-            deposit,
+          FunctionCall: {
+            method_name: transaction.method,
+            args: wallet_args_sequence_fun(transaction),
+            gas: Number(gas),
+            deposit: Number(deposit),
           },
         },
       ],
@@ -201,7 +242,7 @@ export function shit_1170_wallet_transaction_fun(
         type: "FunctionCall",
         params: {
           methodName: transaction.method,
-          args: wallet_args_fun(transaction, false),
+          args: wallet_args_fun(transaction),
           gas,
           deposit,
         },
