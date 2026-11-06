@@ -33,7 +33,10 @@ import {
 import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
 import { shit_1170_outcome_hash_fun } from "../shared/outcome_hash";
-import { shit_1170_wallet_transaction_fun } from "../shared/queue_args_wallet_action";
+import {
+  shit_1170_wallet_can_carry_bytes_fun,
+  shit_1170_wallet_transaction_fun,
+} from "../shared/queue_args_wallet_action";
 import { SHIT_1170_TOAST_STORE } from "../shared/toast_store";
 // ========================================
 // ========================================
@@ -128,14 +131,43 @@ export async function shit_1170_queue_send_fun(
   try {
     const connector = near_connect_client();
     const wallet = await connector.wallet();
-    // --- WHY --- THE WALLET'S MANIFEST IS PASSED ALONG: the wallet reads
-    // the arguments in its own way, and the wallet-server kind — the
-    // Intear Wallet is one — reads them as a base64 string while the
-    // browser-signer kind reads them as bytes. the manifest says which
-    // wallet this is, so the arguments can be given the form this wallet
-    // reads. the reason is written down in
-    // shared/queue_args_wallet_action.ts.
+    // --- WHY --- THE WALLET'S MANIFEST IS READ: the wallet reads the
+    // arguments in its own way, and the wallet-server kind — the Intear
+    // Wallet is one — cannot carry raw bytes at all. the manifest says
+    // which wallet this is, so the app can tell the reader before they
+    // approve a call that would go out and do nothing. the reason is
+    // written down in shared/queue_args_wallet_action.ts.
     const manifest = (wallet as { manifest?: unknown }).manifest;
+
+    // --- WHY --- A CALL WITH BYTES IS REFUSED FOR A WALLET THAT CANNOT
+    // CARRY THEM: a FastFS upload through such a wallet is DROPPED
+    // SILENTLY by the indexer. the receipt fails the way a FastFS receipt
+    // always fails, the file never appears at its url, and nothing says
+    // why. refusing here tells the reader the truth instead of sending a
+    // call that cannot work.
+    const has_bytes_call = transactions.some(
+      (transaction) =>
+        transaction.argsBase64 !== null && transaction.argsBase64 !== undefined,
+    );
+    if (
+      has_bytes_call &&
+      !shit_1170_wallet_can_carry_bytes_fun(manifest)
+    ) {
+      const message =
+        "THIS WALLET CANNOT SEND RAW BYTES, AND THIS CALL CARRIES A FILE. " +
+        "THE UPLOAD WOULD BE DROPPED SILENTLY AND THE FILE WOULD NEVER APPEAR. " +
+        "USE A WALLET THAT BORSHES THE TRANSACTION IN THE BROWSER.";
+      SHIT_1170_TOAST_STORE.show("error", "THIS WALLET CANNOT DO THIS", message, null);
+      return {
+        sent: false,
+        succeeded: 0,
+        failed: 0,
+        tx_hash: null,
+        error: message,
+        declined: false,
+      };
+    }
+
     outcomes = await wallet.signAndSendTransactions({
       signerId: account_id,
       transactions: transactions.map((transaction) =>
