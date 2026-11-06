@@ -2,6 +2,11 @@
 
 the page shows one transaction: what it did, what it moved and what came of it.
 
+what it moved and what it put up are WIDGETS — the transfers and the files are
+in the widget registry, and the registry decides WHICH widgets apply to a
+transaction. the page's sections and their order are the page's own, and a
+widget does not move them.
+
 <!--
 this file contains the source of truth for what is on the page.
 do not add classes here as they are something not written in stone.

@@ -17,8 +17,8 @@ import "./import-app-wide";
 import "./tx/app_page_tx_start";
 import "../components/tx/app_page_tx_status";
 import "../components/tx/app_page_tx_summary";
-import "../components/tx/app_page_tx_transfers";
-import "../components/tx/app_page_tx_fastfs";
+import "../components/tx/widgets/app_page_tx_widget_transfers";
+import "../components/tx/widgets/app_page_tx_widget_fastfs";
 import "../components/tx/app_page_tx_actions";
 import "../components/tx/app_page_tx_receipts";
 // ========================================

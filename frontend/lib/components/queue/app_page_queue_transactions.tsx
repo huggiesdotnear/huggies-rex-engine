@@ -30,7 +30,7 @@ import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_QUEUE_STORE } from "../../ts/queue/app_page_queue_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { shit_1170_code_block_fun } from "../tx/code_block";
-import { shit_1170_fastfs_card_fun } from "../tx/app_page_tx_fastfs_card";
+import { shit_1170_fastfs_card_fun } from "../tx/widgets/app_page_tx_widget_fastfs_card";
 import { shit_1170_queue_args_fun } from "../../ts/shared/queue_args";
 import { SHIT_1170_AUTH } from "../../ts/shared/auth_status";
 import type { SHIT_1170_TX_QUEUE_TRANSACTION } from "@huggies/shit-1170-rex-engine-middleman";

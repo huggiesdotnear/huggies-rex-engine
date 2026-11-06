@@ -24,7 +24,7 @@
 // reader cannot tell a json memo from a plain one. a code block says
 // "this is json", shows it formatted, and can be copied.
 import { try_parse_json } from "@sleet-js/fastnear-explorer-api-client";
-import { shit_1170_code_block_fun } from "./code_block";
+import { shit_1170_code_block_fun } from "../code_block";
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------

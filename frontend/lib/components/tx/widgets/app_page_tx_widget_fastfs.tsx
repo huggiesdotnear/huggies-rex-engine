@@ -1,12 +1,18 @@
 // ========================================
-// the transaction's FastFS uploads: the files it put up.
+// the files widget: the transaction's FastFS uploads — the files it put
+// up.
 //
 // a FastFS upload is a function call to `__fastdata_fastfs` whose
 // arguments are RAW BORSH BYTES. the fastnear client's parser decodes
-// them and hangs the file on the action, so this section reads the
+// them and hangs the file on the action, so this widget reads the
 // upload off the action and shows it.
 //
-// --- WHY --- THE UPLOADS ARE THEIR OWN SECTION AND NOT A BLOCK IN THE
+// --- WHY --- IT IS A WIDGET AND NOT A SECTION OF THE PAGE: a file is
+// ONE kind of thing the transaction did, and it stands beside the
+// transfers rather than inside them. the widget says whether it
+// applies, and the page says where it sits.
+//
+// --- WHY --- THE UPLOADS ARE THEIR OWN WIDGET AND NOT A BLOCK IN THE
 // ACTIONS LIST: the fastnear explorer keeps a protocol's own detail in
 // its own widget, beside the transfers and above the receipts, and the
 // raw action list stays raw. a file is what the transaction DID — it
@@ -38,12 +44,13 @@
 // nothing.
 import { render } from "preact";
 import { FileUp, Image as ImageIcon, Film, Trash } from "lucide-preact";
-import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
-import { SHIT_1170_APP_PAGE_TX_STORE } from "../../ts/tx/app_page_tx_store";
-import { use_page_store_fun } from "../../ts/shared/use_page_store";
-import { current_app_depth_fun } from "../../ts/shared/app_depth";
-import { shit_1170_code_block_fun } from "./code_block";
-import { size_text_fun } from "./app_page_tx_fastfs_card";
+import { SHIT_1170_MOUNT_ID } from "../../../ts/shared/mount_ids";
+import { SHIT_1170_APP_PAGE_TX_STORE } from "../../../ts/tx/app_page_tx_store";
+import { use_page_store_fun } from "../../../ts/shared/use_page_store";
+import { current_app_depth_fun } from "../../../ts/shared/app_depth";
+import { shit_1170_code_block_fun } from "../code_block";
+import { size_text_fun } from "./app_page_tx_widget_fastfs_card";
+import { SHIT_1170_TX_WIDGETS } from "./tx_widgets";
 import type {
   FASTFS_FILE_INFO,
   PARSED_ACTION,
@@ -187,11 +194,16 @@ function upload_fun(
 // ========================================
 // ========================================
 // --- COMPONENT --------------------------
-export function SHIT_1170_COMPONENT_TX_FASTFS_FUN() {
+export function SHIT_1170_COMPONENT_TX_WIDGET_FASTFS_FUN() {
   const state = use_page_store_fun(SHIT_1170_APP_PAGE_TX_STORE);
   const data = state.data;
   // no transaction yet — there is nothing to show.
   if (data === null) return null;
+  // --- WHY --- THE REGISTRY DECIDES: this widget applies when the
+  // transaction uploaded a file, and the registry is where that is
+  // written down. the widget does not carry its own rule, so there is
+  // ONE place that says which widgets apply to a transaction.
+  if (!SHIT_1170_TX_WIDGETS.applies("fastfs", data.parsed)) return null;
   // the actions that carry a FastFS upload. the parser hangs the
   // decoded file on the call it belongs to, so the uploads are found
   // by looking for that.
@@ -220,10 +232,14 @@ export function SHIT_1170_COMPONENT_TX_FASTFS_FUN() {
 // ========================================
 // --- MOUNT ------------------------------
 // self-mount guarded by id check.
+//
+// --- WHY --- THE MOUNT ID DID NOT CHANGE: the page's divs and their
+// order are the page's layout, and a widget does not move the page's
+// layout around. the id is the page's, and the widget answers to it.
 const SELF_MOUNT_ID = SHIT_1170_MOUNT_ID.SHIT_1170_COMPONENT_TX_FASTFS;
 if (typeof document !== "undefined") {
   const el = document.getElementById(SELF_MOUNT_ID);
-  if (el !== null) render(<SHIT_1170_COMPONENT_TX_FASTFS_FUN />, el);
+  if (el !== null) render(<SHIT_1170_COMPONENT_TX_WIDGET_FASTFS_FUN />, el);
 }
 // ========================================
 // copyright 2026 by sleet.near

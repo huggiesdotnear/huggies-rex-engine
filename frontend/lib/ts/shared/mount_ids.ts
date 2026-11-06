@@ -4,6 +4,13 @@
 // (frontend/lib/components/app-wide/nav.tsx → SHIT_1170_COMPONENT_NAV).
 // `as const` keeps the values literal, so a consumer that mistypes
 // an id is a type error instead of a silent null mount.
+//
+// --- WHY --- THE TX WIDGETS' IDS ARE NOT RENAMED WITH THEIR FILES: the
+// id belongs to the PAGE's div, and the page's divs and their order do
+// not change because a section became a widget. the transfers widget
+// answers to SHIT_1170_COMPONENT_TX_TRANSFERS and the files widget to
+// SHIT_1170_COMPONENT_TX_FASTFS, and both live in
+// frontend/lib/components/tx/widgets/.
 // ========================================
 export const SHIT_1170_MOUNT_ID = {
   SHIT_1170_COMPONENT_LOADING_BAR: "SHIT_1170_COMPONENT_LOADING_BAR",

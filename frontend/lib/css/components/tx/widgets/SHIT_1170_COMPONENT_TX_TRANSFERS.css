@@ -1,14 +1,18 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_TX_TRANSFERS
-   the transaction's transfers: what moved and where.
+   the transfers widget: what the transaction moved, and where.
 
    one row per transfer: the two ends with an arrow between them, the
    amount, and the contract it came from.
 
    the memo of a transfer is a json block or a line of text, and the
-   block's own look lives in its own file (tx/code_block.css). */
+   block's own look lives in its own file (tx/code_block.css).
+
+   --- WHY --- THE FILE NAME IS THE MOUNT ID AND NOT THE WIDGET'S: the
+   mount id belongs to the page's div, and the page's div did not
+   change. the widget is the transfers and the id is the page's. */
 /*==================================*/
-@import url(./code_block.css);
+@import url(../code_block.css);
 /*==================================*/
 #SHIT_1170_COMPONENT_TX_TRANSFERS .tx-transfers {
   width: 100%;

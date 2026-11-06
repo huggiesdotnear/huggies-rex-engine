@@ -1,9 +1,13 @@
 /*==================================*/
 /* SHIT_1170_COMPONENT_TX_FASTFS
-   the transaction's FastFS uploads: the files it put up.
+   the files widget: the FastFS uploads the transaction put up.
 
    one row per upload: an icon, who put it up, what the file is, and
    the link it is served at. the preview of the file is under the row.
+
+   --- WHY --- THE FILE NAME IS THE MOUNT ID AND NOT THE WIDGET'S: the
+   mount id belongs to the page's div, and the page's div did not
+   change. the widget is the files and the id is the page's.
 
    --- WHY --- THE SECTION LOOKS LIKE THE TRANSFERS ONE: the transfers
    are what the transaction moved, summarised, in their own place. a

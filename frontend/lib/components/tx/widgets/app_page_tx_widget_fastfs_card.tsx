@@ -43,7 +43,7 @@ import {
   fastfs_is_call_fun,
   fastfs_validate_fun,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { shit_1170_code_block_fun } from "./code_block";
+import { shit_1170_code_block_fun } from "../code_block";
 import type { FASTFS_FILE_INFO } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
