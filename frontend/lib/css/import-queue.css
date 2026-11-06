@@ -1,7 +1,7 @@
 /*==================================*/
 /* the queue page's css: the components it mounts. */
 @import url(./components/tx/code_block.css);
-@import url(./components/tx/app_page_tx_fastfs.css);
+@import url(./components/tx/app_page_tx_fastfs_card.css);
 @import url(./components/shared/transfer_amount.css);
 @import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_STATUS.css);
 @import url(./components/queue/SHIT_1170_COMPONENT_QUEUE_SUMMARY.css);

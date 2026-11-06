@@ -1,5 +1,5 @@
 /*==================================*/
-/* app_page_tx_fastfs
+/* app_page_tx_fastfs_card
    the FastFS card: the file, the link it is served at, the preview, and
    the notes.
 
@@ -114,22 +114,14 @@
   word-break: break-all;
 }
 /*==================================*/
-/* the notes: why the link does not work yet, why the receipt fails, and
-   what the indexer will drop. */
+/* the notes: why the link does not work yet, and what the indexer will
+   drop. */
 .fastfs-card .fastfs-note {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 9px;
   line-height: 1.5;
   letter-spacing: 0.06em;
   opacity: 0.75;
-}
-/*==================================*/
-/* the receipt note is the one that stops a reader reading a failed
-   receipt as a broken upload, so it is a touch stronger. */
-.fastfs-card .fastfs-note.is-receipt {
-  opacity: 0.85;
-  border-left: 2px solid var(--color-middle);
-  padding-left: 6px;
 }
 /*==================================*/
 /* the preview: the text, the picture or the video. */

@@ -19,10 +19,12 @@
 // decoded into the json they are, and the viewer under it holds the
 // same bytes as plain text, hex and base64.
 //
-// --- WHY --- A FASTFS CALL SHOWS THE FASTFS CARD: a FastFS upload is a
-// FILE, and a file shown as base64 says nothing about it. the card
-// decodes the bytes and shows the file, the link it is served at and a
-// preview of it.
+// --- WHY --- THE RAW DATA STAYS RAW: a protocol's own detail — a
+// FastFS upload, say — has its own section, the way the fastnear
+// explorer keeps a protocol's detail in its own widget beside the
+// transfers. the actions list is the raw action and the arguments, and
+// nothing else, so a reader who wants the raw thing gets exactly the
+// raw thing.
 //
 // it reads the loaded transaction from the page's store. it fetches
 // nothing.
@@ -37,7 +39,6 @@ import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { app_page_tx_action_args_fun } from "../../ts/tx/app_page_tx_action_args";
 import { shit_1170_code_block_fun } from "./code_block";
 import { shit_1170_args_viewer_fun } from "./app_page_tx_args_viewer";
-import { shit_1170_fastfs_card_fun } from "./app_page_tx_fastfs";
 import type { PARSED_ACTION } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -73,43 +74,12 @@ function deposit_fun(action: PARSED_ACTION): string | null {
 //
 // --- WHY THE CARD IS A COMPONENT AND NOT A FUNCTION: it is used by the
 // queue page too, and the two must show the same card.
-//
-// --- WHY THE SIGNER IS THE PREDECESSOR: a FastFS file is served under
-// the account that SIGNED the transaction — the receipt's predecessor —
-// not under the account the call was made to. the receiver is any
-// account, and `fastfs.near` is only the convention.
-function action_fun(
-  action: PARSED_ACTION,
-  signer_id: string,
-  receiver_id: string,
-): preact.JSX.Element {
+function action_fun(action: PARSED_ACTION): preact.JSX.Element {
   const deposit = deposit_fun(action);
   // the action's arguments, decoded. the helper returns the base64 for
   // the viewer's own base64 mode and the action with the arguments
   // replaced by the json they are.
   const args = app_page_tx_action_args_fun(action.raw);
-  // the FastFS card, when this action is a FastFS upload. it is null
-  // for every other call, and for a FastFS call whose bytes are not
-  // FastFS borsh.
-  //
-  // --- WHY THE BASE64 IS HANDED OVER AND NOT THE DECODED BYTES: the
-  // arguments decoder the viewer uses decodes the base64 to utf-8 TEXT
-  // and re-encodes it, and that round trip is lossy for a binary
-  // payload — a png is not utf-8, and its bytes come back changed and
-  // longer. the card uses the client's lossless decoder instead.
-  const fastfs =
-    args.base64 === null
-      ? null
-      : shit_1170_fastfs_card_fun({
-          args_base64: args.base64,
-          method_name: action.method_name ?? "",
-          predecessor: signer_id,
-          receiver: receiver_id,
-          // --- WHY IT IS ON CHAIN: the transaction is on the chain —
-          // that is what the page shows — so the indexer has had the
-          // chance to pick the file up, and the url works.
-          is_on_chain: true,
-        });
   return (
     <>
       <div class="tx-action-head">
@@ -126,7 +96,6 @@ function action_fun(
           </span>
         )}
       </div>
-      {fastfs}
       {shit_1170_code_block_fun({
         code: JSON.stringify(args.action, null, 2),
       })}
@@ -151,10 +120,6 @@ export function SHIT_1170_COMPONENT_TX_ACTIONS_FUN() {
   // a transaction with no actions is nothing — it can only be a
   // receipt on its own, which is not a transaction.
   if (actions.length === 0) return null;
-  // the account that signed, and the account the transaction was made
-  // to. a FastFS file is served under the signer.
-  const signer_id = data.parsed.signer_id;
-  const receiver_id = data.parsed.receiver_id;
 
   return (
     <section class="tx-actions">
@@ -162,7 +127,7 @@ export function SHIT_1170_COMPONENT_TX_ACTIONS_FUN() {
       <div class="tx-actions-list">
         {actions.map((action, index) => (
           <div key={`${action.type}-${index}`} class="tx-action">
-            {action_fun(action, signer_id, receiver_id)}
+            {action_fun(action)}
           </div>
         ))}
       </div>

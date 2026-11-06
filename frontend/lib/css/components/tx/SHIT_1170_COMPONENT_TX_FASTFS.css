@@ -1,0 +1,144 @@
+/*==================================*/
+/* SHIT_1170_COMPONENT_TX_FASTFS
+   the transaction's FastFS uploads: the files it put up.
+
+   one row per upload: an icon, who put it up, what the file is, and
+   the link it is served at. the preview of the file is under the row.
+
+   --- WHY --- THE SECTION LOOKS LIKE THE TRANSFERS ONE: the transfers
+   are what the transaction moved, summarised, in their own place. a
+   file is the same kind of thing — what the transaction did — and the
+   reader looks in the same place for both.
+
+   --- WHY --- THE ROW IS ONE LINE THAT WRAPS: the explorer's transfer
+   rows read as a sentence — "alice transferred 1.5 USDC to bob" — and
+   the details hang off it. a row of loose fields says nothing about
+   what happened; a sentence does.
+
+   --- WHY --- THE ACCOUNT IS A LINK: the uploader is the account that
+   signed the transaction, and the account the file is served under. a
+   reader who wants the account goes to the account.
+
+   --- WHY --- THE PREVIEW IS DARKER THAN THE PAGE: the file may be an
+   image or a video, and a light frame around a picture makes the
+   picture's own edges hard to see. the preview's own background is a
+   plain dark box, and the picture sits inside it.
+
+   --- WHY --- THE IMAGE IS BOUNDED: a FastFS upload can be 32 MiB, and
+   an unbounded picture would push the whole page down. the box holds
+   the picture and the picture fits in the box. */
+/*==================================*/
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs {
+  width: 100%;
+  max-width: 90vw;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs h2 {
+  text-align: left;
+  font-size: 17px;
+  border-bottom: 1px solid #474747;
+  padding-bottom: 6px;
+}
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/*==================================*/
+/* the upload row: the icon, the account, the verb, the file and the
+   facts. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: left;
+  min-width: 0;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+/* the icon says at a glance what kind of thing this is. the word is
+   still there beside it, for a reader who does not know the icons. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-icon {
+  align-self: center;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-icon.is-delete {
+  color: var(--color-backend);
+}
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-icon.is-image,
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-icon.is-video {
+  color: var(--color-middle);
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-account {
+  font-family: monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/* the verb is the quiet part of the sentence — it says what happened,
+   and it stays out of the way of the file's name. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-verb {
+  opacity: 0.6;
+}
+/* the file's name is the headline of the row. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-file {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-type,
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-size {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+/*==================================*/
+/* the link the file is served at. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-links {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-url {
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  color: var(--color-middle);
+}
+/*==================================*/
+/* the preview: the text, the picture or the video. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-preview {
+  min-width: 0;
+  margin-top: 4px;
+}
+/*==================================*/
+/* the picture and the video: both fit inside the row, and neither
+   overflows it. */
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-image,
+#SHIT_1170_COMPONENT_TX_FASTFS .tx-fastfs-video {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+}
+/*==================================*/

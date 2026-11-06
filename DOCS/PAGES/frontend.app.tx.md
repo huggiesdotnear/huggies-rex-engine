@@ -26,6 +26,8 @@ a page's md file should only contain the html codeblock, nothing else.
     <!--==========================================-->
     <div id="SHIT_1170_COMPONENT_TX_TRANSFERS"></div>
     <!--==========================================-->
+    <div id="SHIT_1170_COMPONENT_TX_FASTFS"></div>
+    <!--==========================================-->
     <div id="SHIT_1170_COMPONENT_TX_ACTIONS"></div>
     <!--==========================================-->
     <div id="SHIT_1170_COMPONENT_TX_RECEIPTS"></div>

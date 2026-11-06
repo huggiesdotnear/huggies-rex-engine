@@ -4,7 +4,8 @@
 @import url(./components/tx/SHIT_1170_COMPONENT_TX_STATUS.css);
 @import url(./components/tx/SHIT_1170_COMPONENT_TX_SUMMARY.css);
 @import url(./components/tx/SHIT_1170_COMPONENT_TX_TRANSFERS.css);
+@import url(./components/tx/SHIT_1170_COMPONENT_TX_FASTFS.css);
 @import url(./components/tx/SHIT_1170_COMPONENT_TX_ACTIONS.css);
 @import url(./components/tx/SHIT_1170_COMPONENT_TX_RECEIPTS.css);
-@import url(./components/tx/app_page_tx_fastfs.css);
+@import url(./components/tx/app_page_tx_fastfs_card.css);
 /*==================================*/
