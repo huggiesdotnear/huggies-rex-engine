@@ -84,3 +84,30 @@
   opacity: 0.75;
 }
 /*==================================*/
+/* a call whose arguments are raw bytes and not a json object. the label
+   says how many bytes there are, and the hex says what they are. */
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-binary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-binary-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+/*==================================*/
+#SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS .queue-transaction-binary-hex {
+  margin: 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/

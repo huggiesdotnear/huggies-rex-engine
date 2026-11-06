@@ -5,6 +5,7 @@
 // is a file and the two can differ: WAL, the journal mode, and the way
 // sqlite writes pages are all file behaviours.
 use sqlx::Row;
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 // ========================================
 // --- HELPERS ----------------------------
 // a temp db file, removed when the guard is dropped.
@@ -151,6 +152,7 @@ async fn the_tx_queue_transactions_table_has_its_columns() {
             "contract_id",
             "method",
             "args",
+            "args_base64",
             "gas",
             "deposit",
             "created_at",
@@ -644,6 +646,64 @@ async fn an_account_row_starts_out_pending() {
             .expect("the status should read");
     assert_eq!(status.0, "pending");
 }
+
+#[tokio::test]
+async fn an_old_db_gets_the_args_base64_column_and_a_new_one_does_not_break() {
+    // --- WHY --- THIS IS THE "NO MIGRATION SYSTEM" PROBLEM: a db that
+    // was made BEFORE the `args_base64` column existed would never get
+    // it from `CREATE TABLE IF NOT EXISTS`, so the column is added by an
+    // `ALTER TABLE` that checks first. this test makes the old db, opens
+    // it, and checks the column is there.
+    let db = TEMP_DB::new_fun("old-db");
+    {
+        // the db as it was BEFORE the column existed.
+        //
+        // --- WHY --- A RAW POOL AND NOT `db_open_fun`: `db_open_fun`
+        // runs the schema, and the schema is what this test is checking.
+        // so the old table is made by hand here.
+        let options = SqliteConnectOptions::new()
+            .filename(&db.path)
+            .create_if_missing(true);
+        let pool = SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect_with(options)
+            .await
+            .expect("the db should connect");
+        sqlx::query(
+            "CREATE TABLE IF NOT EXISTS tx_queue_transactions (
+                tx_id              TEXT    NOT NULL PRIMARY KEY,
+                queue_id           TEXT    NOT NULL,
+                position           INTEGER NOT NULL,
+                contract_id        TEXT    NOT NULL,
+                method             TEXT    NOT NULL,
+                args               TEXT    NOT NULL,
+                gas                TEXT,
+                deposit            TEXT,
+                created_at         INTEGER NOT NULL,
+                updated_at         INTEGER NOT NULL
+            )",
+        )
+        .execute(&pool)
+        .await
+        .expect("the old table should be made");
+        pool.close().await;
+    }
+
+    // opening it runs the schema, and the schema adds the column.
+    let pool = db.pool_fun().await;
+
+    let columns = columns_of_fun(&pool, "tx_queue_transactions").await;
+    assert!(
+        columns.contains(&"args_base64".to_string()),
+        "the old db must have gained the column: {columns:?}"
+    );
+
+    // and opening it AGAIN must not fail with "duplicate column name".
+    let _pool_again = db.pool_fun().await;
+    let columns_again = columns_of_fun(&_pool_again, "tx_queue_transactions").await;
+    assert_eq!(columns_again, columns);
+}
+
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================

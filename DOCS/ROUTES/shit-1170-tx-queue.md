@@ -146,6 +146,48 @@ list is the order the transactions are sent in, and it becomes the
 and then it is an empty object - a call with no arguments is an
 ordinary thing.
 
+### the raw bytes
+
+some contracts take their arguments as RAW BYTES and not as json. the
+FastFS protocol (`__fastdata_fastfs`) is one of them - it wants borsh
+bytes, and a json object cannot be borsh bytes.
+
+such a call carries `argsBase64` instead of `args`:
+
+```json
+{
+  "contractId": "fastfs.near",
+  "method": "__fastdata_fastfs",
+  "argsBase64": "AAwAAABmYXN0bmVhci5wbmc=",
+  "gas": "1",
+  "deposit": "0"
+}
+```
+
+`argsBase64` is **standard base64** - the `A-Z a-z 0-9 + /` alphabet with
+`=` padding. it is the encoding the near wallet uses for action
+arguments, so the bytes that come out of the wire are the bytes the
+chain expects. it is NOT the url-safe kind.
+
+a transaction sets **exactly one** of `args` and `argsBase64`:
+
+- **both** set - a `400` with the code `args_and_args_base64`
+- **neither** set - the args are an empty object, which is what a call
+  with no arguments has always been
+- an `argsBase64` that does not decode - a `400` with the code
+  `args_base64_not_base64`
+
+> --- WHY --- the two are ALTERNATIVES and not a pair. they carry
+> different things. `args` is a json object the toolbox can name its
+> keys from, and `argsBase64` is an opaque run of bytes that only the
+> contract can read. a transaction that carries both does not say which
+> one the contract gets.
+>
+> --- WHY --- the browser decodes the base64 back into bytes and hands
+> the BYTES to the wallet. the wallet's adapter tries `JSON.parse` on the
+> bytes and passes them through untouched when they are not json, so the
+> raw borsh bytes reach the chain as they are.
+
 `accounts` is the WHO - the accounts the agent is queuing this for. it
 is **optional**, and **every account in it must be one the agent holds
 an api key for** - the NAMING rule. an account the agent has no key
@@ -189,6 +231,7 @@ their feed before anyone has signed it.
       "contractId": "ref.finance.near",
       "method": "ft_swap",
       "args": { "receiver_id": "alice.near" },
+      "argsBase64": null,
       "gas": "30000000000000",
       "deposit": "1",
       "accounts": [
@@ -223,6 +266,10 @@ the answer is read back out of the db, not built from what was just
 written. so it is the SAME shape whether it came from the queue route,
 the one-batch route or the list route.
 
+`argsBase64` is `null` for a call with json arguments, and it holds the
+base64 for a call with raw bytes. the json `args` is the empty object
+for such a call - the bytes have no names.
+
 ### the errors
 
 - `401` - `no_api_key` when the header is missing, or
@@ -230,7 +277,9 @@ the one-batch route or the list route.
 - `400` - `no_transactions` when the batch was empty,
   `too_many_transactions` when it held more than fifty,
   `no_contract_id` or `no_method` when a call was missing one,
-  `args_not_an_object` when the args were not a json object, or
+  `args_not_an_object` when the args were not a json object,
+  `args_base64_not_base64` when the raw args were not base64,
+  `args_and_args_base64` when a call carried both kinds of args, or
   `account_not_named_by_agent` when the `accounts` list named an
   account the agent holds **no api key for** - the NAMING rule
 - `500` - `db_unavailable`

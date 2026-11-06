@@ -33,6 +33,15 @@
 // indexes, and this file holds nothing but the order: a table's shape is
 // read in one place, and this is the only file that says how many tables
 // there are.
+//
+// --- WHY --- A COLUMN THAT WAS ADDED LATER IS A DIFFERENT THING: a
+// `CREATE TABLE IF NOT EXISTS` does nothing to a table that already
+// exists, so a db that was made before a column was added would never
+// get it. there is still no migration system — no numbered steps and no
+// record of which steps have run — but a column is added by an
+// `ALTER TABLE` that checks whether the column is already there, and it
+// runs on every start. the check is what makes it safe to run every
+// time: the statement runs only when the column is missing.
 use sqlx::{Connection, Executor, SqliteConnection};
 // ========================================
 // --- RUN -------------------------------
@@ -85,6 +94,20 @@ pub async fn db_schema_run_fun(connection: &mut SqliteConnection) -> Result<(), 
         .await?;
 
     transaction.commit().await?;
+
+    // --- WHY --- THE COLUMNS THAT CAME LATER ARE ADDED AFTER THE
+    // TRANSACTION: the table creates run in ONE transaction so a
+    // half-created schema is impossible. the `ALTER TABLE`s that bring an
+    // OLD db up to the current shape have to run outside it — they are
+    // not part of the create, and they must not be able to roll the
+    // creates back.
+    //
+    // --- WHY --- THIS IS WHERE THE "NO MIGRATION SYSTEM" NOTE IS KEPT
+    // HONEST: a db that was made before a column was added does not get
+    // it from `CREATE TABLE IF NOT EXISTS`, so the column is added here,
+    // and the add is checked so it never runs twice.
+    crate::backend::logic::db::db_table_tx_queue_transactions_fun::db_table_tx_queue_transactions_add_args_base64_fun(connection).await?;
+
     Ok(())
 }
 // ========================================

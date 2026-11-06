@@ -103,6 +103,9 @@ export function shit_1170_queue_transfer_of_fun(
   transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
 ): SHIT_1170_QUEUE_TRANSFER | null {
   const method = transaction.method.trim();
+  // --- WHY --- A CALL WITH RAW BYTES SHOWS NO TRANSFER: its arguments
+  // are bytes and not named keys, so there is no `amount` to read. the
+  // transactions list still shows the bytes, so nothing is hidden.
   const args = transaction.args ?? {};
   // the standard: the token IS the contract being called.
   if (SHIT_1170_FT_METHODS.has(method)) {

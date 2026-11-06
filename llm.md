@@ -95,6 +95,11 @@ call that moves the wrong amount to the wrong place.
   `{ contractId, method, args, gas, deposit }` — and the engine holds it for
   a human to sign.
 
+a call whose contract takes RAW BYTES instead of json arguments — the
+FastFS protocol (`__fastdata_fastfs`) is one — carries them as
+`argsBase64` (standard base64) instead of `args`. a transaction sets
+exactly one of the two; the engine refuses one that sets both.
+
 never call `near.call`, `generic_contract_call_fun`, or
 `generic_contract_call_wallet` from a skill bin. the tool box's `*_fun_json`
 helpers that CALL are reference only: use their argument shape, gas, and

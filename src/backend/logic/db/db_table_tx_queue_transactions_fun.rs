@@ -36,7 +36,15 @@
 // takes `number | string` for gas and `number | string | bigint` for
 // deposit, and a big deposit does not fit a json number safely. as
 // strings both fit, and a call that omits them has no gas of its own.
-use sqlx::{Connection, Executor, SqliteConnection};
+//
+// --- WHY --- `args_base64` is a column of its OWN and not a second
+// encoding inside `args`: the two carry different things. `args` is a
+// json object with named keys, and `args_base64` is an opaque run of
+// bytes that only the contract can read — the FastFS protocol's borsh
+// arguments are the case. a column of its own keeps the json object
+// readable as json, so the feed's json reads are not asked to look at
+// base64.
+use sqlx::{Connection, Executor, Row, SqliteConnection};
 // ========================================
 // --- SCHEMA ----------------------------
 // the statement that creates the table and its indexes.
@@ -61,6 +69,7 @@ pub const SHIT_1170_DB_TABLE_TX_QUEUE_TRANSACTIONS: &str = r#"
     contract_id        TEXT    NOT NULL,
     method             TEXT    NOT NULL,
     args               TEXT    NOT NULL,
+    args_base64        TEXT,
     gas                TEXT,
     deposit            TEXT,
     created_at         INTEGER NOT NULL,
@@ -76,6 +85,10 @@ pub const SHIT_1170_DB_TABLE_TX_QUEUE_TRANSACTIONS: &str = r#"
   CREATE INDEX IF NOT EXISTS tx_queue_transactions_created_at_idx
     ON tx_queue_transactions (created_at);
 "#;
+
+// the column the `ALTER TABLE` adds, named once so the check and the
+// statement cannot drift apart.
+const SHIT_1170_TX_QUEUE_TRANSACTIONS_ARGS_BASE64_COLUMN: &str = "args_base64";
 // ========================================
 // --- CREATE ----------------------------
 // create the tx_queue_transactions table if it is not there yet.
@@ -86,6 +99,13 @@ pub const SHIT_1170_DB_TABLE_TX_QUEUE_TRANSACTIONS: &str = r#"
 // --- WHY --- it runs on every start: the statement does nothing when the
 // table already exists, so there is no bookkeeping to say "already
 // done" and no state to get out of step with the schema.
+//
+// --- WHY --- IT ALSO ADDS THE MISSING COLUMNS: this db has no
+// migration system, so a db that was created BEFORE a column was added
+// would never get it — `CREATE TABLE IF NOT EXISTS` does nothing to a
+// table that already exists. so the columns that were added later are
+// added here, one `ALTER TABLE` each, and each one is checked first so
+// it does not run on a db that already has it.
 pub async fn db_table_tx_queue_transactions_create_fun(
     connection: &mut SqliteConnection,
 ) -> Result<(), sqlx::Error> {
@@ -94,6 +114,52 @@ pub async fn db_table_tx_queue_transactions_create_fun(
         .execute(SHIT_1170_DB_TABLE_TX_QUEUE_TRANSACTIONS)
         .await?;
     transaction.commit().await?;
+
+    // the column that came after the table was first written.
+    db_table_tx_queue_transactions_add_args_base64_fun(connection).await?;
+
+    Ok(())
+}
+
+// ========================================
+// --- ADD ARGS BASE64 ------------------
+// add the `args_base64` column to a db that was made before it existed.
+//
+// --- WHY --- THE COLUMN IS CHECKED FIRST AND NOT CAUGHT AS AN ERROR:
+// sqlite has no `ADD COLUMN IF NOT EXISTS`, and an `ALTER TABLE` that
+// adds a column that is already there fails with "duplicate column
+// name". so the table's columns are read first and the statement only
+// runs when the column is missing. that way the same code brings a
+// fresh db and an old db to the same shape, and neither of them fails.
+//
+// --- WHY --- THE CHECK IS ON `pragma_table_info` AND NOT ON A TRY: a
+// try would swallow a real failure — a locked db, a full disk — and
+// answer "the column is there" when it is not. the pragma says what the
+// table's shape IS.
+//
+// --- WHY --- IT IS CALLED AFTER THE TABLE'S OWN TRANSACTION IS
+// COMMITTED: the transaction is already closed by the time this runs,
+// and a fresh db has the column from the `CREATE TABLE` above, so this
+// statement does nothing there.
+pub async fn db_table_tx_queue_transactions_add_args_base64_fun(
+    connection: &mut SqliteConnection,
+) -> Result<(), sqlx::Error> {
+    let has_column = sqlx::query("SELECT name FROM pragma_table_info('tx_queue_transactions')")
+        .fetch_all(&mut *connection)
+        .await?
+        .iter()
+        .any(|row| {
+            row.get::<String, _>("name") == SHIT_1170_TX_QUEUE_TRANSACTIONS_ARGS_BASE64_COLUMN
+        });
+
+    if has_column {
+        return Ok(());
+    }
+
+    connection
+        .execute("ALTER TABLE tx_queue_transactions ADD COLUMN args_base64 TEXT")
+        .await?;
+
     Ok(())
 }
 // ========================================

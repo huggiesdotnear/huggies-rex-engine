@@ -21,6 +21,17 @@
 // takes a json object of arguments. a string would make the frontend
 // parse it and then re-serialize it.
 //
+// --- WHY --- there is a SECOND WAY to carry the arguments,
+// `argsBase64`: some contracts take their arguments as RAW BYTES and
+// not as json — the FastFS protocol (`__fastdata_fastfs`) wants borsh
+// bytes, and a json object cannot be borsh bytes. so the bytes ride as
+// standard base64 beside the json, and the browser decodes them back
+// into bytes for the wallet.
+//
+// --- WHY --- the two are ALTERNATIVES and not a pair: a transaction
+// sets exactly one of them. a transaction that set both would not say
+// which one the contract gets.
+//
 // --- WHY --- there is no status on the queue and none on the
 // transaction: the truth is on the account row. a queue is never done —
 // any account may still send it — so there is nothing for a queue
@@ -61,6 +72,14 @@ export interface SHIT_1170_TX_QUEUE_TRANSACTION {
   method: string;
   // the arguments, as a json object.
   args: Record<string, unknown>;
+  // the arguments, as raw bytes, base64 encoded. it is null when the
+  // arguments are the json object above.
+  //
+  // --- WHY --- IT IS NULLABLE AND NOT OPTIONAL: it comes from the
+  // backend, and the backend always sends it — null for a json-args
+  // transaction. a reader can tell the two kinds of call apart without
+  // guessing.
+  argsBase64: string | null;
   // the gas, as a string. it may be nothing.
   gas: string | null;
   // the deposit, as a string. it may be nothing.
@@ -121,6 +140,12 @@ export interface SHIT_1170_TX_QUEUE_TRANSACTION_REQUEST {
   method: string;
   // the arguments, as a json object.
   args?: Record<string, unknown>;
+  // the arguments, as raw bytes, base64 encoded.
+  //
+  // --- WHY --- IT IS OPTIONAL HERE AND NOT NULLABLE: the agent writes
+  // the request, and most calls carry json arguments. the binary form is
+  // for the contracts that want raw bytes.
+  argsBase64?: string;
   // the gas, as a string.
   gas?: string;
   // the deposit, as a string.

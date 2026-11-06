@@ -17,6 +17,7 @@ tx_queue_transactions,position,INTEGER,no,,the order of this transaction inside 
 tx_queue_transactions,contract_id,TEXT,no,,the contract being called. it has its own column so the stats query is a GROUP BY and not a json scan
 tx_queue_transactions,method,TEXT,no,,the method name. it has its own column for the same reason as contract_id
 tx_queue_transactions,args,TEXT,no,,"the arguments as a compact json object held as a string. it stays a json column because it is a bag of arbitrary keys with no shape"
+tx_queue_transactions,args_base64,TEXT,yes,,"the arguments as raw bytes, base64 encoded. null for a call with json arguments. it has its own column because the two carry different things — the FastFS protocol's borsh bytes have no names to be json keys"
 tx_queue_transactions,gas,TEXT,yes,,the gas as a string. null when the call has no gas of its own
 tx_queue_transactions,deposit,TEXT,yes,,the deposit as a string. null when the call has no deposit of its own
 tx_queue_transactions,created_at,INTEGER,no,,when the transaction was queued in ms since the epoch

@@ -41,6 +41,12 @@ use crate::backend::types::tx_queue_request::{
 // --- WHY --- a blob that will not parse is an ERROR and not an empty
 // object: a call whose arguments are gone must not be answered with
 // arguments that were never there. the caller turns the error into a 500.
+//
+// --- WHY --- THE BINARY ARGS RIDE ALONGSIDE AND NOT INSTEAD OF THE JSON:
+// the json object is still there — it is the empty object for a
+// binary-args call — and the base64 goes beside it. a client that only
+// reads `args` sees a call with no named arguments, which is the truth:
+// the bytes have no names.
 pub fn tx_queue_row_to_json_fun(
     queue: &TX_QUEUE_ROW,
     transactions: &[TX_QUEUE_TRANSACTION_ROW],
@@ -63,6 +69,7 @@ pub fn tx_queue_row_to_json_fun(
             contract_id: transaction.contract_id.clone(),
             method: transaction.method.clone(),
             args,
+            args_base64: transaction.args_base64.clone(),
             gas: transaction.gas.clone(),
             deposit: transaction.deposit.clone(),
             accounts: own_accounts

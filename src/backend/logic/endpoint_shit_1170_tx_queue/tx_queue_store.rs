@@ -488,7 +488,7 @@ pub async fn tx_queue_page_children_fun(
     // after the other and the placeholders are the same count, so the
     // two still line up.
     let mut transaction_builder = sqlx::QueryBuilder::<sqlx::Sqlite>::new(
-        "SELECT tx_id, queue_id, position, contract_id, method, args, gas, deposit, created_at, updated_at
+        "SELECT tx_id, queue_id, position, contract_id, method, args, args_base64, gas, deposit, created_at, updated_at
        FROM tx_queue_transactions
       WHERE queue_id IN (",
     );

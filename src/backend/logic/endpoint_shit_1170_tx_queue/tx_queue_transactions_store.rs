@@ -21,6 +21,11 @@
 // three calls has an order — the deposit comes first, the swap second,
 // the withdrawal third — and `position` is that order, `0, 1, 2` within
 // the queue.
+//
+// --- WHY --- `args_base64` is a column of its OWN: a call's arguments
+// are EITHER a json object with named keys OR an opaque run of bytes —
+// the FastFS protocol's borsh arguments are the case. one column for
+// both would make every json read of the feed walk over base64.
 use sqlx::{Row, SqlitePool};
 
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_store::now_ms_fun;
@@ -41,7 +46,15 @@ pub struct TX_QUEUE_TRANSACTION_ROW {
     // the method name.
     pub method: String,
     // the arguments, as a json string. the wire shape is a json object.
+    //
+    // --- WHY --- IT IS NOT NULL AND IS NOT OPTIONAL: a call always has
+    // arguments, and a call with binary arguments has the EMPTY object
+    // here — the bytes are in the column below. so this column is never
+    // null and never missing.
     pub args: String,
+    // the arguments, as raw bytes, base64 encoded. it is null when the
+    // arguments are the json object above.
+    pub args_base64: Option<String>,
     // the gas, as a string. it may be nothing.
     pub gas: Option<String>,
     // the deposit, as a string. it may be nothing.
@@ -59,7 +72,7 @@ pub struct TX_QUEUE_TRANSACTION_ROW {
 // column is text, and the json <-> column conversion lives in
 // `tx_queue_args_fun` so the two directions can never disagree.
 //
-// --- WHY --- there are NINE arguments and not a struct: every one of
+// --- WHY --- there are TEN arguments and not a struct: every one of
 // them is a COLUMN of the row, and a struct would only move the columns
 // into a struct and give the caller another thing to fill in. the
 // columns are the shape.
@@ -72,6 +85,7 @@ pub async fn tx_queue_transactions_insert_fun(
     contract_id: &str,
     method: &str,
     args: &str,
+    args_base64: Option<&str>,
     gas: Option<&str>,
     deposit: Option<&str>,
 ) -> Result<(), sqlx::Error> {
@@ -79,8 +93,8 @@ pub async fn tx_queue_transactions_insert_fun(
 
     sqlx::query(
         "INSERT INTO tx_queue_transactions
-        (tx_id, queue_id, position, contract_id, method, args, gas, deposit, created_at, updated_at)
-       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?9)",
+        (tx_id, queue_id, position, contract_id, method, args, args_base64, gas, deposit, created_at, updated_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?10)",
     )
     .bind(tx_id)
     .bind(queue_id)
@@ -88,6 +102,7 @@ pub async fn tx_queue_transactions_insert_fun(
     .bind(contract_id)
     .bind(method)
     .bind(args)
+    .bind(args_base64)
     .bind(gas)
     .bind(deposit)
     .bind(now)
@@ -109,7 +124,7 @@ pub async fn tx_queue_transactions_list_by_queue_fun(
     queue_id: &str,
 ) -> Result<Vec<TX_QUEUE_TRANSACTION_ROW>, sqlx::Error> {
     let rows = sqlx::query(
-        "SELECT tx_id, queue_id, position, contract_id, method, args, gas, deposit, created_at, updated_at
+        "SELECT tx_id, queue_id, position, contract_id, method, args, args_base64, gas, deposit, created_at, updated_at
        FROM tx_queue_transactions
       WHERE queue_id = ?1
       ORDER BY position ASC",
@@ -129,7 +144,7 @@ pub async fn tx_queue_transactions_get_fun(
     tx_id: &str,
 ) -> Result<Option<TX_QUEUE_TRANSACTION_ROW>, sqlx::Error> {
     let row = sqlx::query(
-        "SELECT tx_id, queue_id, position, contract_id, method, args, gas, deposit, created_at, updated_at
+        "SELECT tx_id, queue_id, position, contract_id, method, args, args_base64, gas, deposit, created_at, updated_at
        FROM tx_queue_transactions
       WHERE tx_id = ?1",
     )
@@ -155,6 +170,7 @@ pub fn row_to_tx_queue_transaction_fun(row: &sqlx::sqlite::SqliteRow) -> TX_QUEU
         contract_id: row.get("contract_id"),
         method: row.get("method"),
         args: row.get("args"),
+        args_base64: row.get("args_base64"),
         gas: row.get("gas"),
         deposit: row.get("deposit"),
         created_at: row.get("created_at"),

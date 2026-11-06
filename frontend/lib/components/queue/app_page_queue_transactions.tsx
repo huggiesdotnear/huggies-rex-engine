@@ -10,18 +10,25 @@
 // --- WHY THE POSITION IS SHOWN: the batch is a list, and the order is
 // part of it — a swap's legs only make sense in order.
 //
+// --- WHY A CALL WITH RAW BYTES SHOWS A HEX PREVIEW AND NOT JSON: some
+// contracts take their arguments as raw bytes — the FastFS protocol
+// (`__fastdata_fastfs`) wants borsh bytes — and those bytes are not
+// json. printing them as json would show a reader a broken blob that
+// says nothing. the byte count and the hex say what the bytes are.
+//
 // mounts into <div id="SHIT_1170_COMPONENT_QUEUE_TRANSACTIONS">.
 import { render } from "preact";
 import { SHIT_1170_MOUNT_ID } from "../../ts/shared/mount_ids";
 import { SHIT_1170_APP_PAGE_QUEUE_STORE } from "../../ts/queue/app_page_queue_store";
 import { use_page_store_fun } from "../../ts/shared/use_page_store";
 import { shit_1170_code_block_fun } from "../tx/code_block";
+import { shit_1170_queue_args_fun } from "../../ts/shared/queue_args";
 import type { SHIT_1170_TX_QUEUE_TRANSACTION } from "@huggies/shit-1170-rex-engine-middleman";
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
 // one transaction: its position, its contract and method, its gas and
-// deposit, and its arguments as json.
+// deposit, and its arguments.
 //
 // --- WHY THE GAS AND THE DEPOSIT ARE SHOWN AS THEY WERE WRITTEN: the
 // queue stores what the agent wrote — "30 Tgas", "1 NEAR" — and that is
@@ -29,6 +36,7 @@ import type { SHIT_1170_TX_QUEUE_TRANSACTION } from "@huggies/shit-1170-rex-engi
 function transaction_fun(
   transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
 ): preact.JSX.Element {
+  const args = shit_1170_queue_args_fun(transaction);
   return (
     <div class="queue-transaction">
       <div class="queue-transaction-head">
@@ -50,9 +58,21 @@ function transaction_fun(
           )}
         </div>
       )}
-      {shit_1170_code_block_fun({
-        code: JSON.stringify(transaction.args ?? {}, null, 2),
-      })}
+      {args.binary ? (
+        <div class="queue-transaction-binary">
+          <span class="queue-transaction-binary-label">
+            RAW BYTES — {args.byte_length} BYTE
+            {args.byte_length === 1 ? "" : "S"}
+          </span>
+          <pre class="queue-transaction-binary-hex">
+            <code>{args.hex}</code>
+          </pre>
+        </div>
+      ) : (
+        shit_1170_code_block_fun({
+          code: args.json,
+        })
+      )}
     </div>
   );
 }

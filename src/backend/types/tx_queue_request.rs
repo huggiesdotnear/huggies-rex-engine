@@ -16,6 +16,23 @@
 // hands the transactions straight to `generic_contract_call_wallet`. a
 // string would make the frontend parse it and then re-serialize it.
 //
+// --- WHY --- there is a SECOND WAY to carry the arguments,
+// `argsBase64`: some contracts take their arguments as RAW BYTES and not
+// as json. the FastFS protocol (`__fastdata_fastfs`) is one of them — it
+// wants borsh bytes, and a json object cannot be borsh bytes. so the
+// bytes ride as base64 beside the json, and the browser decodes them
+// back into bytes for the wallet.
+//
+// --- WHY --- `argsBase64` is BASE64 and not hex: base64 is what the
+// near wallet and the chain itself use for action arguments, so the
+// bytes that come out of the wire are the bytes the chain expects. hex
+// would be a second encoding for the same bytes and one more thing to
+// get wrong.
+//
+// --- WHY --- standard base64 and NOT the url-safe kind: the cursor
+// token is url-safe because it goes in a url, and this one does not. it
+// is the same encoding the near wallet uses for action arguments.
+//
 // --- WHY --- the `when` field is `when` and not `when_text`: `when` is a
 // reserved word in RUST, so the db row calls it `when_text`, but the
 // wire name is the plain word the plan uses.
@@ -48,6 +65,15 @@ pub struct TX_QUEUE_TRANSACTION_REQUEST {
     // an empty object — a call with no arguments is a normal thing.
     #[serde(default)]
     pub args: Option<Value>,
+    // the arguments, as RAW BYTES, base64 encoded.
+    //
+    // --- WHY --- IT IS A SIBLING OF `args` AND NOT A MODE OF IT: the two
+    // carry different things. `args` is a json object the toolbox can
+    // name its keys from, and `argsBase64` is an opaque run of bytes
+    // that only the contract can read. a transaction sets exactly one of
+    // them, and the route refuses one that sets both.
+    #[serde(default)]
+    pub args_base64: Option<String>,
     // the gas, as a string. it may be nothing.
     #[serde(default)]
     pub gas: Option<String>,
@@ -171,6 +197,14 @@ pub struct TX_QUEUE_TRANSACTION {
     pub method: String,
     // the arguments, as a json object.
     pub args: Value,
+    // the arguments, as raw bytes, base64 encoded. it is null when the
+    // arguments are the json object above.
+    //
+    // --- WHY --- IT RIDES ALONGSIDE AND NOT INSTEAD OF `args`: the json
+    // object is still there, and it is the empty object for a
+    // binary-args call. a client that only reads `args` sees a call with
+    // no named arguments, which is the truth — the bytes have no names.
+    pub args_base64: Option<String>,
     // the gas, as a string. it may be nothing.
     pub gas: Option<String>,
     // the deposit, as a string. it may be nothing.

@@ -365,6 +365,196 @@ async fn args_that_are_not_an_object_are_refused() {
     assert_eq!(answer.body["error"]["code"], "args_not_an_object");
 }
 
+// --- WHY --- THE BINARY ARGS ---
+// some contracts take their arguments as raw bytes and not as json —
+// the FastFS protocol (`__fastdata_fastfs`) wants borsh bytes. so a
+// transaction may carry `argsBase64` instead, and these tests are about
+// that second way of carrying the arguments.
+#[tokio::test]
+async fn a_transaction_with_binary_args_is_queued_and_comes_back_with_the_same_base64() {
+    let db = TEMP_DB::new_fun("binary-args");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // "AAwAAABmYXN0bmVhci5wbmc=" — the bytes of a borsh call.
+    let body = json!({
+        "what": "a fastfs write",
+        "transactions": [ {
+            "contractId": "fastfs.near",
+            "method": "__fastdata_fastfs",
+            "argsBase64": "AAwAAABmYXN0bmVhci5wbmc=",
+            "gas": "30000000000000",
+            "deposit": "0"
+        } ]
+    });
+
+    let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+    assert_eq!(answer.status, 201, "body was: {}", answer.body);
+
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
+    assert_eq!(transactions.len(), 1);
+    assert_eq!(
+        transactions[0]["argsBase64"], "AAwAAABmYXN0bmVhci5wbmc=",
+        "the base64 must come back exactly as it went in"
+    );
+    // and the json args are the empty object — the bytes have no names.
+    assert!(transactions[0]["args"].is_object());
+    assert_eq!(transactions[0]["args"].as_object().expect("args").len(), 0);
+}
+
+#[tokio::test]
+async fn a_transaction_with_both_kinds_of_args_is_refused() {
+    let db = TEMP_DB::new_fun("both-args");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let body = json!({
+        "transactions": [ {
+            "contractId": "fastfs.near",
+            "method": "__fastdata_fastfs",
+            "args": { "a": "1" },
+            "argsBase64": "AAwAAABmYXN0bmVhci5wbmc="
+        } ]
+    });
+
+    let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+
+    assert_eq!(answer.status, 400, "body was: {}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "args_and_args_base64");
+}
+
+#[tokio::test]
+async fn an_empty_args_with_binary_args_is_the_binary_shape_and_not_both() {
+    // --- WHY --- THE EMPTY OBJECT DOES NOT COUNT AS "BOTH": the rule is
+    // about what the call MEANS, and the empty object is the shape a
+    // binary-args call takes on its way through the db. the middleman
+    // reads it the same way, so the two agree.
+    let db = TEMP_DB::new_fun("empty-args-and-binary");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let body = json!({
+        "transactions": [ {
+            "contractId": "fastfs.near",
+            "method": "__fastdata_fastfs",
+            "args": {},
+            "argsBase64": "AAwAAABmYXN0bmVhci5wbmc="
+        } ]
+    });
+
+    let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+
+    assert_eq!(answer.status, 201, "body was: {}", answer.body);
+    assert_eq!(
+        answer.body["transactions"][0]["argsBase64"],
+        "AAwAAABmYXN0bmVhci5wbmc="
+    );
+    assert_eq!(
+        answer.body["transactions"][0]["args"]
+            .as_object()
+            .expect("args")
+            .len(),
+        0
+    );
+}
+
+#[tokio::test]
+async fn a_transaction_with_args_base64_that_is_not_base64_is_refused() {
+    let db = TEMP_DB::new_fun("bad-base64");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let body = json!({
+        "transactions": [ {
+            "contractId": "fastfs.near",
+            "method": "__fastdata_fastfs",
+            "argsBase64": "not base64 at all!!"
+        } ]
+    });
+
+    let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+
+    assert_eq!(answer.status, 400, "body was: {}", answer.body);
+    assert_eq!(answer.body["error"]["code"], "args_base64_not_base64");
+}
+
+#[tokio::test]
+async fn the_args_base64_the_engine_accepts_is_the_args_base64_it_answers_with() {
+    // --- WHY --- THE SET IS THE STANDARD DECODER'S SET: the middleman
+    // refuses a string this decoder would not read, so the two must
+    // agree on every one of them. a payload the builder accepted and
+    // the engine refused would be a payload that only fails on the wire.
+    let db = TEMP_DB::new_fun("base64-set");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // these are the ones the standard decoder takes.
+    for good in ["AAA=", "abc=", "aQ==", "AQI=", "AQID", "AAAA"] {
+        let body = json!({
+            "transactions": [ {
+                "contractId": "fastfs.near",
+                "method": "__fastdata_fastfs",
+                "argsBase64": good
+            } ]
+        });
+        let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+        assert_eq!(
+            answer.status, 201,
+            "{good} should be taken: {}",
+            answer.body
+        );
+        assert_eq!(answer.body["transactions"][0]["argsBase64"], good);
+    }
+
+    // and these are the ones it does not.
+    for bad in ["AAA", "abc", "ab==", "a-b_c==", "a+b/c"] {
+        let body = json!({
+            "transactions": [ {
+                "contractId": "fastfs.near",
+                "method": "__fastdata_fastfs",
+                "argsBase64": bad
+            } ]
+        });
+        let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+        assert_eq!(
+            answer.status, 400,
+            "{bad} should be refused: {}",
+            answer.body
+        );
+        assert_eq!(answer.body["error"]["code"], "args_base64_not_base64");
+    }
+}
+
+#[tokio::test]
+async fn a_transaction_with_no_args_at_all_is_still_an_empty_object() {
+    let db = TEMP_DB::new_fun("no-args");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    let body = json!({
+        "transactions": [ { "contractId": "ref.finance.near", "method": "ft_swap" } ]
+    });
+
+    let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+
+    assert_eq!(answer.status, 201, "body was: {}", answer.body);
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
+    assert!(transactions[0]["args"].is_object());
+    assert_eq!(transactions[0]["args"].as_object().expect("args").len(), 0);
+    // and there is no binary args on it.
+    assert!(transactions[0]["argsBase64"].is_null());
+}
+
 #[tokio::test]
 async fn a_named_account_the_agent_holds_no_key_for_is_refused() {
     // --- WHY --- this is the NAMING RULE and the anti-spam wall: the
@@ -1429,3 +1619,43 @@ async fn the_method_stats_carry_the_contract_id() {
 // ========================================
 // copyright 2026 by sleet.near
 // ========================================
+
+// --- WHY --- THE SKILL'S OWN PAYLOAD, POSTED TO THE REAL ROUTE: the
+// FastFS skill builds its payload with its own encoder, and this route
+// is what receives it. the two are separate code, so the only way to
+// know they fit is to take the skill's bytes and post them here.
+#[tokio::test]
+async fn the_fastfs_skills_own_payload_is_queued() {
+    let db = TEMP_DB::new_fun("skill-payload");
+    let pool = db.pool_fun().await;
+    let alice_key = put_api_key_fun(&pool, "alice.near").await;
+    let base_url = serve_fun(pool).await;
+
+    // the exact base64 the `shit-1170-rex-fastfs` skill produces for a
+    // 13-byte text file at "notes/small.txt" with the mime "text/plain".
+    let args_base64 = "AA8AAABub3Rlcy9zbWFsbC50eHQBCgAAAHRleHQvcGxhaW4NAAAAaGVsbG8gZmFzdGZzCg==";
+
+    let body = json!({
+        "what": "Upload notes/small.txt to FastFS",
+        "transactions": [ {
+            "contractId": "fastfs.near",
+            "method": "__fastdata_fastfs",
+            "argsBase64": args_base64,
+            "gas": "1",
+            "deposit": "0"
+        } ]
+    });
+
+    let answer = post_queue_fun(&base_url, Some(&alice_key), &body).await;
+    assert_eq!(answer.status, 201, "body was: {}", answer.body);
+
+    let transactions = answer.body["transactions"]
+        .as_array()
+        .expect("transactions");
+    assert_eq!(transactions.len(), 1);
+    assert_eq!(transactions[0]["argsBase64"], args_base64);
+    assert_eq!(transactions[0]["method"], "__fastdata_fastfs");
+    assert_eq!(transactions[0]["contractId"], "fastfs.near");
+    assert_eq!(transactions[0]["gas"], "1");
+    assert_eq!(transactions[0]["deposit"], "0");
+}

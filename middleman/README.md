@@ -129,10 +129,25 @@ the gas and the deposit are raw digit strings — gas units and
 yoctoNEAR. the web app also accepts the human forms ("30 Tgas"), but
 raw digits are the unambiguous form.
 
+a call whose contract takes RAW BYTES instead of json arguments — the
+FastFS protocol (`__fastdata_fastfs`) is one — carries them as
+`args_base64` (standard base64) instead of `args`:
+
+```ts
+const call = queue_call_fun({
+  contractId: "fastfs.near",
+  method: "__fastdata_fastfs",
+  args_base64: "AAwAAABmYXN0bmVhci5wbmc=",
+});
+```
+
+a call carries one or the other, never both.
+
 the builder refuses what it cannot trust: an empty contract id, an
-empty method, args that are not a plain object, and a gas or deposit
-that is not raw digits. the engine records whatever it is given, so
-the check belongs where the payload is built.
+empty method, args that are not a plain object, an args_base64 that is
+not base64, both kinds of args at once, and a gas or deposit that is
+not raw digits. the engine records whatever it is given, so the check
+belongs where the payload is built.
 
 =====================
 <br/>

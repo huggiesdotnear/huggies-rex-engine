@@ -13,7 +13,8 @@
 //
 // 400 = the body was empty, or held more than fifty transactions, or a
 // transaction had no contract id, no method, or args that were not a
-// json object, or the `accounts` list named an account the agent holds
+// json object, or args that were not base64, or both kinds of args at
+// once, or the `accounts` list named an account the agent holds
 // NO api key for — the NAMING rule. on the GET, 400 is also a cursor the
 // api did not make, and a `hide_sent` with no account to be about.
 // 401 = the x-api-key header is missing, or the key is not one of ours.
@@ -57,6 +58,7 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
+use base64::Engine;
 use sqlx::SqlitePool;
 
 use crate::backend::logic::endpoint_shit_1170_tx_queue::tx_queue_accounts_store::{
@@ -235,6 +237,7 @@ pub async fn tx_queue_post_route(
             &one.contract_id,
             &one.method,
             &one.args,
+            one.args_base64.as_deref(),
             one.gas.as_deref(),
             one.deposit.as_deref(),
         )
@@ -532,6 +535,21 @@ pub async fn tx_queue_get_route(
 //
 // --- WHY --- a missing args is an EMPTY OBJECT and not an error: a call
 // with no arguments is an ordinary thing.
+//
+// --- WHY --- THERE IS A SECOND WAY TO CARRY THE ARGUMENTS: some
+// contracts take their arguments as RAW BYTES and not as json — the
+// FastFS protocol (`__fastdata_fastfs`) wants borsh bytes, and a json
+// object cannot be borsh bytes. so a transaction may carry `argsBase64`
+// instead, and the bytes ride the wire as standard base64.
+//
+// --- WHY --- EXACTLY ONE OF THE TWO: they are different things, and a
+// transaction that carries both does not say which one the contract
+// gets. refusing it is better than picking one.
+//
+// --- WHY --- THE BASE64 IS CHECKED HERE AND NOT ON THE WAY OUT: the
+// bytes have to survive the db and come back the same, and a string
+// that is not base64 is a string that will not decode into bytes. the
+// check happens where the mistake is still visible — at the request.
 fn prepared_transaction_fun(
     transaction: &TX_QUEUE_TRANSACTION_REQUEST,
     position: i64,
@@ -552,11 +570,64 @@ fn prepared_transaction_fun(
         ));
     }
 
+    // --- THE BINARY ARGS ----------------
+    // the base64, when the transaction carries one.
+    let args_base64 = match transaction.args_base64.as_deref() {
+        Some(raw) => {
+            let trimmed = raw.trim();
+            if trimmed.is_empty() {
+                return Err((
+                    "args_base64_not_base64".to_string(),
+                    format!("the argsBase64 of the transaction at position {position} is empty"),
+                ));
+            }
+            // --- WHY --- THE DECODE IS THE CHECK: a base64 string that
+            // decodes is a base64 string, and one that does not is not.
+            // the bytes are thrown away — they are read back out of the
+            // base64 by the browser — but decoding them proves the
+            // string is base64.
+            if base64::engine::general_purpose::STANDARD
+                .decode(trimmed.as_bytes())
+                .is_err()
+            {
+                return Err((
+                    "args_base64_not_base64".to_string(),
+                    format!(
+                        "the argsBase64 of the transaction at position {position} is not base64"
+                    ),
+                ));
+            }
+            Some(trimmed.to_string())
+        }
+        None => None,
+    };
+
+    // --- WHY --- AN EMPTY `args` DOES NOT COUNT AS "BOTH": the rule is
+    // about what the transaction MEANS, and an empty json object is the
+    // shape a binary-args call takes on the way through the db. so a
+    // transaction with an empty object and a base64 is a binary-args
+    // call, not a call that carries two kinds of arguments.
     let args_value = match &transaction.args {
         Some(value) => value.clone(),
         None => serde_json::json!({}),
     };
+    let args_is_empty_object = args_value
+        .as_object()
+        .map(|object| object.is_empty())
+        .unwrap_or(false);
 
+    if args_base64.is_some() && !args_is_empty_object {
+        return Err((
+            "args_and_args_base64".to_string(),
+            format!(
+                "the transaction at position {position} carries both args and argsBase64 — it must carry only one"
+            ),
+        ));
+    }
+
+    // --- WHY --- THE JSON ARGS ARE STILL CHECKED FOR BEING AN OBJECT:
+    // a json object is the shape the toolbox takes, and an array or a
+    // bare string is not a set of named arguments.
     if !args_value.is_object() {
         return Err((
             "args_not_an_object".to_string(),
@@ -579,6 +650,7 @@ fn prepared_transaction_fun(
         contract_id: contract_id.to_string(),
         method: method.to_string(),
         args,
+        args_base64,
         gas: transaction.gas.clone(),
         deposit: transaction.deposit.clone(),
     })
@@ -710,11 +782,16 @@ async fn queue_item_from_row_fun(
 // request carries the args as a json VALUE, and the column carries them
 // as a STRING. the conversion happens once, here, so the write path
 // never has to think about it.
+//
+// --- WHY --- THE BASE64 IS A FIELD OF ITS OWN: it is not part of the
+// json args, it is the OTHER way to carry them. a row has either a json
+// object or a run of bytes, and the struct says which.
 struct PREPARED_TRANSACTION {
     position: i64,
     contract_id: String,
     method: String,
     args: String,
+    args_base64: Option<String>,
     gas: Option<String>,
     deposit: Option<String>,
 }

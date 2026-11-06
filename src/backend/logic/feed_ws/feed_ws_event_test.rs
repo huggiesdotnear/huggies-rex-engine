@@ -26,6 +26,7 @@ fn one_queue_item_fun() -> TX_QUEUE_ITEM {
             contract_id: "ref.finance.near".to_string(),
             method: "ft_swap".to_string(),
             args: json!({ "receiver_id": "alice.near" }),
+            args_base64: None,
             gas: Some("30000000000000".to_string()),
             deposit: Some("1".to_string()),
             accounts: vec![TX_QUEUE_ACCOUNT {

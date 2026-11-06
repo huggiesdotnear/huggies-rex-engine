@@ -16,6 +16,14 @@
 // reader's key and the backend knows the account. the body does not
 // repeat it, because a body that named the account could name somebody
 // else's.
+//
+// --- WHY THE BINARY ARGS ARE DECODED HERE AND NOT AT THE BACKEND: the
+// wallet takes the BYTES. a contract like the FastFS protocol
+// (`__fastdata_fastfs`) wants borsh bytes and not json, and the
+// browser's wallet adapter passes raw bytes through untouched — it
+// tries `JSON.parse` and, when the bytes are not json, hands them on
+// as they are. so the base64 the queue holds is turned back into bytes
+// here, right before the wallet is asked.
 import { near_connect_client } from "@near-kit-tool-box/web";
 import {
   api_shit_1170_tx_queue_sent_post,
@@ -29,6 +37,7 @@ import {
   shit_1170_gas_fun,
 } from "../shared/gas_deposit";
 import { shit_1170_outcome_hash_fun } from "../shared/outcome_hash";
+import { shit_1170_queue_args_bytes_fun } from "../shared/queue_args";
 import { SHIT_1170_TOAST_STORE } from "../shared/toast_store";
 // ========================================
 // ========================================
@@ -55,13 +64,18 @@ export interface SHIT_1170_QUEUE_SEND_RESULT {
 }
 
 // the wallet's transaction shape.
+//
+// --- WHY --- the args are `unknown` and not a json object: a call may
+// carry its arguments as raw bytes, and the wallet takes both. the
+// adapter tries `JSON.parse` on the bytes and hands them on untouched
+// when they are not json.
 interface SHIT_1170_WALLET_TRANSACTION {
   receiverId: string;
   actions: Array<{
     type: "FunctionCall";
     params: {
       methodName: string;
-      args: Record<string, unknown>;
+      args: unknown;
       gas: string;
       deposit: string;
     };
@@ -76,6 +90,14 @@ interface SHIT_1170_WALLET_TRANSACTION {
 // what the agent wrote — "30 Tgas", "1 NEAR" — and the wallet wants
 // the raw numbers. the conversion is the toolbox's rule, carried in
 // shared/gas_deposit.ts.
+//
+// --- WHY THE BINARY ARGS BECOME BYTES: the wallet's adapter reads the
+// args as a json object, and a contract that wants raw bytes — the
+// FastFS protocol (`__fastdata_fastfs`) is one — cannot be given a json
+// object. the adapter takes a `Uint8Array` too, and it tries
+// `JSON.parse` on the bytes and passes them through untouched when they
+// are not json. so the base64 the queue holds is turned back into the
+// bytes the agent wrote.
 function to_wallet_transaction_fun(
   transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
 ): SHIT_1170_WALLET_TRANSACTION {
@@ -86,13 +108,32 @@ function to_wallet_transaction_fun(
         type: "FunctionCall",
         params: {
           methodName: transaction.method,
-          args: transaction.args ?? {},
+          args: wallet_args_fun(transaction),
           gas: shit_1170_gas_fun(transaction.gas),
           deposit: shit_1170_deposit_fun(transaction.deposit),
         },
       },
     ],
   };
+}
+
+// the arguments of a queued call, in the shape the wallet wants.
+//
+// --- WHY --- THE BYTES COME FROM THE SHARED READER: the queue page
+// shows the same bytes, and one place decodes them so the two cannot
+// disagree about what the call carries.
+//
+// --- WHY --- A CALL WITH NO BINARY ARGS GETS ITS JSON OBJECT: the two
+// kinds of call are different, and the json object is what the toolbox
+// and the wallet both understand.
+function wallet_args_fun(
+  transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
+): unknown {
+  const args_base64 = transaction.argsBase64;
+  if (args_base64 === null || args_base64 === undefined) {
+    return transaction.args ?? {};
+  }
+  return shit_1170_queue_args_bytes_fun(args_base64);
 }
 // ========================================
 // --- DECLINED --------------------------
