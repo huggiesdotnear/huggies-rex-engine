@@ -44,6 +44,7 @@ import {
   shit_1170_transfer_icon_fun,
 } from "../shared/transfer_amount";
 import { shit_1170_queue_first_transfer_fun } from "../../ts/shared/queue_transfers";
+import { shit_1170_queue_args_display_fun } from "../../ts/shared/queue_args_display";
 import { shit_1170_code_block_fun } from "../tx/code_block";
 import type { SHIT_1170_TRANSFER_TOKEN } from "../../ts/shared/transfer_tokens";
 import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman";
@@ -59,6 +60,12 @@ import type { SHIT_1170_TX_QUEUE } from "@huggies/shit-1170-rex-engine-middleman
 // --- WHY --- THE KEYS ARE SORTED: the order the agent wrote the args in
 // is not meaningful, and a post whose block changed shape between loads
 // would be unreadable.
+//
+// --- WHY --- A CALL WITH BYTES SHOWS THE BYTES: a FastFS call carries
+// its payload in `argsBase64` and its `args` is an EMPTY object, so
+// reading only `args` showed NOTHING for it. the reader was asked to
+// approve a call whose arguments were not on the page. the shared
+// reader knows what the bytes are and says so.
 function args_json_fun(args: Record<string, unknown>): string | null {
   const keys = Object.keys(args).sort();
   if (keys.length === 0) return null;
@@ -79,7 +86,8 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN(props: {
   // a batch with no calls has nothing to show here.
   if (first === undefined) return null;
   const transfer = shit_1170_queue_first_transfer_fun(props.queue);
-  const args_json = args_json_fun(first.args ?? {});
+  const args_display = shit_1170_queue_args_display_fun(first);
+  const args_json = args_display.binary ? null : args_json_fun(first.args ?? {});
 
   return (
     <div class="feed-call">
@@ -102,6 +110,39 @@ export function SHIT_1170_COMPONENT_APP_PAGE_FEED_TRANSACTIONS_FUN(props: {
           a queued call's args and a finished transaction's args look
           the same. */}
       {args_json !== null && shit_1170_code_block_fun({ code: args_json })}
+      {/* --- WHY --- A CALL WITH BYTES SHOWS THE FILE'S FACTS AND THE HEX:
+          the reader is about to approve an upload, and "notes/small.txt,
+          text/plain, 13 bytes" is what that approval means. the hex is
+          there so the reader can see the payload itself. */}
+      {args_display.binary && args_display.byte_length > 0 && (
+        <div class="feed-call-bytes">
+          {args_display.fastfs_path !== "" && (
+            <div class="feed-call-bytes-line">
+              <span class="feed-call-bytes-path">
+                {args_display.fastfs_path}
+              </span>
+              {args_display.fastfs_mime !== "" && (
+                <span class="feed-call-bytes-mime">
+                  {args_display.fastfs_mime}
+                </span>
+              )}
+              <span class="feed-call-bytes-size">
+                {args_display.byte_length} BYTES
+              </span>
+            </div>
+          )}
+          {args_display.fastfs_path === "" && (
+            <div class="feed-call-bytes-line">
+              <span class="feed-call-bytes-size">
+                {args_display.byte_length} BYTES
+              </span>
+            </div>
+          )}
+          <div class="feed-call-bytes-hex">
+            {shit_1170_code_block_fun({ code: args_display.hex })}
+          </div>
+        </div>
+      )}
       {/* --- WHY --- THE TOKEN LINE IS ONLY DRAWN FOR A CALL THAT MOVES
           ONE: there is nothing to say about the tokens of a call that
           moves none. */}
