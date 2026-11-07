@@ -17,13 +17,20 @@
 // repeat it, because a body that named the account could name somebody
 // else's.
 //
-// --- WHY THE BINARY ARGS ARE DECODED HERE AND NOT AT THE BACKEND: the
+// --- WHY THE BYTES ARE DECODED HERE AND NOT AT THE BACKEND: the
 // wallet takes the BYTES. a contract like the FastFS protocol
-// (`__fastdata_fastfs`) wants borsh bytes and not json, and the
-// browser's wallet adapter passes raw bytes through untouched — it
-// tries `JSON.parse` and, when the bytes are not json, hands them on
-// as they are. so the base64 the queue holds is turned back into bytes
-// here, right before the wallet is asked.
+// (`__fastdata_fastfs`) wants borsh bytes and not json, and the wallet
+// that can carry them decodes the base64 into the exact bytes itself.
+// so the base64 the queue holds is handed to the wallet as it is, and
+// the wallet's native action does the decoding.
+//
+// --- WHY A CALL WITH BYTES GOES OUT A DIFFERENT WAY: near-connect
+// converts every action into the connector shape, and the wallet's Rust
+// writes those arguments out as json text, which the FastFS indexer
+// cannot read. a call with bytes goes out through the wallet's
+// `executor` instead, which posts the params straight to the wallet
+// with no conversion. the shape of that route lives in
+// shared/queue_args_wallet_action.ts.
 import { near_connect_client } from "@near-kit-tool-box/web";
 import {
   api_shit_1170_tx_queue_sent_post,
@@ -34,7 +41,10 @@ import { SHIT_1170_BASE_URL } from "../shared/base_url";
 import { api_key_options_fun } from "../shared/api_key_token";
 import { shit_1170_outcome_hash_fun } from "../shared/outcome_hash";
 import {
+  shit_1170_batch_has_bytes_fun,
   shit_1170_wallet_can_carry_bytes_fun,
+  shit_1170_wallet_executor_fun,
+  shit_1170_wallet_native_transaction_fun,
   shit_1170_wallet_transaction_fun,
 } from "../shared/queue_args_wallet_action";
 import { SHIT_1170_TOAST_STORE } from "../shared/toast_store";
@@ -62,29 +72,11 @@ export interface SHIT_1170_QUEUE_SEND_RESULT {
   declined: boolean;
 }
 
-// the wallet's transaction shape.
-//
-// --- WHY --- the args are `unknown` and not a json object: a call may
-// carry its arguments as raw bytes, and the wallet takes both. the
-// adapter tries `JSON.parse` on the bytes and hands them on untouched
-// when they are not json.
-interface SHIT_1170_WALLET_TRANSACTION {
-  receiverId: string;
-  actions: Array<{
-    type: "FunctionCall";
-    params: {
-      methodName: string;
-      args: unknown;
-      gas: string;
-      deposit: string;
-    };
-  }>;
-}
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the wallet's transaction shape, and the reason the arguments take a
-// different form for each kind of wallet, live in
+// the wallet's transaction shapes, and the reason a call with bytes
+// goes out a different way, live in
 // shared/queue_args_wallet_action.ts.
 // ========================================
 // ========================================
@@ -132,11 +124,11 @@ export async function shit_1170_queue_send_fun(
     const connector = near_connect_client();
     const wallet = await connector.wallet();
     // --- WHY --- THE WALLET'S MANIFEST IS READ: the wallet reads the
-    // arguments in its own way, and the wallet-server kind — the Intear
-    // Wallet is one — cannot carry raw bytes at all. the manifest says
-    // which wallet this is, so the app can tell the reader before they
-    // approve a call that would go out and do nothing. the reason is
-    // written down in shared/queue_args_wallet_action.ts.
+    // arguments in its own way, and a call that carries raw bytes needs
+    // the wallet that can carry them. the manifest says which wallet this
+    // is, so the app can tell the reader before they approve a call that
+    // would go out and do nothing. the reason is written down in
+    // shared/queue_args_wallet_action.ts.
     const manifest = (wallet as { manifest?: unknown }).manifest;
 
     // --- WHY --- A CALL WITH BYTES IS REFUSED FOR A WALLET THAT CANNOT
@@ -145,10 +137,7 @@ export async function shit_1170_queue_send_fun(
     // always fails, the file never appears at its url, and nothing says
     // why. refusing here tells the reader the truth instead of sending a
     // call that cannot work.
-    const has_bytes_call = transactions.some(
-      (transaction) =>
-        transaction.argsBase64 !== null && transaction.argsBase64 !== undefined,
-    );
+    const has_bytes_call = shit_1170_batch_has_bytes_fun(transactions);
     if (
       has_bytes_call &&
       !shit_1170_wallet_can_carry_bytes_fun(manifest)
@@ -156,7 +145,7 @@ export async function shit_1170_queue_send_fun(
       const message =
         "THIS WALLET CANNOT SEND RAW BYTES, AND THIS CALL CARRIES A FILE. " +
         "THE UPLOAD WOULD BE DROPPED SILENTLY AND THE FILE WOULD NEVER APPEAR. " +
-        "USE A WALLET THAT BORSHES THE TRANSACTION IN THE BROWSER.";
+        "SIGN IN WITH THE INTEAR WALLET TO UPLOAD A FILE.";
       SHIT_1170_TOAST_STORE.show("error", "THIS WALLET CANNOT DO THIS", message, null);
       return {
         sent: false,
@@ -168,12 +157,45 @@ export async function shit_1170_queue_send_fun(
       };
     }
 
-    outcomes = await wallet.signAndSendTransactions({
-      signerId: account_id,
-      transactions: transactions.map((transaction) =>
-        shit_1170_wallet_transaction_fun(transaction, manifest),
-      ),
-    });
+    // --- WHY --- A CALL WITH BYTES GOES OUT A DIFFERENT WAY: near-connect
+    // converts every action into the connector shape, and the wallet's
+    // Rust writes those arguments out with `serde_json::to_vec`, which
+    // turns the bytes into json text and the indexer drops the action.
+    // the wallet's `executor` posts the params straight to the wallet
+    // iframe with no conversion, so the native action reaches the wallet
+    // untouched and the bytes land on chain. the executor takes the whole
+    // batch, so this is still one popup for the batch.
+    if (has_bytes_call) {
+      const executor = shit_1170_wallet_executor_fun(wallet);
+      if (executor === null) {
+        const message =
+          "THIS WALLET HAS NO WAY TO SEND RAW BYTES. " +
+          "THE UPLOAD WOULD BE DROPPED SILENTLY AND THE FILE WOULD NEVER APPEAR.";
+        SHIT_1170_TOAST_STORE.show("error", "THIS WALLET CANNOT DO THIS", message, null);
+        return {
+          sent: false,
+          succeeded: 0,
+          failed: 0,
+          tx_hash: null,
+          error: message,
+          declined: false,
+        };
+      }
+      outcomes = (await executor.call("wallet:signAndSendTransactions", {
+        signerId: account_id,
+        network: connector.network,
+        transactions: transactions.map((transaction) =>
+          shit_1170_wallet_native_transaction_fun(transaction),
+        ),
+      })) as ReadonlyArray<unknown>;
+    } else {
+      outcomes = await wallet.signAndSendTransactions({
+        signerId: account_id,
+        transactions: transactions.map((transaction) =>
+          shit_1170_wallet_transaction_fun(transaction),
+        ),
+      });
+    }
   } catch (err) {
     // --- WHY --- A DECLINE IS NOT AN ERROR: the reader said no, and
     // that is not a failure. it is reported as a decline and the reader

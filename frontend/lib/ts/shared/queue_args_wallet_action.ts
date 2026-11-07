@@ -5,64 +5,103 @@
 // --- WHY THIS FILE IS ITS OWN ---
 // the shape of the arguments decides whether the bytes survive, and the
 // reason is long enough that it needs a home of its own. this file makes
-// the shape and explains what it has to be for each kind of wallet.
+// the shape and explains what it has to be for each kind of call.
 //
-// --- WHAT FASTFS NEEDS ---
-// a FastFS upload's arguments are BORSH BYTES, and the indexer reads them
-// with `borsh::from_slice(&action.args)`. so the bytes have to reach the
-// chain as bytes. a json object cannot be borsh bytes.
+// --- THE TWO KINDS OF CALL ---
+// a queued call carries its arguments one of two ways:
 //
-// --- THE TWO WALLET FAMILIES NEED OPPOSITE SHAPES ---
-// the wallets split by what they do with the arguments they are given.
+//   the JSON way — `args` is a json object with named keys.
+//   the BYTE way — `argsBase64` is the raw bytes of the call, and the
+//                  contract reads them itself.
 //
-//   the BROWSER-SIGNER wallets — MyNearWallet, OKX, Nightly, HOT Wallet —
-//   take the arguments as a `Uint8Array` and borsh-serialize the whole
-//   transaction in the browser, so the bytes reach the chain untouched.
-//   the arguments ride the `postMessage` as a `Uint8Array` and survive.
+// the byte way is what the FastFS protocol (`__fastdata_fastfs`) needs:
+// it wants borsh bytes, and a json object cannot be borsh bytes.
 //
-//   the WALLET-SERVER wallets — the Intear Wallet — hand the transaction
-//   to their own server as JSON, and their Rust side reads the arguments
-//   out of that JSON. their native action type is
+// --- WHY THE BYTE WAY NEEDS A DIFFERENT ROUTE ---
+// the indexer reads the action's args with `borsh::from_slice`, so the
+// bytes have to reach the chain as bytes. a json object is not borsh,
+// and a byte array that went through `JSON.stringify` is not borsh
+// either — it becomes an object keyed by byte index.
 //
-//       FunctionCallAction { method_name: String, args: Vec<u8> /* base64 */ }
+// near-connect has exactly ONE way to hand a transaction to a wallet:
 //
-//   so their native path wants the arguments as a BASE64 STRING, and
-//   their fallback path — the one a connector-shaped action lands on —
-//   takes the arguments as a json VALUE and writes them out with
-//   `serde_json::to_vec`, which turns the bytes into the json text of a
-//   byte map. THAT is what reaches the chain when a FastFS upload goes
-//   through the Intear Wallet: 52 bytes of borsh arrive as 426 bytes of
-//   json, the indexer finds no borsh, and the action is DROPPED SILENTLY.
+//   wallet.signAndSendTransactions({ transactions })
 //
-// so the app has to give each wallet the shape it reads.
+// and it runs every action through `nearActionsToConnectorActions`,
+// which turns an action into the CONNECTOR shape:
 //
-// --- WHY THE WALLET IS ASKED WHICH ONE IT IS ---
-// the connector hands back the connected wallet, and the wallet carries
-// its manifest, and the manifest carries the wallet's id. so the app can
-// ask, rather than guess, and it asks the wallet that is going to sign.
+//   { type: "FunctionCall", params: { methodName, args, gas, deposit } }
 //
-// --- WHY EVERY WALLET GETS THE CONNECTOR SHAPE ---
-// near-connect accepts two action shapes and rejects everything else with
-// "Unsupported action type": an action that carries a `type` is passed
-// through untouched, and an action with a `functionCall` is converted into
-// the connector shape. the native shape — `{ "FunctionCall": { … } }` —
-// has NEITHER, so near-connect refuses it before the wallet ever sees it.
+// that shape is fine for json arguments. for raw bytes it is not, and
+// the reason is in the wallet's own Rust:
 //
-// so the app sends the connector shape, and the wallet reads the bytes out
-// of it. the wallets that borsh-serialize the transaction in the browser —
-// MyNearWallet, OKX, Nightly, HOT Wallet — take the arguments as a
-// `Uint8Array` and the bytes reach the chain untouched.
+//   impl From<WalletSelectorAction> for NearAction {
+//       ... args: serde_json::to_vec(&args).unwrap_or_default() ...
+//   }
 //
-// --- WHY THE INTEAR WALLET IS THE EXCEPTION ---
-// the Intear Wallet hands the transaction to its own server as json, and
-// its Rust reads the arguments out of that json and writes them out with
-// `serde_json::to_vec` — which turns ANY json value into TEXT. a
-// `Uint8Array` becomes the json text of a byte map, and a base64 string
-// becomes the json text of a string. neither is the file's bytes.
+// the arguments are a `serde_json::Value` and they are SERIALIZED AS
+// JSON. every json value serializes to text. a `Uint8Array` becomes the
+// json text of a byte map and a base64 string becomes the json text of
+// a string. neither is the file's bytes, so the indexer finds no borsh
+// and DROPS THE ACTION SILENTLY: the receipt fails the way a FastFS
+// receipt always fails, the file never appears at its url, and nothing
+// anywhere says why.
 //
-// so the Intear Wallet cannot carry raw bytes at all, and the FastFS
-// upload does not work through it. that is a wallet limitation, and the
-// app says so instead of sending something that is dropped silently.
+// --- THE ROUTE THAT CARRIES BYTES ---
+// the wallet has a second path, its NATIVE action, and it is tried
+// FIRST because its action enum is untagged:
+//
+//   #[serde(untagged)]
+//   enum SendTransactionsAction { Native(NearAction), WalletSelector(...) }
+//
+// the native action holds the arguments as bytes:
+//
+//   pub struct FunctionCallAction {
+//       pub method_name: String,
+//       #[serde_as(as = "Base64")]
+//       pub args: Vec<u8>,     // base64 in json -> RAW BYTES on chain
+//       ...
+//   }
+//
+// so the native path decodes the base64 into the exact bytes, and those
+// go on chain verbatim.
+//
+// the native path is UNREACHABLE through near-connect's own methods,
+// because `nearActionsToConnectorActions` refuses an action it does not
+// recognize:
+//
+//   if ("type" in action) return action;      // passthrough
+//   if (action.functionCall) { ...convert... }
+//   throw new Error("Unsupported action type");
+//
+// a native action has no `type` key, so it hits the throw. and adding a
+// `type` key does not help: the native variant is an EXTERNALLY TAGGED
+// enum, so a sibling `type` key makes serde look for a variant named
+// `type` and fail with
+//
+//   unknown variant `type`, expected `FunctionCall`
+//
+// we compiled the wallet's exact serde types and ran them:
+//
+//   native, no type key            -> OK Native, raw bytes, first 0x00
+//   native WITH type key           -> ERR unknown variant `type`
+//   wallet-selector, args a string -> OK, but the args become JSON text
+//   wallet-selector, args an array -> OK, but the args become JSON text
+//
+// --- THE WAY THROUGH ---
+// the wallet's `executor` is a PUBLIC field, and the executor posts its
+// params straight to the wallet iframe as JSON, with NO conversion:
+//
+//   async call(method, params) { ... iframe.postMessage({ method, params, id }) ... }
+//
+// so calling the executor directly skips the conversion, and the native
+// action reaches the wallet untouched. `executor.call` with the method
+// `wallet:signAndSendTransactions` takes the WHOLE BATCH, so this route
+// keeps the one-popup-for-the-batch behaviour the app has.
+//
+// so: a call with bytes goes out as a native action through the
+// executor, and a call with json goes out as the connector shape
+// through the wallet's own method.
 import type { SHIT_1170_TX_QUEUE_TRANSACTION } from "@huggies/shit-1170-rex-engine-middleman";
 import {
   shit_1170_deposit_fun,
@@ -74,7 +113,7 @@ import { shit_1170_queue_args_bytes_fun } from "../shared/queue_args";
 // --- TYPES ------------------------------
 // the wallet's transaction shape.
 //
-// --- WHY THE ACTIONS ARE TYPED LOOSE: the two kinds of wallet take
+// --- WHY THE ACTIONS ARE TYPED LOOSE: the two kinds of call take
 // different action shapes, and the shape of an action is the wallet's
 // business. what this file guarantees is the one thing that matters: the
 // arguments of a binary call are bytes, in the form the wallet reads.
@@ -91,79 +130,96 @@ export interface SHIT_1170_WALLET_MANIFEST {
   id: string;
 }
 
-// the wallets that hand the transaction to their own server as json, and
-// read the arguments out of that json as a base64 string.
+// the wallet that can carry raw bytes.
 //
-// --- WHY THESE IDS: the Intear Wallet's executor is the one that
-// `JSON.stringify`s the transactions and signs that text, and its Rust
-// reads the native action's arguments as base64. the Trezu Wallet does
-// the same thing — it puts `JSON.stringify(transactions)` into a url — and
-// its backend is Rust too.
+// --- WHY THIS ONE --- the Intear Wallet's native action holds its
+// arguments as `Vec<u8>` with `#[serde_as(as = "Base64")]`, so the
+// native path decodes the base64 into the exact bytes. it is the wallet
+// we tested an upload with, end to end, on mainnet.
 //
-// --- WHY THE LIST IS NOT LONGER: every other wallet in the manifest
-// borsh-serializes the transaction in the browser, and the bytes survive
-// there. a wallet added to this list later needs its own check.
-const SHIT_1170_WALLET_SERVER_IDS = [
+// --- WHY THE OTHERS ARE NOT ON THE LIST --- the browser-signer wallets
+// — MyNearWallet, OKX, Nightly, HOT Wallet — borsh-serialize the whole
+// transaction in the browser, so the bytes survive the connector shape
+// too. but their raw-byte route has not been tested here, and a
+// FastFS upload that is DROPPED SILENTLY is worse than one that is
+// refused out loud. a wallet added to this list needs its own test.
+const SHIT_1170_BYTE_WALLET_IDS = [
   "intear-wallet",
-  "trezu-wallet",
 ];
 // ========================================
 // ========================================
 // --- HELPERS ----------------------------
-// the arguments of a queued call, in the shape a wallet reads.
-//
-// --- WHY --- THE BYTES COME FROM THE SHARED READER: the queue page shows
-// the same bytes, and one place decodes them so the two cannot disagree
-// about what the call carries.
-//
-// --- WHY --- A CALL WITH NO BINARY ARGS GETS ITS JSON OBJECT: the two kinds
-// of call are different, and the json object is what the toolbox and the
-// wallet both understand.
-//
-// --- WHY --- THE BASE64 IS STANDARD: the wallets that read a base64
-// string decode it with the standard alphabet.
-function wallet_args_fun(
-  transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
-): unknown {
-  const args_base64 = transaction.argsBase64;
-  if (args_base64 === null || args_base64 === undefined) {
-    return transaction.args ?? {};
-  }
-  return shit_1170_queue_args_bytes_fun(args_base64);
-}
-
 // the wallet's id, or an empty string when it is not known.
 //
 // --- WHY --- THE ID IS READ DEFENSIVELY: the manifest is the wallet's
 // own object, and a wallet that does not carry one is not a wallet this
 // app knows how to ask.
-function wallet_id_fun(manifest: unknown): string {
+export function shit_1170_wallet_id_fun(manifest: unknown): string {
   if (typeof manifest !== "object" || manifest === null) return "";
   const id = (manifest as SHIT_1170_WALLET_MANIFEST).id;
   return typeof id === "string" ? id : "";
 }
 
-// true when the wallet cannot carry raw bytes.
+// does this call carry raw bytes?
 //
-// --- WHY --- THE INTEAR WALLET IS ON THE LIST: it hands the transaction
-// to its own server as json, and its Rust reads the arguments out of that
-// json and writes them out with `serde_json::to_vec`, which turns ANY
-// json value into TEXT. a `Uint8Array` becomes the json text of a byte
-// map, and a base64 string becomes the json text of a string. neither is
-// the file's bytes, so the indexer drops the action and the file never
-// appears.
+// --- WHY --- THE BYTES ARE DECIDED BY THE PAYLOAD AND NOT BY THE
+// CONTRACT: a contract can be called either way. what says whether the
+// arguments are bytes is which field of the queue holds them.
+export function shit_1170_transaction_has_bytes_fun(
+  transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
+): boolean {
+  return (
+    transaction.argsBase64 !== null && transaction.argsBase64 !== undefined
+  );
+}
+
+// does the batch carry any call with raw bytes?
+export function shit_1170_batch_has_bytes_fun(
+  transactions: ReadonlyArray<SHIT_1170_TX_QUEUE_TRANSACTION>,
+): boolean {
+  return transactions.some(shit_1170_transaction_has_bytes_fun);
+}
+
+// true when the wallet can carry raw bytes to the chain.
 //
-// --- WHY THE LIST IS NOT LONGER: every other wallet in the manifest
-// borsh-serializes the transaction in the browser, and the bytes survive
-// there. a wallet added to this list later needs its own check.
-function wallet_cannot_carry_bytes_fun(manifest: unknown): boolean {
-  const id = wallet_id_fun(manifest);
-  return SHIT_1170_WALLET_SERVER_IDS.includes(id);
+// --- WHY --- THE APP ASKS: the reader is about to approve a call, and a
+// FastFS upload through a wallet that cannot carry bytes is a call that
+// goes out and does nothing. the app says so instead of letting the
+// reader approve it in the dark.
+export function shit_1170_wallet_can_carry_bytes_fun(
+  manifest: unknown,
+): boolean {
+  return SHIT_1170_BYTE_WALLET_IDS.includes(shit_1170_wallet_id_fun(manifest));
+}
+
+// the executor the wallet exposes, when it has one.
+//
+// --- WHY --- THE EXECUTOR IS THE ONLY WAY BYTES CROSS: it posts the
+// params to the wallet iframe with no conversion. the wallet's own
+// `signAndSendTransaction` runs `nearActionsToConnectorActions` first,
+// and that turns the bytes into json text.
+//
+// --- WHY --- IT IS CHECKED AND NOT ASSUMED: a wallet without an
+// executor cannot take the native route, so there is nothing to send it.
+export function shit_1170_wallet_executor_fun(
+  wallet: unknown,
+): { call: (method: string, params: unknown) => Promise<unknown> } | null {
+  if (typeof wallet !== "object" || wallet === null) return null;
+  const executor = (wallet as { executor?: unknown }).executor;
+  if (typeof executor !== "object" || executor === null) return null;
+  const call = (executor as { call?: unknown }).call;
+  if (typeof call !== "function") return null;
+  return executor as {
+    call: (method: string, params: unknown) => Promise<unknown>;
+  };
 }
 // ========================================
 // ========================================
 // --- TRANSACTION -----------------------
-// one queued call as the wallet wants it.
+// one queued call, in the CONNECTOR shape.
+//
+// --- WHY --- THIS IS THE SHAPE FOR A CALL WITH JSON ARGUMENTS: this is
+// what near-connect builds, and every wallet reads it.
 //
 // --- WHY --- THE RECEIVER IS THE CONTRACT: the queue holds the contract
 // the call is made against, and for a FastFS upload that is the namespace
@@ -175,7 +231,6 @@ function wallet_cannot_carry_bytes_fun(manifest: unknown): boolean {
 // shared/gas_deposit.ts.
 export function shit_1170_wallet_transaction_fun(
   transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
-  manifest: unknown,
 ): SHIT_1170_WALLET_TRANSACTION {
   const gas = shit_1170_gas_fun(transaction.gas);
   const deposit = shit_1170_deposit_fun(transaction.deposit);
@@ -187,7 +242,51 @@ export function shit_1170_wallet_transaction_fun(
         type: "FunctionCall",
         params: {
           methodName: transaction.method,
-          args: wallet_args_fun(transaction),
+          args: transaction.args ?? {},
+          gas,
+          deposit,
+        },
+      },
+    ],
+  };
+}
+
+// one queued call, in the NATIVE shape.
+//
+// --- WHY --- THE FIELD NAMES ARE SNAKE CASE: the native action is the
+// wallet's own type, and its fields are `method_name`, `args`, `gas` and
+// `deposit`. the connector shape's `methodName` is a different type.
+//
+// --- WHY --- THERE IS NO `type` KEY: the native variant is an
+// externally tagged enum, so a sibling `type` key makes serde look for
+// a variant named `type` and fail with
+// `unknown variant 'type', expected 'FunctionCall'`.
+//
+// --- WHY --- THE ARGS ARE BASE64: the native action holds its arguments
+// as `Vec<u8>` with `#[serde_as(as = "Base64")]`, so the base64 string
+// is DECODED into the exact bytes, and those go on chain verbatim. a
+// json string would come out quoted, and those quotes are bytes on chain.
+//
+// --- WHY --- THE GAS AND THE DEPOSIT ARE STRINGS: the wallet's `Gas` and
+// `NearToken` use `dec_format` in serde, so they are decimal strings.
+export function shit_1170_wallet_native_transaction_fun(
+  transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
+): SHIT_1170_WALLET_TRANSACTION {
+  const gas = shit_1170_gas_fun(transaction.gas);
+  const deposit = shit_1170_deposit_fun(transaction.deposit);
+
+  // --- WHY --- THE BYTES ARE READ FROM THE QUEUE: the queue holds the
+  // base64, and the wallet's native action wants base64 too. decoding
+  // and re-encoding would be a round trip that can only lose.
+  const args_base64 = transaction.argsBase64 ?? "";
+
+  return {
+    receiverId: transaction.contractId,
+    actions: [
+      {
+        FunctionCall: {
+          method_name: transaction.method,
+          args: args_base64,
           gas,
           deposit,
         },
@@ -197,17 +296,16 @@ export function shit_1170_wallet_transaction_fun(
 }
 // ========================================
 // ========================================
-// --- CAN CARRY BYTES -------------------
-// true when the wallet can carry raw bytes to the chain.
+// --- BYTES CROSS THE BOUNDARY ---------
+// the bytes of a base64 string, as the wallet takes them.
 //
-// --- WHY --- THE APP ASKS: the reader is about to approve a call, and a
-// FastFS upload through a wallet that cannot carry bytes is a call that
-// goes out and does nothing. the app says so instead of letting the
-// reader approve it in the dark.
-export function shit_1170_wallet_can_carry_bytes_fun(
-  manifest: unknown,
-): boolean {
-  return !wallet_cannot_carry_bytes_fun(manifest);
+// --- WHY --- THIS EXISTS: a call with json arguments gives the wallet a
+// json object, and a call with bytes gives the wallet the base64 string
+// it decodes itself. the two are never mixed.
+export function shit_1170_wallet_bytes_fun(
+  transaction: SHIT_1170_TX_QUEUE_TRANSACTION,
+): Uint8Array {
+  return shit_1170_queue_args_bytes_fun(transaction.argsBase64 ?? "");
 }
 // ========================================
 // copyright 2026 by sleet.near

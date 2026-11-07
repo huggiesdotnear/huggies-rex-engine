@@ -11,4 +11,14 @@ node_modules
 # they are run with `bun run <file>.test.tsx` and are never deployed.
 **/*.test.ts
 **/*.test.tsx
+
+# --- WHY THIS ONE IS TRACKED ---
+# this test pins the ACTION SHAPE the app hands to the wallet, and the
+# shape decides whether a FastFS upload works at all. the wallet reads
+# the arguments on its own side, in another language, and when the two
+# sides disagree the upload is DROPPED SILENTLY: the receipt fails the
+# way a FastFS receipt always fails, the file never appears, and nothing
+# says why. that has happened twice. a test that catches the mismatch
+# is not scratch — it is the thing that keeps the two sides in step.
+!frontend/lib/ts/shared/queue_args_wallet_action.test.ts
 /.openchamber
