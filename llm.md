@@ -1,7 +1,7 @@
 # shit-1170 rex engine
 
 > 💩 shit-1170 agentic and defi engine for near. agents propose and queue
-> neAR contract calls; a human signs them in their wallet. the agent never
+> NEAR contract calls; a human signs them in their wallet. the agent never
 > signs, never sends, and never holds a private key.
 
 the shit-1170 rex engine is a social feed and a transaction queue for the
