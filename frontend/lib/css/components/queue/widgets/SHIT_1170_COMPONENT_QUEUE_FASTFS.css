@@ -2,8 +2,8 @@
 /* SHIT_1170_COMPONENT_QUEUE_FASTFS
    the queue page's files widget: the FastFS uploads the batch asks for.
 
-   one row per upload: an icon, who will put it up, what the file is,
-   and the link it will be served at. the card that says what the bytes
+   one row per upload: an icon, the word that says what will happen, and
+   the file's name, type and size. the card that says what the bytes
    mean is under the row.
 
    --- WHY --- THE FILE NAME IS THE MOUNT ID AND NOT THE WIDGET'S: the
@@ -20,24 +20,14 @@
    the details hang off it. a row of loose fields says nothing about
    what happened; a sentence does.
 
-   --- WHY --- THE ACCOUNT IS A LINK: the uploader is the account that
-   will sign the upload, and the account the file is served under. a
-   reader who wants the account goes to the account.
+   --- WHY --- THERE IS NO ACCOUNT IN THE ROW: the row says what the file
+   IS, and the batch's accounts have their own section on the page.
+   naming the signer here says it twice.
 
-   --- WHY --- THE PREVIEW IS DARKER THAN THE PAGE: the file may be an
-   image or a video, and a light frame around a picture makes the
-   picture's own edges hard to see. the preview's own background is a
-   plain dark box, and the picture sits inside it.
-
-   --- WHY --- THE IMAGE IS BOUNDED: a FastFS upload can be 32 MiB, and
-   an unbounded picture would push the whole page down. the box holds
-   the picture and the picture fits in the box.
-
-   --- WHY --- THE SHARED CARD'S CSS RIDES IN HERE: the card is a
-   shared piece, and the shared pieces bring their own css in with the
-   @import below. the page's import file lists components and not
-   pieces. */
-@import url(../../shared/app_page_fastfs_card.css);
+   --- WHY --- THE CARD'S CSS RIDES IN HERE: the card is this page's own
+   piece, and the pieces bring their own css in with the @import below.
+   the page's import file lists components and not pieces. */
+@import url(./app_page_queue_widget_fastfs_card.css);
 /*==================================*/
 #SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs {
   width: 500px;
@@ -95,12 +85,6 @@
   color: var(--color-middle);
 }
 /*==================================*/
-#SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-account {
-  font-family: monospace;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-  word-break: break-all;
-}
 /* the verb is the quiet part of the sentence — it says what will
    happen, and it stays out of the way of the file's name. */
 #SHIT_1170_COMPONENT_QUEUE_FASTFS .queue-fastfs-verb {
@@ -124,8 +108,8 @@
   font-variant-numeric: tabular-nums;
 }
 /*==================================*/
-/* --- WHY --- THERE IS NO LINK RULE HERE: the row is the one-line
-   summary and the SHARED FastFS card below it owns the serving link
-   and says that it does not work until the batch is signed. a link in
-   both places is the same link twice on one screen. */
+/* --- WHY --- THERE IS NO LINK RULE HERE: there is no link on this page
+   at all. the file is not indexed until the batch is signed, so a link
+   would point at nothing, and the transaction page shows the served
+   file. */
 /*==================================*/

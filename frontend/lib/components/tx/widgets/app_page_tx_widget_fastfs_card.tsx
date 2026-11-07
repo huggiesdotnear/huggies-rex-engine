@@ -1,19 +1,19 @@
 // ========================================
-// the FastFS card: what a FastFS upload is.
+// the transaction page's FastFS card: what a FastFS upload that already
+// happened IS.
 //
 // a FastFS upload is a function call to `__fastdata_fastfs` whose
 // arguments are RAW BORSH BYTES. the client decodes those bytes into a
 // file's facts, and this card shows them — the name, the type, the
-// size — the link the file will be served at, and a preview of it when
-// the type allows one.
+// size — the link the file is served at, and a preview of it when the
+// type allows one.
 //
 // --- WHY THE CARD IS GIVEN THE DECODED FILE AND NOT THE BYTES: the
 // caller has to decode the bytes anyway — the transaction page's parser
-// has already decoded them, and the queue page's widget needs the
-// file's path and its mime type to build its row. so the decode happens
-// ONCE, in the caller's hands, and the card is given the result. the
-// card is about what a file IS, and how to show one, and not about
-// what the bytes are.
+// has already decoded them — so the decode happens ONCE, in the
+// caller's hands, and the card is given the result. the card is about
+// what a file IS, and how to show one, and not about what the bytes
+// are.
 //
 // --- WHY THE DECODER IS THE CLIENT'S AND NOT A COPY HERE: the queue
 // page shows a QUEUED upload, before it is signed, and the transaction
@@ -21,22 +21,23 @@
 // same way, and two decoders drift. the fastnear client owns the borsh
 // rules, so both pages ask it what the bytes mean.
 //
-// --- WHY THE CARD LIVES IN THE SHARED FOLDER AND NOT IN EITHER PAGE'S:
-// the queue page and the transaction page both show one, and the rules
-// about what a queued upload can show — no preview, no working link —
-// are the same on both. so the card is SHARED, and neither page reaches
-// across into the other's folder for it. the shared folder already
-// holds the shared transfer amount, and the two pages already share
-// that.
+// --- WHY THE CARD IS NOT SHARED WITH THE QUEUE PAGE: the queue page
+// asks what the file IS — its facts, and nothing else — while this page
+// shows the SERVED file, with the link it is served at and the preview
+// that link loads. the two are not the same card with a switch on, and
+// one card with a switch is two cards wearing one coat. so the queue
+// page has its own card, in its own folder, and this one belongs to
+// the page that shows the live file.
 //
-// --- WHY THE CARD IS ITS OWN COMPONENT AND NOT A BLOCK IN EACH PAGE:
-// the rules about what a queued upload can show are the same on both,
-// and one copy of the rules is one copy to keep true.
+// --- WHY THE CARD IS ITS OWN COMPONENT AND NOT A BLOCK IN THE WIDGET:
+// the rules about what the served file shows — what a preview needs,
+// what the link means, what the indexer will drop — are a set of their
+// own, and one copy of them is one copy to keep true.
 //
 // --- WHY THE PREVIEW ONLY WORKS ON-CHAIN: the file is served by the
 // FastData indexer, and the indexer only knows about a file after the
-// transaction is on chain. a QUEUED upload is not on chain, so its url
-// 404s and an image preview would be a broken picture.
+// transaction is on chain. this page shows an ON-CHAIN upload, so the
+// url has the file at it.
 //
 // --- WHY THE LIMIT PROBLEMS ARE HERE: the indexer drops what breaks
 // its rules SILENTLY, so a payload that breaks them describes a file
@@ -56,7 +57,7 @@ import {
   fastfs_file_url_fun,
   fastfs_validate_fun,
 } from "@sleet-js/fastnear-explorer-api-client";
-import { shit_1170_code_block_fun } from "../tx/code_block";
+import { shit_1170_code_block_fun } from "../code_block";
 import type { FASTFS_FILE_INFO } from "@sleet-js/fastnear-explorer-api-client";
 // ========================================
 // ========================================
@@ -129,12 +130,11 @@ function text_preview_fun(content: Uint8Array): {
 // --- WHY A QUEUED UPLOAD GETS NO IMAGE AND NO VIDEO: the file is
 // served by the indexer, and the indexer only knows about a file once
 // its transaction is on chain. a queued upload is not on chain, so the
-// url has nothing at it. the card says so instead of showing a broken
-// picture.
+// url has nothing at it. THIS PAGE SHOWS AN ON-CHAIN UPLOAD, so the
+// url has the file at it and the preview draws.
 function preview_fun(
   info: FASTFS_FILE_INFO,
   url: string,
-  is_on_chain: boolean,
 ): preact.JSX.Element | null {
   const kind = fastfs_can_display_fun(info.mime_type);
   if (kind === null) return null;
@@ -149,17 +149,6 @@ function preview_fun(
             TRUNCATED — THE FILE IS {size_text_fun(info.content.length)}
           </span>
         )}
-      </div>
-    );
-  }
-
-  if (!is_on_chain) {
-    return (
-      <div class="fastfs-preview is-unavailable">
-        <span class="fastfs-preview-note">
-          NO {kind.toUpperCase()} PREVIEW YET — THE FILE IS NOT ON CHAIN, SO
-          THERE IS NOTHING AT THE LINK YET
-        </span>
       </div>
     );
   }
@@ -203,16 +192,13 @@ export function fastfs_card_fun(props: {
   info: FASTFS_FILE_INFO;
   predecessor: string;
   receiver: string;
-  // true when the upload is on chain — a transaction that already
-  // happened. false for a queued upload, which is not signed yet.
-  is_on_chain: boolean;
 }): preact.JSX.Element {
   const info = props.info;
   // --- WHY --- THE LINK IS ONLY BUILT WHEN THERE IS A PREDECESSOR: the
   // predecessor is the HOST of the serving url, so without it the url
   // is `https://.fastfs.io/...` — a link to nothing, dressed up as a
-  // link. a queued batch with no accounts on it has no signer yet, and
-  // the card says so.
+  // link. a transaction with no signer has no account to serve the
+  // file under, and the card says so.
   const has_predecessor = props.predecessor !== "";
   const url = has_predecessor
     ? fastfs_file_url_fun(props.predecessor, props.receiver, info.relative_path)
@@ -278,25 +264,23 @@ export function fastfs_card_fun(props: {
           <span class="fastfs-uri">{uri}</span>
         </div>
       ) : (
+        // --- WHY --- NO LINK WITHOUT A PREDECESSOR: the url is built
+        // from the account that signed, and without one there is no
+        // account to serve the file under. the transaction is on chain,
+        // so the file is indexed somewhere, and this card does not know
+        // where. it says so instead of showing a link to nothing.
         <div class="fastfs-links is-unknown">
           <span class="fastfs-note">
-            NO LINK YET — THE FILE IS SERVED UNDER THE ACCOUNT THAT SIGNS
-            THE UPLOAD, AND NOBODY HAS SIGNED IT
+            NO LINK — THE FILE IS SERVED UNDER THE ACCOUNT THAT SIGNED THE
+            UPLOAD, AND THIS TRANSACTION CARRIES NO SIGNER
           </span>
         </div>
       )}
-      {props.is_on_chain ? (
-        <div class="fastfs-note is-live">
-          THE FILE IS SERVED FROM THE LINK ABOVE — THE INDEXER PICKED IT UP
-          FROM THE TRANSACTION
-        </div>
-      ) : (
-        <div class="fastfs-note is-queued">
-          THE LINK DOES NOT WORK YET — THE FILE IS NOT INDEXED UNTIL THIS
-          IS SIGNED AND THE INDEXER CATCHES UP
-        </div>
-      )}
-      {preview_fun(info, url, props.is_on_chain)}
+      <div class="fastfs-note is-live">
+        THE FILE IS SERVED FROM THE LINK ABOVE — THE INDEXER PICKED IT UP
+        FROM THE TRANSACTION
+      </div>
+      {preview_fun(info, url)}
       {problems.length > 0 && (
         <div class="fastfs-problems">
           <span class="fastfs-problems-label">

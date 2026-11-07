@@ -36,12 +36,11 @@
 // breaks the line. the row says what happened; the preview shows the
 // file.
 //
-// --- WHY --- THE CARD IS THE SHARED ONE AND NOT A COPY: the queue
-// page's files widget shows the same card, and the card's own rules —
-// what a preview needs, what the link means, what the indexer will
-// drop — are the same on both. one card, in the shared folder, and the
-// two pages hand it what they know. this page's upload IS on chain, so
-// the card is told so, and it renders the live preview.
+// --- WHY --- THE CARD IS THE PAGE'S OWN AND NOT A SHARED ONE: the queue
+// page's files widget asks what a queued file IS, and this page shows
+// the SERVED file — the link it is served at and the preview that link
+// loads. the two are not one card with a switch on, so the card lives
+// in this page's folder and the queue page has its own.
 //
 // --- WHY --- THE ACCOUNT LINKS: the uploader is the account that
 // SIGNED — the receipt's predecessor — and it is the account the file
@@ -58,7 +57,7 @@ import { current_app_depth_fun } from "../../../ts/shared/app_depth";
 import {
   fastfs_card_fun,
   size_text_fun,
-} from "../../shared/app_page_fastfs_card";
+} from "./app_page_tx_widget_fastfs_card";
 import { SHIT_1170_TX_WIDGETS } from "./tx_widgets";
 import type {
   FASTFS_FILE_INFO,
@@ -148,9 +147,6 @@ function upload_fun(
         info,
         predecessor: signer_id,
         receiver: receiver_id,
-        // --- WHY IT IS ON CHAIN: the transaction already happened. the
-        // indexer has the file, the link works, and the preview renders.
-        is_on_chain: true,
       })}
     </div>
   );

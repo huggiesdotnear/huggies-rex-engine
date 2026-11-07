@@ -1,0 +1,113 @@
+/*==================================*/
+/* app_page_queue_widget_fastfs_card
+   the queue page's FastFS card: the file's facts and the problems the
+   indexer will drop it for.
+
+   --- WHY --- THE CARD IS DARKER THAN THE PAGE: the card is a box of
+   facts, and a box inside the row reads as the detail of that row.
+   its own background is a plain dark box, and it sits inside the row's
+   lighter one.
+
+   --- WHY --- THERE IS NO LINK HERE: the file is not indexed until the
+   batch is signed, so a link on this page is a link to nothing. the
+   transaction page shows the served file. */
+/*==================================*/
+.queue-fastfs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  text-align: left;
+  min-width: 0;
+}
+/*==================================*/
+/* the head row: what this is, and what kind of upload it is. */
+.queue-fastfs-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+.queue-fastfs-card-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+/*==================================*/
+/* the kind: simple, partial or delete. it tells the reader whether the
+   sizes below are one number or two. */
+.queue-fastfs-card-kind {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  opacity: 0.85;
+}
+/*==================================*/
+/* the path: the name the file was uploaded with. */
+.queue-fastfs-card-path {
+  font-family: monospace;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/*==================================*/
+/* the facts: the type, the sizes, the offset and the nonce. */
+.queue-fastfs-card-facts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+/*==================================*/
+.queue-fastfs-card-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/*==================================*/
+.queue-fastfs-card-fact-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+/*==================================*/
+.queue-fastfs-card-fact-value {
+  font-family: monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+/*==================================*/
+/* the problems the indexer will drop the upload for. */
+.queue-fastfs-card-problems {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #da291c;
+  border-radius: 8px;
+  background: rgba(218, 41, 28, 0.12);
+}
+/*==================================*/
+.queue-fastfs-card-problems-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: #da291c;
+}
+/*==================================*/
+.queue-fastfs-card-problems-list {
+  margin: 0;
+  padding-left: 16px;
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1.5;
+}
+/*==================================*/
