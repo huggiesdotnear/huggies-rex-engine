@@ -30,12 +30,11 @@ COPY tsconfig.json ./
 COPY middleman ./middleman
 COPY frontend ./frontend
 COPY build.ts ./build.ts
-# --- WHY: llm.md comes along ---
-# build.ts copies llm.md to static/llms.txt — the served name stays
-# llms.txt and the source stays markdown. the file lives at the repo
-# root, so it has to be copied in, or the frontend stage fails on a
-# missing /src/llm.md.
-COPY llm.md ./llm.md
+# --- WHY: frontend/llm.md comes along ---
+# build.ts copies frontend/llm.md to static/llms.txt — the served name
+# stays llms.txt and the source stays markdown. the file lives in the
+# frontend folder, so the `COPY frontend ./frontend` above already
+# brings it in.
 
 # install only what's needed for the frontend build. the middleman/
 # and frontend trees import `preact` indirectly (components that call

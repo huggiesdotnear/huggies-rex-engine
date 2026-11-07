@@ -50,7 +50,7 @@ await mkdir(dirname(openGraphImageOutput), { recursive: true });
 await cp(join(frontendDirectory, openGraphImage), openGraphImageOutput);
 
 // ========================================
-// the llms.txt is copied by hand too, and it lives at the REPO ROOT.
+// the llms.txt is copied by hand too, and it lives in the FRONTEND folder.
 //
 // the SOURCE is `llm.md` — markdown, so it reads and edits like the rest
 // of the docs. the SERVED file is `llms.txt` — that is the name the
@@ -67,6 +67,6 @@ const llmMd = "llm.md";
 const llmsTxt = "llms.txt";
 const llmsTxtOutput = join(outputDirectory, llmsTxt);
 
-await cp(join(repositoryRoot, llmMd), llmsTxtOutput);
+await cp(join(frontendDirectory, llmMd), llmsTxtOutput);
 
 console.log(`Built ${result.outputs.length} files into ${outputDirectory}`);
