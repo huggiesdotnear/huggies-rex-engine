@@ -177,5 +177,45 @@ describe("the wallet's executor", () => {
     expect(shit_1170_wallet_executor_fun(null)).toBeNull();
   });
 });
+
+describe("the params the wallet reads", () => {
+  // --- WHY THIS IS PINNED ---
+  // the wallet's own connector reads the params like this:
+  //
+  //   async signAndSendTransactions({ network, transactions }) {
+  //     transactions = transactions.map(t => ({
+  //       signerId: t.signerId ?? this.near.connectedAccount.accountId,
+  //       receiverId: t.receiverId,
+  //       actions: t.actions,
+  //     }));
+  //     ...
+  //   }
+  //
+  // the `actions` are passed through UNTOUCHED — only `action.params.code`
+  // is rewritten, and a native action has no `params`. so the native shape
+  // reaches the wallet's Rust exactly as it was built.
+  //
+  // and the SIGNER is read per transaction, with the wallet's own account
+  // as the fallback. so the app's selected account has to be on EACH
+  // transaction — a top-level `signerId` alone would sign with the
+  // wallet's default account, which may be a different one.
+
+  test("a transaction carries the signer, the receiver and the actions", () => {
+    const transaction = {
+      ...shit_1170_wallet_native_transaction_fun(BYTES_CALL),
+      signerId: "sleet.near",
+    };
+
+    expect(transaction.signerId).toBe("sleet.near");
+    expect(transaction.receiverId).toBe("fastfs.near");
+    expect(transaction.actions).toHaveLength(1);
+
+    // the native action is NOT rewritten — no `params` key for the
+    // wallet's `fixAction` to touch.
+    const action = transaction.actions[0]!;
+    expect(action.params).toBeUndefined();
+    expect(action.FunctionCall).toBeDefined();
+  });
+});
 // ========================================
 // copyright 2026 by sleet.near

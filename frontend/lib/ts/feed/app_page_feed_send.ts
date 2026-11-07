@@ -184,16 +184,18 @@ export async function shit_1170_queue_send_fun(
       outcomes = (await executor.call("wallet:signAndSendTransactions", {
         signerId: account_id,
         network: connector.network,
-        transactions: transactions.map((transaction) =>
-          shit_1170_wallet_native_transaction_fun(transaction),
-        ),
+        transactions: transactions.map((transaction) => ({
+          ...shit_1170_wallet_native_transaction_fun(transaction),
+          signerId: account_id,
+        })),
       })) as ReadonlyArray<unknown>;
     } else {
       outcomes = await wallet.signAndSendTransactions({
         signerId: account_id,
-        transactions: transactions.map((transaction) =>
-          shit_1170_wallet_transaction_fun(transaction),
-        ),
+        transactions: transactions.map((transaction) => ({
+          ...shit_1170_wallet_transaction_fun(transaction),
+          signerId: account_id,
+        })),
       });
     }
   } catch (err) {
